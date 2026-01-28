@@ -122,7 +122,7 @@ export default function Home() {
           isDark ? 'text-nadeshiko-600' : 'text-nadeshiko-400'
         }`}>
           <p>所有檔案處理皆在瀏覽器本機完成，不會上傳到任何伺服器。</p>
-          <p className="mt-3">Copyright © 2025 Kaoru Tsai. All rights reserved.</p>
+          <p className="mt-3">Copyright © 2026 Kaoru Tsai. All rights reserved.</p>
         </footer>
       </div>
     </div>
