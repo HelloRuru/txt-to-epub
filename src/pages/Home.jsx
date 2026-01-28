@@ -17,7 +17,7 @@ const tools = [
     description: '將簡體 EPUB 電子書轉換為繁體中文',
     icon: '🔄',
     path: '/epub-convert',
-    ready: false,
+    ready: true,
   },
   {
     id: 'image',
