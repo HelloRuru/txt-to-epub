@@ -99,8 +99,10 @@ export default function EpubConvert() {
         compressionOptions: { level: 9 }
       })
 
-      // 下載
-      const newFileName = file.name.replace(/\.epub$/i, '_繁體.epub')
+      // 檔名也轉繁體
+      const originalName = file.name.replace(/\.epub$/i, '')
+      const convertedName = await convertToTraditional(originalName)
+      const newFileName = `${convertedName}.epub`
       saveAs(newEpub, newFileName)
 
       setStats({ files: convertedCount, chars: totalChars })

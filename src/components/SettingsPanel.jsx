@@ -1,16 +1,42 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FONT_CONFIG, DEFAULT_FONT } from '../utils/fontSubset'
 import { useTheme } from '../contexts/ThemeContext'
+import { FILENAME_FORMATS, loadFilenamePrefs, saveFilenamePrefs, generateFilename } from '../utils/filenameFormat'
 
 export default function SettingsPanel({ settings, setSettings }) {
   const { isDark } = useTheme()
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [filenamePrefs, setFilenamePrefs] = useState(loadFilenamePrefs)
+
+  // 當檔名偏好改變時，儲存並更新 settings
+  useEffect(() => {
+    saveFilenamePrefs(filenamePrefs)
+    setSettings(prev => ({
+      ...prev,
+      filenameFormat: filenamePrefs.format,
+      filenameIncludeDate: filenamePrefs.includeDate,
+      filenameCustomTemplate: filenamePrefs.customTemplate,
+    }))
+  }, [filenamePrefs, setSettings])
 
   const handleChange = (key, value) => {
     setSettings(prev => ({ ...prev, [key]: value }))
   }
 
+  const handleFilenameFormatChange = (format) => {
+    setFilenamePrefs(prev => ({ ...prev, format }))
+  }
+
   const selectedFont = FONT_CONFIG[settings.fontFamily] || FONT_CONFIG[DEFAULT_FONT]
+
+  // 預覽檔名
+  const previewFilename = generateFilename({
+    title: settings.title || '書名',
+    author: settings.author || '',
+    format: filenamePrefs.format,
+    includeDate: filenamePrefs.includeDate,
+    customTemplate: filenamePrefs.customTemplate,
+  })
 
   // 共用樣式
   const labelClass = `text-sm ${isDark ? 'text-nadeshiko-400/80' : 'text-nadeshiko-600/80'}`
@@ -77,6 +103,72 @@ export default function SettingsPanel({ settings, setSettings }) {
             placeholder="輸入作者名稱（選填）"
             className={inputClass}
           />
+        </div>
+      </div>
+
+      {/* 輸出檔名格式 */}
+      <div className={`space-y-4 ${cardClass}`}>
+        <div>
+          <p className={headingClass}>輸出檔名格式</p>
+          <p className={subTextClass}>選擇偏好的檔名格式，設定會自動記住</p>
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          {FILENAME_FORMATS.filter(f => f.id !== 'custom').map((fmt) => (
+            <button
+              key={fmt.id}
+              onClick={() => handleFilenameFormatChange(fmt.id)}
+              className={getSmallButtonClass(filenamePrefs.format === fmt.id)}
+            >
+              {fmt.label}
+            </button>
+          ))}
+        </div>
+
+        {/* 自訂選項 */}
+        <button
+          onClick={() => handleFilenameFormatChange('custom')}
+          className={`w-full ${getSmallButtonClass(filenamePrefs.format === 'custom')}`}
+        >
+          自訂格式
+        </button>
+
+        {filenamePrefs.format === 'custom' && (
+          <div className="space-y-2">
+            <input
+              type="text"
+              value={filenamePrefs.customTemplate}
+              onChange={(e) => setFilenamePrefs(prev => ({ ...prev, customTemplate: e.target.value }))}
+              placeholder="使用 {title}、{author}、{date} 變數"
+              className={inputClass}
+            />
+            <p className={subTextClass}>
+              例如：{'{author}'}_{'{title}'}_{'{date}'} → 作者_書名_20260129
+            </p>
+          </div>
+        )}
+
+        {/* 加入日期選項 */}
+        {filenamePrefs.format !== 'title-date' && filenamePrefs.format !== 'custom' && (
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={filenamePrefs.includeDate}
+              onChange={(e) => setFilenamePrefs(prev => ({ ...prev, includeDate: e.target.checked }))}
+              className="w-4 h-4 rounded border-nadeshiko-300 text-nadeshiko-400 focus:ring-nadeshiko-400"
+            />
+            <span className={isDark ? 'text-nadeshiko-300' : 'text-nadeshiko-600'}>
+              加上轉換日期
+            </span>
+          </label>
+        )}
+
+        {/* 預覽 */}
+        <div className={`p-3 rounded-lg ${isDark ? 'bg-dark-bg' : 'bg-white'}`}>
+          <p className={subTextClass}>預覽：</p>
+          <p className={`font-medium ${isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'}`}>
+            {previewFilename}.epub
+          </p>
         </div>
       </div>
 

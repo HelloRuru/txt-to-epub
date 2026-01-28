@@ -34,6 +34,7 @@ export async function generateEpub({
   fontSize = 'medium',
   lineHeight = 'normal',
   textIndent = 'two',
+  filename = null,
   onProgress = () => {},
 }) {
   const zip = new JSZip()
@@ -286,7 +287,9 @@ p {
 
   onProgress({ stage: 'done', message: '完成！' })
   
-  saveAs(blob, `${title || '未命名'}.epub`)
+  // 使用自訂檔名或預設用書名
+  const outputFilename = filename || title || '未命名'
+  saveAs(blob, `${outputFilename}.epub`)
 }
 
 function escapeHtml(text) {

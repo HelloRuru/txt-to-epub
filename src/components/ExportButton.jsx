@@ -3,6 +3,7 @@ import { generateEpub } from '../utils/epubGenerator'
 import { convertToTraditional } from '../utils/converter'
 import { FONT_CONFIG } from '../utils/fontSubset'
 import { useTheme } from '../contexts/ThemeContext'
+import { generateFilename } from '../utils/filenameFormat'
 
 export default function ExportButton({ content, chapters, cover, settings, onReset }) {
   const { isDark } = useTheme()
@@ -30,9 +31,23 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
         processedTitle = await convertToTraditional(settings.title)
       }
 
+      // 生成輸出檔名（轉繁體後）
+      let processedAuthor = settings.author
+      if (settings.convertToTraditional && settings.author) {
+        processedAuthor = await convertToTraditional(settings.author)
+      }
+      
+      const outputFilename = generateFilename({
+        title: processedTitle,
+        author: processedAuthor,
+        format: settings.filenameFormat || 'title-author',
+        includeDate: settings.filenameIncludeDate || false,
+        customTemplate: settings.filenameCustomTemplate || '',
+      })
+
       await generateEpub({
         title: processedTitle,
-        author: settings.author,
+        author: processedAuthor,
         chapters: processedChapters,
         cover,
         writingMode: settings.writingMode,
@@ -41,6 +56,7 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
         fontSize: settings.fontSize,
         lineHeight: settings.lineHeight,
         textIndent: settings.textIndent,
+        filename: outputFilename,
         onProgress: setProgress,
       })
 
