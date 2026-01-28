@@ -1,9 +1,9 @@
+/* Google Fonts - Huninn 粉圓（必須放在最前面） */
+@import url('https://fonts.googleapis.com/css2?family=Huninn&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Google Fonts - Huninn 粉圓 */
-@import url('https://fonts.googleapis.com/css2?family=Huninn&display=swap');
 
 * {
   box-sizing: border-box;
@@ -11,7 +11,7 @@
 
 /* 淺色模式（預設） */
 body {
-  font-family: 'Huninn', 'jf-openhuninn', 'Noto Sans TC', sans-serif;
+  font-family: 'Huninn', 'Noto Sans TC', sans-serif;
   background-color: #FFFAF8;
   color: #3D2830;
   min-height: 100vh;

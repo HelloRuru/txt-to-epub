@@ -49,11 +49,14 @@ export default function Home() {
           <h1 className={`text-4xl md:text-5xl mb-4 ${
             isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'
           }`}>
-            ✿ Ruru 工具箱 ✿
+            ✿ HelloRuru-Tools ✿
           </h1>
           <div className="decorative-line mb-4"></div>
-          <p className={`text-lg ${isDark ? 'text-nadeshiko-400' : 'text-nadeshiko-500'}`}>
-            簡單好用的線上小工具，全程本機處理，保護你的隱私 ♡
+          <p className={`text-lg mb-3 ${isDark ? 'text-nadeshiko-400' : 'text-nadeshiko-500'}`}>
+            簡單好用的線上小工具，全程本機處理，保護個人隱私。
+          </p>
+          <p className={`text-sm italic ${isDark ? 'text-nadeshiko-500' : 'text-nadeshiko-400'}`}>
+            「一起在世界的難題裡面學著如何開心，慢慢前進。」
           </p>
         </header>
 
@@ -118,8 +121,8 @@ export default function Home() {
         <footer className={`mt-16 text-center text-sm ${
           isDark ? 'text-nadeshiko-600' : 'text-nadeshiko-400'
         }`}>
-          <p>✿ 所有檔案處理皆在瀏覽器本機完成，不會上傳到任何伺服器 ✿</p>
-          <p className="mt-2">Made with ♡ by HelloRuru</p>
+          <p>所有檔案處理皆在瀏覽器本機完成，不會上傳到任何伺服器。</p>
+          <p className="mt-3">Copyright © 2025 Kaoru Tsai. All rights reserved.</p>
         </footer>
       </div>
     </div>
