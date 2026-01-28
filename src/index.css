@@ -2,31 +2,89 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Google Fonts - Huninn 粉圓 */
+@import url('https://fonts.googleapis.com/css2?family=Huninn&display=swap');
+
 * {
   box-sizing: border-box;
 }
 
+/* 淺色模式（預設） */
 body {
-  font-family: 'Noto Sans TC', sans-serif;
-  background-color: #1a1612;
-  color: #FDF6E3;
+  font-family: 'Huninn', 'jf-openhuninn', 'Noto Sans TC', sans-serif;
+  background-color: #FFFAF8;
+  color: #3D2830;
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* 自訂滾動條 */
+/* 深色模式 */
+body.dark {
+  background-color: #1a1418;
+  color: #F8C3CD;
+}
+
+/* 自訂滾動條 - 淺色 */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #2a2420;
+  background: #FFF5F5;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #5a4a3a;
+  background: #F596AA;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #6a5a4a;
+  background: #DC9FB4;
+}
+
+/* 深色模式滾動條 */
+body.dark ::-webkit-scrollbar-track {
+  background: #2a2025;
+}
+
+body.dark ::-webkit-scrollbar-thumb {
+  background: #8E5D6E;
+}
+
+body.dark ::-webkit-scrollbar-thumb:hover {
+  background: #B87D91;
+}
+
+/* 日系文青風格 - 裝飾線條 */
+.decorative-line {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #DC9FB4, transparent);
+  margin: 0 auto;
+}
+
+/* 卡片懸浮效果 */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(220, 159, 180, 0.2);
+}
+
+/* 按鈕點擊效果 */
+.btn-press:active {
+  transform: scale(0.98);
+}
+
+/* 選取文字顏色 */
+::selection {
+  background-color: #FEDFE1;
+  color: #3D2830;
+}
+
+body.dark ::selection {
+  background-color: #64404D;
+  color: #F8C3CD;
 }

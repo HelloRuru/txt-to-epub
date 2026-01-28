@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { generateEpub } from '../utils/epubGenerator'
 import { convertToTraditional } from '../utils/converter'
 import { FONT_CONFIG } from '../utils/fontSubset'
+import { useTheme } from '../contexts/ThemeContext'
 
 export default function ExportButton({ content, chapters, cover, settings, onReset }) {
+  const { isDark } = useTheme()
   const [isGenerating, setIsGenerating] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
   const [progress, setProgress] = useState({ stage: '', message: '' })
@@ -16,7 +18,6 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
       let processedChapters = chapters
       let processedTitle = settings.title
 
-      // 簡轉繁
       if (settings.convertToTraditional) {
         setProgress({ stage: 'convert', message: '正在轉換簡體為繁體...' })
         processedChapters = await Promise.all(
@@ -29,7 +30,6 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
         processedTitle = await convertToTraditional(settings.title)
       }
 
-      // 生成 EPUB
       await generateEpub({
         title: processedTitle,
         author: settings.author,
@@ -59,11 +59,15 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
     return (
       <div className="text-center py-12">
         <div className="text-6xl mb-6">🎉</div>
-        <h2 className="font-serif text-2xl text-cream mb-4">EPUB 生成完成！</h2>
-        <p className="text-warm-400/80 mb-8">檔案已自動下載到你的裝置</p>
+        <h2 className={`text-2xl mb-4 ${isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'}`}>
+          EPUB 生成完成！
+        </h2>
+        <p className={`mb-8 ${isDark ? 'text-nadeshiko-400/80' : 'text-nadeshiko-500/80'}`}>
+          檔案已自動下載到你的裝置 ♡
+        </p>
         <button
           onClick={onReset}
-          className="px-8 py-3 rounded-xl bg-warm-500 text-cream hover:bg-warm-400 transition-colors"
+          className="px-8 py-3 rounded-xl bg-nadeshiko-400 text-white hover:bg-nadeshiko-500 transition-colors btn-press"
         >
           轉換另一個檔案
         </button>
@@ -73,50 +77,46 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
 
   return (
     <div className="text-center py-8">
-      <h2 className="font-serif text-2xl text-cream mb-6">確認並輸出</h2>
+      <h2 className={`text-2xl mb-2 ${isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'}`}>
+        確認並輸出
+      </h2>
+      <div className="decorative-line mb-6"></div>
       
       {/* 摘要 */}
-      <div className="max-w-md mx-auto mb-8 p-6 rounded-xl bg-warm-700/10 text-left space-y-3">
-        <div className="flex justify-between">
-          <span className="text-warm-400/80">書名</span>
-          <span className="text-cream">{settings.title || '未命名'}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-warm-400/80">作者</span>
-          <span className="text-cream">{settings.author || '未填寫'}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-warm-400/80">章節數</span>
-          <span className="text-cream">{chapters.length} 章</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-warm-400/80">封面</span>
-          <span className="text-cream">{cover ? '已設定' : '無'}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-warm-400/80">簡轉繁</span>
-          <span className="text-cream">{settings.convertToTraditional ? '是' : '否'}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-warm-400/80">排版</span>
-          <span className="text-cream">{settings.writingMode === 'vertical' ? '直排' : '橫排'}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-warm-400/80">字型</span>
-          <span className="text-cream">{fontConfig?.name || '預設'}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-warm-400/80">嵌入字型</span>
-          <span className="text-cream">{settings.embedFont ? '是（子集化）' : '否'}</span>
-        </div>
+      <div className={`max-w-md mx-auto mb-8 p-6 rounded-xl text-left space-y-3 ${
+        isDark ? 'bg-nadeshiko-900/10' : 'bg-nadeshiko-50/80'
+      }`}>
+        {[
+          { label: '書名', value: settings.title || '未命名' },
+          { label: '作者', value: settings.author || '未填寫' },
+          { label: '章節數', value: `${chapters.length} 章` },
+          { label: '封面', value: cover ? '已設定' : '無' },
+          { label: '簡轉繁', value: settings.convertToTraditional ? '是' : '否' },
+          { label: '排版', value: settings.writingMode === 'vertical' ? '直排' : '橫排' },
+          { label: '字型', value: fontConfig?.name || '預設' },
+          { label: '嵌入字型', value: settings.embedFont ? '是（子集化）' : '否' },
+        ].map((item, i) => (
+          <div key={i} className="flex justify-between">
+            <span className={isDark ? 'text-nadeshiko-400/80' : 'text-nadeshiko-500/80'}>
+              {item.label}
+            </span>
+            <span className={isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'}>
+              {item.value}
+            </span>
+          </div>
+        ))}
       </div>
 
       {/* 進度顯示 */}
       {isGenerating && (
-        <div className="max-w-md mx-auto mb-6 p-4 rounded-xl bg-warm-700/20 text-left">
+        <div className={`max-w-md mx-auto mb-6 p-4 rounded-xl text-left ${
+          isDark ? 'bg-nadeshiko-900/20' : 'bg-nadeshiko-100/80'
+        }`}>
           <div className="flex items-center gap-3">
             <span className="animate-spin text-xl">⏳</span>
-            <span className="text-warm-400">{progress.message || '處理中...'}</span>
+            <span className={isDark ? 'text-nadeshiko-300' : 'text-nadeshiko-600'}>
+              {progress.message || '處理中...'}
+            </span>
           </div>
         </div>
       )}
@@ -124,10 +124,12 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
       <button
         onClick={handleExport}
         disabled={isGenerating}
-        className={`px-12 py-4 rounded-xl text-lg font-medium transition-all ${
+        className={`px-12 py-4 rounded-xl text-lg font-medium transition-all btn-press ${
           isGenerating
-            ? 'bg-warm-700/50 text-warm-400/50 cursor-wait'
-            : 'bg-warm-500 text-cream hover:bg-warm-400 hover:scale-105'
+            ? isDark 
+              ? 'bg-dark-border text-nadeshiko-600 cursor-wait'
+              : 'bg-nadeshiko-200 text-nadeshiko-400 cursor-wait'
+            : 'bg-nadeshiko-400 text-white hover:bg-nadeshiko-500 hover:scale-105 shadow-soft'
         }`}
       >
         {isGenerating ? (
@@ -140,12 +142,12 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
         )}
       </button>
 
-      <p className="text-warm-400/50 text-sm mt-4">
+      <p className={`text-sm mt-4 ${isDark ? 'text-nadeshiko-500' : 'text-nadeshiko-400'}`}>
         輸出檔名：{settings.title || '未命名'}.epub
       </p>
 
       {settings.embedFont && (
-        <p className="text-warm-400/40 text-xs mt-2">
+        <p className={`text-xs mt-2 ${isDark ? 'text-nadeshiko-600' : 'text-nadeshiko-300'}`}>
           ⚡ 首次嵌入字型需下載完整字型檔，之後會快取加速
         </p>
       )}

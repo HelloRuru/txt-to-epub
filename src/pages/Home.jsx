@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import ThemeToggle from '../components/ThemeToggle'
+import { useTheme } from '../contexts/ThemeContext'
 
 const tools = [
   {
@@ -10,6 +12,14 @@ const tools = [
     ready: true,
   },
   {
+    id: 'epub-convert',
+    name: 'EPUB 簡轉繁',
+    description: '將簡體 EPUB 電子書轉換為繁體中文',
+    icon: '🔄',
+    path: '/epub-convert',
+    ready: false,
+  },
+  {
     id: 'image',
     name: '圖片工具',
     description: '壓縮、轉檔、調整尺寸',
@@ -17,27 +27,33 @@ const tools = [
     path: '/image',
     ready: false,
   },
-  {
-    id: 'pdf',
-    name: 'PDF 工具',
-    description: '合併、分割、壓縮',
-    icon: '📄',
-    path: '/pdf',
-    ready: false,
-  },
 ]
 
 export default function Home() {
+  const { isDark } = useTheme()
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a1612] to-[#2a2420] py-16 px-4">
+    <div className={`min-h-screen py-16 px-4 transition-colors duration-300 ${
+      isDark 
+        ? 'bg-gradient-to-b from-dark-bg to-dark-card' 
+        : 'bg-gradient-to-b from-nadeshiko-50 to-nadeshiko-100'
+    }`}>
       <div className="max-w-4xl mx-auto">
+        {/* 頂部切換 */}
+        <div className="flex justify-end mb-8">
+          <ThemeToggle />
+        </div>
+
         {/* 標題 */}
         <header className="text-center mb-16">
-          <h1 className="font-serif text-4xl md:text-5xl text-cream mb-4">
-            Ruru 工具箱
+          <h1 className={`text-4xl md:text-5xl mb-4 ${
+            isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'
+          }`}>
+            ✿ Ruru 工具箱 ✿
           </h1>
-          <p className="text-warm-400 text-lg">
-            簡單好用的線上小工具，全程本機處理，保護你的隱私
+          <div className="decorative-line mb-4"></div>
+          <p className={`text-lg ${isDark ? 'text-nadeshiko-400' : 'text-nadeshiko-500'}`}>
+            簡單好用的線上小工具，全程本機處理，保護你的隱私 ♡
           </p>
         </header>
 
@@ -48,28 +64,48 @@ export default function Home() {
               {tool.ready ? (
                 <Link
                   to={tool.path}
-                  className="block p-6 rounded-2xl bg-[#2a2420] border border-warm-700/30 
-                           hover:border-warm-500/50 hover:bg-[#332c26] 
-                           transition-all duration-300 group"
+                  className={`block p-6 rounded-2xl border transition-all duration-300 card-hover ${
+                    isDark 
+                      ? 'bg-dark-card border-dark-border hover:border-nadeshiko-600' 
+                      : 'bg-white/80 border-nadeshiko-200 hover:border-nadeshiko-400 shadow-soft'
+                  }`}
                 >
                   <div className="text-4xl mb-4">{tool.icon}</div>
-                  <h2 className="font-serif text-xl text-cream mb-2 group-hover:text-warm-400 transition-colors">
+                  <h2 className={`text-xl mb-2 transition-colors ${
+                    isDark 
+                      ? 'text-nadeshiko-200 group-hover:text-nadeshiko-300' 
+                      : 'text-nadeshiko-700'
+                  }`}>
                     {tool.name}
                   </h2>
-                  <p className="text-warm-400/80 text-sm leading-relaxed">
+                  <p className={`text-sm leading-relaxed ${
+                    isDark ? 'text-nadeshiko-400/80' : 'text-nadeshiko-500/80'
+                  }`}>
                     {tool.description}
                   </p>
                 </Link>
               ) : (
-                <div className="p-6 rounded-2xl bg-[#2a2420]/50 border border-warm-700/20 opacity-60">
+                <div className={`p-6 rounded-2xl border opacity-60 ${
+                  isDark 
+                    ? 'bg-dark-card/50 border-dark-border' 
+                    : 'bg-white/40 border-nadeshiko-200/50'
+                }`}>
                   <div className="text-4xl mb-4 grayscale">{tool.icon}</div>
-                  <h2 className="font-serif text-xl text-cream/60 mb-2">
+                  <h2 className={`text-xl mb-2 ${
+                    isDark ? 'text-nadeshiko-400' : 'text-nadeshiko-500'
+                  }`}>
                     {tool.name}
                   </h2>
-                  <p className="text-warm-400/50 text-sm leading-relaxed">
+                  <p className={`text-sm leading-relaxed ${
+                    isDark ? 'text-nadeshiko-600' : 'text-nadeshiko-400'
+                  }`}>
                     {tool.description}
                   </p>
-                  <span className="absolute top-4 right-4 text-xs text-warm-500/50 bg-warm-700/20 px-2 py-1 rounded">
+                  <span className={`absolute top-4 right-4 text-xs px-2 py-1 rounded ${
+                    isDark 
+                      ? 'text-nadeshiko-500 bg-dark-border' 
+                      : 'text-nadeshiko-400 bg-nadeshiko-100'
+                  }`}>
                     即將推出
                   </span>
                 </div>
@@ -79,8 +115,11 @@ export default function Home() {
         </div>
 
         {/* 底部說明 */}
-        <footer className="mt-16 text-center text-warm-400/60 text-sm">
-          <p>所有檔案處理皆在瀏覽器本機完成，不會上傳到任何伺服器</p>
+        <footer className={`mt-16 text-center text-sm ${
+          isDark ? 'text-nadeshiko-600' : 'text-nadeshiko-400'
+        }`}>
+          <p>✿ 所有檔案處理皆在瀏覽器本機完成，不會上傳到任何伺服器 ✿</p>
+          <p className="mt-2">Made with ♡ by HelloRuru</p>
         </footer>
       </div>
     </div>
