@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { generateEpub } from '../utils/epubGenerator'
 import { convertToTraditional } from '../utils/converter'
+import { FONT_CONFIG } from '../utils/fontSubset'
 
 export default function ExportButton({ content, chapters, cover, settings, onReset }) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
+  const [progress, setProgress] = useState({ stage: '', message: '' })
 
   const handleExport = async () => {
     setIsGenerating(true)
+    setProgress({ stage: 'convert', message: '準備中...' })
 
     try {
       let processedChapters = chapters
@@ -15,6 +18,7 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
 
       // 簡轉繁
       if (settings.convertToTraditional) {
+        setProgress({ stage: 'convert', message: '正在轉換簡體為繁體...' })
         processedChapters = await Promise.all(
           chapters.map(async (ch) => ({
             ...ch,
@@ -32,16 +36,24 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
         chapters: processedChapters,
         cover,
         writingMode: settings.writingMode,
+        fontFamily: settings.fontFamily,
+        embedFont: settings.embedFont,
+        fontSize: settings.fontSize,
+        lineHeight: settings.lineHeight,
+        textIndent: settings.textIndent,
+        onProgress: setProgress,
       })
 
       setIsComplete(true)
     } catch (error) {
       console.error('生成失敗:', error)
-      alert('生成失敗，請稍後再試')
+      alert(`生成失敗：${error.message}`)
     } finally {
       setIsGenerating(false)
     }
   }
+
+  const fontConfig = FONT_CONFIG[settings.fontFamily]
 
   if (isComplete) {
     return (
@@ -89,7 +101,25 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
           <span className="text-warm-400/80">排版</span>
           <span className="text-cream">{settings.writingMode === 'vertical' ? '直排' : '橫排'}</span>
         </div>
+        <div className="flex justify-between">
+          <span className="text-warm-400/80">字型</span>
+          <span className="text-cream">{fontConfig?.name || '預設'}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-warm-400/80">嵌入字型</span>
+          <span className="text-cream">{settings.embedFont ? '是（子集化）' : '否'}</span>
+        </div>
       </div>
+
+      {/* 進度顯示 */}
+      {isGenerating && (
+        <div className="max-w-md mx-auto mb-6 p-4 rounded-xl bg-warm-700/20 text-left">
+          <div className="flex items-center gap-3">
+            <span className="animate-spin text-xl">⏳</span>
+            <span className="text-warm-400">{progress.message || '處理中...'}</span>
+          </div>
+        </div>
+      )}
 
       <button
         onClick={handleExport}
@@ -113,6 +143,12 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
       <p className="text-warm-400/50 text-sm mt-4">
         輸出檔名：{settings.title || '未命名'}.epub
       </p>
+
+      {settings.embedFont && (
+        <p className="text-warm-400/40 text-xs mt-2">
+          ⚡ 首次嵌入字型需下載完整字型檔，之後會快取加速
+        </p>
+      )}
     </div>
   )
 }

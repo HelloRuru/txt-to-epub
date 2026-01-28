@@ -1,10 +1,100 @@
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
+import { subsetFont, FONT_CONFIG, DEFAULT_FONT } from './fontSubset'
 
-export async function generateEpub({ title, author, chapters, cover, writingMode }) {
+// 樣式對應表
+const SIZE_MAP = {
+  'small': '0.9em',
+  'medium': '1em',
+  'large': '1.15em',
+  'xlarge': '1.3em',
+}
+
+const LINE_HEIGHT_MAP = {
+  'compact': '1.5',
+  'normal': '1.8',
+  'relaxed': '2.0',
+  'loose': '2.3',
+}
+
+const INDENT_MAP = {
+  'none': '0',
+  'one': '1em',
+  'two': '2em',
+}
+
+export async function generateEpub({ 
+  title, 
+  author, 
+  chapters, 
+  cover, 
+  writingMode,
+  fontFamily = DEFAULT_FONT,
+  embedFont = false,
+  fontSize = 'medium',
+  lineHeight = 'normal',
+  textIndent = 'two',
+  onProgress = () => {},
+}) {
   const zip = new JSZip()
   const bookId = `urn:uuid:${crypto.randomUUID()}`
   const isVertical = writingMode === 'vertical'
+
+  // 取得字型設定
+  const fontConfig = FONT_CONFIG[fontFamily] || FONT_CONFIG[DEFAULT_FONT]
+  const fontFamilyCSS = `"${fontConfig.family}", "Noto Sans TC", sans-serif`
+
+  // 取得樣式值
+  const fontSizeValue = SIZE_MAP[fontSize] || SIZE_MAP['medium']
+  const lineHeightValue = LINE_HEIGHT_MAP[lineHeight] || LINE_HEIGHT_MAP['normal']
+  const textIndentValue = INDENT_MAP[textIndent] || INDENT_MAP['two']
+
+  // 字型相關變數
+  let fontManifest = ''
+  let fontFaceCSS = ''
+  let embeddedFontFilename = ''
+
+  // 如果要嵌入字型，進行子集化
+  if (embedFont) {
+    onProgress({ stage: 'font', message: '正在處理字型...' })
+
+    // 合併所有章節內容
+    const allText = chapters.map(ch => ch.title + '\n' + ch.content).join('\n')
+    
+    try {
+      // 子集化字型
+      const subsetResult = await subsetFont(fontFamily, allText, (p) => {
+        onProgress({ stage: 'font', message: p.message })
+      })
+
+      // 產生檔名
+      embeddedFontFilename = `${fontFamily}-subset.ttf`
+
+      // 加入字型檔案到 EPUB
+      zip.file(`OEBPS/fonts/${embeddedFontFilename}`, subsetResult.buffer)
+
+      // 產生 @font-face CSS
+      fontFaceCSS = `
+@font-face {
+  font-family: "${fontConfig.family}";
+  src: url("../fonts/${embeddedFontFilename}") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+`
+
+      // manifest 項目
+      fontManifest = `<item id="font-main" href="fonts/${embeddedFontFilename}" media-type="font/ttf"/>`
+
+      onProgress({ stage: 'font', message: '字型嵌入完成！' })
+    } catch (error) {
+      console.error('字型嵌入失敗:', error)
+      onProgress({ stage: 'font', message: '字型嵌入失敗，改用預設模式' })
+      // 失敗時不嵌入字型，繼續產生 EPUB
+    }
+  }
+
+  onProgress({ stage: 'structure', message: '正在建立 EPUB 結構...' })
 
   // mimetype（必須第一個，且不壓縮）
   zip.file('mimetype', 'application/epub+zip', { compression: 'STORE' })
@@ -38,28 +128,51 @@ export async function generateEpub({ title, author, chapters, cover, writingMode
     coverManifest += '\n    <item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>'
   }
 
+  onProgress({ stage: 'css', message: '正在產生樣式表...' })
+
   // 樣式表
-  const css = `
+  const css = `${fontFaceCSS}
+/* 
+ * 字型設定：${fontConfig.name}
+ * ${embedFont ? '已嵌入子集化字型' : '建議使用上述字型閱讀'}
+ */
+
 body {
-  font-family: "Noto Serif TC", "Source Han Serif TC", serif;
-  line-height: 1.8;
+  font-family: ${fontFamilyCSS};
+  font-size: ${fontSizeValue};
+  line-height: ${lineHeightValue};
   padding: 1em;
+  margin: 0;
+  text-align: justify;
   ${isVertical ? `
   writing-mode: vertical-rl;
   -webkit-writing-mode: vertical-rl;
   -epub-writing-mode: vertical-rl;
+  text-orientation: mixed;
   ` : ''}
 }
-h1, h2 {
+
+h1 {
+  font-size: 1.5em;
   font-weight: bold;
-  margin: 1em 0;
+  margin: 1.5em 0 1em 0;
+  line-height: 1.3;
+  text-align: ${isVertical ? 'center' : 'left'};
 }
+
 p {
-  text-indent: 2em;
+  text-indent: ${textIndentValue};
   margin: 0.5em 0;
+}
+
+/* 避免標點符號在行首 */
+p {
+  hanging-punctuation: allow-end;
 }
 `
   zip.file('OEBPS/styles/main.css', css)
+
+  onProgress({ stage: 'chapters', message: '正在處理章節...' })
 
   // 章節檔案
   const chapterManifest = []
@@ -95,6 +208,8 @@ p {
     chapterSpine.push(`<itemref idref="${id}"/>`)
   })
 
+  onProgress({ stage: 'toc', message: '正在建立目錄...' })
+
   // 目錄 (toc.ncx)
   const tocNcx = `<?xml version="1.0" encoding="UTF-8"?>
 <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
@@ -119,6 +234,7 @@ p {
 <head>
   <meta charset="UTF-8"/>
   <title>目錄</title>
+  <link rel="stylesheet" type="text/css" href="styles/main.css"/>
 </head>
 <body>
   <nav epub:type="toc">
@@ -130,6 +246,8 @@ p {
 </body>
 </html>`
   zip.file('OEBPS/nav.xhtml', navXhtml)
+
+  onProgress({ stage: 'opf', message: '正在產生套件描述...' })
 
   // content.opf
   const opf = `<?xml version="1.0" encoding="UTF-8"?>
@@ -145,6 +263,7 @@ p {
     <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
     <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
     <item id="css" href="styles/main.css" media-type="text/css"/>
+    ${fontManifest}
     ${coverManifest}
     ${chapterManifest.join('\n    ')}
   </manifest>
@@ -155,6 +274,8 @@ p {
 </package>`
   zip.file('OEBPS/content.opf', opf)
 
+  onProgress({ stage: 'compress', message: '正在壓縮檔案...' })
+
   // 生成並下載
   const blob = await zip.generateAsync({ 
     type: 'blob',
@@ -162,6 +283,8 @@ p {
     compression: 'DEFLATE',
     compressionOptions: { level: 9 }
   })
+
+  onProgress({ stage: 'done', message: '完成！' })
   
   saveAs(blob, `${title || '未命名'}.epub`)
 }

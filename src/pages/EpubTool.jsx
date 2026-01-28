@@ -16,7 +16,12 @@ export default function EpubTool() {
     title: '',
     author: '',
     convertToTraditional: true,
-    writingMode: 'horizontal', // horizontal | vertical
+    writingMode: 'horizontal',
+    fontFamily: 'noto-sans',
+    embedFont: false,
+    fontSize: 'medium',
+    lineHeight: 'normal',
+    textIndent: 'two',
   })
   const [step, setStep] = useState(1) // 1: 上傳, 2: 預覽, 3: 設定, 4: 輸出
 
@@ -53,6 +58,11 @@ export default function EpubTool() {
       author: '',
       convertToTraditional: true,
       writingMode: 'horizontal',
+      fontFamily: 'noto-sans',
+      embedFont: false,
+      fontSize: 'medium',
+      lineHeight: 'normal',
+      textIndent: 'two',
     })
     setStep(1)
   }
