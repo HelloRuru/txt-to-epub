@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 import { convertToTraditional } from '../utils/converter'
+import { detectEncoding } from '../utils/encodingDetector'
 import ThemeToggle from '../components/ThemeToggle'
 import { useTheme } from '../contexts/ThemeContext'
 
@@ -58,7 +59,22 @@ export default function EpubConvert() {
             percent: 10 + Math.floor((processedFiles / totalFiles) * 80) 
           })
 
-          const content = await zipEntry.async('string')
+          // 先取得 binary 資料，偵測編碼
+          const uint8Array = await zipEntry.async('uint8array')
+          const encoding = detectEncoding(uint8Array)
+          
+          // 根據偵測結果解碼
+          let content
+          if (encoding === 'UTF-8') {
+            content = new TextDecoder('utf-8').decode(uint8Array)
+          } else if (encoding === 'GBK') {
+            content = new TextDecoder('gbk').decode(uint8Array)
+          } else if (encoding === 'Big5') {
+            content = new TextDecoder('big5').decode(uint8Array)
+          } else {
+            content = new TextDecoder('utf-8').decode(uint8Array)
+          }
+          
           const converted = await convertToTraditional(content)
           
           if (converted !== content) {
@@ -66,6 +82,7 @@ export default function EpubConvert() {
             totalChars += content.length
           }
           
+          // 統一輸出為 UTF-8
           zip.file(filename, converted)
         }
         
