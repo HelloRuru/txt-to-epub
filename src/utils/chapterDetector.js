@@ -42,12 +42,9 @@ export function detectChapters(text) {
     return Math.abs(m.index - arr[i - 1].index) > 5
   })
 
-  // 如果沒有找到章節，整份作為一章
+  // 如果沒有找到章節，回傳 null 讓 UI 處理
   if (matches.length === 0) {
-    return [{
-      title: '全文',
-      content: text,
-    }]
+    return null
   }
 
   // 切分內容
@@ -75,4 +72,93 @@ export function detectChapters(text) {
   }
 
   return chapters
+}
+
+/**
+ * 依分隔符號分章
+ * @param {string} text - 原始文字
+ * @param {string} separator - 分隔符號，例如 "===" 或 "---" 或 "***"
+ */
+export function splitBySeparator(text, separator) {
+  const parts = text.split(separator).filter(p => p.trim())
+  
+  if (parts.length <= 1) {
+    return null
+  }
+
+  return parts.map((content, index) => ({
+    title: `第 ${index + 1} 章`,
+    content: content.trim(),
+  }))
+}
+
+/**
+ * 依空行分章（連續多個空行視為分章點）
+ * @param {string} text - 原始文字
+ * @param {number} minEmptyLines - 最少幾個連續空行才視為分章（預設 3）
+ */
+export function splitByEmptyLines(text, minEmptyLines = 3) {
+  const pattern = new RegExp(`(\\n\\s*){${minEmptyLines},}`, 'g')
+  const parts = text.split(pattern).filter(p => p.trim())
+  
+  if (parts.length <= 1) {
+    return null
+  }
+
+  return parts.map((content, index) => ({
+    title: `第 ${index + 1} 章`,
+    content: content.trim(),
+  }))
+}
+
+/**
+ * 依固定字數分章
+ * @param {string} text - 原始文字
+ * @param {number} charsPerChapter - 每章約幾個字
+ */
+export function splitByCharCount(text, charsPerChapter = 5000) {
+  const chapters = []
+  const lines = text.split('\n')
+  let currentContent = []
+  let currentLength = 0
+  let chapterIndex = 1
+
+  for (const line of lines) {
+    currentContent.push(line)
+    currentLength += line.length
+
+    // 到達字數門檻，且剛好在段落結尾（空行或行尾）
+    if (currentLength >= charsPerChapter && line.trim() === '') {
+      chapters.push({
+        title: `第 ${chapterIndex} 章`,
+        content: currentContent.join('\n').trim(),
+      })
+      currentContent = []
+      currentLength = 0
+      chapterIndex++
+    }
+  }
+
+  // 剩餘內容
+  if (currentContent.length > 0) {
+    const remaining = currentContent.join('\n').trim()
+    if (remaining) {
+      chapters.push({
+        title: `第 ${chapterIndex} 章`,
+        content: remaining,
+      })
+    }
+  }
+
+  return chapters.length > 0 ? chapters : null
+}
+
+/**
+ * 強制分為單一章節（全文）
+ */
+export function splitAsSingleChapter(text, title = '全文') {
+  return [{
+    title,
+    content: text.trim(),
+  }]
 }
