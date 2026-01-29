@@ -1,14 +1,55 @@
 import { useState, useEffect } from 'react'
 import { FONT_CONFIG, DEFAULT_FONT } from '../utils/fontSubset'
-import { useTheme } from '../contexts/ThemeContext'
 import { FILENAME_FORMATS, loadFilenamePrefs, saveFilenamePrefs, generateFilename } from '../utils/filenameFormat'
 
+// SVG Icons
+const SettingsIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-5 h-5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+)
+
+const ChevronDownIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <polyline points="6 9 12 15 18 9"/>
+  </svg>
+)
+
+const SmartphoneIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-6 h-6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+    <line x1="12" y1="18" x2="12.01" y2="18"/>
+  </svg>
+)
+
+const PackageIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-6 h-6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/>
+    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+    <line x1="12" y1="22.08" x2="12" y2="12"/>
+  </svg>
+)
+
+const ZapIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+  </svg>
+)
+
+const InfoIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="16" x2="12" y2="12"/>
+    <line x1="12" y1="8" x2="12.01" y2="8"/>
+  </svg>
+)
+
 export default function SettingsPanel({ settings, setSettings }) {
-  const { isDark } = useTheme()
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [filenamePrefs, setFilenamePrefs] = useState(loadFilenamePrefs)
 
-  // 當檔名偏好改變時，儲存並更新 settings
   useEffect(() => {
     saveFilenamePrefs(filenamePrefs)
     setSettings(prev => ({
@@ -29,7 +70,6 @@ export default function SettingsPanel({ settings, setSettings }) {
 
   const selectedFont = FONT_CONFIG[settings.fontFamily] || FONT_CONFIG[DEFAULT_FONT]
 
-  // 預覽檔名
   const previewFilename = generateFilename({
     title: settings.title || '書名',
     author: settings.author || '',
@@ -38,100 +78,159 @@ export default function SettingsPanel({ settings, setSettings }) {
     customTemplate: filenamePrefs.customTemplate,
   })
 
-  // 共用樣式
-  const labelClass = `text-sm ${isDark ? 'text-nadeshiko-400/80' : 'text-nadeshiko-600/80'}`
-  const headingClass = `font-medium ${isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'}`
-  const subTextClass = `text-xs ${isDark ? 'text-nadeshiko-400/60' : 'text-nadeshiko-500/60'}`
-  const inputClass = `w-full px-4 py-3 rounded-xl border transition-colors focus:outline-none ${
-    isDark 
-      ? 'bg-dark-bg border-dark-border text-nadeshiko-200 placeholder:text-nadeshiko-600 focus:border-nadeshiko-600' 
-      : 'bg-white border-nadeshiko-200 text-nadeshiko-800 placeholder:text-nadeshiko-400 focus:border-nadeshiko-400'
-  }`
-  const cardClass = `p-4 rounded-xl transition-colors ${
-    isDark ? 'bg-nadeshiko-900/10 border border-dark-border' : 'bg-nadeshiko-50/50 border border-nadeshiko-200'
-  }`
+  const OptionButton = ({ isActive, onClick, children, className = '' }) => (
+    <button
+      onClick={onClick}
+      className={`p-4 rounded-2xl border text-left transition-all ${className}`}
+      style={{
+        borderColor: isActive ? 'var(--accent-primary)' : 'var(--border)',
+        background: isActive ? 'rgba(212, 165, 165, 0.1)' : 'transparent'
+      }}
+      onMouseEnter={(e) => {
+        if (!isActive) e.currentTarget.style.borderColor = 'var(--accent-secondary)'
+      }}
+      onMouseLeave={(e) => {
+        if (!isActive) e.currentTarget.style.borderColor = 'var(--border)'
+      }}
+    >
+      {children}
+    </button>
+  )
 
-  const getButtonClass = (isActive) => `
-    p-3 rounded-xl border text-left transition-all btn-press
-    ${isActive 
-      ? 'border-nadeshiko-400 bg-nadeshiko-400/10' 
-      : isDark
-        ? 'border-dark-border hover:border-nadeshiko-600'
-        : 'border-nadeshiko-200 hover:border-nadeshiko-300'
-    }
-  `
-
-  const getSmallButtonClass = (isActive) => `
-    py-2 px-3 rounded-lg border text-sm transition-all btn-press
-    ${isActive 
-      ? 'border-nadeshiko-400 bg-nadeshiko-400/10 ' + (isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700')
-      : isDark
-        ? 'border-dark-border text-nadeshiko-400 hover:border-nadeshiko-600'
-        : 'border-nadeshiko-200 text-nadeshiko-500 hover:border-nadeshiko-300'
-    }
-  `
+  const SmallButton = ({ isActive, onClick, children }) => (
+    <button
+      onClick={onClick}
+      className="py-2 px-3 rounded-xl border text-sm transition-all"
+      style={{
+        borderColor: isActive ? 'var(--accent-primary)' : 'var(--border)',
+        background: isActive ? 'rgba(212, 165, 165, 0.1)' : 'transparent',
+        color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)'
+      }}
+      onMouseEnter={(e) => {
+        if (!isActive) e.currentTarget.style.borderColor = 'var(--accent-secondary)'
+      }}
+      onMouseLeave={(e) => {
+        if (!isActive) e.currentTarget.style.borderColor = 'var(--border)'
+      }}
+    >
+      {children}
+    </button>
+  )
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className={`text-lg flex items-center gap-2 ${headingClass}`}>
-          <span>⚙️</span> 書籍設定
+      <div className="flex items-center gap-3">
+        <div 
+          className="w-10 h-10 rounded-full flex items-center justify-center"
+          style={{ 
+            background: 'linear-gradient(135deg, rgba(212, 165, 165, 0.2), rgba(212, 165, 165, 0.1))',
+            color: 'var(--rose)'
+          }}
+        >
+          <SettingsIcon />
+        </div>
+        <h3 
+          className="font-serif text-lg font-medium"
+          style={{ color: 'var(--text-primary)' }}
+        >
+          書籍設定
         </h3>
-        <div className="decorative-line mt-2"></div>
       </div>
 
-      {/* 基本資訊 */}
+      {/* Basic Info */}
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label className={labelClass}>書名</label>
+          <label 
+            className="text-sm"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            書名
+          </label>
           <input
             type="text"
             value={settings.title}
             onChange={(e) => handleChange('title', e.target.value)}
             placeholder="輸入書名"
-            className={inputClass}
+            className="w-full px-4 py-3 rounded-2xl border transition-colors focus:outline-none"
+            style={{
+              background: 'var(--bg-secondary)',
+              borderColor: 'var(--border)',
+              color: 'var(--text-primary)',
+              caretColor: 'var(--accent-primary)'
+            }}
           />
-          <p className={subTextClass}>輸出檔名也會使用此名稱</p>
+          <p 
+            className="text-xs"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            輸出檔名也會使用此名稱
+          </p>
         </div>
 
         <div className="space-y-2">
-          <label className={labelClass}>作者</label>
+          <label 
+            className="text-sm"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            作者
+          </label>
           <input
             type="text"
             value={settings.author}
             onChange={(e) => handleChange('author', e.target.value)}
             placeholder="輸入作者名稱（選填）"
-            className={inputClass}
+            className="w-full px-4 py-3 rounded-2xl border transition-colors focus:outline-none"
+            style={{
+              background: 'var(--bg-secondary)',
+              borderColor: 'var(--border)',
+              color: 'var(--text-primary)',
+              caretColor: 'var(--accent-primary)'
+            }}
           />
         </div>
       </div>
 
-      {/* 輸出檔名格式 */}
-      <div className={`space-y-4 ${cardClass}`}>
+      {/* Filename Format */}
+      <div 
+        className="space-y-4 p-5 rounded-2xl"
+        style={{ 
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border)'
+        }}
+      >
         <div>
-          <p className={headingClass}>輸出檔名格式</p>
-          <p className={subTextClass}>選擇偏好的檔名格式，設定會自動記住</p>
+          <p 
+            className="font-serif font-medium"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            輸出檔名格式
+          </p>
+          <p 
+            className="text-xs"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            選擇偏好的檔名格式，設定會自動記住
+          </p>
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {FILENAME_FORMATS.filter(f => f.id !== 'custom').map((fmt) => (
-            <button
+            <SmallButton
               key={fmt.id}
+              isActive={filenamePrefs.format === fmt.id}
               onClick={() => handleFilenameFormatChange(fmt.id)}
-              className={getSmallButtonClass(filenamePrefs.format === fmt.id)}
             >
               {fmt.label}
-            </button>
+            </SmallButton>
           ))}
         </div>
 
-        {/* 自訂選項 */}
-        <button
+        <SmallButton
+          isActive={filenamePrefs.format === 'custom'}
           onClick={() => handleFilenameFormatChange('custom')}
-          className={`w-full ${getSmallButtonClass(filenamePrefs.format === 'custom')}`}
         >
           自訂格式
-        </button>
+        </SmallButton>
 
         {filenamePrefs.format === 'custom' && (
           <div className="space-y-2">
@@ -140,161 +239,271 @@ export default function SettingsPanel({ settings, setSettings }) {
               value={filenamePrefs.customTemplate}
               onChange={(e) => setFilenamePrefs(prev => ({ ...prev, customTemplate: e.target.value }))}
               placeholder="使用 {title}、{author}、{date} 變數"
-              className={inputClass}
+              className="w-full px-4 py-3 rounded-2xl border transition-colors focus:outline-none"
+              style={{
+                background: 'var(--bg-card)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-primary)'
+              }}
             />
-            <p className={subTextClass}>
+            <p 
+              className="text-xs"
+              style={{ color: 'var(--text-muted)' }}
+            >
               例如：{'{author}'}_{'{title}'}_{'{date}'} → 作者_書名_20260129
             </p>
           </div>
         )}
 
-        {/* 加入日期選項 */}
         {filenamePrefs.format !== 'title-date' && filenamePrefs.format !== 'custom' && (
           <label className="flex items-center gap-3 cursor-pointer">
             <input
               type="checkbox"
               checked={filenamePrefs.includeDate}
               onChange={(e) => setFilenamePrefs(prev => ({ ...prev, includeDate: e.target.checked }))}
-              className="w-4 h-4 rounded border-nadeshiko-300 text-nadeshiko-400 focus:ring-nadeshiko-400"
+              className="w-4 h-4 rounded"
+              style={{ accentColor: 'var(--accent-primary)' }}
             />
-            <span className={isDark ? 'text-nadeshiko-300' : 'text-nadeshiko-600'}>
+            <span style={{ color: 'var(--text-secondary)' }}>
               加上轉換日期
             </span>
           </label>
         )}
 
-        {/* 預覽 */}
-        <div className={`p-3 rounded-lg ${isDark ? 'bg-dark-bg' : 'bg-white'}`}>
-          <p className={subTextClass}>預覽：</p>
-          <p className={`font-medium ${isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'}`}>
+        <div 
+          className="p-3 rounded-xl"
+          style={{ background: 'var(--bg-card)' }}
+        >
+          <p 
+            className="text-xs"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            預覽：
+          </p>
+          <p 
+            className="font-serif font-medium"
+            style={{ color: 'var(--text-primary)' }}
+          >
             {previewFilename}.epub
           </p>
         </div>
       </div>
 
-      {/* 簡轉繁 */}
-      <div className={`flex items-center justify-between ${cardClass}`}>
+      {/* Convert Toggle */}
+      <div 
+        className="flex items-center justify-between p-5 rounded-2xl"
+        style={{ 
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border)'
+        }}
+      >
         <div>
-          <p className={headingClass}>簡體轉繁體</p>
-          <p className={subTextClass}>使用 OpenCC 繁化姬引擎，含詞彙轉換</p>
+          <p 
+            className="font-serif font-medium"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            簡體轉繁體
+          </p>
+          <p 
+            className="text-xs"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            使用 OpenCC 繁化姬引擎，含詞彙轉換
+          </p>
         </div>
         <button
           onClick={() => handleChange('convertToTraditional', !settings.convertToTraditional)}
-          className={`relative w-14 h-8 rounded-full transition-colors ${
-            settings.convertToTraditional ? 'bg-nadeshiko-400' : isDark ? 'bg-dark-border' : 'bg-nadeshiko-200'
-          }`}
+          className="relative w-14 h-8 rounded-full transition-colors"
+          style={{ 
+            background: settings.convertToTraditional 
+              ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))' 
+              : 'var(--border)'
+          }}
         >
           <span
-            className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow transition-transform ${
-              settings.convertToTraditional ? 'left-7' : 'left-1'
-            }`}
+            className="absolute top-1 w-6 h-6 rounded-full bg-white shadow transition-transform"
+            style={{ left: settings.convertToTraditional ? '1.75rem' : '0.25rem' }}
           />
         </button>
       </div>
 
-      {/* 排版方向 */}
+      {/* Writing Mode */}
       <div className="space-y-3">
-        <p className={labelClass}>排版方向</p>
+        <p 
+          className="text-sm"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          排版方向
+        </p>
         <div className="flex gap-4">
           {[
             { id: 'horizontal', label: '橫排 →', desc: '現代閱讀習慣，由左至右' },
             { id: 'vertical', label: '直排 ↓', desc: '傳統中文，由上至下' },
           ].map((mode) => (
-            <button
+            <OptionButton
               key={mode.id}
+              isActive={settings.writingMode === mode.id}
               onClick={() => handleChange('writingMode', mode.id)}
-              className={`flex-1 ${getButtonClass(settings.writingMode === mode.id)}`}
+              className="flex-1"
             >
-              <p className={`font-medium mb-1 ${isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'}`}>
+              <p 
+                className="font-serif font-medium mb-1"
+                style={{ color: 'var(--text-primary)' }}
+              >
                 {mode.label}
               </p>
-              <p className={subTextClass}>{mode.desc}</p>
-            </button>
+              <p 
+                className="text-xs"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                {mode.desc}
+              </p>
+            </OptionButton>
           ))}
         </div>
       </div>
 
-      {/* 字型選擇 */}
+      {/* Font Selection */}
       <div className="space-y-3">
-        <p className={labelClass}>字型風格</p>
+        <p 
+          className="text-sm"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          字型風格
+        </p>
         <div className="grid grid-cols-2 gap-3">
           {Object.values(FONT_CONFIG).map((font) => (
-            <button
+            <OptionButton
               key={font.id}
+              isActive={settings.fontFamily === font.id}
               onClick={() => handleChange('fontFamily', font.id)}
-              className={getButtonClass(settings.fontFamily === font.id)}
             >
-              <p className={`font-medium text-sm ${isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'}`}>
+              <p 
+                className="font-serif font-medium text-sm"
+                style={{ color: 'var(--text-primary)' }}
+              >
                 {font.name}
               </p>
-              <p className={subTextClass}>{font.description}</p>
-            </button>
+              <p 
+                className="text-xs"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                {font.description}
+              </p>
+            </OptionButton>
           ))}
         </div>
       </div>
 
-      {/* 字型嵌入選項 */}
-      <div className={`space-y-3 ${cardClass}`}>
-        <p className={labelClass}>字型處理方式</p>
+      {/* Font Embed Options */}
+      <div 
+        className="space-y-3 p-5 rounded-2xl"
+        style={{ 
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border)'
+        }}
+      >
+        <p 
+          className="text-sm"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          字型處理方式
+        </p>
         
-        <button
+        <OptionButton
+          isActive={!settings.embedFont}
           onClick={() => handleChange('embedFont', false)}
-          className={`w-full ${getButtonClass(!settings.embedFont)}`}
+          className="w-full"
         >
           <div className="flex items-start gap-3">
-            <span className="text-xl">📱</span>
+            <SmartphoneIcon style={{ color: 'var(--accent-secondary)', flexShrink: 0 }} />
             <div>
-              <p className={`font-medium ${isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'}`}>
+              <p 
+                className="font-serif font-medium"
+                style={{ color: 'var(--text-primary)' }}
+              >
                 使用閱讀器字型
               </p>
-              <p className={`${subTextClass} mt-1`}>
+              <p 
+                className="text-xs mt-1"
+                style={{ color: 'var(--text-muted)' }}
+              >
                 檔案較小。電子書會建議使用「{selectedFont.name}」，但實際顯示取決於閱讀器設定。
               </p>
             </div>
           </div>
-        </button>
+        </OptionButton>
 
-        <button
+        <OptionButton
+          isActive={settings.embedFont}
           onClick={() => handleChange('embedFont', true)}
-          className={`w-full ${getButtonClass(settings.embedFont)}`}
+          className="w-full"
         >
           <div className="flex items-start gap-3">
-            <span className="text-xl">📦</span>
+            <PackageIcon style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
             <div>
-              <p className={`font-medium ${isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'}`}>
+              <p 
+                className="font-serif font-medium"
+                style={{ color: 'var(--text-primary)' }}
+              >
                 嵌入字型（子集化）
               </p>
-              <p className={`${subTextClass} mt-1`}>
+              <p 
+                className="text-xs mt-1"
+                style={{ color: 'var(--text-muted)' }}
+              >
                 只保留書中用到的字，檔案約 +300KB~1MB。無論在哪個閱讀器都顯示「{selectedFont.name}」。
               </p>
-              <p className={`text-xs mt-2 ${isDark ? 'text-nadeshiko-500' : 'text-nadeshiko-400'}`}>
-                ⚡ 首次使用需下載完整字型（約 5~20MB），之後會自動快取
+              <p 
+                className="text-xs mt-2 flex items-center gap-1"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                <ZapIcon style={{ color: 'var(--accent-secondary)' }} />
+                首次使用需下載完整字型（約 5~20MB），之後會自動快取
               </p>
             </div>
           </div>
-        </button>
+        </OptionButton>
       </div>
 
-      {/* 進階選項切換 */}
+      {/* Advanced Options Toggle */}
       <button
         onClick={() => setShowAdvanced(!showAdvanced)}
-        className={`w-full p-3 rounded-xl border transition-all btn-press flex items-center justify-center gap-2 ${
-          isDark 
-            ? 'border-dark-border text-nadeshiko-400 hover:border-nadeshiko-600' 
-            : 'border-nadeshiko-200 text-nadeshiko-500 hover:border-nadeshiko-300'
-        }`}
+        className="w-full p-4 rounded-2xl border transition-all flex items-center justify-center gap-2"
+        style={{
+          borderColor: 'var(--border)',
+          color: 'var(--text-secondary)'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent-secondary)'}
+        onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
       >
         <span>{showAdvanced ? '收起' : '展開'}進階排版選項</span>
-        <span className={`transition-transform ${showAdvanced ? 'rotate-180' : ''}`}>▼</span>
+        <span 
+          className="transition-transform"
+          style={{ transform: showAdvanced ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        >
+          <ChevronDownIcon />
+        </span>
       </button>
 
-      {/* 進階選項 */}
+      {/* Advanced Options */}
       {showAdvanced && (
-        <div className={`space-y-6 ${cardClass}`}>
+        <div 
+          className="space-y-6 p-5 rounded-2xl"
+          style={{ 
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border)'
+          }}
+        >
           
-          {/* 字體大小 */}
+          {/* Font Size */}
           <div className="space-y-3">
-            <p className={labelClass}>字體大小</p>
+            <p 
+              className="text-sm"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              字體大小
+            </p>
             <div className="grid grid-cols-4 gap-2">
               {[
                 { id: 'small', name: '小', desc: '適合大螢幕' },
@@ -302,23 +511,33 @@ export default function SettingsPanel({ settings, setSettings }) {
                 { id: 'large', name: '大', desc: '輕鬆閱讀' },
                 { id: 'xlarge', name: '特大', desc: '護眼模式' },
               ].map((size) => (
-                <button
+                <SmallButton
                   key={size.id}
+                  isActive={settings.fontSize === size.id}
                   onClick={() => handleChange('fontSize', size.id)}
-                  className={`text-center ${getSmallButtonClass(settings.fontSize === size.id)}`}
                 >
-                  <p className="font-medium">{size.name}</p>
-                  <p className={`text-xs ${isDark ? 'text-nadeshiko-500' : 'text-nadeshiko-400'}`}>
-                    {size.desc}
-                  </p>
-                </button>
+                  <div className="text-center">
+                    <p className="font-medium">{size.name}</p>
+                    <p 
+                      className="text-xs"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      {size.desc}
+                    </p>
+                  </div>
+                </SmallButton>
               ))}
             </div>
           </div>
 
-          {/* 行高 */}
+          {/* Line Height */}
           <div className="space-y-3">
-            <p className={labelClass}>行距</p>
+            <p 
+              className="text-sm"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              行距
+            </p>
             <div className="flex gap-2">
               {[
                 { id: 'compact', name: '緊湊' },
@@ -326,39 +545,48 @@ export default function SettingsPanel({ settings, setSettings }) {
                 { id: 'relaxed', name: '寬鬆' },
                 { id: 'loose', name: '特寬' },
               ].map((lh) => (
-                <button
+                <SmallButton
                   key={lh.id}
+                  isActive={settings.lineHeight === lh.id}
                   onClick={() => handleChange('lineHeight', lh.id)}
-                  className={`flex-1 ${getSmallButtonClass(settings.lineHeight === lh.id)}`}
                 >
                   {lh.name}
-                </button>
+                </SmallButton>
               ))}
             </div>
           </div>
 
-          {/* 首行縮排 */}
+          {/* Text Indent */}
           <div className="space-y-3">
-            <p className={labelClass}>段落首行縮排</p>
+            <p 
+              className="text-sm"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              段落首行縮排
+            </p>
             <div className="flex gap-2">
               {[
                 { id: 'none', name: '無' },
                 { id: 'one', name: '1字' },
                 { id: 'two', name: '2字' },
               ].map((indent) => (
-                <button
+                <SmallButton
                   key={indent.id}
+                  isActive={settings.textIndent === indent.id}
                   onClick={() => handleChange('textIndent', indent.id)}
-                  className={`flex-1 ${getSmallButtonClass(settings.textIndent === indent.id)}`}
                 >
                   {indent.name}
-                </button>
+                </SmallButton>
               ))}
             </div>
           </div>
 
-          <p className={`text-xs ${isDark ? 'text-nadeshiko-600' : 'text-nadeshiko-400'}`}>
-            💡 這些設定會寫入電子書，但部分閱讀器可能會用自己的設定覆蓋
+          <p 
+            className="text-xs flex items-center gap-2"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            <InfoIcon style={{ color: 'var(--accent-secondary)' }} />
+            這些設定會寫入電子書，但部分閱讀器可能會用自己的設定覆蓋
           </p>
         </div>
       )}
