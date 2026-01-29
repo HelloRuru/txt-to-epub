@@ -1,90 +1,254 @@
-/* Google Fonts - Huninn 粉圓（必須放在最前面） */
-@import url('https://fonts.googleapis.com/css2?family=Huninn&display=swap');
+/* HelloRuru Design System v1.0 */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* 源雲明體 Web Font */
+@font-face {
+  font-family: 'GenWanMin';
+  src: url('https://cdn.jsdelivr.net/gh/nickhsine/genwan-font@master/webfont/GenWanMin2-L.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GenWanMin';
+  src: url('https://cdn.jsdelivr.net/gh/nickhsine/genwan-font@master/webfont/GenWanMin2-R.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GenWanMin';
+  src: url('https://cdn.jsdelivr.net/gh/nickhsine/genwan-font@master/webfont/GenWanMin2-M.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GenWanMin';
+  src: url('https://cdn.jsdelivr.net/gh/nickhsine/genwan-font@master/webfont/GenWanMin2-SB.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --rose: #D4A5A5;
+  --blush: #F5D0C5;
+  --lavender: #B8A9C9;
+  --cream: #FDF6F0;
+  --dusty-rose: #C9929A;
+  --mauve: #9B7E93;
+  --sage: #A8B5A0;
+}
+
+/* Light Mode */
+body {
+  --bg-primary: #FFFCFA;
+  --bg-secondary: #FDF6F0;
+  --bg-card: #FFFFFF;
+  --text-primary: #3D3535;
+  --text-secondary: #6B5B5B;
+  --text-muted: #A09090;
+  --accent-primary: #D4A5A5;
+  --accent-secondary: #B8A9C9;
+  --accent-tertiary: #C9929A;
+  --border: rgba(212, 165, 165, 0.15);
+  --shadow: 0 4px 24px rgba(212, 165, 165, 0.12);
+  --shadow-hover: 0 12px 48px rgba(212, 165, 165, 0.2);
+  --card-glow: rgba(212, 165, 165, 0.08);
+  --icon-stroke: #D4A5A5;
+}
+
+/* Dark Mode */
+body.dark {
+  --bg-primary: #1E1A1D;
+  --bg-secondary: #2A2428;
+  --bg-card: #322C30;
+  --text-primary: #F5EDE9;
+  --text-secondary: #C5B5B0;
+  --text-muted: #8A7A75;
+  --accent-primary: #E8B4B8;
+  --accent-secondary: #C9B8D4;
+  --accent-tertiary: #D4A0A8;
+  --border: rgba(232, 180, 184, 0.1);
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 12px 48px rgba(232, 180, 184, 0.15);
+  --card-glow: rgba(232, 180, 184, 0.06);
+  --icon-stroke: #E8B4B8;
+}
+
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
-/* 淺色模式（預設） */
 body {
-  font-family: 'Huninn', 'Noto Sans TC', sans-serif;
-  background-color: #FFFAF8;
-  color: #3D2830;
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100dvh;
+  transition: background 0.5s ease, color 0.5s ease;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* 深色模式 */
-body.dark {
-  background-color: #1a1418;
-  color: #F8C3CD;
+/* Background glow effect */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 20% 20%, var(--card-glow) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, var(--card-glow) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* 自訂滾動條 - 淺色 */
+/* Typography */
+.font-serif {
+  font-family: 'GenWanMin', serif;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 50%, var(--accent-tertiary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: 24px 24px 0 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* Buttons */
+.btn-primary {
+  padding: 12px 24px;
+  border-radius: 100px;
+  border: none;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: white;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(212, 165, 165, 0.3);
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+}
+
+.btn-secondary {
+  padding: 12px 24px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+/* Icon containers */
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.icon-container.rose {
+  background: linear-gradient(135deg, rgba(212, 165, 165, 0.2) 0%, rgba(184, 169, 201, 0.2) 100%);
+}
+
+.icon-container.lavender {
+  background: linear-gradient(135deg, rgba(184, 169, 201, 0.2) 0%, rgba(155, 126, 147, 0.2) 100%);
+}
+
+.icon-container.sage {
+  background: linear-gradient(135deg, rgba(168, 181, 160, 0.2) 0%, rgba(184, 169, 201, 0.15) 100%);
+}
+
+.icon-container:hover {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #FFF5F5;
+  background: var(--bg-secondary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #F596AA;
+  background: var(--accent-primary);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #DC9FB4;
+  background: var(--accent-secondary);
 }
 
-/* 深色模式滾動條 */
-body.dark ::-webkit-scrollbar-track {
-  background: #2a2025;
-}
-
-body.dark ::-webkit-scrollbar-thumb {
-  background: #8E5D6E;
-}
-
-body.dark ::-webkit-scrollbar-thumb:hover {
-  background: #B87D91;
-}
-
-/* 日系文青風格 - 裝飾線條 */
-.decorative-line {
-  width: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #DC9FB4, transparent);
-  margin: 0 auto;
-}
-
-/* 卡片懸浮效果 */
-.card-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(220, 159, 180, 0.2);
-}
-
-/* 按鈕點擊效果 */
-.btn-press:active {
-  transform: scale(0.98);
-}
-
-/* 選取文字顏色 */
+/* Selection */
 ::selection {
-  background-color: #FEDFE1;
-  color: #3D2830;
+  background-color: rgba(212, 165, 165, 0.3);
+  color: var(--text-primary);
 }
 
-body.dark ::selection {
-  background-color: #64404D;
-  color: #F8C3CD;
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.5s ease forwards;
 }
