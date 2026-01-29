@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { FONT_CONFIG, DEFAULT_FONT } from '../utils/fontSubset'
-import { FILENAME_FORMATS, loadFilenamePrefs, saveFilenamePrefs, generateFilename } from '../utils/filenameFormat'
+import { FILENAME_FORMATS, CUSTOM_BLOCKS, loadFilenamePrefs, saveFilenamePrefs, generateFilename } from '../utils/filenameFormat'
 
 // SVG Icons
 const SettingsIcon = () => (
@@ -46,6 +46,20 @@ const InfoIcon = () => (
   </svg>
 )
 
+const PlusIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <line x1="12" y1="5" x2="12" y2="19"/>
+    <line x1="5" y1="12" x2="19" y2="12"/>
+  </svg>
+)
+
+const XIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-3 h-3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <line x1="18" y1="6" x2="6" y2="18"/>
+    <line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+)
+
 export default function SettingsPanel({ settings, setSettings }) {
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [filenamePrefs, setFilenamePrefs] = useState(loadFilenamePrefs)
@@ -57,6 +71,8 @@ export default function SettingsPanel({ settings, setSettings }) {
       filenameFormat: filenamePrefs.format,
       filenameIncludeDate: filenamePrefs.includeDate,
       filenameCustomTemplate: filenamePrefs.customTemplate,
+      filenameCustomBlocks: filenamePrefs.customBlocks,
+      exporter: filenamePrefs.exporter,
     }))
   }, [filenamePrefs, setSettings])
 
@@ -68,14 +84,31 @@ export default function SettingsPanel({ settings, setSettings }) {
     setFilenamePrefs(prev => ({ ...prev, format }))
   }
 
+  // 方塊操作
+  const addBlock = (blockId) => {
+    setFilenamePrefs(prev => ({
+      ...prev,
+      customBlocks: [...prev.customBlocks, blockId]
+    }))
+  }
+
+  const removeBlock = (index) => {
+    setFilenamePrefs(prev => ({
+      ...prev,
+      customBlocks: prev.customBlocks.filter((_, i) => i !== index)
+    }))
+  }
+
   const selectedFont = FONT_CONFIG[settings.fontFamily] || FONT_CONFIG[DEFAULT_FONT]
 
   const previewFilename = generateFilename({
     title: settings.title || '書名',
     author: settings.author || '',
+    exporter: filenamePrefs.exporter || '',
     format: filenamePrefs.format,
     includeDate: filenamePrefs.includeDate,
     customTemplate: filenamePrefs.customTemplate,
+    customBlocks: filenamePrefs.customBlocks,
   })
 
   const OptionButton = ({ isActive, onClick, children, className = '' }) => (
@@ -116,6 +149,12 @@ export default function SettingsPanel({ settings, setSettings }) {
       {children}
     </button>
   )
+
+  // 取得方塊的顯示標籤
+  const getBlockLabel = (blockId) => {
+    const block = CUSTOM_BLOCKS.find(b => b.id === blockId)
+    return block ? block.label : blockId
+  }
 
   return (
     <div className="space-y-6">
@@ -159,12 +198,6 @@ export default function SettingsPanel({ settings, setSettings }) {
               caretColor: 'var(--accent-primary)'
             }}
           />
-          <p 
-            className="text-xs"
-            style={{ color: 'var(--text-muted)' }}
-          >
-            輸出檔名也會使用此名稱
-          </p>
         </div>
 
         <div className="space-y-2">
@@ -188,6 +221,35 @@ export default function SettingsPanel({ settings, setSettings }) {
             }}
           />
         </div>
+      </div>
+
+      {/* Exporter - 只在自訂格式或需要時顯示 */}
+      <div className="space-y-2">
+        <label 
+          className="text-sm"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          輸出者（選填）
+        </label>
+        <input
+          type="text"
+          value={filenamePrefs.exporter}
+          onChange={(e) => setFilenamePrefs(prev => ({ ...prev, exporter: e.target.value }))}
+          placeholder="你的名字，用於檔名顯示"
+          className="w-full px-4 py-3 rounded-2xl border transition-colors focus:outline-none"
+          style={{
+            background: 'var(--bg-secondary)',
+            borderColor: 'var(--border)',
+            color: 'var(--text-primary)',
+            caretColor: 'var(--accent-primary)'
+          }}
+        />
+        <p 
+          className="text-xs"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          可在自訂檔名格式中使用
+        </p>
       </div>
 
       {/* Filename Format */}
@@ -232,26 +294,86 @@ export default function SettingsPanel({ settings, setSettings }) {
           自訂格式
         </SmallButton>
 
+        {/* 自訂格式方塊 UI */}
         {filenamePrefs.format === 'custom' && (
-          <div className="space-y-2">
-            <input
-              type="text"
-              value={filenamePrefs.customTemplate}
-              onChange={(e) => setFilenamePrefs(prev => ({ ...prev, customTemplate: e.target.value }))}
-              placeholder="使用 {title}、{author}、{date} 變數"
-              className="w-full px-4 py-3 rounded-2xl border transition-colors focus:outline-none"
-              style={{
-                background: 'var(--bg-card)',
-                borderColor: 'var(--border)',
-                color: 'var(--text-primary)'
-              }}
-            />
-            <p 
-              className="text-xs"
-              style={{ color: 'var(--text-muted)' }}
-            >
-              例如：{'{author}'}_{'{title}'}_{'{date}'} → 作者_書名_20260129
-            </p>
+          <div className="space-y-4">
+            {/* 已選方塊 */}
+            <div className="space-y-2">
+              <p 
+                className="text-xs"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                檔名組成（點擊移除）
+              </p>
+              <div className="flex flex-wrap gap-2 min-h-[40px] p-3 rounded-xl" style={{ background: 'var(--bg-card)' }}>
+                {filenamePrefs.customBlocks.length === 0 ? (
+                  <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                    請點擊下方方塊加入
+                  </span>
+                ) : (
+                  filenamePrefs.customBlocks.map((blockId, index) => (
+                    <span key={index}>
+                      {index > 0 && (
+                        <span 
+                          className="mx-1"
+                          style={{ color: 'var(--text-muted)' }}
+                        >
+                          _
+                        </span>
+                      )}
+                      <button
+                        onClick={() => removeBlock(index)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm transition-all"
+                        style={{
+                          background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                          color: 'white'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                        onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                      >
+                        {getBlockLabel(blockId)}
+                        <XIcon />
+                      </button>
+                    </span>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* 可選方塊 */}
+            <div className="space-y-2">
+              <p 
+                className="text-xs"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                點擊加入
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {CUSTOM_BLOCKS.map((block) => (
+                  <button
+                    key={block.id}
+                    onClick={() => addBlock(block.id)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm border transition-all"
+                    style={{
+                      borderColor: 'var(--border)',
+                      color: 'var(--text-secondary)',
+                      background: 'transparent'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--accent-primary)'
+                      e.currentTarget.style.color = 'var(--accent-primary)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--border)'
+                      e.currentTarget.style.color = 'var(--text-secondary)'
+                    }}
+                  >
+                    <PlusIcon />
+                    {block.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
