@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { generateEpub } from '../utils/epubGenerator'
 import { convertToTraditional } from '../utils/converter'
 import { FONT_CONFIG } from '../utils/fontSubset'
 import { generateFilename } from '../utils/filenameFormat'
+import { saveAs } from 'file-saver'
 
 // SVG Icons
 const CheckCircleIcon = () => (
@@ -39,10 +40,19 @@ const ZapIcon = () => (
   </svg>
 )
 
+const RefreshIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <polyline points="23 4 23 10 17 10"/>
+    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+  </svg>
+)
+
 export default function ExportButton({ content, chapters, cover, settings, onReset }) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
   const [progress, setProgress] = useState({ stage: '', message: '' })
+  const lastBlobRef = useRef(null)
+  const lastFilenameRef = useRef('')
 
   const handleExport = async () => {
     setIsGenerating(true)
@@ -77,7 +87,10 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
         customTemplate: settings.filenameCustomTemplate || '',
       })
 
-      await generateEpub({
+      // Store filename for re-download
+      lastFilenameRef.current = outputFilename
+
+      const blob = await generateEpub({
         title: processedTitle,
         author: processedAuthor,
         chapters: processedChapters,
@@ -90,7 +103,13 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
         textIndent: settings.textIndent,
         filename: outputFilename,
         onProgress: setProgress,
+        returnBlob: true, // Request blob to be returned for re-download
       })
+
+      // Store blob for re-download
+      if (blob) {
+        lastBlobRef.current = blob
+      }
 
       setIsComplete(true)
     } catch (error) {
@@ -98,6 +117,12 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
       alert(`生成失敗：${error.message}`)
     } finally {
       setIsGenerating(false)
+    }
+  }
+
+  const handleRedownload = () => {
+    if (lastBlobRef.current && lastFilenameRef.current) {
+      saveAs(lastBlobRef.current, `${lastFilenameRef.current}.epub`)
     }
   }
 
@@ -124,19 +149,46 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
         >
           檔案已自動下載到你的裝置
         </p>
-        <button
-          onClick={onReset}
-          className="px-8 py-3 rounded-full text-sm font-medium transition-all"
-          style={{ 
-            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-            color: 'white',
-            boxShadow: '0 4px 16px rgba(212, 165, 165, 0.3)'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-        >
-          轉換另一個檔案
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+          {lastBlobRef.current && (
+            <button
+              onClick={handleRedownload}
+              className="px-6 py-3 rounded-full text-sm font-medium transition-all flex items-center gap-2"
+              style={{ 
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border)',
+                color: 'var(--text-secondary)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-primary)'
+                e.currentTarget.style.color = 'var(--accent-primary)'
+                e.currentTarget.style.transform = 'scale(1.05)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border)'
+                e.currentTarget.style.color = 'var(--text-secondary)'
+                e.currentTarget.style.transform = 'scale(1)'
+              }}
+            >
+              <DownloadIcon />
+              再次下載
+            </button>
+          )}
+          <button
+            onClick={onReset}
+            className="px-6 py-3 rounded-full text-sm font-medium transition-all flex items-center gap-2"
+            style={{ 
+              background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+              color: 'white',
+              boxShadow: '0 4px 16px rgba(212, 165, 165, 0.3)'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            <RefreshIcon />
+            轉換另一個檔案
+          </button>
+        </div>
       </div>
     )
   }
