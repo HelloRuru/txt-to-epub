@@ -5,9 +5,128 @@
  * - Chapter X、CHAPTER X
  * - 數字編號（1.、1、①）
  * - 卷X、篇X
+ * - [數字] 格式（如 [1]、[01]、[001]）
+ * - 自訂分隔符號
  */
-export function detectChapters(text) {
+
+// 偵測模式類型
+export const DETECTION_MODES = {
+  AUTO: 'auto',                  // 自動偵測（系統判斷）
+  BY_EMPTY_LINES: 'emptyLines',  // 依空行分章
+  BY_SEPARATOR: 'separator',     // 依分隔符號
+  SINGLE_CHAPTER: 'single',      // 單一章節
+}
+
+/**
+ * 分析文字內容，回傳偵測結果與建議
+ */
+export function analyzeText(text) {
+  const analysis = {
+    hasPatternChapters: false,
+    patternChapterCount: 0,
+    hasBracketNumbers: false,
+    bracketNumberCount: 0,
+    emptyLineBlocks: 0,
+    commonSeparators: [],
+    totalLength: text.length,
+    recommendation: DETECTION_MODES.AUTO,
+    detectedPatterns: [],
+  }
+
+  // 偵測 [數字] 格式
+  const bracketPattern = /^\s*\[(\d+)\]/gm
+  const bracketMatches = [...text.matchAll(bracketPattern)]
+  if (bracketMatches.length >= 2) {
+    analysis.hasBracketNumbers = true
+    analysis.bracketNumberCount = bracketMatches.length
+    analysis.detectedPatterns.push(`[數字] 格式（${bracketMatches.length} 處）`)
+  }
+
+  // 偵測傳統章節格式
   const patterns = [
+    { regex: /^[　\s]*(第[零一二三四五六七八九十百千\d]+[章節回卷篇集部])/gm, name: '中文章節' },
+    { regex: /^[　\s]*(Chapter\s+\d+)/gim, name: 'Chapter' },
+    { regex: /^[　\s]*(\d+[\.、]\s*.+?)$/gm, name: '數字編號' },
+    { regex: /^[　\s]*([①②③④⑤⑥⑦⑧⑨⑩])/gm, name: '圈號' },
+  ]
+
+  for (const p of patterns) {
+    const matches = [...text.matchAll(p.regex)]
+    if (matches.length >= 2) {
+      analysis.hasPatternChapters = true
+      analysis.patternChapterCount += matches.length
+      analysis.detectedPatterns.push(`${p.name}（${matches.length} 處）`)
+    }
+  }
+
+  // 計算空行區塊數量（連續 2+ 空行視為分隔）
+  const emptyLineBlocks = text.split(/\n\s*\n\s*\n/).length
+  analysis.emptyLineBlocks = emptyLineBlocks
+
+  // 偵測常見分隔符號
+  const separatorPatterns = [
+    { pattern: /^[=]{3,}$/gm, name: '===' },
+    { pattern: /^[-]{3,}$/gm, name: '---' },
+    { pattern: /^[*]{3,}$/gm, name: '***' },
+    { pattern: /^[#]{3,}$/gm, name: '###' },
+    { pattern: /^[~]{3,}$/gm, name: '~~~' },
+    { pattern: /^[─]{3,}$/gm, name: '───' },
+    { pattern: /^[＊]{3,}$/gm, name: '＊＊＊' },
+  ]
+  
+  for (const sep of separatorPatterns) {
+    const matches = [...text.matchAll(sep.pattern)]
+    if (matches.length >= 2) {
+      analysis.commonSeparators.push({ name: sep.name, count: matches.length })
+    }
+  }
+
+  // 判斷推薦模式
+  if (analysis.hasPatternChapters || analysis.hasBracketNumbers) {
+    analysis.recommendation = DETECTION_MODES.AUTO
+  } else if (emptyLineBlocks >= 3 && emptyLineBlocks <= 200) {
+    // 若無明確章節格式，但有合理數量的空行分隔，推薦空行分章
+    analysis.recommendation = DETECTION_MODES.BY_EMPTY_LINES
+  } else {
+    analysis.recommendation = DETECTION_MODES.SINGLE_CHAPTER
+  }
+
+  return analysis
+}
+
+/**
+ * 主要偵測函數
+ * @param {string} text - 文字內容
+ * @param {string} mode - 偵測模式
+ * @param {object} options - 額外選項（如 separator）
+ */
+export function detectChapters(text, mode = DETECTION_MODES.AUTO, options = {}) {
+  if (mode === DETECTION_MODES.BY_EMPTY_LINES) {
+    return detectByEmptyLines(text)
+  }
+  
+  if (mode === DETECTION_MODES.BY_SEPARATOR && options.separator) {
+    return detectBySeparator(text, options.separator)
+  }
+  
+  if (mode === DETECTION_MODES.SINGLE_CHAPTER) {
+    return [{
+      title: '全文',
+      content: text,
+    }]
+  }
+
+  // AUTO 模式：使用規則偵測
+  return detectByPatterns(text)
+}
+
+/**
+ * 依規則偵測章節
+ */
+function detectByPatterns(text) {
+  const patterns = [
+    // [數字] 格式 - 新增支援
+    /^[　\s]*(\[\d+\].*?)$/gm,
     // 中文章節
     /^[　\s]*(第[零一二三四五六七八九十百千\d]+[章節回卷篇集部].*?)$/gm,
     // 英文章節
@@ -42,9 +161,12 @@ export function detectChapters(text) {
     return Math.abs(m.index - arr[i - 1].index) > 5
   })
 
-  // 如果沒有找到章節，回傳 null 讓 UI 處理
+  // 如果沒有找到章節，整份作為一章
   if (matches.length === 0) {
-    return null
+    return [{
+      title: '全文',
+      content: text,
+    }]
   }
 
   // 切分內容
@@ -75,90 +197,97 @@ export function detectChapters(text) {
 }
 
 /**
+ * 依空行分章
+ * 連續 2 個以上空行視為章節分隔
+ */
+function detectByEmptyLines(text) {
+  // 以連續空行（2行以上）分割
+  const blocks = text.split(/\n\s*\n\s*\n+/)
+    .map(block => block.trim())
+    .filter(block => block.length > 0)
+
+  if (blocks.length === 0) {
+    return [{
+      title: '全文',
+      content: text,
+    }]
+  }
+
+  if (blocks.length === 1) {
+    return [{
+      title: '全文',
+      content: blocks[0],
+    }]
+  }
+
+  // 為每個區塊生成章節
+  return blocks.map((block, index) => {
+    // 嘗試從區塊第一行提取標題
+    const lines = block.split('\n')
+    const firstLine = lines[0].trim()
+    
+    // 如果第一行較短（可能是標題），使用它作為章節名
+    let title
+    if (firstLine.length <= 50 && firstLine.length > 0) {
+      title = firstLine
+    } else {
+      title = `章節 ${index + 1}`
+    }
+
+    return {
+      title,
+      content: block,
+    }
+  })
+}
+
+/**
  * 依分隔符號分章
- * @param {string} text - 原始文字
- * @param {string} separator - 分隔符號，例如 "===" 或 "---" 或 "***"
+ * @param {string} text - 文字內容
+ * @param {string} separator - 分隔符號（如 ===、---、***）
  */
-export function splitBySeparator(text, separator) {
-  const parts = text.split(separator).filter(p => p.trim())
+function detectBySeparator(text, separator) {
+  // 將分隔符號轉為正則表達式，處理特殊字元
+  const escapedSeparator = separator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  // 匹配該分隔符號（連續出現 3 次以上，或完全匹配）
+  const regex = new RegExp(`^[\\s]*${escapedSeparator}+[\\s]*$`, 'gm')
   
-  if (parts.length <= 1) {
-    return null
+  // 用分隔符號切分文字
+  const blocks = text.split(regex)
+    .map(block => block.trim())
+    .filter(block => block.length > 0)
+
+  if (blocks.length === 0) {
+    return [{
+      title: '全文',
+      content: text,
+    }]
   }
 
-  return parts.map((content, index) => ({
-    title: `第 ${index + 1} 章`,
-    content: content.trim(),
-  }))
-}
-
-/**
- * 依空行分章（連續多個空行視為分章點）
- * @param {string} text - 原始文字
- * @param {number} minEmptyLines - 最少幾個連續空行才視為分章（預設 3）
- */
-export function splitByEmptyLines(text, minEmptyLines = 3) {
-  const pattern = new RegExp(`(\\n\\s*){${minEmptyLines},}`, 'g')
-  const parts = text.split(pattern).filter(p => p.trim())
-  
-  if (parts.length <= 1) {
-    return null
+  if (blocks.length === 1) {
+    return [{
+      title: '全文',
+      content: blocks[0],
+    }]
   }
 
-  return parts.map((content, index) => ({
-    title: `第 ${index + 1} 章`,
-    content: content.trim(),
-  }))
-}
-
-/**
- * 依固定字數分章
- * @param {string} text - 原始文字
- * @param {number} charsPerChapter - 每章約幾個字
- */
-export function splitByCharCount(text, charsPerChapter = 5000) {
-  const chapters = []
-  const lines = text.split('\n')
-  let currentContent = []
-  let currentLength = 0
-  let chapterIndex = 1
-
-  for (const line of lines) {
-    currentContent.push(line)
-    currentLength += line.length
-
-    // 到達字數門檻，且剛好在段落結尾（空行或行尾）
-    if (currentLength >= charsPerChapter && line.trim() === '') {
-      chapters.push({
-        title: `第 ${chapterIndex} 章`,
-        content: currentContent.join('\n').trim(),
-      })
-      currentContent = []
-      currentLength = 0
-      chapterIndex++
+  // 為每個區塊生成章節
+  return blocks.map((block, index) => {
+    // 嘗試從區塊第一行提取標題
+    const lines = block.split('\n')
+    const firstLine = lines[0].trim()
+    
+    // 如果第一行較短（可能是標題），使用它作為章節名
+    let title
+    if (firstLine.length <= 50 && firstLine.length > 0) {
+      title = firstLine
+    } else {
+      title = `章節 ${index + 1}`
     }
-  }
 
-  // 剩餘內容
-  if (currentContent.length > 0) {
-    const remaining = currentContent.join('\n').trim()
-    if (remaining) {
-      chapters.push({
-        title: `第 ${chapterIndex} 章`,
-        content: remaining,
-      })
+    return {
+      title,
+      content: block,
     }
-  }
-
-  return chapters.length > 0 ? chapters : null
-}
-
-/**
- * 強制分為單一章節（全文）
- */
-export function splitAsSingleChapter(text, title = '全文') {
-  return [{
-    title,
-    content: text.trim(),
-  }]
+  })
 }
