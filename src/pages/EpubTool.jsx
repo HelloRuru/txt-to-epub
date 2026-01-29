@@ -80,7 +80,8 @@ export default function EpubTool() {
     setFile(uploadedFile)
     setContent(text)
     const detectedChapters = detectChapters(text)
-    setChapters(detectedChapters)
+    // detectChapters 可能回傳 null（未偵測到章節）
+    setChapters(detectedChapters || [])
     const fileName = uploadedFile.name.replace(/\.txt$/i, '')
     setSettings(prev => ({ ...prev, title: fileName }))
     setStep(2)
@@ -111,6 +112,13 @@ export default function EpubTool() {
       textIndent: 'two',
     })
     setStep(1)
+  }
+
+  // 檢查是否可以進入下一步
+  const canProceed = () => {
+    if (step === 1) return !!file
+    if (step === 2) return chapters.length > 0
+    return true
   }
 
   const steps = [
@@ -272,6 +280,7 @@ export default function EpubTool() {
               chapters={chapters} 
               setChapters={setChapters}
               fileName={file?.name}
+              rawContent={content}
             />
           )}
           {step === 3 && (
@@ -322,18 +331,18 @@ export default function EpubTool() {
           {step < 4 && (
             <button
               onClick={handleNext}
-              disabled={step === 1 && !file}
+              disabled={!canProceed()}
               className="px-6 py-3 rounded-full text-sm font-medium transition-all flex items-center gap-2"
               style={{ 
-                background: (step === 1 && !file) 
+                background: !canProceed()
                   ? 'var(--bg-secondary)' 
                   : 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                color: (step === 1 && !file) ? 'var(--text-muted)' : 'white',
-                cursor: (step === 1 && !file) ? 'not-allowed' : 'pointer',
-                boxShadow: (step === 1 && !file) ? 'none' : '0 4px 16px rgba(212, 165, 165, 0.3)'
+                color: !canProceed() ? 'var(--text-muted)' : 'white',
+                cursor: !canProceed() ? 'not-allowed' : 'pointer',
+                boxShadow: !canProceed() ? 'none' : '0 4px 16px rgba(212, 165, 165, 0.3)'
               }}
               onMouseEnter={(e) => {
-                if (!(step === 1 && !file)) {
+                if (canProceed()) {
                   e.currentTarget.style.transform = 'scale(1.05)'
                 }
               }}
