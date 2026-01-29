@@ -36,6 +36,7 @@ export async function generateEpub({
   textIndent = 'two',
   filename = null,
   onProgress = () => {},
+  returnBlob = false,
 }) {
   const zip = new JSZip()
   const bookId = `urn:uuid:${crypto.randomUUID()}`
@@ -290,6 +291,11 @@ p {
   // 使用自訂檔名或預設用書名
   const outputFilename = filename || title || '未命名'
   saveAs(blob, `${outputFilename}.epub`)
+
+  // 回傳 blob 供再次下載使用
+  if (returnBlob) {
+    return blob
+  }
 }
 
 function escapeHtml(text) {
