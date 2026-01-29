@@ -2,11 +2,44 @@ import { useState } from 'react'
 import { generateEpub } from '../utils/epubGenerator'
 import { convertToTraditional } from '../utils/converter'
 import { FONT_CONFIG } from '../utils/fontSubset'
-import { useTheme } from '../contexts/ThemeContext'
 import { generateFilename } from '../utils/filenameFormat'
 
+// SVG Icons
+const CheckCircleIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-16 h-16" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+    <polyline points="22 4 12 14.01 9 11.01"/>
+  </svg>
+)
+
+const DownloadIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-5 h-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/>
+    <line x1="12" y1="15" x2="12" y2="3"/>
+  </svg>
+)
+
+const LoaderIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-5 h-5 animate-spin" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <line x1="12" y1="2" x2="12" y2="6"/>
+    <line x1="12" y1="18" x2="12" y2="22"/>
+    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/>
+    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
+    <line x1="2" y1="12" x2="6" y2="12"/>
+    <line x1="18" y1="12" x2="22" y2="12"/>
+    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/>
+    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
+  </svg>
+)
+
+const ZapIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+  </svg>
+)
+
 export default function ExportButton({ content, chapters, cover, settings, onReset }) {
-  const { isDark } = useTheme()
   const [isGenerating, setIsGenerating] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
   const [progress, setProgress] = useState({ stage: '', message: '' })
@@ -31,7 +64,6 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
         processedTitle = await convertToTraditional(settings.title)
       }
 
-      // 生成輸出檔名（轉繁體後）
       let processedAuthor = settings.author
       if (settings.convertToTraditional && settings.author) {
         processedAuthor = await convertToTraditional(settings.author)
@@ -74,16 +106,34 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
   if (isComplete) {
     return (
       <div className="text-center py-12">
-        <div className="text-6xl mb-6">🎉</div>
-        <h2 className={`text-2xl mb-4 ${isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'}`}>
+        <div 
+          className="inline-flex mb-6"
+          style={{ color: 'var(--accent-primary)' }}
+        >
+          <CheckCircleIcon />
+        </div>
+        <h2 
+          className="font-serif text-2xl font-semibold mb-4"
+          style={{ color: 'var(--text-primary)' }}
+        >
           EPUB 生成完成！
         </h2>
-        <p className={`mb-8 ${isDark ? 'text-nadeshiko-400/80' : 'text-nadeshiko-500/80'}`}>
-          檔案已自動下載到你的裝置 ♡
+        <p 
+          className="mb-8"
+          style={{ color: 'var(--text-secondary)' }}
+        >
+          檔案已自動下載到你的裝置
         </p>
         <button
           onClick={onReset}
-          className="px-8 py-3 rounded-xl bg-nadeshiko-400 text-white hover:bg-nadeshiko-500 transition-colors btn-press"
+          className="px-8 py-3 rounded-full text-sm font-medium transition-all"
+          style={{ 
+            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+            color: 'white',
+            boxShadow: '0 4px 16px rgba(212, 165, 165, 0.3)'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
         >
           轉換另一個檔案
         </button>
@@ -91,46 +141,55 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
     )
   }
 
+  const summaryItems = [
+    { label: '書名', value: settings.title || '未命名' },
+    { label: '作者', value: settings.author || '未填寫' },
+    { label: '章節數', value: `${chapters.length} 章` },
+    { label: '封面', value: cover ? '已設定' : '無' },
+    { label: '簡轉繁', value: settings.convertToTraditional ? '是' : '否' },
+    { label: '排版', value: settings.writingMode === 'vertical' ? '直排' : '橫排' },
+    { label: '字型', value: fontConfig?.name || '預設' },
+    { label: '嵌入字型', value: settings.embedFont ? '是（子集化）' : '否' },
+  ]
+
   return (
     <div className="text-center py-8">
-      <h2 className={`text-2xl mb-2 ${isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'}`}>
+      <h2 
+        className="font-serif text-2xl font-semibold mb-6"
+        style={{ color: 'var(--text-primary)' }}
+      >
         確認並輸出
       </h2>
-      <div className="decorative-line mb-6"></div>
       
-      {/* 摘要 */}
-      <div className={`max-w-md mx-auto mb-8 p-6 rounded-xl text-left space-y-3 ${
-        isDark ? 'bg-nadeshiko-900/10' : 'bg-nadeshiko-50/80'
-      }`}>
-        {[
-          { label: '書名', value: settings.title || '未命名' },
-          { label: '作者', value: settings.author || '未填寫' },
-          { label: '章節數', value: `${chapters.length} 章` },
-          { label: '封面', value: cover ? '已設定' : '無' },
-          { label: '簡轉繁', value: settings.convertToTraditional ? '是' : '否' },
-          { label: '排版', value: settings.writingMode === 'vertical' ? '直排' : '橫排' },
-          { label: '字型', value: fontConfig?.name || '預設' },
-          { label: '嵌入字型', value: settings.embedFont ? '是（子集化）' : '否' },
-        ].map((item, i) => (
+      {/* Summary */}
+      <div 
+        className="max-w-md mx-auto mb-8 p-6 rounded-2xl text-left space-y-3"
+        style={{ background: 'var(--bg-secondary)' }}
+      >
+        {summaryItems.map((item, i) => (
           <div key={i} className="flex justify-between">
-            <span className={isDark ? 'text-nadeshiko-400/80' : 'text-nadeshiko-500/80'}>
+            <span style={{ color: 'var(--text-muted)' }}>
               {item.label}
             </span>
-            <span className={isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'}>
+            <span style={{ color: 'var(--text-primary)' }}>
               {item.value}
             </span>
           </div>
         ))}
       </div>
 
-      {/* 進度顯示 */}
+      {/* Progress */}
       {isGenerating && (
-        <div className={`max-w-md mx-auto mb-6 p-4 rounded-xl text-left ${
-          isDark ? 'bg-nadeshiko-900/20' : 'bg-nadeshiko-100/80'
-        }`}>
+        <div 
+          className="max-w-md mx-auto mb-6 p-4 rounded-2xl text-left"
+          style={{ 
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border)'
+          }}
+        >
           <div className="flex items-center gap-3">
-            <span className="animate-spin text-xl">⏳</span>
-            <span className={isDark ? 'text-nadeshiko-300' : 'text-nadeshiko-600'}>
+            <LoaderIcon style={{ color: 'var(--accent-primary)' }} />
+            <span style={{ color: 'var(--text-secondary)' }}>
               {progress.message || '處理中...'}
             </span>
           </div>
@@ -140,31 +199,49 @@ export default function ExportButton({ content, chapters, cover, settings, onRes
       <button
         onClick={handleExport}
         disabled={isGenerating}
-        className={`px-12 py-4 rounded-xl text-lg font-medium transition-all btn-press ${
-          isGenerating
-            ? isDark 
-              ? 'bg-dark-border text-nadeshiko-600 cursor-wait'
-              : 'bg-nadeshiko-200 text-nadeshiko-400 cursor-wait'
-            : 'bg-nadeshiko-400 text-white hover:bg-nadeshiko-500 hover:scale-105 shadow-soft'
-        }`}
+        className="px-12 py-4 rounded-full text-lg font-medium transition-all flex items-center gap-3 mx-auto"
+        style={{ 
+          background: isGenerating 
+            ? 'var(--bg-secondary)' 
+            : 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+          color: isGenerating ? 'var(--text-muted)' : 'white',
+          cursor: isGenerating ? 'wait' : 'pointer',
+          boxShadow: isGenerating ? 'none' : '0 4px 16px rgba(212, 165, 165, 0.3)'
+        }}
+        onMouseEnter={(e) => {
+          if (!isGenerating) e.currentTarget.style.transform = 'scale(1.05)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)'
+        }}
       >
         {isGenerating ? (
-          <span className="flex items-center gap-2">
-            <span className="animate-spin">⏳</span>
+          <>
+            <LoaderIcon />
             生成中...
-          </span>
+          </>
         ) : (
-          '📥 下載 EPUB'
+          <>
+            <DownloadIcon />
+            下載 EPUB
+          </>
         )}
       </button>
 
-      <p className={`text-sm mt-4 ${isDark ? 'text-nadeshiko-500' : 'text-nadeshiko-400'}`}>
+      <p 
+        className="text-sm mt-4"
+        style={{ color: 'var(--text-muted)' }}
+      >
         輸出檔名：{settings.title || '未命名'}.epub
       </p>
 
       {settings.embedFont && (
-        <p className={`text-xs mt-2 ${isDark ? 'text-nadeshiko-600' : 'text-nadeshiko-300'}`}>
-          ⚡ 首次嵌入字型需下載完整字型檔，之後會快取加速
+        <p 
+          className="text-xs mt-3 flex items-center justify-center gap-2"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          <ZapIcon style={{ color: 'var(--accent-secondary)' }} />
+          首次嵌入字型需下載完整字型檔，之後會快取加速
         </p>
       )}
     </div>
