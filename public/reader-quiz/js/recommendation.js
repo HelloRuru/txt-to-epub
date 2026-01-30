@@ -46,15 +46,28 @@ export function calculateRecommendation(devices, rules, answers) {
     }
   });
   
-  // 使用情境
-  const usageAnswer = answers.usage;
+  // 使用情境（複選）
+  const usageAnswers = answers.usage || [];
   devices.forEach(device => {
-    if (usageAnswer === 'commute') {
+    if (usageAnswers.includes('commute')) {
       if (device.weight <= 200) scores[device.id] += 15;
       if (device.screen.size <= 7) scores[device.id] += 10;
-    } else if (usageAnswer === 'bath') {
-      if (device.waterproof) scores[device.id] += 25;
-    } else if (usageAnswer === 'work') {
+    }
+    if (usageAnswers.includes('home')) {
+      // 在家定點，大螢幕加分
+      if (device.screen.size >= 7.8) scores[device.id] += 5;
+    }
+    if (usageAnswers.includes('bedtime')) {
+      // 睡前閱讀，需要前光
+      if (device.features.some(f => f.includes('前光') || f.includes('ComfortLight') || f.includes('色調'))) {
+        scores[device.id] += 15;
+      }
+      // 無前光扣分
+      if (device.features.some(f => f.includes('無前光'))) {
+        scores[device.id] -= 10;
+      }
+    }
+    if (usageAnswers.includes('work')) {
       if (device.features.some(f => f.includes('手寫') || f.includes('筆'))) {
         scores[device.id] += 20;
       }
@@ -129,6 +142,7 @@ export function calculateRecommendation(devices, rules, answers) {
 
 export function getReasonText(device, answers) {
   const reasons = [];
+  const usageAnswers = answers.usage || [];
   
   if (device.system === 'closed' && (answers.platform === 'single' || answers.priority?.includes('easy'))) {
     reasons.push('封閉式系統，操作直覺簡單');
@@ -136,7 +150,7 @@ export function getReasonText(device, answers) {
     reasons.push('開放式系統，可安裝多種 APP');
   }
   
-  if (device.screen.size <= 6.5 && answers.usage === 'commute') {
+  if (device.screen.size <= 6.5 && usageAnswers.includes('commute')) {
     reasons.push(`${device.screen.size} 吋輕巧設計，適合通勤攜帶`);
   } else if (device.screen.size >= 10 && (answers.content === 'pdf' || answers.content === 'magazine')) {
     reasons.push(`${device.screen.size} 吋大螢幕，適合閱讀 PDF 和雜誌`);
@@ -160,7 +174,7 @@ export function getReasonText(device, answers) {
     reasons.push('台灣品牌，在地服務支援');
   }
   
-  if (device.waterproof && (answers.usage === 'bath' || answers.priority?.includes('waterproof'))) {
+  if (device.waterproof && answers.priority?.includes('waterproof')) {
     reasons.push('IPX8 防水，可在浴室安心使用');
   }
   
