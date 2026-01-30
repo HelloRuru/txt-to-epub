@@ -171,19 +171,19 @@
         "id": "custom",
         "text": "想用自己喜歡的字體",
         "icon": "type",
-        "description": "推薦 Boox、mooInk 等 Android 系統機種"
+        "description": "可安裝自有字體，體驗自定義的閱讀感受"
       },
       {
         "id": "default",
         "text": "內建字體就夠用",
         "icon": "check-circle",
-        "description": "Kobo、Kindle 字體有限但穩定"
+        "description": "使用原生系統內建字體，不需額外再安裝"
       },
       {
         "id": "vertical",
-        "text": "需要直排閱讀優化",
+        "text": "習慣閱讀直排書籍",
         "icon": "align-vertical",
-        "description": "日文輕小說、日漫對話、繁中直排書（⚠️ Kindle 直排支援差）"
+        "description": "日文小說、繁中直排書等，需選擇排版調整彈性較高的裝置（⚠️ Kindle 部分字體可能標點錯位）"
       }
     ]
   },

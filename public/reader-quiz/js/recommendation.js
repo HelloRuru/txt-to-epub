@@ -198,7 +198,7 @@ export function getReasonText(device, answers) {
     reasons.push('支援安裝自訂字體，閱讀體驗可完全客製');
   }
   if (answers.font === 'vertical' && device.verticalText === 'excellent') {
-    reasons.push('直排閱讀優化出色，適合日文與繁中直排書籍');
+    reasons.push('直排顯示優秀，適合日文小說與繁中直排書');
   } else if (answers.font === 'vertical' && device.verticalText === 'good') {
     reasons.push('直排閱讀支援良好');
   }
