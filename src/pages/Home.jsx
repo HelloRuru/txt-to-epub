@@ -120,8 +120,8 @@ export default function Home() {
     <div 
       className="min-h-screen py-12 px-6 transition-colors duration-500 relative"
       style={{ 
-        background: isDark ? 'var(--bg-primary)' : 'var(--bg-primary)',
-        color: isDark ? 'var(--text-primary)' : 'var(--text-primary)'
+        background: 'var(--bg-primary)',
+        color: 'var(--text-primary)'
       }}
     >
       <div className="max-w-5xl mx-auto relative z-10">
@@ -307,15 +307,7 @@ export default function Home() {
             className="font-serif text-sm"
             style={{ color: 'var(--text-muted)' }}
           >
-            © 2026{' '}
-            <a 
-              href="https://helloruru.com" 
-              className="transition-colors hover:opacity-80"
-              style={{ color: 'var(--accent-primary)' }}
-            >
-              Ruru
-            </a>
-            {' '}— Built with curiosity
+            © 2026 Kaoru Tsai. All rights reserved.
           </p>
           <div className="flex justify-center gap-8 mt-5">
             <a 

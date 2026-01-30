@@ -95,34 +95,33 @@ export default function EpubTool() {
   ]
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      isDark 
-        ? 'bg-gradient-to-b from-dark-bg to-dark-card' 
-        : 'bg-gradient-to-b from-nadeshiko-50 to-nadeshiko-100'
-    }`}>
+    <div 
+      className="min-h-screen transition-colors duration-300"
+      style={{ background: 'var(--bg-primary)' }}
+    >
       {/* 頂部導航 */}
-      <nav className={`border-b sticky top-0 z-10 backdrop-blur-sm transition-colors ${
-        isDark 
-          ? 'border-dark-border bg-dark-bg/80' 
-          : 'border-nadeshiko-200 bg-nadeshiko-50/80'
-      }`}>
+      <nav 
+        className="border-b sticky top-0 z-10 backdrop-blur-sm transition-colors"
+        style={{ 
+          borderColor: 'var(--border)',
+          background: isDark ? 'rgba(30, 26, 29, 0.8)' : 'rgba(255, 252, 250, 0.8)'
+        }}
+      >
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link 
             to="/" 
-            className={`flex items-center gap-2 transition-colors ${
-              isDark 
-                ? 'text-nadeshiko-300 hover:text-nadeshiko-200' 
-                : 'text-nadeshiko-600 hover:text-nadeshiko-700'
-            }`}
+            className="flex items-center gap-2 transition-colors hover:opacity-70"
+            style={{ color: 'var(--accent-primary)' }}
           >
             <ArrowLeftIcon />
             <span>返回工具箱</span>
           </Link>
           
-          <h1 className={`flex items-center gap-2 text-xl font-medium ${
-            isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-800'
-          }`}>
-            <span className={isDark ? 'text-lavender-300' : 'text-lavender-500'}>
+          <h1 
+            className="flex items-center gap-2 text-xl font-medium"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            <span style={{ color: 'var(--accent-secondary)' }}>
               <BookIcon />
             </span>
             TXT 轉 EPUB
@@ -135,40 +134,53 @@ export default function EpubTool() {
       <main className="max-w-5xl mx-auto px-4 py-8">
         {/* 使用說明 */}
         {step === 1 && (
-          <div className={`mb-8 p-6 rounded-3xl border card-hover transition-colors ${
-            isDark 
-              ? 'bg-dark-card border-dark-border' 
-              : 'bg-white/70 border-nadeshiko-200'
-          }`}>
-            <h2 className={`text-xl mb-2 flex items-center gap-3 ${
-              isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-700'
-            }`}>
-              <span className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                isDark 
-                  ? 'bg-lavender-500/20' 
-                  : 'bg-gradient-to-br from-lavender-100 to-nadeshiko-100'
-              }`}>
-                <BookOpenIcon className={isDark ? 'text-lavender-300' : 'text-lavender-500'} />
+          <div 
+            className="mb-8 p-6 rounded-3xl border transition-colors"
+            style={{ 
+              background: 'var(--bg-card)',
+              borderColor: 'var(--border)',
+              boxShadow: 'var(--shadow)'
+            }}
+          >
+            <h2 
+              className="text-xl mb-2 flex items-center gap-3"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              <span 
+                className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ 
+                  background: 'linear-gradient(135deg, rgba(184, 169, 201, 0.2), rgba(212, 165, 165, 0.2))'
+                }}
+              >
+                <BookOpenIcon style={{ color: 'var(--accent-secondary)' }} />
               </span>
               使用說明
             </h2>
-            <div className="decorative-line mb-4"></div>
+            <div 
+              className="h-px my-4"
+              style={{ background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), transparent)' }}
+            />
             
             <div className="grid md:grid-cols-3 gap-6 text-sm">
               {instructionSteps.map((item, i) => (
                 <div key={i} className="flex gap-3">
-                  <span className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-semibold flex-shrink-0 ${
-                    isDark 
-                      ? 'border-nadeshiko-400 text-nadeshiko-400' 
-                      : 'border-nadeshiko-400 text-nadeshiko-500'
-                  }`}>
+                  <span 
+                    className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-semibold flex-shrink-0"
+                    style={{ 
+                      borderColor: 'var(--accent-primary)',
+                      color: 'var(--accent-primary)'
+                    }}
+                  >
                     {i + 1}
                   </span>
                   <div>
-                    <p className={`font-medium mb-1 ${isDark ? 'text-nadeshiko-200' : 'text-nadeshiko-800'}`}>
+                    <p 
+                      className="font-medium mb-1"
+                      style={{ color: 'var(--text-primary)' }}
+                    >
                       {item.title}
                     </p>
-                    <p className={isDark ? 'text-nadeshiko-400/70' : 'text-nadeshiko-600/70'}>
+                    <p style={{ color: 'var(--text-muted)' }}>
                       {item.desc}
                     </p>
                   </div>
@@ -183,39 +195,47 @@ export default function EpubTool() {
           {[1, 2, 3, 4].map((s) => (
             <div key={s} className="flex items-center">
               <div
-                className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                  step >= s 
-                    ? 'bg-gradient-to-br from-nadeshiko-400 to-lavender-400 text-white shadow-md' 
-                    : isDark 
-                      ? 'bg-dark-border text-nadeshiko-600' 
-                      : 'bg-nadeshiko-200 text-nadeshiko-400'
-                }`}
+                className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all"
+                style={{ 
+                  background: step >= s 
+                    ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))' 
+                    : 'var(--bg-secondary)',
+                  color: step >= s ? 'white' : 'var(--text-muted)',
+                  boxShadow: step >= s ? 'var(--shadow)' : 'none'
+                }}
               >
                 {s}
               </div>
               {s < 4 && (
-                <div className={`w-12 h-0.5 mx-1 transition-colors ${
-                  step > s 
-                    ? 'bg-gradient-to-r from-nadeshiko-400 to-lavender-400' 
-                    : isDark ? 'bg-dark-border' : 'bg-nadeshiko-200'
-                }`} />
+                <div 
+                  className="w-12 h-0.5 mx-1 transition-colors"
+                  style={{ 
+                    background: step > s 
+                      ? 'linear-gradient(90deg, var(--accent-primary), var(--accent-secondary))' 
+                      : 'var(--border)'
+                  }}
+                />
               )}
             </div>
           ))}
         </div>
         
-        <div className={`text-center text-sm mb-8 ${
-          isDark ? 'text-nadeshiko-400' : 'text-nadeshiko-600'
-        }`}>
+        <div 
+          className="text-center text-sm mb-8"
+          style={{ color: 'var(--text-secondary)' }}
+        >
           {stepLabels[step - 1]}
         </div>
 
         {/* 步驟內容 */}
-        <div className={`rounded-3xl border p-6 md:p-8 transition-colors ${
-          isDark 
-            ? 'bg-dark-card border-dark-border' 
-            : 'bg-white/80 border-nadeshiko-200 shadow-soft'
-        }`}>
+        <div 
+          className="rounded-3xl border p-6 md:p-8 transition-colors"
+          style={{ 
+            background: 'var(--bg-card)',
+            borderColor: 'var(--border)',
+            boxShadow: 'var(--shadow)'
+          }}
+        >
           {step === 1 && <FileUploader onUpload={handleFileUpload} />}
           {step === 2 && (
             <ChapterPreview 
@@ -247,13 +267,14 @@ export default function EpubTool() {
           <button
             onClick={step === 1 ? undefined : handleBack}
             disabled={step === 1}
-            className={`px-6 py-2.5 rounded-full transition-all btn-press flex items-center gap-2 ${
-              step === 1 
-                ? 'opacity-0 cursor-default' 
-                : isDark
-                  ? 'bg-dark-border text-nadeshiko-300 hover:bg-nadeshiko-700/30'
-                  : 'bg-nadeshiko-100 text-nadeshiko-600 hover:bg-nadeshiko-200'
-            }`}
+            className="px-6 py-2.5 rounded-full transition-all flex items-center gap-2"
+            style={{ 
+              opacity: step === 1 ? 0 : 1,
+              cursor: step === 1 ? 'default' : 'pointer',
+              background: 'var(--bg-secondary)',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--border)'
+            }}
           >
             <ArrowLeftIcon className="w-4 h-4" />
             上一步
@@ -263,13 +284,15 @@ export default function EpubTool() {
             <button
               onClick={handleNext}
               disabled={step === 1 && !file}
-              className={`px-6 py-2.5 rounded-full transition-all btn-press flex items-center gap-2 ${
-                step === 1 && !file
-                  ? isDark
-                    ? 'bg-dark-border text-nadeshiko-600 cursor-not-allowed'
-                    : 'bg-nadeshiko-100 text-nadeshiko-300 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-nadeshiko-400 to-lavender-400 text-white hover:shadow-lg'
-              }`}
+              className="px-6 py-2.5 rounded-full transition-all flex items-center gap-2"
+              style={{ 
+                background: (step === 1 && !file) 
+                  ? 'var(--bg-secondary)' 
+                  : 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                color: (step === 1 && !file) ? 'var(--text-muted)' : 'white',
+                cursor: (step === 1 && !file) ? 'not-allowed' : 'pointer',
+                boxShadow: (step === 1 && !file) ? 'none' : 'var(--shadow)'
+              }}
             >
               下一步
               <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
@@ -281,9 +304,10 @@ export default function EpubTool() {
       </main>
 
       {/* 底部 */}
-      <footer className={`text-center py-6 text-xs ${
-        isDark ? 'text-nadeshiko-700' : 'text-nadeshiko-400'
-      }`}>
+      <footer 
+        className="text-center py-6 text-xs"
+        style={{ color: 'var(--text-muted)' }}
+      >
         <p>© 2026 Kaoru Tsai. All rights reserved.</p>
       </footer>
     </div>
