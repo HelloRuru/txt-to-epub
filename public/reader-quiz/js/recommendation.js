@@ -35,8 +35,13 @@ export function calculateRecommendation(devices, rules, answers) {
       if (size <= 7) scores[device.id] += 15;
       if (!isColor) scores[device.id] += 5;
     } else if (contentAnswer === 'manga-bw') {
+      // 黑白漫畫／日文書 → 直排支援加分
       if (size >= 7 && size <= 8) scores[device.id] += 15;
       if (!isColor) scores[device.id] += 5;
+      // 日文書直排加分
+      if (device.verticalText === 'excellent') scores[device.id] += 10;
+      else if (device.verticalText === 'good') scores[device.id] += 5;
+      else if (device.verticalText === 'poor') scores[device.id] -= 10;
     } else if (contentAnswer === 'manga-color') {
       if (size >= 7.8) scores[device.id] += 10;
       if (isColor) scores[device.id] += 20;
@@ -97,12 +102,12 @@ export function calculateRecommendation(devices, rules, answers) {
       // 內建就好 → 封閉系統穩定
       if (device.system === 'closed') scores[device.id] += 10;
     } else if (fontAnswer === 'vertical') {
-      // 需要直排優化
-      if (device.verticalText === 'excellent') scores[device.id] += 25;
+      // 需要直排優化 → 重點加分
+      if (device.verticalText === 'excellent') scores[device.id] += 30;
       else if (device.verticalText === 'good') scores[device.id] += 15;
-      else if (device.verticalText === 'poor') scores[device.id] -= 15;
+      else if (device.verticalText === 'poor') scores[device.id] -= 20;
       // Kindle 直排差，額外扣分
-      if (device.brand === 'Amazon') scores[device.id] -= 10;
+      if (device.brand === 'Amazon') scores[device.id] -= 15;
     }
   });
   
@@ -167,7 +172,14 @@ export function getReasonText(device, answers) {
     reasons.push('支援安裝自訂字體，閱讀體驗可完全客製');
   }
   if (answers.font === 'vertical' && device.verticalText === 'excellent') {
-    reasons.push('直排閱讀優化出色，適合日文與繁中書籍');
+    reasons.push('直排閱讀優化出色，適合日文與繁中直排書籍');
+  } else if (answers.font === 'vertical' && device.verticalText === 'good') {
+    reasons.push('直排閱讀支援良好');
+  }
+  
+  // 日文書/漫畫選項額外理由
+  if (answers.content === 'manga-bw' && device.verticalText === 'excellent') {
+    reasons.push('日漫對話直排顯示優秀');
   }
   
   if (device.origin === '台灣品牌' && answers.priority?.includes('taiwan')) {
@@ -209,8 +221,17 @@ export function getRelevantTip(tips, answers) {
     tipList.push(tips['color-display']);
   }
   
-  // 字體相關提示
+  // 字體/直排相關提示
   if (answers.font === 'vertical') {
+    tipList.push(tips['vertical-text']);
+  }
+  
+  if (answers.font === 'custom') {
+    tipList.push(tips['font-custom']);
+  }
+  
+  // 日文書選項也顯示直排提示
+  if (answers.content === 'manga-bw') {
     tipList.push(tips['vertical-text']);
   }
   
