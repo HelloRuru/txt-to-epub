@@ -1,0 +1,22 @@
+{
+  "systemWeight": {
+    "single": { "closed": 10, "open": 0 },
+    "multi": { "closed": 0, "open": 10 },
+    "library": { "closed": 0, "open": 15 },
+    "webnovel": { "closed": 0, "open": 15 },
+    "undecided": { "closed": 5, "open": 5 }
+  },
+  "contentWeight": {
+    "novel": { "size": [6, 7], "color": false },
+    "manga-bw": { "size": [7, 7.8], "color": false },
+    "manga-color": { "size": [7.8, 10.3], "color": true },
+    "pdf": { "size": [10.3, 13.3], "color": false },
+    "magazine": { "size": [10.3, 13.3], "color": true }
+  },
+  "budgetRange": {
+    "low": { "min": 0, "max": 6000 },
+    "mid": { "min": 6000, "max": 12000 },
+    "high": { "min": 12000, "max": 999999 },
+    "flexible": { "min": 0, "max": 999999 }
+  }
+}
