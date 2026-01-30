@@ -1,0 +1,207 @@
+[
+  {
+    "id": "experience",
+    "question": "你目前使用電子書的經驗？",
+    "description": "這會幫助我們了解你的起點",
+    "options": [
+      {
+        "id": "none",
+        "text": "完全沒用過電子書",
+        "icon": "seedling",
+        "description": "從零開始，想了解閱讀器"
+      },
+      {
+        "id": "app-only",
+        "text": "用手機/平板 APP 看過",
+        "icon": "mobile",
+        "description": "有電子書經驗，但沒用過閱讀器"
+      },
+      {
+        "id": "has-reader",
+        "text": "已經有閱讀器，想換機",
+        "icon": "sync",
+        "description": "現有機器不滿意或想升級"
+      }
+    ]
+  },
+  {
+    "id": "platform",
+    "question": "你的電子書主要來自哪裡？",
+    "description": "不同來源會影響閱讀器的選擇",
+    "options": [
+      {
+        "id": "single",
+        "text": "固定在同一個平台買書",
+        "icon": "store",
+        "description": "例如：只在 Kobo 或只在讀墨買"
+      },
+      {
+        "id": "multi",
+        "text": "在多個平台都有買書",
+        "icon": "layers",
+        "description": "會比較價格，在不同書城購買"
+      },
+      {
+        "id": "library",
+        "text": "主要用圖書館借閱",
+        "icon": "book-open",
+        "description": "想用 HyRead 或台灣雲端書庫"
+      },
+      {
+        "id": "webnovel",
+        "text": "看網文/連載為主",
+        "icon": "scroll",
+        "description": "常看起點、刺蝰貓、輕小說平台等"
+      },
+      {
+        "id": "undecided",
+        "text": "還沒決定，先了解再說",
+        "icon": "compass",
+        "description": "尚未固定平台，保持彈性"
+      }
+    ]
+  },
+  {
+    "id": "content",
+    "question": "你最常看什麼類型的內容？",
+    "description": "內容類型會影響螢幕尺寸和顏色的選擇",
+    "options": [
+      {
+        "id": "novel",
+        "text": "文字為主的書",
+        "icon": "file-text",
+        "description": "小說、散文、傳記、人文類"
+      },
+      {
+        "id": "manga-bw",
+        "text": "黑白漫畫",
+        "icon": "image",
+        "description": "日本漫畫、同人誌等"
+      },
+      {
+        "id": "manga-color",
+        "text": "彩色漫畫/繪本",
+        "icon": "palette",
+        "description": "彩漫、童書、圖文書"
+      },
+      {
+        "id": "pdf",
+        "text": "PDF/論文/文件",
+        "icon": "file",
+        "description": "學術論文、工作文件、期刊"
+      },
+      {
+        "id": "magazine",
+        "text": "雜誌/食譜",
+        "icon": "newspaper",
+        "description": "固定版面為主的內容"
+      }
+    ]
+  },
+  {
+    "id": "usage",
+    "question": "你最常在什麼情境下閱讀？",
+    "description": "使用情境會影響尺寸和重量的選擇",
+    "options": [
+      {
+        "id": "commute",
+        "text": "通勤/外出攜帶",
+        "icon": "train",
+        "description": "需要輕巧好攜帶，單手操作"
+      },
+      {
+        "id": "home",
+        "text": "在家定點閱讀",
+        "icon": "home",
+        "description": "重量較不重要，舒適優先"
+      },
+      {
+        "id": "bath",
+        "text": "泡澡/海邊等有水環境",
+        "icon": "droplet",
+        "description": "需要防水功能"
+      },
+      {
+        "id": "work",
+        "text": "工作/學習使用",
+        "icon": "briefcase",
+        "description": "需要做筆記、標註文件"
+      }
+    ]
+  },
+  {
+    "id": "budget",
+    "question": "你的預算範圍是？",
+    "description": "價格區間會幫助篩選適合的機型",
+    "options": [
+      {
+        "id": "low",
+        "text": "6,000 元以下",
+        "icon": "piggy-bank",
+        "description": "入門體驗，先試試水溫"
+      },
+      {
+        "id": "mid",
+        "text": "6,000 ~ 12,000 元",
+        "icon": "wallet",
+        "description": "主流價位，功能完整"
+      },
+      {
+        "id": "high",
+        "text": "12,000 元以上",
+        "icon": "gem",
+        "description": "追求最佳體驗，功能到位"
+      },
+      {
+        "id": "flexible",
+        "text": "價格不是主要考量",
+        "icon": "infinity",
+        "description": "選到對的比價格重要"
+      }
+    ]
+  },
+  {
+    "id": "priority",
+    "question": "對你來說最重要的是？",
+    "description": "選擇你最在意的特點（可複選）",
+    "multiple": true,
+    "options": [
+      {
+        "id": "easy",
+        "text": "簡單好上手",
+        "icon": "smile",
+        "description": "不想花時間研究設定"
+      },
+      {
+        "id": "flexible",
+        "text": "彈性/可裝 APP",
+        "icon": "puzzle",
+        "description": "想自由安裝各種應用程式"
+      },
+      {
+        "id": "taiwan",
+        "text": "台灣品牌",
+        "icon": "flag",
+        "description": "支持本土品牌或在意產地"
+      },
+      {
+        "id": "light",
+        "text": "輕巧好攜帶",
+        "icon": "feather",
+        "description": "重量是重要考量"
+      },
+      {
+        "id": "waterproof",
+        "text": "防水功能",
+        "icon": "droplets",
+        "description": "需要在有水環境使用"
+      },
+      {
+        "id": "pen",
+        "text": "手寫筆記",
+        "icon": "pen-tool",
+        "description": "需要在書上劃記或做筆記"
+      }
+    ]
+  }
+]
