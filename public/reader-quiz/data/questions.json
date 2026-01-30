@@ -64,7 +64,8 @@
   {
     "id": "content",
     "question": "你最常看什麼類型的內容？",
-    "description": "內容類型會影響螢幕尺寸和顏色的選擇",
+    "description": "可複選，內容類型會影響螢幕尺寸和顏色的選擇",
+    "multiple": true,
     "options": [
       {
         "id": "novel",
