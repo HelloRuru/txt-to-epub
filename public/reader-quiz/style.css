@@ -374,9 +374,10 @@ p { line-height: 1.8; }
 .footer__credit-title { font-size: 0.875rem; color: var(--color-text-muted); }
 .footer__credit-name { font-family: var(--font-heading); font-size: 1rem; font-weight: 500; margin: var(--space-sm) 0; }
 .footer__credit-thanks { font-size: 0.875rem; color: var(--color-text-light); }
-.footer__info { font-size: 0.8125rem; color: var(--color-text-muted); }
-.footer__info a { color: var(--color-primary); text-decoration: none; }
-.footer__info a:hover { text-decoration: underline; }
+
+.footer__copyright { font-size: 0.8125rem; color: var(--color-text-muted); }
+.footer__copyright a { color: var(--color-primary); text-decoration: none; }
+.footer__copyright a:hover { text-decoration: underline; }
 
 .loading {
   display: flex;
