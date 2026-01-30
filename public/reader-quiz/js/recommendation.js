@@ -25,29 +25,49 @@ export function calculateRecommendation(devices, rules, answers) {
     }
   });
   
-  // 內容類型 → 螢幕尺寸和顏色
-  const contentAnswer = answers.content;
+  // 內容類型（複選）→ 螢幕尺寸和顏色
+  const contentAnswers = answers.content || [];
   devices.forEach(device => {
     const size = device.screen.size;
     const isColor = device.screen.type === 'color';
     
-    if (contentAnswer === 'novel') {
-      if (size <= 7) scores[device.id] += 15;
-      if (!isColor) scores[device.id] += 5;
-    } else if (contentAnswer === 'manga-bw') {
+    if (contentAnswers.includes('novel')) {
+      if (size <= 7) scores[device.id] += 10;
+      if (!isColor) scores[device.id] += 3;
+    }
+    
+    if (contentAnswers.includes('manga-bw')) {
       // 黑白漫畫／日文書 → 直排支援加分
-      if (size >= 7 && size <= 8) scores[device.id] += 15;
-      if (!isColor) scores[device.id] += 5;
+      if (size >= 7 && size <= 8) scores[device.id] += 10;
+      if (!isColor) scores[device.id] += 3;
       // 日文書直排加分
-      if (device.verticalText === 'excellent') scores[device.id] += 10;
-      else if (device.verticalText === 'good') scores[device.id] += 5;
-      else if (device.verticalText === 'poor') scores[device.id] -= 10;
-    } else if (contentAnswer === 'manga-color') {
-      if (size >= 7.8) scores[device.id] += 10;
-      if (isColor) scores[device.id] += 20;
-    } else if (contentAnswer === 'pdf' || contentAnswer === 'magazine') {
-      if (size >= 10) scores[device.id] += 20;
-      if (contentAnswer === 'magazine' && isColor) scores[device.id] += 10;
+      if (device.verticalText === 'excellent') scores[device.id] += 8;
+      else if (device.verticalText === 'good') scores[device.id] += 4;
+      else if (device.verticalText === 'poor') scores[device.id] -= 8;
+    }
+    
+    if (contentAnswers.includes('manga-color')) {
+      if (size >= 7.8) scores[device.id] += 8;
+      if (isColor) scores[device.id] += 15;
+    }
+    
+    if (contentAnswers.includes('pdf')) {
+      if (size >= 10) scores[device.id] += 15;
+    }
+    
+    if (contentAnswers.includes('magazine')) {
+      if (size >= 10) scores[device.id] += 12;
+      if (isColor) scores[device.id] += 8;
+    }
+    
+    // 同時選小說+漫畫 → 中型螢幕最佳
+    if (contentAnswers.includes('novel') && (contentAnswers.includes('manga-bw') || contentAnswers.includes('manga-color'))) {
+      if (size >= 7 && size <= 8) scores[device.id] += 5;
+    }
+    
+    // 同時選彩漫+黑白漫 → 彩色機更通用
+    if (contentAnswers.includes('manga-bw') && contentAnswers.includes('manga-color')) {
+      if (isColor) scores[device.id] += 5;
     }
   });
   
@@ -148,6 +168,7 @@ export function calculateRecommendation(devices, rules, answers) {
 export function getReasonText(device, answers) {
   const reasons = [];
   const usageAnswers = answers.usage || [];
+  const contentAnswers = answers.content || [];
   
   if (device.system === 'closed' && (answers.platform === 'single' || answers.priority?.includes('easy'))) {
     reasons.push('封閉式系統，操作直覺簡單');
@@ -157,14 +178,19 @@ export function getReasonText(device, answers) {
   
   if (device.screen.size <= 6.5 && usageAnswers.includes('commute')) {
     reasons.push(`${device.screen.size} 吋輕巧設計，適合通勤攜帶`);
-  } else if (device.screen.size >= 10 && (answers.content === 'pdf' || answers.content === 'magazine')) {
+  } else if (device.screen.size >= 10 && (contentAnswers.includes('pdf') || contentAnswers.includes('magazine'))) {
     reasons.push(`${device.screen.size} 吋大螢幕，適合閱讀 PDF 和雜誌`);
   }
   
-  if (device.screen.type === 'color' && (answers.content === 'manga-color' || answers.content === 'magazine')) {
+  if (device.screen.type === 'color' && (contentAnswers.includes('manga-color') || contentAnswers.includes('magazine'))) {
     reasons.push('彩色螢幕，適合看彩漫和繪本');
-  } else if (device.screen.type === 'black-white' && answers.content === 'novel') {
+  } else if (device.screen.type === 'black-white' && contentAnswers.includes('novel') && !contentAnswers.includes('manga-color')) {
     reasons.push('黑白螢幕，文字閱讀體驗最佳');
+  }
+  
+  // 多種內容類型理由
+  if (contentAnswers.includes('novel') && contentAnswers.includes('manga-bw') && device.screen.size >= 7 && device.screen.size <= 8) {
+    reasons.push('7-8 吋中型螢幕，小說漫畫都合適');
   }
   
   // 字體相關理由
@@ -178,7 +204,7 @@ export function getReasonText(device, answers) {
   }
   
   // 日文書/漫畫選項額外理由
-  if (answers.content === 'manga-bw' && device.verticalText === 'excellent') {
+  if (contentAnswers.includes('manga-bw') && device.verticalText === 'excellent') {
     reasons.push('日漫對話直排顯示優秀');
   }
   
@@ -212,12 +238,13 @@ export function getReasonText(device, answers) {
 
 export function getRelevantTip(tips, answers) {
   const tipList = [];
+  const contentAnswers = answers.content || [];
   
   if (answers.platform === 'library') {
     tipList.push(tips.library);
   }
   
-  if (answers.content === 'manga-color' || answers.content === 'magazine') {
+  if (contentAnswers.includes('manga-color') || contentAnswers.includes('magazine')) {
     tipList.push(tips['color-display']);
   }
   
@@ -231,7 +258,7 @@ export function getRelevantTip(tips, answers) {
   }
   
   // 日文書選項也顯示直排提示
-  if (answers.content === 'manga-bw') {
+  if (contentAnswers.includes('manga-bw')) {
     tipList.push(tips['vertical-text']);
   }
   
