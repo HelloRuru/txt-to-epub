@@ -5,6 +5,7 @@ import { saveAs } from 'file-saver'
 import { convertToTraditional } from '../utils/converter'
 import { detectEncoding } from '../utils/encodingDetector'
 import ThemeToggle from '../components/ThemeToggle'
+import Footer from '../components/Footer'
 import { useTheme } from '../contexts/ThemeContext'
 
 // SVG Icons
@@ -496,12 +497,7 @@ export default function EpubConvert() {
       </main>
 
       {/* Footer */}
-      <footer 
-        className="text-center py-8 text-sm"
-        style={{ color: 'var(--text-muted)' }}
-      >
-        <p>Built with curiosity at HelloRuru</p>
-      </footer>
+      <Footer />
     </div>
   )
 }
