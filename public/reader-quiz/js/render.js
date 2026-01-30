@@ -244,7 +244,6 @@ export function renderResult(app, quizData, recommendation, reasons, tip, callba
 }
 
 function renderFooter(meta) {
-  const updateDate = meta?.lastUpdate || '2026.01';
   return `
     <footer class="footer">
       <div class="footer__credit">
@@ -252,10 +251,7 @@ function renderFooter(meta) {
         <p class="footer__credit-name">DiDaDi 的電子書閱讀器選購指南</p>
         <p class="footer__credit-thanks">感謝 Di 提供專業且詳盡的閱讀器知識整理</p>
       </div>
-      <div class="footer__info">
-        <p>製作：<a href="https://helloruru.com" target="_blank" rel="noopener">Hello Ruru</a></p>
-        <p>最後更新：${updateDate}</p>
-      </div>
+      <p class="footer__copyright">© 2026 Kaoru Tsai. All Rights Reserved. | Contact: <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
     </footer>
   `;
 }
