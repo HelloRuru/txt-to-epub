@@ -1,6 +1,6 @@
 /**
  * main.js - 入口與初始化
- * 電子書閱讀器選購測驗 v2.1.0
+ * 電子書閱讀器選購測驗 v2.2.0
  */
 
 import { renderQuiz, renderResult, renderError, updateOptionUI } from './render.js';
@@ -23,7 +23,7 @@ async function loadJSON(path) {
 }
 
 async function loadData() {
-  const [meta, devices, questions, rules, tipsData] = await Promise.all([
+  const [meta, devices, questions, rules, tips] = await Promise.all([
     loadJSON(`${DATA_PATH}/meta.json`),
     loadJSON(`${DATA_PATH}/devices.json`),
     loadJSON(`${DATA_PATH}/questions.json`),
@@ -36,8 +36,7 @@ async function loadData() {
     devices,
     questions,
     rules,
-    tips: tipsData.tips,
-    resources: tipsData.resources
+    tips  // 直接使用 tips，不是 tips.tips
   };
 }
 
