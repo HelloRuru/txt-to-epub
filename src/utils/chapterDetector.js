@@ -291,3 +291,171 @@ function detectBySeparator(text, separator) {
     }
   })
 }
+
+
+/**
+ * 自動偵測書籍元資料（書名、作者）
+ * 從檔名和文字內容前幾行嘗試提取
+ * @param {string} text - 文字內容
+ * @param {string} fileName - 檔案名稱（不含副檔名）
+ * @returns {{ title: string, author: string }}
+ */
+export function detectBookMetadata(text, fileName = '') {
+  const result = {
+    title: fileName || '',
+    author: '',
+    confidence: { title: 'low', author: 'none' },
+  }
+
+  // ===== 1. 從檔名偵測 =====
+  if (fileName) {
+    // 常見檔名格式：
+    // 《書名》作者
+    // 作者 - 書名
+    // 作者_書名
+    // [作者] 書名
+    // 書名 by 作者
+    // 書名（作者）
+    // 書名(作者)
+    
+    const fileNamePatterns = [
+      // 《書名》作者
+      /^《(.+?)》\s*[-_—]?\s*(.+?)$/,
+      // 作者《書名》
+      /^(.+?)\s*[-_—]?\s*《(.+?)》$/,
+      // [作者] 書名 或 【作者】書名
+      /^[\[【](.+?)[\]】]\s*[-_—]?\s*(.+?)$/,
+      // 書名 [作者] 或 書名【作者】
+      /^(.+?)\s*[-_—]?\s*[\[【](.+?)[\]】]$/,
+      // 書名 by 作者 / 書名 By 作者
+      /^(.+?)\s+[Bb][Yy]\s+(.+?)$/,
+      // 書名（作者）或 書名(作者)
+      /^(.+?)\s*[（(](.+?)[）)]$/,
+      // 作者 - 書名 / 作者 — 書名 / 作者_書名
+      /^(.+?)\s*[-_—]\s*(.+?)$/,
+    ]
+
+    for (const pattern of fileNamePatterns) {
+      const match = fileName.match(pattern)
+      if (match) {
+        const [, part1, part2] = match
+        
+        // 判斷哪個是書名、哪個是作者
+        // 通常書名較長，或包含特定關鍵字
+        if (pattern.source.includes('《')) {
+          // 《書名》作者 格式
+          if (pattern.source.startsWith('^《')) {
+            result.title = part1.trim()
+            result.author = part2.trim()
+          } else {
+            result.author = part1.trim()
+            result.title = part2.trim()
+          }
+        } else if (pattern.source.includes('[Bb][Yy]')) {
+          // 書名 by 作者 格式
+          result.title = part1.trim()
+          result.author = part2.trim()
+        } else if (pattern.source.includes('[（(]')) {
+          // 書名（作者）格式
+          result.title = part1.trim()
+          result.author = part2.trim()
+        } else if (pattern.source.startsWith('^[\\[【]')) {
+          // [作者] 書名 格式
+          result.author = part1.trim()
+          result.title = part2.trim()
+        } else if (pattern.source.includes('[\\[【]$')) {
+          // 書名 [作者] 格式
+          result.title = part1.trim()
+          result.author = part2.trim()
+        } else {
+          // 作者 - 書名 格式（預設第一部分為作者）
+          // 但若第一部分明顯較長，可能是書名
+          if (part1.length > part2.length * 2 && part2.length <= 10) {
+            result.title = part1.trim()
+            result.author = part2.trim()
+          } else {
+            result.author = part1.trim()
+            result.title = part2.trim()
+          }
+        }
+        
+        result.confidence.title = 'high'
+        result.confidence.author = 'high'
+        break
+      }
+    }
+  }
+
+  // ===== 2. 從文字內容前幾行偵測（補充或覆寫） =====
+  const lines = text.split('\n').slice(0, 30) // 只檢查前 30 行
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim()
+    if (!line) continue
+    
+    // 跳過太長的行（超過 60 字元可能不是元資料）
+    if (line.length > 60) continue
+    
+    // 偵測作者行
+    // 常見格式：作者：XXX / 作者:XXX / Author: XXX / by XXX / 著：XXX / 文：XXX
+    const authorPatterns = [
+      /^(?:作者|著者|原著|作|文|撰)[\s]*[：:︰]\s*(.+?)$/i,
+      /^(?:Author|Written\s+by|By)[\s]*[：:]?\s*(.+?)$/i,
+      /^[——\-─]+\s*(.{2,15})\s*[著作撰文]$/,  // ——作者名 著
+      /^(.{2,15})\s*[著作撰文]$/,  // 作者名 著
+    ]
+    
+    for (const pattern of authorPatterns) {
+      const match = line.match(pattern)
+      if (match) {
+        const authorCandidate = match[1].trim()
+        // 驗證作者名合理性（2-20 字元，不含特殊章節詞）
+        if (authorCandidate.length >= 2 && 
+            authorCandidate.length <= 20 &&
+            !authorCandidate.match(/第[零一二三四五六七八九十百千\d]+[章節回卷篇集部]/)) {
+          result.author = authorCandidate
+          result.confidence.author = 'high'
+          break
+        }
+      }
+    }
+    
+    // 偵測書名行（如果檔名沒有可靠的書名）
+    if (result.confidence.title !== 'high') {
+      // 常見格式：書名：XXX / 《XXX》 / Title: XXX
+      const titlePatterns = [
+        /^(?:書名|篇名|名稱|Title)[\s]*[：:︰]\s*(.+?)$/i,
+        /^《(.+?)》$/,
+        /^【(.+?)】$/,
+      ]
+      
+      for (const pattern of titlePatterns) {
+        const match = line.match(pattern)
+        if (match) {
+          const titleCandidate = match[1].trim()
+          if (titleCandidate.length >= 1 && titleCandidate.length <= 50) {
+            result.title = titleCandidate
+            result.confidence.title = 'high'
+            break
+          }
+        }
+      }
+    }
+    
+    // 如果前幾行有明確的標題格式（第一行非空且較短）
+    if (i === 0 && result.confidence.title !== 'high' && line.length <= 30) {
+      // 第一行可能是書名
+      const possibleTitle = line.replace(/^[《【\[]|[》】\]]$/g, '')
+      if (!possibleTitle.match(/作者|著者|Author/i)) {
+        result.title = possibleTitle
+        result.confidence.title = 'medium'
+      }
+    }
+  }
+
+  // 清理結果
+  result.title = result.title.trim()
+  result.author = result.author.trim()
+  
+  return result
+}

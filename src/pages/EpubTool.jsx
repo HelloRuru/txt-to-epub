@@ -8,7 +8,7 @@ import ExportButton from '../components/ExportButton'
 import ThemeToggle from '../components/ThemeToggle'
 import Footer from '../components/Footer'
 import { useTheme } from '../contexts/ThemeContext'
-import { detectChapters } from '../utils/chapterDetector'
+import { detectChapters, detectBookMetadata } from '../utils/chapterDetector'
 
 // SVG Icons
 const ArrowLeftIcon = () => (
@@ -56,8 +56,16 @@ export default function EpubTool() {
     setContent(text)
     const detectedChapters = detectChapters(text)
     setChapters(detectedChapters)
+    
+    // 自動偵測書名與作者
     const fileName = uploadedFile.name.replace(/\.txt$/i, '')
-    setSettings(prev => ({ ...prev, title: fileName }))
+    const metadata = detectBookMetadata(text, fileName)
+    
+    setSettings(prev => ({ 
+      ...prev, 
+      title: metadata.title || fileName,
+      author: metadata.author || '',
+    }))
     setStep(2)
   }, [])
 
