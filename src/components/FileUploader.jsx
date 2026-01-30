@@ -25,12 +25,6 @@ const LoaderIcon = () => (
   </svg>
 )
 
-const ShieldIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-  </svg>
-)
-
 const SearchIcon = () => (
   <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
     <circle cx="11" cy="11" r="8"/>
@@ -109,18 +103,17 @@ export default function FileUploader({ onUpload }) {
     <div className="space-y-5">
       <div className="text-center mb-6">
         <h2 
-          className="font-serif text-2xl font-semibold mb-3"
+          className="font-serif text-2xl font-semibold mb-4"
           style={{ color: 'var(--text-primary)' }}
         >
           上傳你的 TXT 檔案
         </h2>
-        <p 
-          className="text-sm flex items-center justify-center gap-2"
-          style={{ color: 'var(--text-muted)' }}
-        >
-          <ShieldIcon style={{ color: 'var(--accent-primary)' }} />
-          檔案不會上傳到伺服器，全程在你的瀏覽器處理
-        </p>
+        
+        {/* 補充說明 - 光芒列點 */}
+        <div className="flex flex-col items-center gap-1.5 text-sm" style={{ color: 'var(--text-muted)' }}>
+          <span>✦ 所有處理都在瀏覽器中完成</span>
+          <span>✦ 關閉分頁後，資料自動清除</span>
+        </div>
       </div>
 
       <label
