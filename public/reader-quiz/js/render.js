@@ -122,6 +122,9 @@ export function renderResult(app, quizData, recommendation, reasons, tip, callba
   const device = recommendation.primary;
   const alternatives = recommendation.alternatives;
   
+  // 取得 tip 的內容（處理物件或字串）
+  const tipContent = tip?.content || tip || '建議到門市實際試用後再做決定。';
+  
   app.innerHTML = `
     <header class="header">
       <div class="header__logo">
@@ -200,6 +203,13 @@ export function renderResult(app, quizData, recommendation, reasons, tip, callba
               `).join('')}
             </ul>
           </div>
+          
+          ${device.url ? `
+            <a href="${device.url}" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--buy">
+              ${icons['external-link']}
+              前往官網查看
+            </a>
+          ` : ''}
         </div>
       </div>
       
@@ -207,7 +217,7 @@ export function renderResult(app, quizData, recommendation, reasons, tip, callba
         <div class="alternatives">
           <h3 class="alternatives__title">也可以考慮</h3>
           ${alternatives.map(alt => `
-            <div class="alt-card">
+            <a href="${alt.url || '#'}" target="_blank" rel="noopener noreferrer" class="alt-card ${alt.url ? 'alt-card--clickable' : ''}">
               <div class="alt-card__icon">
                 ${icons.monitor}
               </div>
@@ -216,7 +226,8 @@ export function renderResult(app, quizData, recommendation, reasons, tip, callba
                 <p class="alt-card__note">${alt.brand} · ${alt.screen.size}" ${alt.screen.type === 'color' ? '彩色' : '黑白'}</p>
               </div>
               <p class="alt-card__price">$${alt.price.toLocaleString()}</p>
-            </div>
+              ${alt.url ? `<span class="alt-card__link">${icons['external-link']}</span>` : ''}
+            </a>
           `).join('')}
         </div>
       ` : ''}
@@ -226,7 +237,7 @@ export function renderResult(app, quizData, recommendation, reasons, tip, callba
           ${icons.lightbulb}
           購買前提醒
         </h3>
-        <p class="tips__content">${tip}</p>
+        <p class="tips__content">${tipContent}</p>
       </div>
       
       <div class="actions">
