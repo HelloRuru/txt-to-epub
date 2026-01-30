@@ -1,31 +1,30 @@
 {
-  "tips": {
-    "bookwalker": "BookWalker 的 APP 在所有裝置上都不太順暢，在閱讀器的體驗跟手機差不多。如果主要看 BW，只能選擇開放式機種。",
-    "library": "台灣圖書館電子書主要有 HyRead 和台灣雲端書庫兩個平台。桃園市圖的館藏最豐富，有接近 3800 本漫畫。但要注意預約人數和借閱額度限制。",
-    "kobo-app": "Kobo 的 APP 被認為「超級難用」，所以最佳使用方式就是直接用他家的閱讀器。",
-    "color-display": "彩色閱讀器採用 E Ink Kaleido 3 技術，彩色解析度 150ppi（黑白 300ppi），底色偏灰，類似報紙印刷效果，不是手機那種鮮豔色彩。",
-    "try-first": "建議去門市實際試用看看！誠品、樂天、momo 都有展示機可以體驗。",
-    "rental": "如果還在猶豫，可以考慮熊老闆的閱讀器租借服務，多天實際體驗後再決定。",
-    "open-vs-closed": "封閉式（Kobo/Readmoo/Kindle）操作直覺、閱讀體驗好；開放式（Boox/HyRead）彈性大、可裝多平台 APP，但需要花時間設定。",
-    "2025-trend": "2025-2026 年趨勢：彩色電子紙成為主流、折疊閱讀器即將問世（mooInk V）、AI 功能開始導入（Kindle Scribe）。"
+  "library": {
+    "title": "圖書館借閱小提醒",
+    "content": "台灣主要有 HyRead 和台灣雲端書庫兩個平台。各縣市圖書館的漫畫繪本數量約 3,300~3,800 本。需注意預約人數和額度使用情況。"
   },
-  "resources": {
-    "communities": [
-      { "name": "FB 電子書閱讀器討論區", "platform": "Facebook" },
-      { "name": "Readmoo×mooInk 線上討論區", "platform": "Facebook" },
-      { "name": "噗浪 #閱讀器 標籤", "platform": "Plurk" },
-      { "name": "PTT e-reader 板", "platform": "PTT" },
-      { "name": "Dcard 電子書閱讀器", "platform": "Dcard" }
-    ],
-    "stores": [
-      { "name": "誠品", "note": "多家門市有 Kobo/Readmoo 展示機" },
-      { "name": "樂天市場", "note": "Kobo 官方通路" },
-      { "name": "momo 購物", "note": "多品牌販售" },
-      { "name": "BOOX 台灣官方", "note": "熊老闆代理" },
-      { "name": "HyRead 官網", "note": "HyRead Gaze 系列" }
-    ],
-    "rental": [
-      { "name": "熊老闆閱讀器租借", "note": "多天租借，實際體驗", "url": "https://www.bearboss.com/" }
-    ]
+  "color-display": {
+    "title": "彩色螢幕顯示效果",
+    "content": "彩色閱讀器的解析度通常只有黑白機的一半（約 150ppi），底色也較灰。比起平板，更像報紙的彩色印刷效果。建議到門市實際試用確認能否接受。"
+  },
+  "try-first": {
+    "title": "建議先試用",
+    "content": "去門市實際操作各家閱讀器，用你常看的書籍類型試閱。現場有問題都可以問店員。也可以考慮租借服務（如熊老闆）體驗幾天。"
+  },
+  "vertical-text": {
+    "title": "直排閱讀注意事項",
+    "content": "Kindle 系列的直排支援度較差，若常看日文書或繁中直排書籍，建議選擇 Boox、mooInk 等對直排優化較好的機種。開放式系統還可安裝支援直排的第三方閱讀 APP。"
+  },
+  "font-custom": {
+    "title": "自訂字體功能",
+    "content": "開放式 Android 系統（如 Boox、HyRead）可自由安裝系統字體。封閉式系統（如 Kobo、Kindle）字體選擇有限但穩定。若對字體有特殊需求，建議優先考慮開放式機種。"
+  },
+  "bookwalker": {
+    "title": "Book Walker 使用者注意",
+    "content": "BW 的 APP 在各裝置上的體驗相近，開書速度較慢是共通現象。若需在閱讀器上使用 BW，只能選擇開放式機種。"
+  },
+  "kobo-app": {
+    "title": "Kobo 使用者建議",
+    "content": "Kobo 的手機 APP 較難用，最佳使用方式是直接用他家的閱讀器。美版 Kobo APP 據說比較好用，使用他牌閱讀器的人可以參考。"
   }
 }

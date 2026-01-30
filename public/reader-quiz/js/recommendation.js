@@ -73,6 +73,26 @@ export function calculateRecommendation(devices, rules, answers) {
     }
   });
   
+  // 字體自由度評估
+  const fontAnswer = answers.font;
+  devices.forEach(device => {
+    if (fontAnswer === 'custom') {
+      // 想自訂字體 → 優先開放式系統
+      if (device.fontSupport === 'full') scores[device.id] += 20;
+      if (device.system === 'open') scores[device.id] += 10;
+    } else if (fontAnswer === 'default') {
+      // 內建就好 → 封閉系統穩定
+      if (device.system === 'closed') scores[device.id] += 10;
+    } else if (fontAnswer === 'vertical') {
+      // 需要直排優化
+      if (device.verticalText === 'excellent') scores[device.id] += 25;
+      else if (device.verticalText === 'good') scores[device.id] += 15;
+      else if (device.verticalText === 'poor') scores[device.id] -= 15;
+      // Kindle 直排差，額外扣分
+      if (device.brand === 'Amazon') scores[device.id] -= 10;
+    }
+  });
+  
   // 優先特點
   const priorities = answers.priority || [];
   devices.forEach(device => {
@@ -117,15 +137,23 @@ export function getReasonText(device, answers) {
   }
   
   if (device.screen.size <= 6.5 && answers.usage === 'commute') {
-    reasons.push(`${device.screen.size} 吐輕巧設計，適合通勤攜帶`);
+    reasons.push(`${device.screen.size} 吋輕巧設計，適合通勤攜帶`);
   } else if (device.screen.size >= 10 && (answers.content === 'pdf' || answers.content === 'magazine')) {
-    reasons.push(`${device.screen.size} 吐大螢幕，適合閱讀 PDF 和雜誌`);
+    reasons.push(`${device.screen.size} 吋大螢幕，適合閱讀 PDF 和雜誌`);
   }
   
   if (device.screen.type === 'color' && (answers.content === 'manga-color' || answers.content === 'magazine')) {
     reasons.push('彩色螢幕，適合看彩漫和繪本');
   } else if (device.screen.type === 'black-white' && answers.content === 'novel') {
     reasons.push('黑白螢幕，文字閱讀體驗最佳');
+  }
+  
+  // 字體相關理由
+  if (answers.font === 'custom' && device.fontSupport === 'full') {
+    reasons.push('支援安裝自訂字體，閱讀體驗可完全客製');
+  }
+  if (answers.font === 'vertical' && device.verticalText === 'excellent') {
+    reasons.push('直排閱讀優化出色，適合日文與繁中書籍');
   }
   
   if (device.origin === '台灣品牌' && answers.priority?.includes('taiwan')) {
@@ -165,6 +193,11 @@ export function getRelevantTip(tips, answers) {
   
   if (answers.content === 'manga-color' || answers.content === 'magazine') {
     tipList.push(tips['color-display']);
+  }
+  
+  // 字體相關提示
+  if (answers.font === 'vertical') {
+    tipList.push(tips['vertical-text']);
   }
   
   tipList.push(tips['try-first']);

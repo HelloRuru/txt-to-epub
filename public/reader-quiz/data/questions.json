@@ -161,6 +161,31 @@
     ]
   },
   {
+    "id": "font",
+    "question": "你對字體有什麼需求？",
+    "description": "不同閱讀器對字體的支援度差異很大",
+    "options": [
+      {
+        "id": "custom",
+        "text": "想用自己喜歡的字體",
+        "icon": "type",
+        "description": "可安裝系統字體，自訂閱讀體驗"
+      },
+      {
+        "id": "default",
+        "text": "內建字體就夠用",
+        "icon": "check-circle",
+        "description": "不需要特別設定，穩定優先"
+      },
+      {
+        "id": "vertical",
+        "text": "需要直排閱讀優化",
+        "icon": "align-justify",
+        "description": "看日文書或繁中直排書籍"
+      }
+    ]
+  },
+  {
     "id": "priority",
     "question": "對你來說最重要的是？",
     "description": "選擇你最在意的特點（可複選）",
