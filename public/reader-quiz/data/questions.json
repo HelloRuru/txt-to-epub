@@ -101,7 +101,8 @@
   {
     "id": "usage",
     "question": "你最常在什麼情境下閱讀？",
-    "description": "使用情境會影響尺寸和重量的選擇",
+    "description": "可複選，使用情境會影響尺寸和功能的選擇",
+    "multiple": true,
     "options": [
       {
         "id": "commute",
@@ -111,15 +112,15 @@
       },
       {
         "id": "home",
-        "text": "在家定點閱讀",
+        "text": "在家/咖啡廳定點閱讀",
         "icon": "home",
         "description": "重量較不重要，舒適優先"
       },
       {
-        "id": "bath",
-        "text": "泡澡/海邊等有水環境",
-        "icon": "droplet",
-        "description": "需要防水功能"
+        "id": "bedtime",
+        "text": "睡前閱讀",
+        "icon": "moon",
+        "description": "需要前光功能"
       },
       {
         "id": "work",
@@ -219,7 +220,7 @@
         "id": "waterproof",
         "text": "防水功能",
         "icon": "droplets",
-        "description": "需要在有水環境使用"
+        "description": "泡澡、海邊等環境使用"
       },
       {
         "id": "pen",
