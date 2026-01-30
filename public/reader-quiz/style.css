@@ -1,5 +1,5 @@
 /* ========================================
-   電子書閱讀器選購測驗 - Design System v1.3
+   電子書閱讀器選購測驗 - Design System v1.4
    Hello Ruru / tools.helloruru.com
    ======================================== */
 
@@ -219,6 +219,7 @@ p { line-height: 1.8; }
   border-radius: var(--radius);
   cursor: pointer;
   transition: all var(--transition-base);
+  text-decoration: none;
 }
 
 .btn svg { width: 20px; height: 20px; }
@@ -229,6 +230,7 @@ p { line-height: 1.8; }
 .btn--primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .btn--primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .btn--full { width: 100%; }
+.btn--buy { margin-top: var(--space-lg); }
 
 .result__header { text-align: center; margin-bottom: var(--space-xl); }
 .result__badge {
@@ -331,6 +333,15 @@ p { line-height: 1.8; }
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   margin-bottom: var(--space-sm);
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--transition-base);
+}
+
+.alt-card--clickable:hover {
+  border-color: var(--color-primary-light);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
 }
 
 .alt-card__icon {
@@ -347,6 +358,15 @@ p { line-height: 1.8; }
 .alt-card__name { font-weight: 500; font-size: 0.9375rem; }
 .alt-card__note { font-size: 0.8125rem; color: var(--color-text-muted); }
 .alt-card__price { font-weight: 700; color: var(--color-primary-dark); }
+.alt-card__link { 
+  width: 24px; 
+  height: 24px; 
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.alt-card__link svg { width: 16px; height: 16px; }
 
 .tips {
   background: linear-gradient(135deg, rgba(212, 165, 165, 0.1), rgba(184, 169, 201, 0.1));
