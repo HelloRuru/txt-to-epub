@@ -16,7 +16,8 @@
     "platform": "Kobo/樂天書城",
     "origin": "海外品牌",
     "pros": ["輕巧好攜帶", "操作直覺", "繁中書豐富", "性價比高"],
-    "cons": ["不能裝其他 APP", "只能用 Kobo 書城"]
+    "cons": ["不能裝其他 APP", "只能用 Kobo 書城"],
+    "url": "https://www.kobo.com/tw/zh/ereaders"
   },
   {
     "id": "kobo-clara-colour",
@@ -35,7 +36,8 @@
     "platform": "Kobo/樂天書城",
     "origin": "海外品牌",
     "pros": ["輕巧彩色入門", "價格親民", "防水", "繁中書豐富"],
-    "cons": ["彩色解析度 150ppi", "封閉系統"]
+    "cons": ["彩色解析度 150ppi", "封閉系統"],
+    "url": "https://www.kobo.com/tw/zh/ereaders"
   },
   {
     "id": "kobo-libra-colour",
@@ -54,7 +56,8 @@
     "platform": "Kobo/樂天書城",
     "origin": "海外品牌",
     "pros": ["翻頁鍵好用", "彩色+手寫", "防水泡澡", "握持舒適"],
-    "cons": ["價格較高", "手寫筆需另購"]
+    "cons": ["價格較高", "手寫筆需另購"],
+    "url": "https://www.kobo.com/tw/zh/ereaders"
   },
   {
     "id": "kobo-elipsa-2e",
@@ -73,7 +76,8 @@
     "platform": "Kobo/樂天書城",
     "origin": "海外品牌",
     "pros": ["大螢幕看 PDF", "附手寫筆", "定點閱讀舒適"],
-    "cons": ["較重不便攜", "解析度較低", "無彩色"]
+    "cons": ["較重不便攜", "解析度較低", "無彩色"],
+    "url": "https://www.kobo.com/tw/zh/ereaders"
   },
   {
     "id": "mooink-nana",
@@ -92,7 +96,8 @@
     "platform": "Readmoo 讀墨",
     "origin": "台灣品牌",
     "pros": ["台灣品牌首選", "效能順暢", "實體按鍵方便", "讀墨社群活躍"],
-    "cons": ["無防水", "封閉系統"]
+    "cons": ["無防水", "封閉系統"],
+    "url": "https://readmoo.com/mooink-series"
   },
   {
     "id": "mooink-nana-bw",
@@ -111,7 +116,8 @@
     "platform": "Readmoo 讀墨",
     "origin": "台灣品牌",
     "pros": ["台灣品牌", "高性價比", "操作順暢", "實體按鍵"],
-    "cons": ["無防水", "無彩色"]
+    "cons": ["無防水", "無彩色"],
+    "url": "https://readmoo.com/mooink-series"
   },
   {
     "id": "mooink-plus-2c",
@@ -130,7 +136,8 @@
     "platform": "Readmoo 讀墨",
     "origin": "台灣品牌",
     "pros": ["彩色中尺寸", "台灣品牌", "大容量", "適合漫畫"],
-    "cons": ["價格較高", "無防水"]
+    "cons": ["價格較高", "無防水"],
+    "url": "https://readmoo.com/mooink-series"
   },
   {
     "id": "readmoo-color-note",
@@ -149,7 +156,8 @@
     "platform": "Readmoo/開放式",
     "origin": "台灣品牌",
     "pros": ["開放式系統", "大螢幕彩色", "台灣品牌", "手寫筆記"],
-    "cons": ["價格較高", "較重"]
+    "cons": ["價格較高", "較重"],
+    "url": "https://readmoo.com/mooink-series"
   },
   {
     "id": "hyread-gaze-mini-plus",
@@ -168,7 +176,8 @@
     "platform": "HyRead/圖書館",
     "origin": "台灣品牌",
     "pros": ["開放系統", "圖書館借閱最強", "輕量好攜帶"],
-    "cons": ["效能中等", "無防水"]
+    "cons": ["效能中等", "無防水"],
+    "url": "https://gaze.hyread.com.tw/"
   },
   {
     "id": "hyread-gaze-mini-cc",
@@ -187,7 +196,8 @@
     "platform": "HyRead/圖書館",
     "origin": "台灣品牌",
     "pros": ["彩色+開放式", "圖書館整合", "聯名設計精美"],
-    "cons": ["價格較高", "無防水"]
+    "cons": ["價格較高", "無防水"],
+    "url": "https://gaze.hyread.com.tw/"
   },
   {
     "id": "hyread-gaze-pro-note-c",
@@ -206,7 +216,8 @@
     "platform": "HyRead/圖書館",
     "origin": "台灣品牌",
     "pros": ["彩色中尺寸", "翻頁鍵設計", "圖書館整合", "開放系統"],
-    "cons": ["價格較高", "無防水"]
+    "cons": ["價格較高", "無防水"],
+    "url": "https://gaze.hyread.com.tw/"
   },
   {
     "id": "hyread-gaze-pro-xc",
@@ -225,7 +236,8 @@
     "platform": "HyRead/圖書館",
     "origin": "台灣品牌",
     "pros": ["旗艦規格", "圖書館整合", "開放系統", "彩色大螢幕"],
-    "cons": ["價格高", "較重"]
+    "cons": ["價格高", "較重"],
+    "url": "https://gaze.hyread.com.tw/"
   },
   {
     "id": "boox-go-6",
@@ -244,7 +256,8 @@
     "platform": "開放式/多平台",
     "origin": "中國品牌",
     "pros": ["超輕薄", "開放系統", "價格實惠"],
-    "cons": ["中國品牌", "無前光"]
+    "cons": ["中國品牌", "無前光"],
+    "url": "https://shop.boox.com/collections/all"
   },
   {
     "id": "boox-go-7",
@@ -263,7 +276,8 @@
     "platform": "開放式/多平台",
     "origin": "中國品牌",
     "pros": ["翻頁鍵設計", "開放系統", "輕巧", "防潑水"],
-    "cons": ["中國品牌", "無前光"]
+    "cons": ["中國品牌", "無前光"],
+    "url": "https://shop.boox.com/collections/all"
   },
   {
     "id": "boox-go-color-7-gen2",
@@ -282,7 +296,8 @@
     "platform": "開放式/多平台",
     "origin": "中國品牌",
     "pros": ["彩色+開放式", "翻頁鍵", "輕巧", "支援手寫"],
-    "cons": ["中國品牌", "需充電手寫筆"]
+    "cons": ["中國品牌", "需充電手寫筆"],
+    "url": "https://shop.boox.com/collections/all"
   },
   {
     "id": "boox-go-103",
@@ -301,7 +316,8 @@
     "platform": "開放式/多平台",
     "origin": "中國品牌",
     "pros": ["超薄輕量", "大螢幕 PDF", "開放系統", "高性價比"],
-    "cons": ["無前光", "中國品牌"]
+    "cons": ["無前光", "中國品牌"],
+    "url": "https://shop.boox.com/collections/all"
   },
   {
     "id": "boox-note-air5-c",
@@ -320,7 +336,8 @@
     "platform": "開放式/多平台",
     "origin": "中國品牌",
     "pros": ["彩色大螢幕", "高效能", "手寫筆記", "第三方 APP 優化"],
-    "cons": ["價格較高", "中國品牌"]
+    "cons": ["價格較高", "中國品牌"],
+    "url": "https://shop.boox.com/collections/all"
   },
   {
     "id": "boox-palma-2-pro",
@@ -339,7 +356,8 @@
     "platform": "開放式/多平台",
     "origin": "中國品牌",
     "pros": ["手機大小超便攜", "彩色螢幕", "可當備用機", "高規格"],
-    "cons": ["螢幕較小", "價格高", "中國品牌"]
+    "cons": ["螢幕較小", "價格高", "中國品牌"],
+    "url": "https://shop.boox.com/collections/all"
   },
   {
     "id": "kindle-paperwhite-2024",
@@ -358,7 +376,8 @@
     "platform": "Amazon Kindle",
     "origin": "海外品牌",
     "pros": ["價格實惠", "英文書最多", "防水", "續航超長"],
-    "cons": ["中文書較少", "台灣無官方通路", "封閉系統", "直排支援差"]
+    "cons": ["中文書較少", "台灣無官方通路", "封閉系統", "直排支援差"],
+    "url": "https://www.amazon.com/kindle"
   },
   {
     "id": "kindle-colorsoft",
@@ -377,7 +396,8 @@
     "platform": "Amazon Kindle",
     "origin": "海外品牌",
     "pros": ["彩色顯示佳", "英文書海量", "防水"],
-    "cons": ["台灣無官方通路", "中文支援弱", "封閉系統", "直排支援差"]
+    "cons": ["台灣無官方通路", "中文支援弱", "封閉系統", "直排支援差"],
+    "url": "https://www.amazon.com/kindle"
   },
   {
     "id": "kindle-scribe-2025",
@@ -396,7 +416,8 @@
     "platform": "Amazon Kindle",
     "origin": "海外品牌",
     "pros": ["手寫筆記強大", "大螢幕舒適", "AI 功能", "雲端同步"],
-    "cons": ["台灣無官方通路", "中文支援弱", "價格高", "直排支援差"]
+    "cons": ["台灣無官方通路", "中文支援弱", "價格高", "直排支援差"],
+    "url": "https://www.amazon.com/kindle"
   },
   {
     "id": "kindle-scribe-colorsoft",
@@ -415,6 +436,7 @@
     "platform": "Amazon Kindle",
     "origin": "海外品牌",
     "pros": ["彩色筆記旗艦", "AI 功能強大", "漫畫顯示佳"],
-    "cons": ["台灣無官方通路", "價格最高", "較重", "直排支援差"]
+    "cons": ["台灣無官方通路", "價格最高", "較重", "直排支援差"],
+    "url": "https://www.amazon.com/kindle"
   }
 ]
