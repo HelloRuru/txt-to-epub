@@ -181,7 +181,7 @@
       {
         "id": "vertical",
         "text": "需要直排閱讀優化",
-        "icon": "align-justify",
+        "icon": "align-vertical",
         "description": "看日文書或繁中直排書籍"
       }
     ]
