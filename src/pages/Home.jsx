@@ -115,6 +115,11 @@ const getIcon = (id) => {
 
 export default function Home() {
   const { isDark } = useTheme()
+  
+  // 年份自動計算
+  const startYear = 2026
+  const currentYear = new Date().getFullYear()
+  const yearDisplay = currentYear > startYear ? `${startYear}–${currentYear}` : `${startYear}`
 
   return (
     <div 
@@ -307,7 +312,14 @@ export default function Home() {
             className="font-serif text-sm"
             style={{ color: 'var(--text-muted)' }}
           >
-            © 2026 Kaoru Tsai. All rights reserved.
+            © {yearDisplay} Kaoru Tsai. All Rights Reserved. |{' '}
+            <a 
+              href="mailto:hello@helloruru.com"
+              className="transition-colors hover:opacity-80"
+              style={{ color: 'var(--accent-primary)' }}
+            >
+              hello@helloruru.com
+            </a>
           </p>
           <div className="flex justify-center gap-8 mt-5">
             <a 
