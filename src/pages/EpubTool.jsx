@@ -6,6 +6,7 @@ import CoverUploader from '../components/CoverUploader'
 import SettingsPanel from '../components/SettingsPanel'
 import ExportButton from '../components/ExportButton'
 import ThemeToggle from '../components/ThemeToggle'
+import Footer from '../components/Footer'
 import { useTheme } from '../contexts/ThemeContext'
 import { detectChapters } from '../utils/chapterDetector'
 
@@ -303,13 +304,8 @@ export default function EpubTool() {
         </div>
       </main>
 
-      {/* 底部 */}
-      <footer 
-        className="text-center py-6 text-xs"
-        style={{ color: 'var(--text-muted)' }}
-      >
-        <p>© 2026 Kaoru Tsai. All rights reserved.</p>
-      </footer>
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }
