@@ -74,9 +74,9 @@
       },
       {
         "id": "manga-bw",
-        "text": "黑白漫畫",
+        "text": "黑白漫畫／日文書",
         "icon": "image",
-        "description": "日本漫畫、同人誌等"
+        "description": "日漫、同人誌、日文輕小說"
       },
       {
         "id": "manga-color",
@@ -170,19 +170,19 @@
         "id": "custom",
         "text": "想用自己喜歡的字體",
         "icon": "type",
-        "description": "可安裝系統字體，自訂閱讀體驗"
+        "description": "推薦 Boox、mooInk 等 Android 系統機種"
       },
       {
         "id": "default",
         "text": "內建字體就夠用",
         "icon": "check-circle",
-        "description": "不需要特別設定，穩定優先"
+        "description": "Kobo、Kindle 字體有限但穩定"
       },
       {
         "id": "vertical",
         "text": "需要直排閱讀優化",
         "icon": "align-vertical",
-        "description": "看日文書或繁中直排書籍"
+        "description": "日文輕小說、日漫對話、繁中直排書（⚠️ Kindle 直排支援差）"
       }
     ]
   },
