@@ -1,213 +1,111 @@
-/**
- * render.js - UI 渲染
- */
-
+// render.js - 修復 undefined bug
 import { icons } from './icons.js';
 
-export function renderQuiz(app, quizData, currentQuestion, answers, callbacks) {
-  const question = quizData.questions[currentQuestion];
-  const progress = ((currentQuestion + 1) / quizData.questions.length) * 100;
-  const isMultiple = question.multiple || false;
+export function renderQuestion(question, onSelect) {
+  const container = document.getElementById('quiz-container');
   
-  app.innerHTML = `
-    <header class="header">
-      <div class="header__logo">
-        ${icons['book-open']}
+  container.innerHTML = `
+    <div class="question-card">
+      <h2 class="question-title">${question.question}</h2>
+      ${question.description ? `<p class="question-description">${question.description}</p>` : ''}
+      <div class="options-grid">
+        ${question.options.map(option => `
+          <button class="option-btn" data-value="${option.id}">
+            <span class="option-icon">${icons[option.icon] || icons['star']}</span>
+            <span class="option-text">${option.text}</span>
+            ${option.description ? `<span class="option-desc">${option.description}</span>` : ''}
+          </button>
+        `).join('')}
       </div>
-      <h1 class="header__title">電子書閱讀器選購測驗</h1>
-      <p class="header__subtitle">回答幾個問題，找到最適合你的閱讀器</p>
-    </header>
-    
-    <main class="quiz">
-      <div class="progress">
-        <div class="progress__bar">
-          <div class="progress__fill" style="width: ${progress}%"></div>
-        </div>
-        <p class="progress__text">問題 ${currentQuestion + 1} / ${quizData.questions.length}</p>
-      </div>
-      
-      <div class="question fade-in">
-        <h2 class="question__title">${question.question}</h2>
-        ${question.description ? `<p class="question__desc">${question.description}</p>` : ''}
-        ${isMultiple ? `<p class="question__hint">可複選</p>` : ''}
-        
-        <div class="options">
-          ${question.options.map(opt => `
-            <button class="option" data-question="${question.id}" data-option="${opt.id}" data-multiple="${isMultiple}">
-              <div class="option__icon">
-                ${icons[opt.icon] || icons['check-circle']}
-              </div>
-              <div class="option__content">
-                <p class="option__text">${opt.text}</p>
-                ${opt.description ? `<p class="option__desc">${opt.description}</p>` : ''}
-              </div>
-            </button>
-          `).join('')}
-        </div>
-      </div>
-      
-      <div class="nav">
-        <button class="btn btn--secondary" id="prevBtn" ${currentQuestion === 0 ? 'disabled' : ''}>
-          ${icons['arrow-left']}
-          上一題
-        </button>
-        <button class="btn btn--primary" id="nextBtn" disabled>
-          ${currentQuestion === quizData.questions.length - 1 ? '看結果' : '下一題'}
-          ${icons['arrow-right']}
-        </button>
-      </div>
-    </main>
-    
-    ${renderFooter(quizData.meta)}
+    </div>
   `;
   
-  bindQuizEvents(app, question.id, isMultiple, answers, callbacks);
-  restoreAnswer(app, question.id, isMultiple, answers);
-  updateNextButton(app, question.id, answers);
+  container.querySelectorAll('.option-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      onSelect(btn.dataset.value);
+    });
+  });
 }
 
-function bindQuizEvents(app, questionId, isMultiple, answers, callbacks) {
-  app.querySelectorAll('.option').forEach(opt => {
-    opt.addEventListener('click', () => {
-      const optionId = opt.dataset.option;
-      callbacks.onSelect(questionId, optionId, isMultiple);
+export function renderMultiSelect(question, onSelect) {
+  const container = document.getElementById('quiz-container');
+  const selected = new Set();
+  
+  container.innerHTML = `
+    <div class="question-card">
+      <h2 class="question-title">${question.question}</h2>
+      ${question.description ? `<p class="question-description">${question.description}</p>` : ''}
+      <div class="options-grid multi-select">
+        ${question.options.map(option => `
+          <button class="option-btn" data-value="${option.id}">
+            <span class="option-icon">${icons[option.icon] || icons['star']}</span>
+            <span class="option-text">${option.text}</span>
+            ${option.description ? `<span class="option-desc">${option.description}</span>` : ''}
+          </button>
+        `).join('')}
+      </div>
+      <button class="confirm-btn" disabled>確認選擇</button>
+    </div>
+  `;
+  
+  const confirmBtn = container.querySelector('.confirm-btn');
+  
+  container.querySelectorAll('.option-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const value = btn.dataset.value;
+      if (selected.has(value)) {
+        selected.delete(value);
+        btn.classList.remove('selected');
+      } else {
+        selected.add(value);
+        btn.classList.add('selected');
+      }
+      confirmBtn.disabled = selected.size === 0;
     });
   });
   
-  app.querySelector('#prevBtn')?.addEventListener('click', callbacks.onPrev);
-  app.querySelector('#nextBtn')?.addEventListener('click', callbacks.onNext);
-}
-
-function restoreAnswer(app, questionId, isMultiple, answers) {
-  if (!answers[questionId]) return;
-  
-  app.querySelectorAll('.option').forEach(opt => {
-    const optionId = opt.dataset.option;
-    const selectedAnswers = answers[questionId];
-    const isSelected = isMultiple 
-      ? selectedAnswers.includes(optionId)
-      : selectedAnswers === optionId;
-    
-    if (isSelected) {
-      opt.classList.add('selected');
-    }
+  confirmBtn.addEventListener('click', () => {
+    onSelect(Array.from(selected));
   });
 }
 
-export function updateOptionUI(app, questionId, answers, isMultiple) {
-  app.querySelectorAll('.option').forEach(opt => {
-    const optionId = opt.dataset.option;
-    if (isMultiple) {
-      if (answers[questionId]?.includes(optionId)) {
-        opt.classList.add('selected');
-      } else {
-        opt.classList.remove('selected');
-      }
-    } else {
-      opt.classList.toggle('selected', answers[questionId] === optionId);
-    }
-  });
+export function renderResult(result, tip) {
+  const container = document.getElementById('quiz-container');
+  const { primary, alternatives } = result;
   
-  updateNextButton(app, questionId, answers);
-}
-
-function updateNextButton(app, questionId, answers) {
-  const btn = app.querySelector('#nextBtn');
-  const hasAnswer = answers[questionId] && 
-    (Array.isArray(answers[questionId]) ? answers[questionId].length > 0 : true);
-  btn.disabled = !hasAnswer;
-}
-
-export function renderResult(app, quizData, recommendation, reasons, tip, callbacks) {
-  const device = recommendation.primary;
-  const alternatives = recommendation.alternatives;
+  // 防呆：確保 icons 存在
+  const externalLinkIcon = icons['external-link'] || icons['link'] || `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`;
   
-  // 取得 tip 的內容（處理物件或字串）
-  const tipContent = tip?.content || tip || '建議到門市實際試用後再做決定。';
-  
-  app.innerHTML = `
-    <header class="header">
-      <div class="header__logo">
-        ${icons['check-circle']}
-      </div>
-      <h1 class="header__title">測驗完成！</h1>
-      <p class="header__subtitle">根據你的回答，我們推薦以下閱讀器</p>
-    </header>
-    
-    <main class="result fade-in">
-      <div class="result__header">
-        <span class="result__badge">
-          ${icons.target}
-          最佳推薦
-        </span>
+  container.innerHTML = `
+    <div class="result-card">
+      <div class="result-header">
+        <span class="result-icon">${icons['trophy'] || '🏆'}</span>
+        <h2>推薦結果</h2>
       </div>
       
-      <div class="recommendation">
-        <div class="recommendation__image">
-          ${icons.monitor}
-        </div>
-        <div class="recommendation__body">
-          <p class="recommendation__brand">${device.brand}</p>
-          <h2 class="recommendation__name">${device.name}</h2>
-          <p class="recommendation__price">NT$ ${device.price.toLocaleString()}</p>
-          
-          <div class="recommendation__tags">
-            <span class="tag">${device.screen.size} 吋</span>
-            <span class="tag">${device.screen.type === 'color' ? '彩色' : '黑白'}</span>
-            <span class="tag tag--secondary">${device.system === 'open' ? '開放式' : '封閉式'}</span>
-            ${device.waterproof ? '<span class="tag">防水</span>' : ''}
+      <p class="result-disclaimer">⚠️ 本測驗僅供參考，建議購買前多方比較</p>
+      
+      <div class="primary-result">
+        <div class="device-card primary">
+          <div class="device-header">
+            <span class="recommend-badge">最佳推薦</span>
+            <h3 class="device-name">${primary.name}</h3>
+            <p class="device-brand">${primary.brand}</p>
           </div>
-          
-          <div class="specs">
-            <div class="spec">
-              <div class="spec__icon">${icons.monitor}</div>
-              <div class="spec__content">
-                <p class="spec__label">螢幕</p>
-                <p class="spec__value">${device.screen.size}" ${device.screen.ppi}PPI</p>
-              </div>
-            </div>
-            <div class="spec">
-              <div class="spec__icon">${icons.weight}</div>
-              <div class="spec__content">
-                <p class="spec__label">重量</p>
-                <p class="spec__value">${device.weight}g</p>
-              </div>
-            </div>
-            <div class="spec">
-              <div class="spec__icon">${icons['hard-drive']}</div>
-              <div class="spec__content">
-                <p class="spec__label">儲存空間</p>
-                <p class="spec__value">${device.storage}GB</p>
-              </div>
-            </div>
-            <div class="spec">
-              <div class="spec__icon">${icons.shield}</div>
-              <div class="spec__content">
-                <p class="spec__label">防水</p>
-                <p class="spec__value">${device.waterproof ? '支援 IPX8' : '無'}</p>
-              </div>
-            </div>
+          <div class="device-specs">
+            <span class="spec">${primary.screenSize}" ${primary.displayType}</span>
+            <span class="spec">${primary.storage}</span>
+            <span class="spec">NT$ ${primary.price.toLocaleString()}</span>
           </div>
-          
-          <div class="reasons">
-            <h3 class="reasons__title">
-              ${icons.lightbulb}
-              推薦理由
-            </h3>
-            <ul class="reasons__list">
-              ${reasons.map(reason => `
-                <li class="reasons__item">
-                  ${icons['check-circle']}
-                  ${reason}
-                </li>
-              `).join('')}
+          <div class="device-reasons">
+            <p class="reasons-title">推薦原因：</p>
+            <ul>
+              ${primary.reasons.map(r => `<li>${r}</li>`).join('')}
             </ul>
           </div>
-          
-          ${device.url ? `
-            <a href="${device.url}" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--buy">
-              ${icons['external-link']}
-              前往官網查看
+          ${primary.url ? `
+            <a href="${primary.url}" target="_blank" rel="noopener noreferrer" class="device-link">
+              前往官網 ${externalLinkIcon}
             </a>
           ` : ''}
         </div>
@@ -215,64 +113,61 @@ export function renderResult(app, quizData, recommendation, reasons, tip, callba
       
       ${alternatives.length > 0 ? `
         <div class="alternatives">
-          <h3 class="alternatives__title">也可以考慮</h3>
-          ${alternatives.map(alt => `
-            <a href="${alt.url || '#'}" target="_blank" rel="noopener noreferrer" class="alt-card ${alt.url ? 'alt-card--clickable' : ''}">
-              <div class="alt-card__icon">
-                ${icons.monitor}
+          <h3 class="alternatives-title">其他選擇</h3>
+          <div class="alternatives-grid">
+            ${alternatives.map(alt => `
+              <div class="device-card alternative">
+                <h4 class="device-name">${alt.name}</h4>
+                <p class="device-brand">${alt.brand}</p>
+                <div class="device-specs">
+                  <span class="spec">${alt.screenSize}"</span>
+                  <span class="spec">NT$ ${alt.price.toLocaleString()}</span>
+                </div>
+                ${alt.url ? `
+                  <a href="${alt.url}" target="_blank" rel="noopener noreferrer" class="device-link">
+                    前往官網 ${externalLinkIcon}
+                  </a>
+                ` : ''}
               </div>
-              <div class="alt-card__content">
-                <p class="alt-card__name">${alt.name}</p>
-                <p class="alt-card__note">${alt.brand} · ${alt.screen.size}" ${alt.screen.type === 'color' ? '彩色' : '黑白'}</p>
-              </div>
-              <p class="alt-card__price">$${alt.price.toLocaleString()}</p>
-              ${alt.url ? `<span class="alt-card__link">${icons['external-link']}</span>` : ''}
-            </a>
-          `).join('')}
+            `).join('')}
+          </div>
         </div>
       ` : ''}
       
-      <div class="tips">
-        <h3 class="tips__title">
-          ${icons.lightbulb}
-          購買前提醒
-        </h3>
-        <p class="tips__content">${tipContent}</p>
-      </div>
+      ${tip ? `
+        <div class="tip-card">
+          <span class="tip-icon">${icons['lightbulb'] || '💡'}</span>
+          <p>${tip}</p>
+        </div>
+      ` : ''}
       
-      <div class="actions">
-        <button class="btn btn--primary btn--full" id="restartBtn">
-          ${icons['refresh-cw']}
-          重新測驗
-        </button>
-      </div>
-    </main>
-    
-    ${renderFooter(quizData.meta)}
-  `;
-  
-  app.querySelector('#restartBtn')?.addEventListener('click', callbacks.onRestart);
-}
-
-function renderFooter(meta) {
-  return `
-    <footer class="footer">
-      <div class="footer__credit">
-        <p class="footer__credit-title">本測驗內容參考自</p>
-        <p class="footer__credit-name">DiDaDi 的電子書閱讀器選購指南</p>
-        <p class="footer__credit-thanks">感謝 Di 提供專業且詳盡的閱讀器知識整理</p>
-      </div>
-      <p class="footer__copyright">© 2026 Kaoru Tsai. All Rights Reserved. | Contact: <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
-    </footer>
+      <button class="restart-btn" onclick="location.reload()">
+        ${icons['refresh'] || '🔄'} 重新測驗
+      </button>
+      
+      <p class="source-note">資料參考：<a href="https://didadi.io/" target="_blank" rel="noopener noreferrer">DiDaDi 電子書閱讀器指南</a></p>
+    </div>
   `;
 }
 
-export function renderError(app) {
-  app.innerHTML = `
-    <div class="error">
-      <h2>載入失敗</h2>
-      <p>無法載入測驗資料，請重新整理頁面。</p>
-      <button onclick="location.reload()">重新整理</button>
+export function renderLoading() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = `
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <p>分析中...</p>
+    </div>
+  `;
+}
+
+export function renderError(message) {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = `
+    <div class="error-card">
+      <span class="error-icon">${icons['alert-circle'] || '⚠️'}</span>
+      <h2>發生錯誤</h2>
+      <p>${message}</p>
+      <button class="restart-btn" onclick="location.reload()">重新開始</button>
     </div>
   `;
 }
