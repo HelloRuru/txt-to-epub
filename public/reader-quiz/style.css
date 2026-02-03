@@ -63,9 +63,9 @@
   --color-secondary-dark: #9B8AB3;
   --color-bg: #FDFBF9;
   --color-surface: #FFFFFF;
-  --color-text: #3D3D3D;
-  --color-text-light: #6B6B6B;
-  --color-text-muted: #9A9A9A;
+  --color-text: #3D3535;
+  --color-text-light: #6B5B5B;
+  --color-text-muted: #9A8E8E;
   --color-border: #E8E4E0;
   --color-success: #8FBC8F;
   --color-warning: #DEB887;
@@ -101,6 +101,11 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Global link reset — eliminate browser default blue */
+a { color: var(--color-primary-dark); text-decoration: none; transition: color var(--transition-fast); }
+a:hover { color: var(--color-primary); }
+a:visited { color: var(--color-primary-dark); }
 
 h1, h2, h3 {
   font-family: var(--font-heading);
