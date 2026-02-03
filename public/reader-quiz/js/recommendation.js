@@ -1,164 +1,153 @@
 /**
  * recommendation.js - 推薦邏輯
+ * 屬性名對齊 devices.json 扁平結構
  */
 
 export function calculateRecommendation(devices, rules, answers) {
   const scores = {};
-  
-  // 初始化分數
+
   devices.forEach(device => {
     scores[device.id] = 0;
   });
-  
+
   // 平台偏好 → 系統類型
   const platformAnswer = answers.platform;
   devices.forEach(device => {
+    const isOpen = device.openSystem;
     if (platformAnswer === 'single') {
-      if (device.system === 'closed') scores[device.id] += 15;
+      if (!isOpen) scores[device.id] += 15;
     } else if (platformAnswer === 'multi' || platformAnswer === 'webnovel') {
-      if (device.system === 'open') scores[device.id] += 20;
+      if (isOpen) scores[device.id] += 20;
     } else if (platformAnswer === 'library') {
-      if (device.system === 'open') scores[device.id] += 25;
+      if (isOpen) scores[device.id] += 25;
       if (device.brand === 'HyRead') scores[device.id] += 10;
     } else if (platformAnswer === 'undecided') {
-      if (device.system === 'open') scores[device.id] += 5;
+      if (isOpen) scores[device.id] += 5;
     }
   });
-  
-  // 內容類型（複選）→ 螢幕尺寸和顏色
+
+  // 內容類型（複選）
   const contentAnswers = answers.content || [];
   devices.forEach(device => {
-    const size = device.screen.size;
-    const isColor = device.screen.type === 'color';
-    
+    const size = device.screenSize;
+    const isColor = device.displayType.includes('彩色');
+
     if (contentAnswers.includes('novel')) {
       if (size <= 7) scores[device.id] += 10;
       if (!isColor) scores[device.id] += 3;
     }
-    
+
     if (contentAnswers.includes('manga-bw')) {
-      // 黑白漫畫／日文書 → 直排支援加分
       if (size >= 7 && size <= 8) scores[device.id] += 10;
       if (!isColor) scores[device.id] += 3;
-      // 日文書直排加分
       if (device.verticalText === 'excellent') scores[device.id] += 8;
       else if (device.verticalText === 'good') scores[device.id] += 4;
       else if (device.verticalText === 'poor') scores[device.id] -= 8;
     }
-    
+
     if (contentAnswers.includes('manga-color')) {
       if (size >= 7.8) scores[device.id] += 8;
       if (isColor) scores[device.id] += 15;
     }
-    
+
     if (contentAnswers.includes('pdf')) {
       if (size >= 10) scores[device.id] += 15;
     }
-    
+
     if (contentAnswers.includes('magazine')) {
       if (size >= 10) scores[device.id] += 12;
       if (isColor) scores[device.id] += 8;
     }
-    
-    // 同時選小說+漫畫 → 中型螢幕最佳
+
     if (contentAnswers.includes('novel') && (contentAnswers.includes('manga-bw') || contentAnswers.includes('manga-color'))) {
       if (size >= 7 && size <= 8) scores[device.id] += 5;
     }
-    
-    // 同時選彩漫+黑白漫 → 彩色機更通用
+
     if (contentAnswers.includes('manga-bw') && contentAnswers.includes('manga-color')) {
       if (isColor) scores[device.id] += 5;
     }
   });
-  
+
   // 使用情境（複選）
   const usageAnswers = answers.usage || [];
   devices.forEach(device => {
     if (usageAnswers.includes('commute')) {
-      if (device.weight <= 200) scores[device.id] += 15;
-      if (device.screen.size <= 7) scores[device.id] += 10;
+      if (device.screenSize <= 7) scores[device.id] += 15;
     }
     if (usageAnswers.includes('home')) {
-      // 在家定點，大螢幕加分
-      if (device.screen.size >= 7.8) scores[device.id] += 5;
+      if (device.screenSize >= 7.8) scores[device.id] += 5;
     }
     if (usageAnswers.includes('bedtime')) {
-      // 睡前閱讀，需要前光
-      if (device.features.some(f => f.includes('前光') || f.includes('ComfortLight') || f.includes('色調'))) {
-        scores[device.id] += 15;
-      }
-      // 無前光扣分
-      if (device.features.some(f => f.includes('無前光'))) {
-        scores[device.id] -= 10;
-      }
+      // 大部分閱讀器都有前光，只有極少數沒有，給所有裝置基礎分
+      scores[device.id] += 5;
     }
     if (usageAnswers.includes('work')) {
-      if (device.features.some(f => f.includes('手寫') || f.includes('筆'))) {
-        scores[device.id] += 20;
-      }
-      if (device.screen.size >= 8) scores[device.id] += 10;
+      if (device.stylus) scores[device.id] += 20;
+      if (device.screenSize >= 8) scores[device.id] += 10;
     }
   });
-  
+
   // 預算
   const budgetAnswer = answers.budget;
   const budgetRange = rules.budgetRange[budgetAnswer];
-  devices.forEach(device => {
-    if (device.price >= budgetRange.min && device.price <= budgetRange.max) {
-      scores[device.id] += 20;
-    } else if (device.price < budgetRange.min) {
-      scores[device.id] += 10;
-    }
-  });
-  
-  // 字體自由度評估
+  if (budgetRange) {
+    devices.forEach(device => {
+      if (device.price >= budgetRange.min && device.price <= budgetRange.max) {
+        scores[device.id] += 20;
+      } else if (device.price < budgetRange.min) {
+        scores[device.id] += 10;
+      }
+    });
+  }
+
+  // 字體自由度
   const fontAnswer = answers.font;
   devices.forEach(device => {
     if (fontAnswer === 'custom') {
-      // 想自訂字體 → 優先開放式系統
-      if (device.fontSupport === 'full') scores[device.id] += 20;
-      if (device.system === 'open') scores[device.id] += 10;
+      if (device.customFont) scores[device.id] += 20;
+      if (device.openSystem) scores[device.id] += 10;
     } else if (fontAnswer === 'default') {
-      // 內建就好 → 封閉系統穩定
-      if (device.system === 'closed') scores[device.id] += 10;
+      if (!device.openSystem) scores[device.id] += 10;
     } else if (fontAnswer === 'vertical') {
-      // 需要直排優化 → 重點加分
       if (device.verticalText === 'excellent') scores[device.id] += 30;
       else if (device.verticalText === 'good') scores[device.id] += 15;
       else if (device.verticalText === 'poor') scores[device.id] -= 20;
-      // Kindle 直排差，額外扣分
       if (device.brand === 'Amazon') scores[device.id] -= 15;
     }
   });
-  
+
   // 優先特點
   const priorities = answers.priority || [];
   devices.forEach(device => {
-    if (priorities.includes('easy') && device.system === 'closed') {
+    if (priorities.includes('easy') && !device.openSystem) {
       scores[device.id] += 15;
     }
-    if (priorities.includes('flexible') && device.system === 'open') {
+    if (priorities.includes('flexible') && device.openSystem) {
       scores[device.id] += 15;
     }
-    if (priorities.includes('taiwan') && device.origin === '台灣品牌') {
-      scores[device.id] += 20;
+    if (priorities.includes('taiwan')) {
+      if (device.brand === 'Readmoo 讀墨' || device.brand === 'HyRead') {
+        scores[device.id] += 20;
+      }
     }
-    if (priorities.includes('light') && device.weight <= 200) {
+    if (priorities.includes('light') && device.screenSize <= 6.5) {
       scores[device.id] += 15;
     }
     if (priorities.includes('waterproof') && device.waterproof) {
       scores[device.id] += 20;
     }
-    if (priorities.includes('pen') && device.features.some(f => f.includes('手寫') || f.includes('筆'))) {
+    if (priorities.includes('buttons') && device.hasPhysicalButtons) {
+      scores[device.id] += 15;
+    }
+    if (priorities.includes('pen') && device.stylus) {
       scores[device.id] += 20;
     }
   });
-  
-  // 按分數排序
+
   const sorted = Object.entries(scores)
     .sort((a, b) => b[1] - a[1])
     .map(([id]) => devices.find(d => d.id === id));
-  
+
   return {
     primary: sorted[0],
     alternatives: sorted.slice(1, 3)
@@ -169,32 +158,32 @@ export function getReasonText(device, answers) {
   const reasons = [];
   const usageAnswers = answers.usage || [];
   const contentAnswers = answers.content || [];
-  
-  if (device.system === 'closed' && (answers.platform === 'single' || answers.priority?.includes('easy'))) {
+  const isOpen = device.openSystem;
+  const isColor = device.displayType.includes('彩色');
+
+  if (!isOpen && (answers.platform === 'single' || answers.priority?.includes('easy'))) {
     reasons.push('封閉式系統，操作直覺簡單');
-  } else if (device.system === 'open' && (answers.platform === 'multi' || answers.platform === 'library' || answers.priority?.includes('flexible'))) {
+  } else if (isOpen && (answers.platform === 'multi' || answers.platform === 'library' || answers.priority?.includes('flexible'))) {
     reasons.push('開放式系統，可安裝多種 APP');
   }
-  
-  if (device.screen.size <= 6.5 && usageAnswers.includes('commute')) {
-    reasons.push(`${device.screen.size} 吋輕巧設計，適合通勤攜帶`);
-  } else if (device.screen.size >= 10 && (contentAnswers.includes('pdf') || contentAnswers.includes('magazine'))) {
-    reasons.push(`${device.screen.size} 吋大螢幕，適合閱讀 PDF 和雜誌`);
+
+  if (device.screenSize <= 6.5 && usageAnswers.includes('commute')) {
+    reasons.push(`${device.screenSize} 吋輕巧設計，適合通勤攜帶`);
+  } else if (device.screenSize >= 10 && (contentAnswers.includes('pdf') || contentAnswers.includes('magazine'))) {
+    reasons.push(`${device.screenSize} 吋大螢幕，適合閱讀 PDF 和雜誌`);
   }
-  
-  if (device.screen.type === 'color' && (contentAnswers.includes('manga-color') || contentAnswers.includes('magazine'))) {
+
+  if (isColor && (contentAnswers.includes('manga-color') || contentAnswers.includes('magazine'))) {
     reasons.push('彩色螢幕，適合看彩漫和繪本');
-  } else if (device.screen.type === 'black-white' && contentAnswers.includes('novel') && !contentAnswers.includes('manga-color')) {
+  } else if (!isColor && contentAnswers.includes('novel') && !contentAnswers.includes('manga-color')) {
     reasons.push('黑白螢幕，文字閱讀體驗最佳');
   }
-  
-  // 多種內容類型理由
-  if (contentAnswers.includes('novel') && contentAnswers.includes('manga-bw') && device.screen.size >= 7 && device.screen.size <= 8) {
+
+  if (contentAnswers.includes('novel') && contentAnswers.includes('manga-bw') && device.screenSize >= 7 && device.screenSize <= 8) {
     reasons.push('7-8 吋中型螢幕，小說漫畫都合適');
   }
-  
-  // 字體相關理由
-  if (answers.font === 'custom' && device.fontSupport === 'full') {
+
+  if (answers.font === 'custom' && device.customFont) {
     reasons.push('支援安裝自訂字體，閱讀體驗可完全客製');
   }
   if (answers.font === 'vertical' && device.verticalText === 'excellent') {
@@ -202,67 +191,59 @@ export function getReasonText(device, answers) {
   } else if (answers.font === 'vertical' && device.verticalText === 'good') {
     reasons.push('直排閱讀支援良好');
   }
-  
-  // 日文書/漫畫選項額外理由
+
   if (contentAnswers.includes('manga-bw') && device.verticalText === 'excellent') {
     reasons.push('日漫對話直排顯示優秀');
   }
-  
-  if (device.origin === '台灣品牌' && answers.priority?.includes('taiwan')) {
+
+  if (answers.priority?.includes('taiwan') && (device.brand === 'Readmoo 讀墨' || device.brand === 'HyRead')) {
     reasons.push('台灣品牌，在地服務支援');
   }
-  
+
   if (device.waterproof && answers.priority?.includes('waterproof')) {
     reasons.push('IPX8 防水，可在浴室安心使用');
   }
-  
-  if (device.weight <= 180 && answers.priority?.includes('light')) {
-    reasons.push(`僅 ${device.weight}g，輕巧好攜帶`);
+
+  if (device.hasPhysicalButtons && answers.priority?.includes('buttons')) {
+    reasons.push('實體翻頁鍵，操作更直覺');
   }
-  
-  if (device.platform) {
-    reasons.push(`整合 ${device.platform}，購書方便`);
-  }
-  
+
   // 補足理由
   if (reasons.length < 3) {
-    device.pros.forEach(pro => {
-      if (reasons.length < 4 && !reasons.some(r => r.includes(pro))) {
-        reasons.push(pro);
-      }
-    });
+    if (device.library) reasons.push('支援圖書館借閱');
+    if (device.stylus && !reasons.some(r => r.includes('筆'))) reasons.push('支援手寫筆記');
+    if (device.waterproof && !reasons.some(r => r.includes('防水'))) reasons.push('具備防水功能');
   }
-  
+
   return reasons.slice(0, 4);
 }
 
 export function getRelevantTip(tips, answers) {
   const tipList = [];
   const contentAnswers = answers.content || [];
-  
+
   if (answers.platform === 'library') {
     tipList.push(tips.library);
   }
-  
+
   if (contentAnswers.includes('manga-color') || contentAnswers.includes('magazine')) {
     tipList.push(tips['color-display']);
   }
-  
-  // 字體/直排相關提示
+
   if (answers.font === 'vertical') {
     tipList.push(tips['vertical-text']);
   }
-  
+
   if (answers.font === 'custom') {
     tipList.push(tips['font-custom']);
   }
-  
-  // 日文書選項也顯示直排提示
+
   if (contentAnswers.includes('manga-bw')) {
     tipList.push(tips['vertical-text']);
   }
-  
+
   tipList.push(tips['try-first']);
-  
-  return tipList[0];
+
+  // 過濾 undefined
+  return tipList.find(t => t) || null;
 }
