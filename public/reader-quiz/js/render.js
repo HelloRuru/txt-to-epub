@@ -236,6 +236,10 @@ export function renderResult(app, quizData, recommendation, reasons, tip, callba
         </div>
       ` : ''}
 
+      <div class="disclaimer">
+        <p class="disclaimer__text">${icon('info')} 本測驗價格與規格資料以 2026 年 2 月 3 日為基準，實際售價可能因通路、促銷活動或產品改版而異，購買前請以各品牌官網或銷售平台公告為準。</p>
+      </div>
+
       ${tip ? `
         <div class="tips">
           <h3 class="tips__title">${icon('lightbulb')} ${tip.title}</h3>
