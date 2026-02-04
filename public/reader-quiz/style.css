@@ -373,6 +373,24 @@ p { line-height: 1.8; }
 }
 .alt-card__link svg { width: 16px; height: 16px; }
 
+/* Disclaimer — 資料基準聲明 */
+.disclaimer {
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  border-left: 3px solid var(--color-border);
+  background: transparent;
+}
+.disclaimer__text {
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+.disclaimer__text svg { width: 16px; height: 16px; min-width: 16px; margin-top: 2px; color: var(--color-text-muted); }
+
 .tips {
   background: linear-gradient(135deg, rgba(212, 165, 165, 0.1), rgba(184, 169, 201, 0.1));
   border-radius: var(--radius);
