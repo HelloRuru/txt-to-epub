@@ -27,7 +27,8 @@
   {
     "id": "platform",
     "question": "你的電子書主要來自哪裡？",
-    "description": "不同來源會影響閱讀器的選擇",
+    "description": "可複選，書源越多元，對閱讀器的彈性要求越高",
+    "multiple": true,
     "options": [
       {
         "id": "single",
@@ -43,15 +44,21 @@
       },
       {
         "id": "library",
-        "text": "主要用圖書館借閱",
+        "text": "圖書館借閱",
         "icon": "book-open",
-        "description": "想用 HyRead 或台灣雲端書庫"
+        "description": "使用 HyRead 或台灣雲端書庫"
       },
       {
         "id": "webnovel",
         "text": "看網文/連載為主",
         "icon": "scroll",
         "description": "常看起點、晉江、輕小說平台等"
+      },
+      {
+        "id": "browse",
+        "text": "也會拿來上網瀏覽",
+        "icon": "globe",
+        "description": "偶爾看網頁、RSS 或其他線上內容"
       },
       {
         "id": "undecided",
