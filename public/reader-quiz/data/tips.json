@@ -15,9 +15,9 @@
     "title": "直排閱讀注意事項",
     "content": "Kindle 系列的直排支援度較差，若常看日文書或繁中直排書籍，建議選擇 Boox、mooInk 等對直排優化較好的機種。開放式系統還可安裝支援直排的第三方閱讀 APP。"
   },
-  "font-custom": {
-    "title": "自訂字體功能",
-    "content": "開放式 Android 系統（如 Boox、HyRead）可自由安裝系統字體。封閉式系統（如 Kobo、Kindle）字體選擇有限但穩定。若對字體有特殊需求，建議優先考慮開放式機種。"
+  "typesetting-flexible": {
+    "title": "排版彈性小提醒",
+    "content": "開放式 Android 系統（如 Boox、HyRead）可自由調整字體、行距、邊距等排版細節，也能安裝第三方閱讀 APP 取得更多排版選項。封閉式系統的排版調整範圍較有限，但穩定性好。若對排版有較高要求，建議優先考慮開放式機種。"
   },
   "bookwalker": {
     "title": "Book Walker 使用者注意",
