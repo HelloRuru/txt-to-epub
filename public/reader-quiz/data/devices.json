@@ -68,6 +68,23 @@
     "url": "https://www.kobo.com/zh/blog/kobo%E9%96%B1%E8%AE%80%E5%99%A8%E5%93%AA%E8%A3%A1%E8%B2%B7"
   },
   {
+    "id": "mooink-chill",
+    "name": "mooInk Chill",
+    "brand": "Readmoo 讀墨",
+    "screenSize": 6.13,
+    "displayType": "彩色 E Ink",
+    "storage": "32GB",
+    "price": 7999,
+    "hasPhysicalButtons": true,
+    "waterproof": false,
+    "verticalText": "excellent",
+    "customFont": true,
+    "openSystem": false,
+    "library": false,
+    "stylus": false,
+    "url": "https://readmoo.com/mooink-series/products/230447443000101"
+  },
+  {
     "id": "mooink-c",
     "name": "mooInk C",
     "brand": "Readmoo 讀墨",
