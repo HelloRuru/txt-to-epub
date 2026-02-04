@@ -143,7 +143,6 @@ function rankLabel(index) {
 }
 
 // ========== renderResult ==========
-// 參數：(app, quizData, recommendation, answers, tip, callbacks)
 export function renderResult(app, quizData, recommendation, answers, tip, callbacks) {
   const { onRestart } = callbacks;
   const topThree = [recommendation.primary, ...recommendation.alternatives];
@@ -246,15 +245,6 @@ export function renderResult(app, quizData, recommendation, answers, tip, callba
           ${icon('refresh')} 重新測驗
         </button>
       </div>
-    </div>
-
-    <div class="footer">
-      <div class="footer__credit">
-        <p class="footer__credit-title">本測驗內容參考自</p>
-        <p class="footer__credit-name"><a href="https://home.gamer.com.tw/artwork.php?sn=6140260" target="_blank" rel="noopener">DiDaDi 的電子書閱讀器選購指南</a></p>
-        <p class="footer__credit-thanks">感謝 Di 提供專業且詳盡的閱讀器知識整理</p>
-      </div>
-      <p class="footer__copyright">&copy; ${new Date().getFullYear()} Kaoru Tsai. All Rights Reserved. | <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
     </div>
   `;
 
