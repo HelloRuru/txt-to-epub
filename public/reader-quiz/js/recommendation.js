@@ -121,18 +121,25 @@ export function calculateRecommendation(devices, rules, answers) {
     });
   }
 
-  // 字體自由度
-  const fontAnswer = answers.font;
+  // 排版彈性需求
+  const typesettingAnswer = answers.typesetting;
   devices.forEach(device => {
-    if (fontAnswer === 'custom') {
+    if (typesettingAnswer === 'flexible') {
+      // 高排版彈性：自訂字體 + 開放系統都是加分
       if (device.customFont) scores[device.id] += 20;
       if (device.openSystem) scores[device.id] += 10;
-    } else if (fontAnswer === 'default') {
+      // 直排好的設備通常排版引擎也更成熟
+      if (device.verticalText === 'excellent') scores[device.id] += 5;
+    } else if (typesettingAnswer === 'basic') {
+      // 低排版需求：封閉系統簡單直覺反而是優勢
       if (!device.openSystem) scores[device.id] += 10;
-    } else if (fontAnswer === 'vertical') {
+    } else if (typesettingAnswer === 'vertical') {
+      // 直排需求：直排品質是核心，排版引擎差的要扣分
       if (device.verticalText === 'excellent') scores[device.id] += 30;
       else if (device.verticalText === 'good') scores[device.id] += 15;
       else if (device.verticalText === 'poor') scores[device.id] -= 20;
+      // 自訂字體能力對直排也有幫助（可換直排優化字體）
+      if (device.customFont) scores[device.id] += 5;
       if (device.brand === 'Amazon') scores[device.id] -= 15;
     }
   });
@@ -183,7 +190,7 @@ export function getReasonText(device, answers) {
   const isOpen = device.openSystem;
   const isColor = device.displayType.includes('彩色');
 
-  // 平台相關理由（改為陣列判斷）
+  // 平台相關理由（陣列判斷）
   const needsOpen = platformAnswers.includes('multi') || platformAnswers.includes('library') || platformAnswers.includes('webnovel') || platformAnswers.includes('browse');
   const needsClosed = platformAnswers.includes('single') && platformAnswers.length === 1;
 
@@ -213,13 +220,16 @@ export function getReasonText(device, answers) {
     reasons.push('7-8 吋中型螢幕，小說漫畫都合適');
   }
 
-  if (answers.font === 'custom' && device.customFont) {
-    reasons.push('支援安裝自訂字體，閱讀體驗可完全客製');
+  // 排版彈性相關理由
+  if (answers.typesetting === 'flexible' && device.customFont) {
+    reasons.push('排版彈性高，可自訂字體、行距與邊距');
   }
-  if (answers.font === 'vertical' && device.verticalText === 'excellent') {
-    reasons.push('直排顯示優秀，適合日文小說與繁中直排書');
-  } else if (answers.font === 'vertical' && device.verticalText === 'good') {
-    reasons.push('直排閱讀支援良好');
+  if (answers.typesetting === 'vertical') {
+    if (device.verticalText === 'excellent') {
+      reasons.push('直排顯示優秀，標點引號排版正確');
+    } else if (device.verticalText === 'good') {
+      reasons.push('直排閱讀支援良好');
+    }
   }
 
   if (contentAnswers.includes('manga-bw') && device.verticalText === 'excellent') {
@@ -266,12 +276,12 @@ export function getRelevantTip(tips, answers) {
     tipList.push(tips['color-display']);
   }
 
-  if (answers.font === 'vertical') {
+  if (answers.typesetting === 'vertical') {
     tipList.push(tips['vertical-text']);
   }
 
-  if (answers.font === 'custom') {
-    tipList.push(tips['font-custom']);
+  if (answers.typesetting === 'flexible') {
+    tipList.push(tips['typesetting-flexible']);
   }
 
   if (contentAnswers.includes('manga-bw')) {
