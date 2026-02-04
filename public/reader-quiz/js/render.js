@@ -4,6 +4,7 @@
  */
 
 import { icons } from './icons.js';
+import { getReasonText } from './recommendation.js';
 
 function icon(name) {
   return icons[name] || '';
@@ -76,7 +77,6 @@ export function renderQuiz(app, quizData, currentQuestion, answers, callbacks) {
       const multi = btn.dataset.multiple === 'true';
       onSelect(qid, oid, multi);
 
-      // 單選時自動啟用下一題按鈕
       if (!multi) {
         const nextBtn = app.querySelector('[data-action="next"]');
         if (nextBtn) nextBtn.disabled = false;
@@ -88,7 +88,6 @@ export function renderQuiz(app, quizData, currentQuestion, answers, callbacks) {
   const nextBtn = app.querySelector('[data-action="next"]');
   if (prevBtn) prevBtn.addEventListener('click', onPrev);
   if (nextBtn) nextBtn.addEventListener('click', () => {
-    // 重新檢查是否有答案
     const ca = answers[question.id];
     const ha = isMultiple
       ? (Array.isArray(ca) && ca.length > 0)
@@ -115,7 +114,6 @@ export function updateOptionUI(app, questionId, answers, isMultiple) {
     }
   });
 
-  // 更新按鈕狀態
   const hasAnswer = isMultiple
     ? (Array.isArray(currentAnswer) && currentAnswer.length > 0)
     : (currentAnswer !== undefined && currentAnswer !== null);
@@ -123,118 +121,114 @@ export function updateOptionUI(app, questionId, answers, isMultiple) {
   if (nextBtn) nextBtn.disabled = !hasAnswer;
 }
 
+// ========== 共用：裝置規格標籤 ==========
+function deviceTags(d) {
+  const tags = [];
+  if (d.displayType) tags.push(d.displayType);
+  if (d.screenSize) tags.push(`${d.screenSize} 吋`);
+  if (d.storage) tags.push(d.storage);
+  if (d.waterproof) tags.push('防水');
+  if (d.stylus) tags.push('手寫筆');
+  if (d.hasPhysicalButtons) tags.push('實體按鍵');
+  if (d.openSystem) tags.push('開放系統');
+  if (d.library) tags.push('圖書館借閱');
+  if (d.customFont) tags.push('自訂字體');
+  return tags;
+}
+
+// ========== 排名標籤 ==========
+function rankLabel(index) {
+  const labels = ['🥇 最佳推薦', '🥈 第二推薦', '🥉 第三推薦'];
+  return labels[index] || '';
+}
+
 // ========== renderResult ==========
-export function renderResult(app, quizData, recommendation, reasons, tip, callbacks) {
+// 參數：(app, quizData, recommendation, answers, tip, callbacks)
+export function renderResult(app, quizData, recommendation, answers, tip, callbacks) {
   const { onRestart } = callbacks;
-  const device = recommendation.primary;
-  const alts = recommendation.alternatives || [];
-
-  // 裝置規格標籤
-  function deviceTags(d) {
-    const tags = [];
-    if (d.displayType) tags.push(d.displayType);
-    if (d.screenSize) tags.push(`${d.screenSize} 吋`);
-    if (d.storage) tags.push(d.storage);
-    if (d.waterproof) tags.push('防水');
-    if (d.stylus) tags.push('手寫筆');
-    if (d.hasPhysicalButtons) tags.push('實體按鍵');
-    if (d.openSystem) tags.push('開放系統');
-    if (d.library) tags.push('圖書館借閱');
-    if (d.customFont) tags.push('自訂字體');
-    return tags;
-  }
-
-  const tags = deviceTags(device);
+  const topThree = [recommendation.primary, ...recommendation.alternatives];
 
   app.innerHTML = `
     <header class="header">
       <div class="header__logo">${icon('trophy')}</div>
       <h1 class="header__title">推薦結果</h1>
-      <p class="header__subtitle">根據你的回答，以下是最適合的選擇</p>
+      <p class="header__subtitle">根據你的回答，以下是最適合的前三名</p>
     </header>
 
     <div class="result fade-in">
-      <div class="result__header">
-        <span class="result__badge">${icon('star')} 最佳推薦</span>
-      </div>
+      ${topThree.map((device, index) => {
+        const tags = deviceTags(device);
+        const reasons = getReasonText(device, answers);
+        const isFirst = index === 0;
 
-      <div class="recommendation">
-        <div class="recommendation__image">
-          ${icon('tablet')}
-        </div>
-        <div class="recommendation__body">
-          <p class="recommendation__brand">${device.brand}</p>
-          <h2 class="recommendation__name">${device.name}</h2>
-          <p class="recommendation__price">NT$ ${device.price.toLocaleString()}</p>
+        return `
+          <div class="ranking-card${isFirst ? ' ranking-card--first' : ''}" data-rank="${index + 1}">
+            <div class="ranking-card__header">
+              <span class="ranking-card__badge${isFirst ? ' ranking-card__badge--first' : ''}">${rankLabel(index)}</span>
+            </div>
 
-          <div class="recommendation__tags">
-            ${tags.map((t, i) => `<span class="tag${i % 2 === 1 ? ' tag--secondary' : ''}">${t}</span>`).join('')}
+            <div class="ranking-card__body">
+              <div class="ranking-card__info">
+                <p class="ranking-card__brand">${device.brand}</p>
+                <h2 class="ranking-card__name">${device.name}</h2>
+                <p class="ranking-card__price">NT$ ${device.price.toLocaleString()}</p>
+              </div>
+
+              <div class="ranking-card__tags">
+                ${tags.map((t, i) => `<span class="tag${i % 2 === 1 ? ' tag--secondary' : ''}">${t}</span>`).join('')}
+              </div>
+
+              ${isFirst ? `
+                <div class="specs">
+                  <div class="spec">
+                    <div class="spec__icon">${icon('monitor')}</div>
+                    <div>
+                      <div class="spec__label">螢幕</div>
+                      <div class="spec__value">${device.screenSize} 吋 ${device.displayType}</div>
+                    </div>
+                  </div>
+                  <div class="spec">
+                    <div class="spec__icon">${icon('layers')}</div>
+                    <div>
+                      <div class="spec__label">容量</div>
+                      <div class="spec__value">${device.storage}</div>
+                    </div>
+                  </div>
+                  <div class="spec">
+                    <div class="spec__icon">${icon('droplet')}</div>
+                    <div>
+                      <div class="spec__label">防水</div>
+                      <div class="spec__value">${device.waterproof ? '支援' : '無'}</div>
+                    </div>
+                  </div>
+                  <div class="spec">
+                    <div class="spec__icon">${icon('type')}</div>
+                    <div>
+                      <div class="spec__label">直排支援</div>
+                      <div class="spec__value">${device.verticalText === 'excellent' ? '優秀' : device.verticalText === 'good' ? '良好' : '較差'}</div>
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+
+              ${reasons.length > 0 ? `
+                <div class="reasons">
+                  <h3 class="reasons__title">${icon('star')} 為什麼適合你</h3>
+                  <ul class="reasons__list">
+                    ${reasons.map(r => `<li class="reasons__item">${icon('check')} ${r}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+
+              ${device.url ? `
+                <a href="${device.url}" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--full${isFirst ? ' btn--buy' : ''}">
+                  前往官網了解更多 ${icon('external-link')}
+                </a>
+              ` : ''}
+            </div>
           </div>
-
-          <div class="specs">
-            <div class="spec">
-              <div class="spec__icon">${icon('monitor')}</div>
-              <div>
-                <div class="spec__label">螢幕</div>
-                <div class="spec__value">${device.screenSize} 吋 ${device.displayType}</div>
-              </div>
-            </div>
-            <div class="spec">
-              <div class="spec__icon">${icon('layers')}</div>
-              <div>
-                <div class="spec__label">容量</div>
-                <div class="spec__value">${device.storage}</div>
-              </div>
-            </div>
-            <div class="spec">
-              <div class="spec__icon">${icon('droplet')}</div>
-              <div>
-                <div class="spec__label">防水</div>
-                <div class="spec__value">${device.waterproof ? '支援' : '無'}</div>
-              </div>
-            </div>
-            <div class="spec">
-              <div class="spec__icon">${icon('type')}</div>
-              <div>
-                <div class="spec__label">直排支援</div>
-                <div class="spec__value">${device.verticalText === 'excellent' ? '優秀' : device.verticalText === 'good' ? '良好' : '較差'}</div>
-              </div>
-            </div>
-          </div>
-
-          ${reasons && reasons.length > 0 ? `
-            <div class="reasons">
-              <h3 class="reasons__title">${icon('star')} 推薦理由</h3>
-              <ul class="reasons__list">
-                ${reasons.map(r => `<li class="reasons__item">${icon('check')} ${r}</li>`).join('')}
-              </ul>
-            </div>
-          ` : ''}
-
-          ${device.url ? `
-            <a href="${device.url}" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--full btn--buy">
-              前往官網了解更多 ${icon('external-link')}
-            </a>
-          ` : ''}
-        </div>
-      </div>
-
-      ${alts.length > 0 ? `
-        <div class="alternatives">
-          <h3 class="alternatives__title">其他推薦</h3>
-          ${alts.map(alt => `
-            <a href="${alt.url || '#'}" target="_blank" rel="noopener noreferrer" class="alt-card${alt.url ? ' alt-card--clickable' : ''}">
-              <div class="alt-card__icon">${icon('tablet')}</div>
-              <div class="alt-card__content">
-                <div class="alt-card__name">${alt.name}</div>
-                <div class="alt-card__note">${alt.brand} · ${alt.screenSize} 吋 ${alt.displayType}</div>
-              </div>
-              <div class="alt-card__price">NT$ ${alt.price.toLocaleString()}</div>
-              ${alt.url ? `<div class="alt-card__link">${icon('external-link')}</div>` : ''}
-            </a>
-          `).join('')}
-        </div>
-      ` : ''}
+        `;
+      }).join('')}
 
       <div class="disclaimer">
         <p class="disclaimer__text">${icon('info')} 本測驗價格與規格資料以 2026 年 2 月 3 日為基準，實際售價可能因通路、促銷活動或產品改版而異，購買前請以各品牌官網或銷售平台公告為準。</p>
