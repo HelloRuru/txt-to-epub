@@ -14,7 +14,7 @@
     "openSystem": false,
     "library": true,
     "stylus": true,
-    "url": "https://tw.kobobooks.com/collections/ereaders"
+    "url": "https://www.kobo.com/zh/blog/kobo%E9%96%B1%E8%AE%80%E5%99%A8%E5%93%AA%E8%A3%A1%E8%B2%B7"
   },
   {
     "id": "kobo-clara-colour",
@@ -31,7 +31,7 @@
     "openSystem": false,
     "library": true,
     "stylus": false,
-    "url": "https://tw.kobobooks.com/collections/ereaders"
+    "url": "https://www.kobo.com/zh/blog/kobo%E9%96%B1%E8%AE%80%E5%99%A8%E5%93%AA%E8%A3%A1%E8%B2%B7"
   },
   {
     "id": "kobo-sage",
@@ -48,7 +48,7 @@
     "openSystem": false,
     "library": true,
     "stylus": true,
-    "url": "https://tw.kobobooks.com/collections/ereaders"
+    "url": "https://www.kobo.com/zh/blog/kobo%E9%96%B1%E8%AE%80%E5%99%A8%E5%93%AA%E8%A3%A1%E8%B2%B7"
   },
   {
     "id": "kobo-elipsa-2e",
@@ -65,7 +65,7 @@
     "openSystem": false,
     "library": true,
     "stylus": true,
-    "url": "https://tw.kobobooks.com/collections/ereaders"
+    "url": "https://www.kobo.com/zh/blog/kobo%E9%96%B1%E8%AE%80%E5%99%A8%E5%93%AA%E8%A3%A1%E8%B2%B7"
   },
   {
     "id": "mooink-c",
@@ -82,7 +82,7 @@
     "openSystem": true,
     "library": false,
     "stylus": false,
-    "url": "https://readmoo.com/mooink"
+    "url": "https://readmoo.com/mooink-series"
   },
   {
     "id": "mooink-pro-2c",
@@ -99,7 +99,7 @@
     "openSystem": true,
     "library": false,
     "stylus": true,
-    "url": "https://readmoo.com/mooink"
+    "url": "https://readmoo.com/mooink-series"
   },
   {
     "id": "mooink-nana",
@@ -116,7 +116,7 @@
     "openSystem": false,
     "library": false,
     "stylus": false,
-    "url": "https://readmoo.com/mooink"
+    "url": "https://readmoo.com/mooink-series"
   },
   {
     "id": "kindle-paperwhite-5",
@@ -184,7 +184,7 @@
     "openSystem": true,
     "library": true,
     "stylus": false,
-    "url": "https://shop.boox.com/"
+    "url": "https://www.boox.com.tw/"
   },
   {
     "id": "boox-poke-5",
@@ -201,7 +201,7 @@
     "openSystem": true,
     "library": true,
     "stylus": false,
-    "url": "https://shop.boox.com/"
+    "url": "https://www.boox.com.tw/"
   },
   {
     "id": "boox-tab-ultra-c-pro",
@@ -218,7 +218,7 @@
     "openSystem": true,
     "library": true,
     "stylus": true,
-    "url": "https://shop.boox.com/"
+    "url": "https://www.boox.com.tw/"
   },
   {
     "id": "boox-go-color-7",
@@ -235,7 +235,7 @@
     "openSystem": true,
     "library": true,
     "stylus": false,
-    "url": "https://shop.boox.com/"
+    "url": "https://www.boox.com.tw/"
   },
   {
     "id": "hyread-gaze-one-plus",
