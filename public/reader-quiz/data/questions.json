@@ -178,19 +178,19 @@
         "id": "flexible",
         "text": "希望能自訂排版細節",
         "icon": "type",
-        "description": "想調整字體、行距、邊距，讓版面符合自己的閱讀習慣"
+        "description": "想自己調整字體、字距、行距、邊距等，打造習慣的閱讀版面"
       },
       {
         "id": "vertical",
         "text": "需要良好的直排顯示",
         "icon": "align-vertical",
-        "description": "閱讀日文書、繁中直排書，在意標點符號與引號的排版正確性"
+        "description": "在意字距行距、天地留白、標點引號位置等直排排版細節"
       },
       {
         "id": "basic",
         "text": "預設排版就好，不太調整",
         "icon": "check-circle",
-        "description": "原廠設定能順暢閱讀就可以，不需要額外設定"
+        "description": "書籍原本的排版就夠用，不需要另外花時間設定"
       }
     ]
   },
