@@ -15,7 +15,6 @@ export function calculateRecommendation(devices, rules, answers) {
   devices.forEach(device => {
     const isOpen = device.openSystem;
 
-    // 選越多來源 → 越需要開放系統
     const sourceCount = platformAnswers.length;
     const diversityBonus = sourceCount >= 3 ? 10 : sourceCount >= 2 ? 5 : 0;
 
@@ -39,10 +38,8 @@ export function calculateRecommendation(devices, rules, answers) {
       if (isOpen) scores[device.id] += 5;
     }
 
-    // 多來源多元性加分（只給開放系統）
     if (isOpen) scores[device.id] += diversityBonus;
 
-    // 若同時選了 single + 其他來源 → 開放系統仍有優勢
     if (platformAnswers.includes('single') && sourceCount > 1 && isOpen) {
       scores[device.id] += 8;
     }
@@ -125,24 +122,19 @@ export function calculateRecommendation(devices, rules, answers) {
   const typesettingAnswer = answers.typesetting;
   devices.forEach(device => {
     if (typesettingAnswer === 'flexible') {
-      // 高排版彈性：自訂字體 + 開放系統都是加分
       if (device.customFont) scores[device.id] += 20;
       if (device.openSystem) scores[device.id] += 10;
-      // 直排好的設備通常排版引擎也更成熟
       if (device.verticalText === 'excellent') scores[device.id] += 5;
     } else if (typesettingAnswer === 'basic') {
-      // 低排版需求：封閉系統簡單直覺反而是優勢
       if (!device.openSystem) scores[device.id] += 10;
     } else if (typesettingAnswer === 'vertical') {
-      // 直排需求：直排品質是核心，排版引擎差的要扣分
       if (device.verticalText === 'excellent') scores[device.id] += 30;
       else if (device.verticalText === 'good') scores[device.id] += 15;
       else if (device.verticalText === 'poor') scores[device.id] -= 20;
-      // 自訂字體能力對直排也有幫助（可換直排優化字體）
       if (device.customFont) scores[device.id] += 5;
       if (device.brand === 'Amazon') scores[device.id] -= 15;
     }
-    // typesettingAnswer === 'none' → 不加減分，由其他題目決定
+    // typesettingAnswer === 'none' → 不加減分
   });
 
   // 優先特點
@@ -177,18 +169,10 @@ export function calculateRecommendation(devices, rules, answers) {
     .sort((a, b) => b[1] - a[1]);
 
   const topThree = sorted.slice(0, 3).map(([id]) => devices.find(d => d.id === id));
-  const maxScore = sorted[0][1];
-
-  // 計算匹配度百分比（第一名 = 100%，其他按比例）
-  const matchScores = {};
-  sorted.slice(0, 3).forEach(([id, score]) => {
-    matchScores[id] = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
-  });
 
   return {
     primary: topThree[0],
-    alternatives: topThree.slice(1, 3),
-    matchScores
+    alternatives: topThree.slice(1, 3)
   };
 }
 
@@ -200,7 +184,7 @@ export function getReasonText(device, answers) {
   const isOpen = device.openSystem;
   const isColor = device.displayType.includes('彩色');
 
-  // 平台相關理由（陣列判斷）
+  // 平台相關理由
   const needsOpen = platformAnswers.includes('multi') || platformAnswers.includes('library') || platformAnswers.includes('webnovel') || platformAnswers.includes('browse');
   const needsClosed = platformAnswers.includes('single') && platformAnswers.length === 1;
 
@@ -258,19 +242,43 @@ export function getReasonText(device, answers) {
     reasons.push('實體翻頁鍵，操作更直覺');
   }
 
+  if (device.stylus && answers.priority?.includes('pen')) {
+    reasons.push('支援手寫筆，可直接在書上劃記');
+  }
+
+  if (priorities_includes_light(answers) && device.screenSize <= 6.5) {
+    // 已在上方螢幕尺寸區塊處理
+  }
+
   // 圖書館借閱理由
   if (platformAnswers.includes('library') && device.library) {
     reasons.push('支援圖書館借閱');
   }
 
+  // 預算符合
+  if (answers.budget) {
+    const budgetLabels = {
+      'under-5k': '5,000 元以下',
+      '5k-8k': '5,000–8,000 元',
+      '8k-12k': '8,000–12,000 元',
+      'over-12k': '12,000 元以上'
+    };
+    const label = budgetLabels[answers.budget];
+    if (label) {
+      reasons.push(`價格落在你的預算範圍（${label}）`);
+    }
+  }
+
   // 補足理由
-  if (reasons.length < 3) {
+  if (reasons.length < 2) {
     if (device.library && !reasons.some(r => r.includes('圖書館'))) reasons.push('支援圖書館借閱');
     if (device.stylus && !reasons.some(r => r.includes('筆'))) reasons.push('支援手寫筆記');
     if (device.waterproof && !reasons.some(r => r.includes('防水'))) reasons.push('具備防水功能');
   }
 
-  return reasons.slice(0, 4);
+  // 去重
+  const unique = [...new Set(reasons)];
+  return unique.slice(0, 4);
 }
 
 export function getRelevantTip(tips, answers) {
