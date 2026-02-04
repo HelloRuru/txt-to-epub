@@ -4,6 +4,7 @@
     "multi": { "closed": 0, "open": 10 },
     "library": { "closed": 0, "open": 15 },
     "webnovel": { "closed": 0, "open": 15 },
+    "browse": { "closed": 0, "open": 15 },
     "undecided": { "closed": 5, "open": 5 }
   },
   "contentWeight": {
