@@ -134,7 +134,6 @@ export function calculateRecommendation(devices, rules, answers) {
       if (device.customFont) scores[device.id] += 5;
       if (device.brand === 'Amazon') scores[device.id] -= 15;
     }
-    // typesettingAnswer === 'none' → 不加減分
   });
 
   // 優先特點
@@ -181,6 +180,7 @@ export function getReasonText(device, answers) {
   const usageAnswers = answers.usage || [];
   const contentAnswers = answers.content || [];
   const platformAnswers = answers.platform || [];
+  const priorities = answers.priority || [];
   const isOpen = device.openSystem;
   const isColor = device.displayType.includes('彩色');
 
@@ -188,9 +188,9 @@ export function getReasonText(device, answers) {
   const needsOpen = platformAnswers.includes('multi') || platformAnswers.includes('library') || platformAnswers.includes('webnovel') || platformAnswers.includes('browse');
   const needsClosed = platformAnswers.includes('single') && platformAnswers.length === 1;
 
-  if (!isOpen && (needsClosed || answers.priority?.includes('easy'))) {
+  if (!isOpen && (needsClosed || priorities.includes('easy'))) {
     reasons.push('封閉式系統，操作直覺簡單');
-  } else if (isOpen && (needsOpen || answers.priority?.includes('flexible'))) {
+  } else if (isOpen && (needsOpen || priorities.includes('flexible'))) {
     if (platformAnswers.length >= 3) {
       reasons.push('開放式系統，多種書源一台搞定');
     } else {
@@ -198,12 +198,16 @@ export function getReasonText(device, answers) {
     }
   }
 
+  // 螢幕尺寸 × 情境
   if (device.screenSize <= 6.5 && usageAnswers.includes('commute')) {
     reasons.push(`${device.screenSize} 吋輕巧設計，適合通勤攜帶`);
   } else if (device.screenSize >= 10 && (contentAnswers.includes('pdf') || contentAnswers.includes('magazine'))) {
     reasons.push(`${device.screenSize} 吋大螢幕，適合閱讀 PDF 和雜誌`);
+  } else if (device.screenSize <= 6.5 && priorities.includes('light')) {
+    reasons.push(`${device.screenSize} 吋輕巧好攜帶`);
   }
 
+  // 螢幕類型 × 內容
   if (isColor && (contentAnswers.includes('manga-color') || contentAnswers.includes('magazine'))) {
     reasons.push('彩色螢幕，適合看彩漫和繪本');
   } else if (!isColor && contentAnswers.includes('novel') && !contentAnswers.includes('manga-color')) {
@@ -214,7 +218,7 @@ export function getReasonText(device, answers) {
     reasons.push('7-8 吋中型螢幕，小說漫畫都合適');
   }
 
-  // 排版彈性相關理由
+  // 排版彈性
   if (answers.typesetting === 'flexible' && device.customFont) {
     reasons.push('排版彈性高，可自訂字體、行距與邊距');
   }
@@ -230,27 +234,21 @@ export function getReasonText(device, answers) {
     reasons.push('日漫對話直排顯示優秀');
   }
 
-  if (answers.priority?.includes('taiwan') && (device.brand === 'Readmoo 讀墨' || device.brand === 'HyRead')) {
+  // 優先功能對應
+  if (priorities.includes('taiwan') && (device.brand === 'Readmoo 讀墨' || device.brand === 'HyRead')) {
     reasons.push('台灣品牌，在地服務支援');
   }
-
-  if (device.waterproof && answers.priority?.includes('waterproof')) {
+  if (device.waterproof && priorities.includes('waterproof')) {
     reasons.push('IPX8 防水，可在浴室安心使用');
   }
-
-  if (device.hasPhysicalButtons && answers.priority?.includes('buttons')) {
+  if (device.hasPhysicalButtons && priorities.includes('buttons')) {
     reasons.push('實體翻頁鍵，操作更直覺');
   }
-
-  if (device.stylus && answers.priority?.includes('pen')) {
+  if (device.stylus && priorities.includes('pen')) {
     reasons.push('支援手寫筆，可直接在書上劃記');
   }
 
-  if (priorities_includes_light(answers) && device.screenSize <= 6.5) {
-    // 已在上方螢幕尺寸區塊處理
-  }
-
-  // 圖書館借閱理由
+  // 圖書館借閱
   if (platformAnswers.includes('library') && device.library) {
     reasons.push('支援圖書館借閱');
   }
@@ -269,14 +267,14 @@ export function getReasonText(device, answers) {
     }
   }
 
-  // 補足理由
+  // 補足理由（至少 2 條）
   if (reasons.length < 2) {
     if (device.library && !reasons.some(r => r.includes('圖書館'))) reasons.push('支援圖書館借閱');
     if (device.stylus && !reasons.some(r => r.includes('筆'))) reasons.push('支援手寫筆記');
     if (device.waterproof && !reasons.some(r => r.includes('防水'))) reasons.push('具備防水功能');
   }
 
-  // 去重
+  // 去重後取前 4 條
   const unique = [...new Set(reasons)];
   return unique.slice(0, 4);
 }
