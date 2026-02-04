@@ -1,6 +1,6 @@
 /**
  * main.js - 入口與初始化
- * 電子書閱讀器選購測驗 v2.2.0
+ * 電子書閱讀器選購測驗 v2.3.0
  */
 
 import { renderQuiz, renderResult, renderError, updateOptionUI } from './render.js';
@@ -36,7 +36,7 @@ async function loadData() {
     devices,
     questions,
     rules,
-    tips  // 直接使用 tips，不是 tips.tips
+    tips
   };
 }
 
@@ -95,10 +95,9 @@ function renderCurrentQuiz() {
 
 function showResult() {
   const recommendation = calculateRecommendation(quizData.devices, quizData.rules, answers);
-  const reasons = getReasonText(recommendation.primary, answers);
   const tip = getRelevantTip(quizData.tips, answers);
   
-  renderResult(app, quizData, recommendation, reasons, tip, {
+  renderResult(app, quizData, recommendation, answers, tip, {
     onRestart: restart
   });
   
