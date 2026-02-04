@@ -10,19 +10,41 @@ export function calculateRecommendation(devices, rules, answers) {
     scores[device.id] = 0;
   });
 
-  // 平台偏好 → 系統類型
-  const platformAnswer = answers.platform;
+  // 平台偏好 → 系統類型（複選）
+  const platformAnswers = answers.platform || [];
   devices.forEach(device => {
     const isOpen = device.openSystem;
-    if (platformAnswer === 'single') {
+
+    // 選越多來源 → 越需要開放系統
+    const sourceCount = platformAnswers.length;
+    const diversityBonus = sourceCount >= 3 ? 10 : sourceCount >= 2 ? 5 : 0;
+
+    if (platformAnswers.includes('single')) {
       if (!isOpen) scores[device.id] += 15;
-    } else if (platformAnswer === 'multi' || platformAnswer === 'webnovel') {
+    }
+    if (platformAnswers.includes('multi')) {
       if (isOpen) scores[device.id] += 20;
-    } else if (platformAnswer === 'library') {
+    }
+    if (platformAnswers.includes('library')) {
       if (isOpen) scores[device.id] += 25;
       if (device.brand === 'HyRead') scores[device.id] += 10;
-    } else if (platformAnswer === 'undecided') {
+    }
+    if (platformAnswers.includes('webnovel')) {
+      if (isOpen) scores[device.id] += 20;
+    }
+    if (platformAnswers.includes('browse')) {
+      if (isOpen) scores[device.id] += 20;
+    }
+    if (platformAnswers.includes('undecided')) {
       if (isOpen) scores[device.id] += 5;
+    }
+
+    // 多來源多元性加分（只給開放系統）
+    if (isOpen) scores[device.id] += diversityBonus;
+
+    // 若同時選了 single + 其他來源 → 開放系統仍有優勢
+    if (platformAnswers.includes('single') && sourceCount > 1 && isOpen) {
+      scores[device.id] += 8;
     }
   });
 
@@ -78,7 +100,6 @@ export function calculateRecommendation(devices, rules, answers) {
       if (device.screenSize >= 7.8) scores[device.id] += 5;
     }
     if (usageAnswers.includes('bedtime')) {
-      // 大部分閱讀器都有前光，只有極少數沒有，給所有裝置基礎分
       scores[device.id] += 5;
     }
     if (usageAnswers.includes('work')) {
@@ -158,13 +179,22 @@ export function getReasonText(device, answers) {
   const reasons = [];
   const usageAnswers = answers.usage || [];
   const contentAnswers = answers.content || [];
+  const platformAnswers = answers.platform || [];
   const isOpen = device.openSystem;
   const isColor = device.displayType.includes('彩色');
 
-  if (!isOpen && (answers.platform === 'single' || answers.priority?.includes('easy'))) {
+  // 平台相關理由（改為陣列判斷）
+  const needsOpen = platformAnswers.includes('multi') || platformAnswers.includes('library') || platformAnswers.includes('webnovel') || platformAnswers.includes('browse');
+  const needsClosed = platformAnswers.includes('single') && platformAnswers.length === 1;
+
+  if (!isOpen && (needsClosed || answers.priority?.includes('easy'))) {
     reasons.push('封閉式系統，操作直覺簡單');
-  } else if (isOpen && (answers.platform === 'multi' || answers.platform === 'library' || answers.priority?.includes('flexible'))) {
-    reasons.push('開放式系統，可安裝多種 APP');
+  } else if (isOpen && (needsOpen || answers.priority?.includes('flexible'))) {
+    if (platformAnswers.length >= 3) {
+      reasons.push('開放式系統，多種書源一台搞定');
+    } else {
+      reasons.push('開放式系統，可安裝多種 APP');
+    }
   }
 
   if (device.screenSize <= 6.5 && usageAnswers.includes('commute')) {
@@ -208,9 +238,14 @@ export function getReasonText(device, answers) {
     reasons.push('實體翻頁鍵，操作更直覺');
   }
 
+  // 圖書館借閱理由
+  if (platformAnswers.includes('library') && device.library) {
+    reasons.push('支援圖書館借閱');
+  }
+
   // 補足理由
   if (reasons.length < 3) {
-    if (device.library) reasons.push('支援圖書館借閱');
+    if (device.library && !reasons.some(r => r.includes('圖書館'))) reasons.push('支援圖書館借閱');
     if (device.stylus && !reasons.some(r => r.includes('筆'))) reasons.push('支援手寫筆記');
     if (device.waterproof && !reasons.some(r => r.includes('防水'))) reasons.push('具備防水功能');
   }
@@ -221,8 +256,9 @@ export function getReasonText(device, answers) {
 export function getRelevantTip(tips, answers) {
   const tipList = [];
   const contentAnswers = answers.content || [];
+  const platformAnswers = answers.platform || [];
 
-  if (answers.platform === 'library') {
+  if (platformAnswers.includes('library')) {
     tipList.push(tips.library);
   }
 
@@ -244,6 +280,5 @@ export function getRelevantTip(tips, answers) {
 
   tipList.push(tips['try-first']);
 
-  // 過濾 undefined
   return tipList.find(t => t) || null;
 }
