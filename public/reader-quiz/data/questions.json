@@ -191,6 +191,12 @@
         "text": "預設排版就好，不太調整",
         "icon": "check-circle",
         "description": "書籍原本的排版就夠用，不需要另外花時間設定"
+      },
+      {
+        "id": "none",
+        "text": "都無所謂",
+        "icon": "skip-forward",
+        "description": "排版不是重點，比較關注其他功能"
       }
     ]
   },
