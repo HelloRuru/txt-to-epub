@@ -142,6 +142,7 @@ export function calculateRecommendation(devices, rules, answers) {
       if (device.customFont) scores[device.id] += 5;
       if (device.brand === 'Amazon') scores[device.id] -= 15;
     }
+    // typesettingAnswer === 'none' → 不加減分，由其他題目決定
   });
 
   // 優先特點
@@ -173,12 +174,21 @@ export function calculateRecommendation(devices, rules, answers) {
   });
 
   const sorted = Object.entries(scores)
-    .sort((a, b) => b[1] - a[1])
-    .map(([id]) => devices.find(d => d.id === id));
+    .sort((a, b) => b[1] - a[1]);
+
+  const topThree = sorted.slice(0, 3).map(([id]) => devices.find(d => d.id === id));
+  const maxScore = sorted[0][1];
+
+  // 計算匹配度百分比（第一名 = 100%，其他按比例）
+  const matchScores = {};
+  sorted.slice(0, 3).forEach(([id, score]) => {
+    matchScores[id] = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+  });
 
   return {
-    primary: sorted[0],
-    alternatives: sorted.slice(1, 3)
+    primary: topThree[0],
+    alternatives: topThree.slice(1, 3),
+    matchScores
   };
 }
 
