@@ -247,6 +247,7 @@ p { line-height: 1.8; }
 .btn--secondary:hover { border-color: var(--color-primary-light); color: var(--color-text); }
 .btn--secondary:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn--primary { background: #D4A5A5; color: #FFFFFF; }
+a.btn--primary, a.btn--primary:visited, a.btn--primary:hover { color: #FFFFFF; }
 .btn--primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .btn--primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .btn--full { width: 100%; }

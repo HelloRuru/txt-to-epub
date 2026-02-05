@@ -277,9 +277,8 @@
             const metaParts = [];
 
             // Release time
-            if (device.releaseYear) {
-              const quarter = device.releaseQuarter ? ` Q${device.releaseQuarter}` : '';
-              metaParts.push(`${device.releaseYear} 年${quarter}`);
+            if (device.releaseYear && device.releaseQuarter) {
+              metaParts.push(`${device.brand} 發表於 ${device.releaseYear} 年 Q${device.releaseQuarter}`);
             }
 
             // Screen panel
