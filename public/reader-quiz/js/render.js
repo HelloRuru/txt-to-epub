@@ -27,6 +27,7 @@ export function renderQuiz(app, quizData, currentQuestion, answers, callbacks) {
       <div class="header__logo">${icon('book')}</div>
       <h1 class="header__title">${quizData.meta?.title || '電子書閱讀器選購測驗'}</h1>
       <p class="header__subtitle">${quizData.meta?.subtitle || '找到最適合你的閱讀器'}</p>
+      <a href="brands.html" class="header__link">查看收錄品牌</a>
     </header>
 
     <div class="progress">

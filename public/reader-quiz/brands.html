@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO Meta Tags -->
+  <title>收錄品牌與機型 | 電子書閱讀器選購測驗 | Hello Ruru Tools</title>
+  <meta name="description" content="查看電子書閱讀器選購測驗收錄的所有品牌與機型，包含 Kobo、Readmoo、Kindle、Boox、HyRead、iReader 等。">
+  <meta name="keywords" content="電子書閱讀器,電子閱讀器品牌,Kobo,Readmoo,mooInk,Kindle,Boox,HyRead,iReader">
+  <meta name="author" content="Hello Ruru">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://tools.helloruru.com/reader-quiz/brands.html">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="收錄品牌與機型 | 電子書閱讀器選購測驗">
+  <meta property="og:description" content="查看電子書閱讀器選購測驗收錄的所有品牌與機型。">
+  <meta property="og:url" content="https://tools.helloruru.com/reader-quiz/brands.html">
+  <meta property="og:site_name" content="Hello Ruru Tools">
+  <meta property="og:locale" content="zh_TW">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="收錄品牌與機型 | 電子書閱讀器選購測驗">
+  <meta name="twitter:description" content="查看電子書閱讀器選購測驗收錄的所有品牌與機型。">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .brands {
+      padding: var(--space-xl) var(--space-lg);
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .brands__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .brand-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: box-shadow var(--transition-base), transform var(--transition-base);
+    }
+
+    .brand-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .brand-card__header {
+      padding: var(--space-md) var(--space-lg);
+      background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary-light));
+    }
+
+    .brand-card__name {
+      font-family: var(--font-heading);
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin: 0;
+    }
+
+    .brand-card__count {
+      font-size: 0.8125rem;
+      color: var(--color-text-light);
+      margin-top: var(--space-xs);
+    }
+
+    .brand-card__body {
+      padding: var(--space-lg);
+    }
+
+    .device-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .device-item {
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 0.9375rem;
+    }
+
+    .device-item:last-child {
+      border-bottom: none;
+    }
+
+    .device-item__name {
+      font-weight: 500;
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .device-item__preorder {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      background: var(--color-warning);
+      color: var(--color-text);
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+    }
+
+    .device-item__meta {
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+      margin-top: var(--space-xs);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .device-item__panel {
+      color: var(--color-secondary-dark);
+    }
+
+    .brands__actions {
+      text-align: center;
+      margin-bottom: var(--space-xl);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+      font-size: 0.9375rem;
+      color: var(--color-text-light);
+    }
+
+    .back-link:hover {
+      color: var(--color-primary-dark);
+    }
+
+    .back-link svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    @media (max-width: 640px) {
+      .brands__grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header__logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+      </svg>
+    </div>
+    <h1 class="header__title">本測驗收錄的品牌與機型</h1>
+    <p class="header__subtitle">共收錄 <span id="total-brands">0</span> 個品牌、<span id="total-devices">0</span> 台機型</p>
+  </header>
+
+  <main class="brands fade-in">
+    <div class="brands__grid" id="brands-grid">
+      <div class="loading">
+        <div class="loading__spinner"></div>
+        <p class="loading__text">載入中...</p>
+      </div>
+    </div>
+
+    <div class="brands__actions">
+      <a href="./" class="btn btn--primary">開始測驗</a>
+    </div>
+  </main>
+
+  <!-- Footer (Design System v1.4) -->
+  <footer class="footer">
+    <div class="footer__credit">
+      <p class="footer__credit-title">本測驗內容參考自</p>
+      <p class="footer__credit-name"><a href="https://home.gamer.com.tw/artwork.php?sn=6140260" target="_blank" rel="noopener">DiDaDi 的電子書閱讀器選購指南</a></p>
+      <p class="footer__credit-thanks">感謝 Di 提供專業且詳盡的閱讀器知識整理</p>
+    </div>
+    <p class="footer__copyright">&copy; <span id="footer-year"></span> Kaoru Tsai. All Rights Reserved. | Contact: <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
+  </footer>
+
+  <script>
+    // Footer year
+    const startYear = 2026;
+    const currentYear = new Date().getFullYear();
+    document.getElementById('footer-year').textContent =
+      currentYear > startYear ? `${startYear}–${currentYear}` : `${startYear}`;
+
+    // Load and render brands
+    async function loadBrands() {
+      try {
+        const response = await fetch('./data/devices.json');
+        if (!response.ok) throw new Error('Failed to load devices');
+        const devices = await response.json();
+
+        // Group by brand
+        const brandMap = new Map();
+        devices.forEach(device => {
+          if (!brandMap.has(device.brand)) {
+            brandMap.set(device.brand, []);
+          }
+          brandMap.get(device.brand).push(device);
+        });
+
+        // Update counts
+        document.getElementById('total-brands').textContent = brandMap.size;
+        document.getElementById('total-devices').textContent = devices.length;
+
+        // Render brand cards
+        const grid = document.getElementById('brands-grid');
+        grid.innerHTML = '';
+
+        brandMap.forEach((brandDevices, brandName) => {
+          const card = document.createElement('div');
+          card.className = 'brand-card';
+
+          const deviceListHTML = brandDevices.map(device => {
+            const metaParts = [];
+
+            // Release time
+            if (device.releaseYear) {
+              const quarter = device.releaseQuarter ? ` Q${device.releaseQuarter}` : '';
+              metaParts.push(`${device.releaseYear} 年${quarter}`);
+            }
+
+            // Screen panel
+            if (device.screenPanel) {
+              metaParts.push(`<span class="device-item__panel">${device.screenPanel}</span>`);
+            }
+
+            return `
+              <li class="device-item">
+                <div class="device-item__name">
+                  ${device.name}
+                  ${device.preorder ? '<span class="device-item__preorder">預購中</span>' : ''}
+                </div>
+                ${metaParts.length > 0 ? `<div class="device-item__meta">${metaParts.join(' · ')}</div>` : ''}
+              </li>
+            `;
+          }).join('');
+
+          card.innerHTML = `
+            <div class="brand-card__header">
+              <h2 class="brand-card__name">${brandName}</h2>
+              <p class="brand-card__count">${brandDevices.length} 台機型</p>
+            </div>
+            <div class="brand-card__body">
+              <ul class="device-list">
+                ${deviceListHTML}
+              </ul>
+            </div>
+          `;
+
+          grid.appendChild(card);
+        });
+
+      } catch (error) {
+        console.error('Failed to load brands:', error);
+        document.getElementById('brands-grid').innerHTML = `
+          <div class="error">
+            <h2>載入失敗</h2>
+            <p>很抱歉，資料載入時發生錯誤。</p>
+            <button onclick="location.reload()">重新整理</button>
+          </div>
+        `;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadBrands);
+  </script>
+</body>
+</html>
