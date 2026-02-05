@@ -1,35 +1,22 @@
-/* HelloRuru Design System v1.0 */
+/* HelloRuru Design System v1.4 */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* 源雲明體 Web Font */
+/* 獅尾字體（全域子集化） */
 @font-face {
-  font-family: 'GenWanMin';
-  src: url('https://cdn.jsdelivr.net/gh/nickhsine/genwan-font@master/webfont/GenWanMin2-L.woff2') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'GenWanMin';
-  src: url('https://cdn.jsdelivr.net/gh/nickhsine/genwan-font@master/webfont/GenWanMin2-R.woff2') format('woff2');
+  font-family: 'Swei Spring';
+  src: url('https://lab.helloruru.com/fonts/SweiSpring-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
+
 @font-face {
-  font-family: 'GenWanMin';
-  src: url('https://cdn.jsdelivr.net/gh/nickhsine/genwan-font@master/webfont/GenWanMin2-M.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'GenWanMin';
-  src: url('https://cdn.jsdelivr.net/gh/nickhsine/genwan-font@master/webfont/GenWanMin2-SB.woff2') format('woff2');
-  font-weight: 600;
+  font-family: 'Swei Sugar';
+  src: url('https://lab.helloruru.com/fonts/SweiSugar-Bold.woff2') format('woff2');
+  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
