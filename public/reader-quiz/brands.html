@@ -71,8 +71,9 @@
     }
 
     .brand-card__count {
+      font-family: var(--font-small);  /* Noto Sans TC for small text */
       font-size: 0.8125rem;
-      color: var(--color-text-light);
+      color: var(--color-text-muted);  /* 灰石 #888888 */
       margin-top: var(--space-xs);
     }
 
@@ -105,15 +106,17 @@
     }
 
     .device-item__preorder {
+      font-family: var(--font-small);  /* Noto Sans TC for ≤12px */
       font-size: 0.75rem;
       padding: 2px 8px;
       background: var(--color-warning);
       color: var(--color-text);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-sm);  /* 8px - Design System v1.4 */
       font-weight: 500;
     }
 
     .device-item__meta {
+      font-family: var(--font-small);  /* Noto Sans TC for small text */
       font-size: 0.8125rem;
       color: var(--color-text-muted);
       margin-top: var(--space-xs);
