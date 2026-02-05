@@ -230,7 +230,9 @@ export function renderResult(app, quizData, recommendation, answers, tip, callba
       }).join('')}
 
       <div class="disclaimer">
-        <p class="disclaimer__text">${icon('info')} 本測驗價格與規格資料以 2026 年 2 月 3 日為基準，實際售價可能因通路、促銷活動或產品改版而異，購買前請以各品牌官網或銷售平台公告為準。</p>
+        <p class="disclaimer__text">${icon('info')} 本測驗價格與規格資料以 2026 年 2 月 5 日為基準，實際售價可能因通路、促銷活動或產品改版而異，購買前請以各品牌官網或銷售平台公告為準。</p>
+        ${topThree.some(d => d.preorder) ? `<p class="disclaimer__text">${icon('clock')} 推薦結果中包含預購中的機型，預購商品的到貨時間可能有變動，確切的取貨日期請以官方公告為準喔！</p>` : ''}
+        <p class="disclaimer__text">${icon('heart')} 本測驗僅作為初步探索的參考，幫助你縮小選擇範圍。每個人的閱讀習慣和喜好不同，最實在的方式還是親自去試用看看喔！</p>
       </div>
 
       ${tip ? `

@@ -78,7 +78,12 @@
     </div>
     <p class="footer__copyright">&copy; <span id="footer-year"></span> Kaoru Tsai. All Rights Reserved. | Contact: <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
   </footer>
-  <script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
+  <script>
+    const startYear = 2026;
+    const currentYear = new Date().getFullYear();
+    document.getElementById('footer-year').textContent =
+      currentYear > startYear ? `${startYear}–${currentYear}` : `${startYear}`;
+  </script>
   
   <!-- Scripts (ES Module) -->
   <script type="module" src="js/main.js"></script>
