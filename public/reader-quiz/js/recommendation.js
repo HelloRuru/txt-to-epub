@@ -153,9 +153,6 @@ export function calculateRecommendation(devices, rules, answers) {
     if (priorities.includes('light') && device.screenSize <= 6.5) {
       scores[device.id] += 15;
     }
-    if (priorities.includes('waterproof') && device.waterproof) {
-      scores[device.id] += 20;
-    }
     if (priorities.includes('buttons') && device.hasPhysicalButtons) {
       scores[device.id] += 15;
     }
@@ -238,9 +235,6 @@ export function getReasonText(device, answers) {
   if (priorities.includes('taiwan') && (device.brand === '讀墨 Readmoo' || device.brand === '凌網 HyRead')) {
     reasons.push('台灣品牌，在地服務支援');
   }
-  if (device.waterproof && priorities.includes('waterproof')) {
-    reasons.push('IPX8 防水，可在浴室安心使用');
-  }
   if (device.hasPhysicalButtons && priorities.includes('buttons')) {
     reasons.push('實體翻頁鍵，操作更直覺');
   }
@@ -256,13 +250,13 @@ export function getReasonText(device, answers) {
   // 預算符合
   if (answers.budget) {
     const budgetLabels = {
-      'under-5k': '5,000 元以下',
-      '5k-8k': '5,000–8,000 元',
-      '8k-12k': '8,000–12,000 元',
-      'over-12k': '12,000 元以上'
+      'low': '6,000 元以下',
+      'mid': '6,000–12,000 元',
+      'high': '12,000 元以上',
+      'flexible': '不限預算'
     };
     const label = budgetLabels[answers.budget];
-    if (label) {
+    if (label && answers.budget !== 'flexible') {
       reasons.push(`價格落在你的預算範圍（${label}）`);
     }
   }

@@ -235,6 +235,12 @@ export function renderResult(app, quizData, recommendation, answers, tip, callba
         `;
       }).join('')}
 
+      ${(answers.experience === 'none' || answers.experience === 'app-only') ? `
+        <div class="newbie-tip">
+          <p class="newbie-tip__text">${icon('lightbulb')} 假如是閱讀器新手，建議先從封閉平台、操作單純的機型入手，上手會比較快喔！</p>
+        </div>
+      ` : ''}
+
       <div class="brands-link">
         <a href="brands.html" class="btn btn--secondary">${icon('book-open')} 查看所有收錄品牌</a>
       </div>

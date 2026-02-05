@@ -402,6 +402,23 @@ a.btn--primary, a.btn--primary:visited, a.btn--primary:hover { color: #FFFFFF; }
 }
 .reasons__item svg { width: 18px; height: 18px; min-width: 18px; color: var(--color-success); margin-top: 2px; }
 
+/* Newbie tip */
+.newbie-tip {
+  background: linear-gradient(135deg, rgba(212, 165, 165, 0.15), rgba(184, 169, 201, 0.15));
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+.newbie-tip__text {
+  font-size: 0.9375rem;
+  color: var(--color-text-light);
+  line-height: 1.8;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+.newbie-tip__text svg { width: 20px; height: 20px; min-width: 20px; color: var(--color-primary); }
+
 /* Brands link */
 .brands-link {
   text-align: center;
