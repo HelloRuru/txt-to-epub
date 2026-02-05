@@ -15,9 +15,9 @@
     "magazine": { "size": [10.3, 13.3], "color": true }
   },
   "budgetRange": {
-    "low": { "min": 0, "max": 6000 },
-    "mid": { "min": 6000, "max": 12000 },
-    "high": { "min": 12000, "max": 999999 },
+    "low": { "min": 0, "max": 7000 },
+    "mid": { "min": 0, "max": 12000 },
+    "high": { "min": 0, "max": 18000 },
     "flexible": { "min": 0, "max": 999999 }
   }
 }

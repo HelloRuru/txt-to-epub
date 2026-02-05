@@ -349,8 +349,8 @@
     "waterproof": true,
     "verticalText": "excellent",
     "customFont": true,
-    "openSystem": false,
-    "library": false,
+    "openSystem": "semi-open",
+    "library": true,
     "stylus": false,
     "url": "https://www.ireader.com/"
   },
@@ -369,8 +369,8 @@
     "waterproof": false,
     "verticalText": "excellent",
     "customFont": true,
-    "openSystem": false,
-    "library": false,
+    "openSystem": "semi-open",
+    "library": true,
     "stylus": true,
     "url": "https://www.ireader.com/"
   },
@@ -389,8 +389,8 @@
     "waterproof": false,
     "verticalText": "excellent",
     "customFont": true,
-    "openSystem": false,
-    "library": false,
+    "openSystem": "semi-open",
+    "library": true,
     "stylus": false,
     "url": "https://www.ireader.com/"
   },
@@ -409,8 +409,8 @@
     "waterproof": false,
     "verticalText": "excellent",
     "customFont": true,
-    "openSystem": false,
-    "library": false,
+    "openSystem": "semi-open",
+    "library": true,
     "stylus": false,
     "url": "https://www.ireader.com/"
   },
@@ -429,8 +429,8 @@
     "waterproof": false,
     "verticalText": "excellent",
     "customFont": true,
-    "openSystem": false,
-    "library": false,
+    "openSystem": "semi-open",
+    "library": true,
     "stylus": false,
     "url": "https://www.ireader.com/"
   }

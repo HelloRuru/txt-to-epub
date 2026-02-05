@@ -131,7 +131,12 @@ function deviceTags(d) {
   if (d.waterproof) tags.push('防水');
   if (d.stylus) tags.push('手寫筆');
   if (d.hasPhysicalButtons) tags.push('實體按鍵');
-  if (d.openSystem) tags.push('開放系統');
+  // 系統類型標籤
+  if (d.openSystem === true || d.openSystem === 'open') {
+    tags.push('開放系統');
+  } else if (d.openSystem === 'semi-open') {
+    tags.push('半開放系統');
+  }
   if (d.library) tags.push('圖書館借閱');
   if (d.customFont) tags.push('自訂字體');
   return tags;

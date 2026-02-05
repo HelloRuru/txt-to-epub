@@ -1,164 +1,274 @@
 /**
- * recommendation.js - 推薦邏輯
- * 屬性名對齊 devices.json 扁平結構
+ * recommendation.js - 推薦邏輯 v2.0
+ * 全新評分系統，支援 closed / semi-open / open 三種系統類型
  */
 
+// ========== 權重配置 ==========
+const WEIGHT_CONFIG = {
+  priority: 30,      // 優先特點
+  budget: 30,        // 預算
+  hardware: 25,      // 硬體規格
+  platform: 15,      // 平台需求（上限 35）
+  localization: 8    // 在地化加成
+};
+
+const BUDGET_THRESHOLDS = {
+  low: 7000,
+  mid: 12000,
+  high: 18000
+};
+
+// ========== 系統類型判斷 ==========
+function getSystemType(device) {
+  if (device.openSystem === true || device.openSystem === 'open') return 'open';
+  if (device.openSystem === 'semi-open') return 'semi-open';
+  return 'closed';
+}
+
+function isOpen(device) {
+  return getSystemType(device) === 'open';
+}
+
+function isSemiOpen(device) {
+  return getSystemType(device) === 'semi-open';
+}
+
+function isClosed(device) {
+  return getSystemType(device) === 'closed';
+}
+
+// ========== 平台評分 ==========
+function calculatePlatformScore(device, answers) {
+  const platformAnswers = answers.platform || [];
+  const contentAnswers = answers.content || [];
+  const systemType = getSystemType(device);
+  let score = 0;
+
+  // 單一平台偏好：封閉系統獲利
+  if (platformAnswers.includes('single')) {
+    if (systemType === 'closed') score += 15;
+    else if (systemType === 'semi-open') score += 8;
+  }
+
+  // 多平台需求：開放系統獲利
+  if (platformAnswers.includes('multi')) {
+    if (systemType === 'open') score += 15;
+    else if (systemType === 'semi-open') score += 10;
+  }
+
+  // 圖書館借閱需求
+  if (platformAnswers.includes('library')) {
+    if (device.brand === '凌網 HyRead') {
+      score += 28; // HyRead 原生支援 (25 + 3)
+    } else if (systemType === 'open') {
+      score += 18;
+    } else if (systemType === 'semi-open') {
+      score += 10;
+    }
+    // closed 系統無法使用圖書館，不加分
+  }
+
+  // 網路小說需求
+  if (platformAnswers.includes('webnovel')) {
+    if (systemType === 'open') score += 15;
+    else if (systemType === 'semi-open') score += 10;
+  }
+
+  // 網頁瀏覽需求
+  if (platformAnswers.includes('browse')) {
+    if (systemType === 'open') score += 15;
+    else if (systemType === 'semi-open') score += 8;
+  }
+
+  // 尚未決定
+  if (platformAnswers.includes('undecided')) {
+    if (systemType === 'open') score += 5;
+    else if (systemType === 'semi-open') score += 3;
+    else score += 5; // 封閉系統也適合新手
+  }
+
+  // 多元書源加成（選 3 個以上平台需求）
+  if (platformAnswers.length >= 3 && (systemType === 'open' || systemType === 'semi-open')) {
+    score += 5;
+  }
+
+  // 平台分數上限 35
+  return Math.min(score, 35);
+}
+
+// ========== 預算評分 ==========
+function calculateBudgetScore(device, answers) {
+  const budgetAnswer = answers.budget;
+  if (!budgetAnswer) return 0;
+
+  const price = device.price;
+
+  if (budgetAnswer === 'flexible') {
+    return 15; // 預算不限，給予基本分
+  }
+
+  const threshold = BUDGET_THRESHOLDS[budgetAnswer];
+  if (!threshold) return 0;
+
+  // 在預算範圍內
+  if (price <= threshold) {
+    return 30;
+  }
+
+  // 超出預算 10% 以內
+  if (price <= threshold * 1.1) {
+    return 10;
+  }
+
+  // 超出預算太多
+  return 0;
+}
+
+// ========== 硬體評分 ==========
+function calculateHardwareScore(device, answers) {
+  const contentAnswers = answers.content || [];
+  const usageAnswers = answers.usage || [];
+  let score = 0;
+
+  const size = device.screenSize;
+  const isColor = device.displayType.includes('彩色');
+
+  // 內容類型 × 螢幕尺寸
+  if (contentAnswers.includes('novel')) {
+    if (size <= 7) score += 8;
+  }
+
+  if (contentAnswers.includes('manga-bw')) {
+    if (size >= 7 && size <= 8) score += 8;
+    if (device.verticalText === 'excellent') score += 5;
+    else if (device.verticalText === 'good') score += 2;
+  }
+
+  if (contentAnswers.includes('manga-color')) {
+    if (size >= 7.8) score += 5;
+    if (isColor) score += 10;
+  }
+
+  if (contentAnswers.includes('pdf')) {
+    if (size >= 10) score += 12;
+  }
+
+  if (contentAnswers.includes('magazine')) {
+    if (size >= 10) score += 8;
+    if (isColor) score += 5;
+  }
+
+  // 使用情境
+  if (usageAnswers.includes('commute')) {
+    if (size <= 7) score += 10;
+  }
+
+  if (usageAnswers.includes('home')) {
+    if (size >= 7.8) score += 3;
+  }
+
+  if (usageAnswers.includes('work')) {
+    if (device.stylus) score += 12;
+    if (size >= 8) score += 5;
+  }
+
+  // 小說 + 漫畫混合閱讀
+  if (contentAnswers.includes('novel') && (contentAnswers.includes('manga-bw') || contentAnswers.includes('manga-color'))) {
+    if (size >= 7 && size <= 8) score += 3;
+  }
+
+  return Math.min(score, 25);
+}
+
+// ========== 優先特點評分 ==========
+function calculatePriorityScore(device, answers) {
+  const priorities = answers.priority || [];
+  const systemType = getSystemType(device);
+  let score = 0;
+
+  // 操作簡單 → 封閉系統
+  if (priorities.includes('easy')) {
+    if (systemType === 'closed') score += 20;
+    else if (systemType === 'semi-open') score += 10;
+  }
+
+  // 彈性擴充 → 開放系統
+  if (priorities.includes('flexible')) {
+    if (systemType === 'open') score += 20;
+    else if (systemType === 'semi-open') score += 12;
+  }
+
+  // 輕巧好攜帶
+  if (priorities.includes('light')) {
+    if (device.screenSize <= 6.5) score += 15;
+    else if (device.screenSize <= 7) score += 8;
+  }
+
+  // 實體按鍵
+  if (priorities.includes('buttons')) {
+    if (device.hasPhysicalButtons) score += 15;
+  }
+
+  // 手寫筆
+  if (priorities.includes('pen')) {
+    if (device.stylus) score += 20;
+  }
+
+  return Math.min(score, 30);
+}
+
+// ========== 在地化評分 ==========
+function calculateLocalizationScore(device, answers) {
+  const priorities = answers.priority || [];
+  let score = 0;
+
+  // 台灣品牌偏好
+  if (priorities.includes('taiwan')) {
+    if (device.brand === '讀墨 Readmoo' || device.brand === '凌網 HyRead') {
+      score += 8;
+    }
+  }
+
+  return Math.min(score, 8);
+}
+
+// ========== 排版評分（獨立於硬體）==========
+function calculateTypesettingScore(device, answers) {
+  const typesettingAnswer = answers.typesetting;
+  const systemType = getSystemType(device);
+  let score = 0;
+
+  if (typesettingAnswer === 'flexible') {
+    if (device.customFont) score += 15;
+    if (systemType === 'open') score += 8;
+    else if (systemType === 'semi-open') score += 4;
+  } else if (typesettingAnswer === 'basic') {
+    if (systemType === 'closed') score += 8;
+  } else if (typesettingAnswer === 'vertical') {
+    if (device.verticalText === 'excellent') score += 20;
+    else if (device.verticalText === 'good') score += 10;
+    else if (device.verticalText === 'poor') score -= 15;
+    if (device.brand === '亞馬遜 Kindle') score -= 10;
+  }
+
+  return score;
+}
+
+// ========== 主推薦函數 ==========
 export function calculateRecommendation(devices, rules, answers) {
   const scores = {};
 
   devices.forEach(device => {
-    scores[device.id] = 0;
-  });
+    let total = 0;
 
-  // 平台偏好 → 系統類型（複選）
-  const platformAnswers = answers.platform || [];
-  devices.forEach(device => {
-    const isOpen = device.openSystem;
+    total += calculatePlatformScore(device, answers);
+    total += calculateBudgetScore(device, answers);
+    total += calculateHardwareScore(device, answers);
+    total += calculatePriorityScore(device, answers);
+    total += calculateLocalizationScore(device, answers);
+    total += calculateTypesettingScore(device, answers);
 
-    const sourceCount = platformAnswers.length;
-    const diversityBonus = sourceCount >= 3 ? 10 : sourceCount >= 2 ? 5 : 0;
-
-    if (platformAnswers.includes('single')) {
-      if (!isOpen) scores[device.id] += 15;
-    }
-    if (platformAnswers.includes('multi')) {
-      if (isOpen) scores[device.id] += 20;
-    }
-    if (platformAnswers.includes('library')) {
-      if (isOpen) scores[device.id] += 25;
-      if (device.brand === '凌網 HyRead') scores[device.id] += 10;
-    }
-    if (platformAnswers.includes('webnovel')) {
-      if (isOpen) scores[device.id] += 20;
-    }
-    if (platformAnswers.includes('browse')) {
-      if (isOpen) scores[device.id] += 20;
-    }
-    if (platformAnswers.includes('undecided')) {
-      if (isOpen) scores[device.id] += 5;
-    }
-
-    if (isOpen) scores[device.id] += diversityBonus;
-
-    if (platformAnswers.includes('single') && sourceCount > 1 && isOpen) {
-      scores[device.id] += 8;
-    }
-  });
-
-  // 內容類型（複選）
-  const contentAnswers = answers.content || [];
-  devices.forEach(device => {
-    const size = device.screenSize;
-    const isColor = device.displayType.includes('彩色');
-
-    if (contentAnswers.includes('novel')) {
-      if (size <= 7) scores[device.id] += 10;
-      if (!isColor) scores[device.id] += 3;
-    }
-
-    if (contentAnswers.includes('manga-bw')) {
-      if (size >= 7 && size <= 8) scores[device.id] += 10;
-      if (!isColor) scores[device.id] += 3;
-      if (device.verticalText === 'excellent') scores[device.id] += 8;
-      else if (device.verticalText === 'good') scores[device.id] += 4;
-      else if (device.verticalText === 'poor') scores[device.id] -= 8;
-    }
-
-    if (contentAnswers.includes('manga-color')) {
-      if (size >= 7.8) scores[device.id] += 8;
-      if (isColor) scores[device.id] += 15;
-    }
-
-    if (contentAnswers.includes('pdf')) {
-      if (size >= 10) scores[device.id] += 15;
-    }
-
-    if (contentAnswers.includes('magazine')) {
-      if (size >= 10) scores[device.id] += 12;
-      if (isColor) scores[device.id] += 8;
-    }
-
-    if (contentAnswers.includes('novel') && (contentAnswers.includes('manga-bw') || contentAnswers.includes('manga-color'))) {
-      if (size >= 7 && size <= 8) scores[device.id] += 5;
-    }
-
-    if (contentAnswers.includes('manga-bw') && contentAnswers.includes('manga-color')) {
-      if (isColor) scores[device.id] += 5;
-    }
-  });
-
-  // 使用情境（複選）
-  const usageAnswers = answers.usage || [];
-  devices.forEach(device => {
-    if (usageAnswers.includes('commute')) {
-      if (device.screenSize <= 7) scores[device.id] += 15;
-    }
-    if (usageAnswers.includes('home')) {
-      if (device.screenSize >= 7.8) scores[device.id] += 5;
-    }
-    if (usageAnswers.includes('bedtime')) {
-      scores[device.id] += 5;
-    }
-    if (usageAnswers.includes('work')) {
-      if (device.stylus) scores[device.id] += 20;
-      if (device.screenSize >= 8) scores[device.id] += 10;
-    }
-  });
-
-  // 預算
-  const budgetAnswer = answers.budget;
-  const budgetRange = rules.budgetRange[budgetAnswer];
-  if (budgetRange) {
-    devices.forEach(device => {
-      if (device.price >= budgetRange.min && device.price <= budgetRange.max) {
-        scores[device.id] += 20;
-      } else if (device.price < budgetRange.min) {
-        scores[device.id] += 10;
-      }
-    });
-  }
-
-  // 排版彈性需求
-  const typesettingAnswer = answers.typesetting;
-  devices.forEach(device => {
-    if (typesettingAnswer === 'flexible') {
-      if (device.customFont) scores[device.id] += 20;
-      if (device.openSystem) scores[device.id] += 10;
-      if (device.verticalText === 'excellent') scores[device.id] += 5;
-    } else if (typesettingAnswer === 'basic') {
-      if (!device.openSystem) scores[device.id] += 10;
-    } else if (typesettingAnswer === 'vertical') {
-      if (device.verticalText === 'excellent') scores[device.id] += 30;
-      else if (device.verticalText === 'good') scores[device.id] += 15;
-      else if (device.verticalText === 'poor') scores[device.id] -= 20;
-      if (device.customFont) scores[device.id] += 5;
-      if (device.brand === '亞馬遜 Kindle') scores[device.id] -= 15;
-    }
-  });
-
-  // 優先特點
-  const priorities = answers.priority || [];
-  devices.forEach(device => {
-    if (priorities.includes('easy') && !device.openSystem) {
-      scores[device.id] += 15;
-    }
-    if (priorities.includes('flexible') && device.openSystem) {
-      scores[device.id] += 15;
-    }
-    if (priorities.includes('taiwan')) {
-      if (device.brand === '讀墨 Readmoo' || device.brand === '凌網 HyRead') {
-        scores[device.id] += 20;
-      }
-    }
-    if (priorities.includes('light') && device.screenSize <= 6.5) {
-      scores[device.id] += 15;
-    }
-    if (priorities.includes('buttons') && device.hasPhysicalButtons) {
-      scores[device.id] += 15;
-    }
-    if (priorities.includes('pen') && device.stylus) {
-      scores[device.id] += 20;
-    }
+    scores[device.id] = total;
   });
 
   const sorted = Object.entries(scores)
@@ -172,27 +282,30 @@ export function calculateRecommendation(devices, rules, answers) {
   };
 }
 
+// ========== 推薦理由生成 ==========
 export function getReasonText(device, answers) {
   const reasons = [];
   const usageAnswers = answers.usage || [];
   const contentAnswers = answers.content || [];
   const platformAnswers = answers.platform || [];
   const priorities = answers.priority || [];
-  const isOpen = device.openSystem;
+  const systemType = getSystemType(device);
   const isColor = device.displayType.includes('彩色');
 
-  // 平台相關理由
+  // 系統類型理由
   const needsOpen = platformAnswers.includes('multi') || platformAnswers.includes('library') || platformAnswers.includes('webnovel') || platformAnswers.includes('browse');
   const needsClosed = platformAnswers.includes('single') && platformAnswers.length === 1;
 
-  if (!isOpen && (needsClosed || priorities.includes('easy'))) {
+  if (systemType === 'closed' && (needsClosed || priorities.includes('easy'))) {
     reasons.push('封閉式系統，操作直覺簡單');
-  } else if (isOpen && (needsOpen || priorities.includes('flexible'))) {
+  } else if (systemType === 'open' && (needsOpen || priorities.includes('flexible'))) {
     if (platformAnswers.length >= 3) {
       reasons.push('開放式系統，多種書源一台搞定');
     } else {
       reasons.push('開放式系統，可安裝多種 APP');
     }
+  } else if (systemType === 'semi-open' && needsOpen) {
+    reasons.push('半開放系統，內建書城並可透過 APK 安裝多種閱讀 APP');
   }
 
   // 螢幕尺寸 × 情境
@@ -244,20 +357,25 @@ export function getReasonText(device, answers) {
 
   // 圖書館借閱
   if (platformAnswers.includes('library') && device.library) {
-    reasons.push('支援圖書館借閱');
+    if (device.brand === '凌網 HyRead') {
+      reasons.push('原生支援圖書館借閱，體驗最佳');
+    } else if (systemType === 'semi-open') {
+      reasons.push('可透過安裝 APK 使用圖書館借閱服務');
+    } else {
+      reasons.push('支援圖書館借閱');
+    }
   }
 
   // 預算符合
-  if (answers.budget) {
-    const budgetLabels = {
-      'low': '6,000 元以下',
-      'mid': '6,000–12,000 元',
-      'high': '12,000 元以上',
-      'flexible': '不限預算'
-    };
-    const label = budgetLabels[answers.budget];
-    if (label && answers.budget !== 'flexible') {
-      reasons.push(`價格落在你的預算範圍（${label}）`);
+  if (answers.budget && answers.budget !== 'flexible') {
+    const threshold = BUDGET_THRESHOLDS[answers.budget];
+    if (threshold && device.price <= threshold) {
+      const budgetLabels = {
+        'low': '7,000 元以下',
+        'mid': '12,000 元以下',
+        'high': '18,000 元以下'
+      };
+      reasons.push(`價格落在你的預算範圍（${budgetLabels[answers.budget]}）`);
     }
   }
 
@@ -266,6 +384,7 @@ export function getReasonText(device, answers) {
     if (device.library && !reasons.some(r => r.includes('圖書館'))) reasons.push('支援圖書館借閱');
     if (device.stylus && !reasons.some(r => r.includes('筆'))) reasons.push('支援手寫筆記');
     if (device.waterproof && !reasons.some(r => r.includes('防水'))) reasons.push('具備防水功能');
+    if (device.hasPhysicalButtons && !reasons.some(r => r.includes('按鍵'))) reasons.push('配備實體翻頁鍵');
   }
 
   // 去重後取前 4 條
@@ -273,6 +392,7 @@ export function getReasonText(device, answers) {
   return unique.slice(0, 4);
 }
 
+// ========== 相關提示 ==========
 export function getRelevantTip(tips, answers) {
   const tipList = [];
   const contentAnswers = answers.content || [];
