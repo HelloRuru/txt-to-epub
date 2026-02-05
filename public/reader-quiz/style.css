@@ -1,61 +1,37 @@
 /* ========================================
-   電子書閱讀器選購測驗 - Design System v1.4
+   電子書閱讀器選購測驗 - Design System v1.5
    Hello Ruru / tools.helloruru.com
    ======================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
 
+/* 獅尾字體（全域子集化） */
 @font-face {
-  font-family: 'Swei Spring Sugar';
-  src: url('https://cdn.jsdelivr.net/gh/nicehorse06/Swei-Four-Seasons-Font@v0.2.0/result/SweiFourSeasonsSpring-Sugar-Regular.woff2') format('woff2');
+  font-family: 'Swei Spring';
+  src: url('https://lab.helloruru.com/fonts/SweiSpring-Regular.woff2') format('woff2');
   font-weight: 400;
+  font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Swei Spring Sugar';
-  src: url('https://cdn.jsdelivr.net/gh/nicehorse06/Swei-Four-Seasons-Font@v0.2.0/result/SweiFourSeasonsSpring-Sugar-Medium.woff2') format('woff2');
+  font-family: 'Swei Spring';
+  src: url('https://lab.helloruru.com/fonts/SweiSpring-Medium.woff2') format('woff2');
   font-weight: 500;
+  font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Swei Spring Sugar';
-  src: url('https://cdn.jsdelivr.net/gh/nicehorse06/Swei-Four-Seasons-Font@v0.2.0/result/SweiFourSeasonsSpring-Sugar-Bold.woff2') format('woff2');
+  font-family: 'Swei Sugar';
+  src: url('https://lab.helloruru.com/fonts/SweiSugar-Bold.woff2') format('woff2');
   font-weight: 700;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Swei Spring';
-  src: url('https://cdn.jsdelivr.net/gh/nicehorse06/Swei-Four-Seasons-Font@v0.2.0/result/SweiFourSeasonsSpring-Light.woff2') format('woff2');
-  font-weight: 300;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Swei Spring';
-  src: url('https://cdn.jsdelivr.net/gh/nicehorse06/Swei-Four-Seasons-Font@v0.2.0/result/SweiFourSeasonsSpring-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Swei Spring';
-  src: url('https://cdn.jsdelivr.net/gh/nicehorse06/Swei-Four-Seasons-Font@v0.2.0/result/SweiFourSeasonsSpring-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Swei Spring';
-  src: url('https://cdn.jsdelivr.net/gh/nicehorse06/Swei-Four-Seasons-Font@v0.2.0/result/SweiFourSeasonsSpring-Bold.woff2') format('woff2');
-  font-weight: 700;
+  font-style: normal;
   font-display: swap;
 }
 
 :root {
-  /* 色彩系統 - Design System v1.4 */
+  /* 色彩系統 - Design System v1.5 */
   --color-primary: #D4A5A5;          /* Rose 主色 */
   --color-secondary: #B8A9C9;        /* Lavender 次色 */
   --color-primary-light: #E8CBCB;    /* 撫子粉 */
@@ -76,8 +52,8 @@
   --radius: 24px;                    /* 按鈕、卡片（alias） */
   --radius-md: 12px;                 /* 輸入框 */
   --radius-sm: 8px;                  /* 標籤、Badge */
-  /* 字體系統 - Design System v1.4 */
-  --font-heading: 'Swei Spring Sugar', 'Noto Sans TC', sans-serif;  /* H1, H2 - 獅尾四季春加糖 */
+  /* 字體系統 - Design System v1.5 */
+  --font-heading: 'Swei Sugar', 'Noto Sans TC', sans-serif;  /* H1, H2 - 獅尾四季春加糖 */
   --font-body: 'Swei Spring', 'Noto Sans TC', sans-serif;           /* H3, p - 獅尾四季春 */
   --font-small: 'Noto Sans TC', sans-serif;                         /* ≤12px 小字 */
   --space-xs: 0.25rem;
@@ -100,7 +76,7 @@ html { font-size: 16px; scroll-behavior: smooth; }
 
 body {
   font-family: var(--font-body);
-  font-weight: 400;
+  font-weight: 500;  /* v1.5: 內文改用 Medium */
   color: var(--color-text);
   background-color: var(--color-bg);
   line-height: 1.7;
