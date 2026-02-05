@@ -417,6 +417,49 @@ a.btn--primary, a.btn--primary:visited, a.btn--primary:hover { color: #FFFFFF; }
 .reasons__item svg { width: 18px; height: 18px; min-width: 18px; color: var(--color-success); margin-top: 2px; }
 
 /* Newbie tip */
+/* Conflict Warning */
+.conflict-warning {
+  background: linear-gradient(135deg, rgba(222, 184, 135, 0.15), rgba(212, 165, 165, 0.15));
+  border: 1px solid rgba(222, 184, 135, 0.3);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  display: flex;
+  gap: var(--space-md);
+}
+.conflict-warning__icon {
+  flex-shrink: 0;
+}
+.conflict-warning__icon svg {
+  width: 24px;
+  height: 24px;
+  color: #C9929A;
+}
+.conflict-warning__content {
+  flex: 1;
+}
+.conflict-warning__title {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.conflict-warning__title svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-primary);
+}
+.conflict-warning__text {
+  font-size: 0.9375rem;
+  color: var(--color-text-light);
+  line-height: 1.8;
+}
+
+/* Newbie tip */
 .newbie-tip {
   background: linear-gradient(135deg, rgba(212, 165, 165, 0.15), rgba(184, 169, 201, 0.15));
   border-radius: var(--radius);

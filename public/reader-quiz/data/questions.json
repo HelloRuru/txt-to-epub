@@ -241,6 +241,12 @@
         "text": "手寫筆記",
         "icon": "pen-tool",
         "description": "需要在書上劃記或做筆記"
+      },
+      {
+        "id": "value",
+        "text": "高 CP 值",
+        "icon": "piggy-bank",
+        "description": "功能齊全但價格實惠"
       }
     ]
   }

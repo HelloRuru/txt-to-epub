@@ -154,7 +154,7 @@ function rankLabel(index) {
 }
 
 // ========== renderResult ==========
-export function renderResult(app, quizData, recommendation, answers, tip, callbacks) {
+export function renderResult(app, quizData, recommendation, answers, tip, conflict, callbacks) {
   const { onRestart } = callbacks;
   const topThree = [recommendation.primary, ...recommendation.alternatives];
 
@@ -239,6 +239,16 @@ export function renderResult(app, quizData, recommendation, answers, tip, callba
           </div>
         `;
       }).join('')}
+
+      ${conflict ? `
+        <div class="conflict-warning">
+          <div class="conflict-warning__icon">${icon('alert-triangle')}</div>
+          <div class="conflict-warning__content">
+            <h3 class="conflict-warning__title">${icon('flag')} 台灣品牌偏好提醒</h3>
+            <p class="conflict-warning__text">${conflict.message}</p>
+          </div>
+        </div>
+      ` : ''}
 
       ${(answers.experience === 'none' || answers.experience === 'app-only') ? `
         <div class="newbie-tip">

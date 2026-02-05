@@ -4,7 +4,7 @@
  */
 
 import { renderQuiz, renderResult, renderError, updateOptionUI } from './render.js';
-import { calculateRecommendation, getReasonText, getRelevantTip } from './recommendation.js';
+import { calculateRecommendation, getReasonText, getRelevantTip, detectTaiwanOpenConflict } from './recommendation.js';
 
 // === 設定 ===
 const DATA_PATH = './data';
@@ -96,11 +96,18 @@ function renderCurrentQuiz() {
 function showResult() {
   const recommendation = calculateRecommendation(quizData.devices, quizData.rules, answers);
   const tip = getRelevantTip(quizData.tips, answers);
-  
-  renderResult(app, quizData, recommendation, answers, tip, {
+
+  // 計算預算閾值
+  const budgetThresholds = { low: 7000, mid: 12000, high: 18000, flexible: 999999 };
+  const budgetThreshold = budgetThresholds[answers.budget] || 999999;
+
+  // 檢測台灣品牌與開放系統需求衝突
+  const conflict = detectTaiwanOpenConflict(answers, budgetThreshold);
+
+  renderResult(app, quizData, recommendation, answers, tip, conflict, {
     onRestart: restart
   });
-  
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 

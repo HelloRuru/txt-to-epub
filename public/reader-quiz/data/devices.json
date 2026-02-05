@@ -14,8 +14,9 @@
     "verticalText": "good",
     "customFont": false,
     "openSystem": false,
-    "library": true,
+    "library": false,
     "stylus": true,
+    "warmLight": true,
     "url": "https://www.kobo.com/zh/blog/kobo%E9%96%B1%E8%AE%80%E5%99%A8%E5%93%AA%E8%A3%A1%E8%B2%B7"
   },
   {
@@ -33,8 +34,9 @@
     "verticalText": "good",
     "customFont": false,
     "openSystem": false,
-    "library": true,
+    "library": false,
     "stylus": false,
+    "warmLight": true,
     "url": "https://www.kobo.com/zh/blog/kobo%E9%96%B1%E8%AE%80%E5%99%A8%E5%93%AA%E8%A3%A1%E8%B2%B7"
   },
   {
@@ -52,9 +54,10 @@
     "verticalText": "good",
     "customFont": false,
     "openSystem": false,
-    "library": true,
+    "library": false,
     "stylus": true,
-    "url": "https://www.kobo.com/zh/blog/kobo%E9%96%B1%E8%AE%80%E5%99%A8%E5%93%AA%E8%A3%A1%E8%B2%B7"
+    "url": "https://www.kobo.com/zh/blog/kobo%E9%96%B1%E8%AE%80%E5%99%A8%E5%93%AA%E8%A3%A1%E8%B2%B7",
+    "warmLight": true
   },
   {
     "id": "mooink-chill",
@@ -74,7 +77,8 @@
     "openSystem": false,
     "library": false,
     "stylus": false,
-    "url": "https://readmoo.com/mooink-series"
+    "url": "https://readmoo.com/mooink-series",
+    "warmLight": true
   },
   {
     "id": "mooink-pro-2c",
@@ -90,10 +94,11 @@
     "waterproof": false,
     "verticalText": "excellent",
     "customFont": true,
-    "openSystem": true,
+    "openSystem": false,
     "library": false,
     "stylus": true,
-    "url": "https://readmoo.com/mooink-series"
+    "url": "https://readmoo.com/mooink-series",
+    "warmLight": true
   },
   {
     "id": "mooink-nana",
@@ -112,7 +117,8 @@
     "openSystem": false,
     "library": false,
     "stylus": false,
-    "url": "https://readmoo.com/mooink-series"
+    "url": "https://readmoo.com/mooink-series",
+    "warmLight": true
   },
   {
     "id": "kindle-basic-2024",
@@ -132,7 +138,8 @@
     "openSystem": false,
     "library": false,
     "stylus": false,
-    "url": "https://www.amazon.com/kindle"
+    "url": "https://www.amazon.com/kindle",
+    "warmLight": false
   },
   {
     "id": "kindle-paperwhite-12",
@@ -152,7 +159,8 @@
     "openSystem": false,
     "library": false,
     "stylus": false,
-    "url": "https://www.amazon.com/kindle"
+    "url": "https://www.amazon.com/kindle",
+    "warmLight": true
   },
   {
     "id": "kindle-scribe-2",
@@ -172,7 +180,8 @@
     "openSystem": false,
     "library": false,
     "stylus": true,
-    "url": "https://www.amazon.com/kindle"
+    "url": "https://www.amazon.com/kindle",
+    "warmLight": true
   },
   {
     "id": "kindle-colorsoft",
@@ -192,7 +201,8 @@
     "openSystem": false,
     "library": false,
     "stylus": false,
-    "url": "https://www.amazon.com/kindle"
+    "url": "https://www.amazon.com/kindle",
+    "warmLight": true
   },
   {
     "id": "boox-page",
@@ -212,7 +222,8 @@
     "openSystem": true,
     "library": true,
     "stylus": false,
-    "url": "https://www.boox.com.tw/"
+    "url": "https://www.boox.com.tw/",
+    "warmLight": true
   },
   {
     "id": "boox-poke-5",
@@ -232,7 +243,8 @@
     "openSystem": true,
     "library": true,
     "stylus": false,
-    "url": "https://www.boox.com.tw/"
+    "url": "https://www.boox.com.tw/",
+    "warmLight": true
   },
   {
     "id": "boox-note-air5-c",
@@ -252,7 +264,8 @@
     "openSystem": true,
     "library": true,
     "stylus": true,
-    "url": "https://www.boox.com.tw/"
+    "url": "https://www.boox.com.tw/",
+    "warmLight": true
   },
   {
     "id": "boox-go-color-7-gen2",
@@ -272,7 +285,29 @@
     "openSystem": true,
     "library": true,
     "stylus": true,
-    "url": "https://www.boox.com.tw/"
+    "url": "https://www.boox.com.tw/",
+    "warmLight": true
+  },
+  {
+    "id": "hyread-gaze-mini-plus",
+    "name": "HyRead Gaze Mini+",
+    "brand": "凌網 HyRead",
+    "screenSize": 6,
+    "displayType": "黑白 E Ink",
+    "screenPanel": "Carta 1200",
+    "storage": "32GB",
+    "price": 7580,
+    "releaseYear": 2024,
+    "releaseQuarter": 2,
+    "hasPhysicalButtons": true,
+    "waterproof": false,
+    "verticalText": "excellent",
+    "customFont": true,
+    "openSystem": true,
+    "library": true,
+    "stylus": false,
+    "url": "https://ebook.hyread.com.tw/activity/201902gaze/productList.jsp",
+    "warmLight": true
   },
   {
     "id": "hyread-gaze-pro-xc",
@@ -282,7 +317,7 @@
     "displayType": "彩色 E Ink",
     "screenPanel": "Kaleido 3",
     "storage": "128GB",
-    "price": 21990,
+    "price": 20890,
     "releaseYear": 2024,
     "releaseQuarter": 4,
     "hasPhysicalButtons": false,
@@ -292,7 +327,8 @@
     "openSystem": true,
     "library": true,
     "stylus": true,
-    "url": "https://ebook.hyread.com.tw/activity/201902gaze/productList.jsp"
+    "url": "https://ebook.hyread.com.tw/activity/201902gaze/productList.jsp",
+    "warmLight": true
   },
   {
     "id": "hyread-gaze-pro-note-c",
@@ -302,7 +338,7 @@
     "displayType": "彩色 E Ink",
     "screenPanel": "Kaleido 3",
     "storage": "64GB",
-    "price": 15390,
+    "price": 16899,
     "releaseYear": 2025,
     "releaseQuarter": 1,
     "hasPhysicalButtons": true,
@@ -312,7 +348,8 @@
     "openSystem": true,
     "library": true,
     "stylus": true,
-    "url": "https://ebook.hyread.com.tw/activity/201902gaze/productList.jsp"
+    "url": "https://ebook.hyread.com.tw/activity/201902gaze/productList.jsp",
+    "warmLight": true
   },
   {
     "id": "hyread-gaze-mini-cc",
@@ -322,7 +359,7 @@
     "displayType": "彩色 E Ink",
     "screenPanel": "Kaleido 3",
     "storage": "32GB",
-    "price": 12500,
+    "price": 13099,
     "releaseYear": 2025,
     "releaseQuarter": 3,
     "hasPhysicalButtons": true,
@@ -332,7 +369,8 @@
     "openSystem": true,
     "library": true,
     "stylus": false,
-    "url": "https://ebook.hyread.com.tw/activity/201902gaze/productList.jsp"
+    "url": "https://ebook.hyread.com.tw/activity/201902gaze/productList.jsp",
+    "warmLight": true
   },
   {
     "id": "ireader-ocean-4-turbo",
@@ -352,7 +390,8 @@
     "openSystem": "semi-open",
     "library": true,
     "stylus": false,
-    "url": "https://www.ireader.com/"
+    "url": "https://www.ireader.com/",
+    "warmLight": true
   },
   {
     "id": "ireader-ocean-4c",
@@ -372,7 +411,8 @@
     "openSystem": "semi-open",
     "library": true,
     "stylus": true,
-    "url": "https://www.ireader.com/"
+    "url": "https://www.ireader.com/",
+    "warmLight": true
   },
   {
     "id": "ireader-neo-3-pro",
@@ -392,7 +432,8 @@
     "openSystem": "semi-open",
     "library": true,
     "stylus": false,
-    "url": "https://www.ireader.com/"
+    "url": "https://www.ireader.com/",
+    "warmLight": true
   },
   {
     "id": "ireader-light-4c",
@@ -412,7 +453,8 @@
     "openSystem": "semi-open",
     "library": true,
     "stylus": false,
-    "url": "https://www.ireader.com/"
+    "url": "https://www.ireader.com/",
+    "warmLight": true
   },
   {
     "id": "ireader-tango-2",
@@ -432,6 +474,238 @@
     "openSystem": "semi-open",
     "library": true,
     "stylus": false,
-    "url": "https://www.ireader.com/"
+    "url": "https://www.ireader.com/",
+    "warmLight": true
+  },
+  {
+    "id": "kobo-clara-bw",
+    "name": "Kobo Clara BW",
+    "brand": "樂天 Kobo",
+    "screenSize": 6,
+    "displayType": "黑白 E Ink",
+    "screenPanel": "Carta 1200",
+    "storage": "16GB",
+    "price": 4549,
+    "releaseYear": 2024,
+    "releaseQuarter": 2,
+    "hasPhysicalButtons": false,
+    "waterproof": true,
+    "verticalText": "good",
+    "customFont": false,
+    "openSystem": false,
+    "library": false,
+    "stylus": false,
+    "url": "https://www.kobo.com/zh/blog/kobo%E9%96%B1%E8%AE%80%E5%99%A8%E5%93%AA%E8%A3%A1%E8%B2%B7",
+    "warmLight": true
+  },
+  {
+    "id": "mooink-nana-bw",
+    "name": "mooInk Nana BW",
+    "brand": "讀墨 Readmoo",
+    "screenSize": 7,
+    "displayType": "黑白 E Ink",
+    "screenPanel": "Carta 1200",
+    "storage": "256GB",
+    "price": 7499,
+    "releaseYear": 2025,
+    "releaseQuarter": 1,
+    "hasPhysicalButtons": true,
+    "waterproof": false,
+    "verticalText": "excellent",
+    "customFont": true,
+    "openSystem": false,
+    "library": false,
+    "stylus": false,
+    "url": "https://readmoo.com/mooink-series",
+    "warmLight": true
+  },
+  {
+    "id": "mooink-pro-2",
+    "name": "mooInk Pro 2",
+    "brand": "讀墨 Readmoo",
+    "screenSize": 10.3,
+    "displayType": "黑白 E Ink",
+    "screenPanel": "Carta 1200",
+    "storage": "64GB",
+    "price": 12499,
+    "releaseYear": 2023,
+    "releaseQuarter": 2,
+    "hasPhysicalButtons": false,
+    "waterproof": false,
+    "verticalText": "excellent",
+    "customFont": true,
+    "openSystem": false,
+    "library": false,
+    "stylus": true,
+    "url": "https://readmoo.com/mooink-series",
+    "warmLight": true
+  },
+  {
+    "id": "mooink-pro-2-13",
+    "name": "mooInk Pro 2 (13.3吋)",
+    "brand": "讀墨 Readmoo",
+    "screenSize": 13.3,
+    "displayType": "黑白 E Ink",
+    "screenPanel": "Carta 1200",
+    "storage": "64GB",
+    "price": 15499,
+    "releaseYear": 2023,
+    "releaseQuarter": 2,
+    "hasPhysicalButtons": false,
+    "waterproof": false,
+    "verticalText": "excellent",
+    "customFont": true,
+    "openSystem": false,
+    "library": false,
+    "stylus": true,
+    "url": "https://readmoo.com/mooink-series",
+    "warmLight": true
+  },
+  {
+    "id": "mooink-pro-2c-13",
+    "name": "mooInk Pro 2C (13.3吋)",
+    "brand": "讀墨 Readmoo",
+    "screenSize": 13.3,
+    "displayType": "彩色 E Ink",
+    "screenPanel": "Kaleido 3",
+    "storage": "64GB",
+    "price": 18499,
+    "releaseYear": 2024,
+    "releaseQuarter": 2,
+    "hasPhysicalButtons": false,
+    "waterproof": false,
+    "verticalText": "excellent",
+    "customFont": true,
+    "openSystem": false,
+    "library": false,
+    "stylus": true,
+    "url": "https://readmoo.com/mooink-series",
+    "warmLight": true
+  },
+  {
+    "id": "hyread-gaze-pro-note",
+    "name": "HyRead Gaze Pro Note",
+    "brand": "凌網 HyRead",
+    "screenSize": 7.8,
+    "displayType": "黑白 E Ink",
+    "screenPanel": "Carta 1200",
+    "storage": "32GB",
+    "price": 10990,
+    "releaseYear": 2023,
+    "releaseQuarter": 3,
+    "hasPhysicalButtons": true,
+    "waterproof": false,
+    "verticalText": "excellent",
+    "customFont": true,
+    "openSystem": true,
+    "library": true,
+    "stylus": true,
+    "url": "https://ebook.hyread.com.tw/activity/201902gaze/productList.jsp",
+    "warmLight": true
+  },
+  {
+    "id": "hyread-gaze-pro-x",
+    "name": "HyRead Gaze Pro X",
+    "brand": "凌網 HyRead",
+    "screenSize": 10.3,
+    "displayType": "黑白 E Ink",
+    "screenPanel": "Carta 1200",
+    "storage": "128GB",
+    "price": 16390,
+    "releaseYear": 2024,
+    "releaseQuarter": 1,
+    "hasPhysicalButtons": false,
+    "waterproof": false,
+    "verticalText": "excellent",
+    "customFont": true,
+    "openSystem": true,
+    "library": true,
+    "stylus": true,
+    "url": "https://ebook.hyread.com.tw/activity/201902gaze/productList.jsp",
+    "warmLight": true
+  },
+  {
+    "id": "boox-palma-2",
+    "name": "Boox Palma 2",
+    "brand": "文石 Boox",
+    "screenSize": 6.13,
+    "displayType": "黑白 E Ink",
+    "screenPanel": "Carta 1200",
+    "storage": "128GB",
+    "price": 7280,
+    "releaseYear": 2025,
+    "releaseQuarter": 1,
+    "hasPhysicalButtons": false,
+    "waterproof": false,
+    "verticalText": "excellent",
+    "customFont": true,
+    "openSystem": true,
+    "library": true,
+    "stylus": false,
+    "url": "https://www.boox.com.tw/",
+    "warmLight": true
+  },
+  {
+    "id": "boox-go-103",
+    "name": "Boox Go 10.3",
+    "brand": "文石 Boox",
+    "screenSize": 10.3,
+    "displayType": "黑白 E Ink",
+    "screenPanel": "Carta 1200",
+    "storage": "64GB",
+    "price": 12380,
+    "releaseYear": 2024,
+    "releaseQuarter": 2,
+    "hasPhysicalButtons": false,
+    "waterproof": false,
+    "verticalText": "excellent",
+    "customFont": true,
+    "openSystem": true,
+    "library": true,
+    "stylus": true,
+    "url": "https://www.boox.com.tw/",
+    "warmLight": true
+  },
+  {
+    "id": "kindle-paperwhite-signature",
+    "name": "Kindle Paperwhite Signature Edition",
+    "brand": "亞馬遜 Kindle",
+    "screenSize": 7,
+    "displayType": "黑白 E Ink",
+    "screenPanel": null,
+    "storage": "32GB",
+    "price": 7255,
+    "releaseYear": 2024,
+    "releaseQuarter": 4,
+    "hasPhysicalButtons": false,
+    "waterproof": true,
+    "verticalText": "poor",
+    "customFont": false,
+    "openSystem": false,
+    "library": false,
+    "stylus": false,
+    "url": "https://www.amazon.com/kindle",
+    "warmLight": true
+  },
+  {
+    "id": "ireader-smart-5-pro",
+    "name": "iReader Smart 5 Pro",
+    "brand": "掌閱 iReader",
+    "screenSize": 10.3,
+    "displayType": "黑白 E Ink",
+    "screenPanel": "Carta 1200",
+    "storage": "128GB",
+    "price": 13500,
+    "releaseYear": 2024,
+    "releaseQuarter": 4,
+    "hasPhysicalButtons": false,
+    "waterproof": false,
+    "verticalText": "excellent",
+    "customFont": true,
+    "openSystem": "semi-open",
+    "library": true,
+    "stylus": true,
+    "url": "https://www.ireader.com/",
+    "warmLight": true
   }
 ]
