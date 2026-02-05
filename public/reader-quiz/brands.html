@@ -149,6 +149,44 @@
       height: 18px;
     }
 
+    .about-section {
+      background: var(--color-bg);
+      border-radius: var(--radius);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .about-section__title {
+      font-family: var(--font-heading);
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: var(--space-lg);
+    }
+
+    .about-section__content {
+      font-size: 0.9375rem;
+      color: var(--color-text-light);
+      line-height: 1.9;
+    }
+
+    .about-section__content p {
+      margin-bottom: var(--space-md);
+    }
+
+    .about-section__content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .about-section__content a {
+      color: var(--color-primary-dark);
+    }
+
+    .about-section__content a:hover {
+      color: var(--color-primary);
+      text-decoration: underline;
+    }
+
     @media (max-width: 640px) {
       .brands__grid {
         grid-template-columns: 1fr;
@@ -178,6 +216,15 @@
 
     <div class="brands__actions">
       <a href="./" class="btn btn--primary">開始測驗</a>
+    </div>
+
+    <div class="about-section">
+      <h2 class="about-section__title">🔖 關於收錄範圍</h2>
+      <div class="about-section__content">
+        <p>這份測驗源於我（Ruru）和朋友的心得筆記。<br>獻給熱愛閱讀的人們！<br>目前優先收錄我們實際操作過、且在台灣易於購得的機型。</p>
+        <p>因市面品牌眾多，我們尚無法逐一親測，<br>故採取階段性更新，確保資料精準後才會陸續釋出。</p>
+        <p>歡迎來信 <a href="mailto:hello@helloruru.com">hello@helloruru.com</a> 分享你的建議，<br>讓我們一起補齊這份閱讀地圖。</p>
+      </div>
     </div>
   </main>
 
