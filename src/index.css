@@ -1,4 +1,4 @@
-/* HelloRuru Design System v1.4 */
+/* HelloRuru Design System v1.5 */
 
 @tailwind base;
 @tailwind components;
@@ -82,7 +82,8 @@ body.dark {
 }
 
 body {
-  font-family: 'Noto Sans TC', sans-serif;
+  font-family: 'Swei Spring', 'Noto Sans TC', sans-serif;
+  font-weight: 500; /* v1.5: 內文改用 Medium */
   background: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
