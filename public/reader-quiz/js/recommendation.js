@@ -1,21 +1,22 @@
 /**
- * recommendation.js - 推薦邏輯 v2.0
- * 全新評分系統，支援 closed / semi-open / open 三種系統類型
+ * recommendation.js - 推薦邏輯 v2.1
+ * 補丁版本：修正 Platform 動態翻轉、預算邏輯、圖書館場景平衡
  */
 
 // ========== 權重配置 ==========
 const WEIGHT_CONFIG = {
-  priority: 30,      // 優先特點
-  budget: 30,        // 預算
-  hardware: 25,      // 硬體規格
-  platform: 15,      // 平台需求（上限 35）
-  localization: 8    // 在地化加成
+  priority: 30,      // 優先特點（上限 30）
+  budget: 30,        // 預算（上限 30）
+  hardware: 25,      // 硬體規格（上限 25）
+  platform: 35,      // 平台需求（上限 35）
+  localization: 8    // 在地化加成（上限 8）
 };
 
+// 預算閾值對應 questions.json 的選項 ID
 const BUDGET_THRESHOLDS = {
-  low: 7000,
-  mid: 12000,
-  high: 18000
+  low: 7000,      // 7,000 元以下
+  mid: 12000,     // 12,000 元以下
+  high: 18000     // 18,000 元以下
 };
 
 // ========== 系統類型判斷 ==========
@@ -25,53 +26,43 @@ function getSystemType(device) {
   return 'closed';
 }
 
-function isOpen(device) {
-  return getSystemType(device) === 'open';
-}
-
-function isSemiOpen(device) {
-  return getSystemType(device) === 'semi-open';
-}
-
-function isClosed(device) {
-  return getSystemType(device) === 'closed';
-}
-
-// ========== 平台評分 ==========
+// ========== 平台評分（動態翻轉）==========
 function calculatePlatformScore(device, answers) {
   const platformAnswers = answers.platform || [];
-  const contentAnswers = answers.content || [];
   const systemType = getSystemType(device);
   let score = 0;
 
   // 單一平台偏好：封閉系統獲利
   if (platformAnswers.includes('single')) {
-    if (systemType === 'closed') score += 15;
+    if (systemType === 'closed') score += 12;
     else if (systemType === 'semi-open') score += 8;
+    else if (systemType === 'open') score += 5;
   }
 
   // 多平台需求：開放系統獲利
   if (platformAnswers.includes('multi')) {
     if (systemType === 'open') score += 15;
     else if (systemType === 'semi-open') score += 10;
+    else if (systemType === 'closed') score += 3;
   }
 
-  // 圖書館借閱需求
+  // 圖書館借閱需求（獨立處理，確保 HyRead 優勢）
   if (platformAnswers.includes('library')) {
     if (device.brand === '凌網 HyRead') {
-      score += 28; // HyRead 原生支援 (25 + 3)
+      score += 28; // HyRead 原生支援（基礎 +25，品牌 bonus +3）
     } else if (systemType === 'open') {
-      score += 18;
+      score += 12; // 可裝 APP 達成，但非原生（從 +18 下修）
     } else if (systemType === 'semi-open') {
-      score += 10;
+      score += 8;  // 可裝 APK 但需自行找安裝檔
     }
-    // closed 系統無法使用圖書館，不加分
+    // closed 系統（Kindle, Kobo）台灣無法使用 OverDrive，不加分
   }
 
   // 網路小說需求
   if (platformAnswers.includes('webnovel')) {
     if (systemType === 'open') score += 15;
     else if (systemType === 'semi-open') score += 10;
+    else if (systemType === 'closed') score += 3;
   }
 
   // 網頁瀏覽需求
@@ -80,11 +71,11 @@ function calculatePlatformScore(device, answers) {
     else if (systemType === 'semi-open') score += 8;
   }
 
-  // 尚未決定
+  // 尚未決定：三種系統都給適當分數
   if (platformAnswers.includes('undecided')) {
-    if (systemType === 'open') score += 5;
-    else if (systemType === 'semi-open') score += 3;
-    else score += 5; // 封閉系統也適合新手
+    if (systemType === 'open') score += 10;
+    else if (systemType === 'semi-open') score += 8;
+    else if (systemType === 'closed') score += 8;
   }
 
   // 多元書源加成（選 3 個以上平台需求）
@@ -92,8 +83,7 @@ function calculatePlatformScore(device, answers) {
     score += 5;
   }
 
-  // 平台分數上限 35
-  return Math.min(score, 35);
+  return Math.min(score, WEIGHT_CONFIG.platform);
 }
 
 // ========== 預算評分 ==========
@@ -103,24 +93,25 @@ function calculateBudgetScore(device, answers) {
 
   const price = device.price;
 
+  // flexible：所有機型一律 +20（不給滿分，避免高價機無條件碾壓）
   if (budgetAnswer === 'flexible') {
-    return 15; // 預算不限，給予基本分
+    return 20;
   }
 
   const threshold = BUDGET_THRESHOLDS[budgetAnswer];
   if (!threshold) return 0;
 
-  // 在預算範圍內
+  // 機型價格 ≤ 該區間上限 → +30
   if (price <= threshold) {
     return 30;
   }
 
-  // 超出預算 10% 以內
+  // 機型價格超出上限但在 10% 以內 → +15
   if (price <= threshold * 1.1) {
-    return 10;
+    return 15;
   }
 
-  // 超出預算太多
+  // 機型價格超出上限 10% 以上 → +0
   return 0;
 }
 
@@ -177,7 +168,7 @@ function calculateHardwareScore(device, answers) {
     if (size >= 7 && size <= 8) score += 3;
   }
 
-  return Math.min(score, 25);
+  return Math.min(score, WEIGHT_CONFIG.hardware);
 }
 
 // ========== 優先特點評分 ==========
@@ -214,7 +205,7 @@ function calculatePriorityScore(device, answers) {
     if (device.stylus) score += 20;
   }
 
-  return Math.min(score, 30);
+  return Math.min(score, WEIGHT_CONFIG.priority);
 }
 
 // ========== 在地化評分 ==========
@@ -222,14 +213,14 @@ function calculateLocalizationScore(device, answers) {
   const priorities = answers.priority || [];
   let score = 0;
 
-  // 台灣品牌偏好
+  // 台灣品牌偏好：統一 +8（上限，不可疊加）
   if (priorities.includes('taiwan')) {
     if (device.brand === '讀墨 Readmoo' || device.brand === '凌網 HyRead') {
       score += 8;
     }
   }
 
-  return Math.min(score, 8);
+  return Math.min(score, WEIGHT_CONFIG.localization);
 }
 
 // ========== 排版評分（獨立於硬體）==========
