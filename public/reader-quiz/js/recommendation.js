@@ -26,7 +26,7 @@ export function calculateRecommendation(devices, rules, answers) {
     }
     if (platformAnswers.includes('library')) {
       if (isOpen) scores[device.id] += 25;
-      if (device.brand === 'HyRead') scores[device.id] += 10;
+      if (device.brand === '凌網 HyRead') scores[device.id] += 10;
     }
     if (platformAnswers.includes('webnovel')) {
       if (isOpen) scores[device.id] += 20;
@@ -132,7 +132,7 @@ export function calculateRecommendation(devices, rules, answers) {
       else if (device.verticalText === 'good') scores[device.id] += 15;
       else if (device.verticalText === 'poor') scores[device.id] -= 20;
       if (device.customFont) scores[device.id] += 5;
-      if (device.brand === 'Amazon') scores[device.id] -= 15;
+      if (device.brand === '亞馬遜 Kindle') scores[device.id] -= 15;
     }
   });
 
@@ -146,7 +146,7 @@ export function calculateRecommendation(devices, rules, answers) {
       scores[device.id] += 15;
     }
     if (priorities.includes('taiwan')) {
-      if (device.brand === 'Readmoo 讀墨' || device.brand === 'HyRead') {
+      if (device.brand === '讀墨 Readmoo' || device.brand === '凌網 HyRead') {
         scores[device.id] += 20;
       }
     }
@@ -235,7 +235,7 @@ export function getReasonText(device, answers) {
   }
 
   // 優先功能對應
-  if (priorities.includes('taiwan') && (device.brand === 'Readmoo 讀墨' || device.brand === 'HyRead')) {
+  if (priorities.includes('taiwan') && (device.brand === '讀墨 Readmoo' || device.brand === '凌網 HyRead')) {
     reasons.push('台灣品牌，在地服務支援');
   }
   if (device.waterproof && priorities.includes('waterproof')) {

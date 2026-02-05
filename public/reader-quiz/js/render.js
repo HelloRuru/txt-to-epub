@@ -27,7 +27,7 @@ export function renderQuiz(app, quizData, currentQuestion, answers, callbacks) {
       <div class="header__logo">${icon('book')}</div>
       <h1 class="header__title">${quizData.meta?.title || '電子書閱讀器選購測驗'}</h1>
       <p class="header__subtitle">${quizData.meta?.subtitle || '找到最適合你的閱讀器'}</p>
-      <a href="brands.html" class="header__link">📖 查看收錄品牌</a>
+      <a href="brands.html" class="header__link">${icon('book-open')} 查看收錄品牌</a>
     </header>
 
     <div class="progress">
@@ -139,8 +139,13 @@ function deviceTags(d) {
 
 // ========== 排名標籤 ==========
 function rankLabel(index) {
-  const labels = ['🥇 最佳推薦', '🥈 第二推薦', '🥉 第三推薦'];
-  return labels[index] || '';
+  const labels = [
+    { icon: 'award-gold', text: '最佳推薦' },
+    { icon: 'award-silver', text: '第二推薦' },
+    { icon: 'award-bronze', text: '第三推薦' }
+  ];
+  const label = labels[index];
+  return label ? `${icon(label.icon)} ${label.text}` : '';
 }
 
 // ========== renderResult ==========
@@ -229,6 +234,10 @@ export function renderResult(app, quizData, recommendation, answers, tip, callba
           </div>
         `;
       }).join('')}
+
+      <div class="brands-link">
+        <a href="brands.html" class="btn btn--secondary">${icon('book-open')} 查看所有收錄品牌</a>
+      </div>
 
       <div class="disclaimer">
         <p class="disclaimer__text">${icon('info')} 本測驗價格與規格資料以 2026 年 2 月 5 日為基準，實際售價可能因通路、促銷活動或產品改版而異，購買前請以各品牌官網或銷售平台公告為準。</p>
