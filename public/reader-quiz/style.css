@@ -90,15 +90,15 @@ a { color: var(--color-primary-dark); text-decoration: none; transition: color v
 a:hover { color: var(--color-primary); }
 a:visited { color: var(--color-primary-dark); }
 
-/* 標題層級 - Design System v1.4 */
+/* 標題層級 - Design System v1.6 */
 h1, h2 {
-  font-family: var(--font-heading);  /* 獅尾四季春加糖 */
+  font-family: var(--font-heading);
   font-weight: 700;
   line-height: 1.3;
 }
 
 h3 {
-  font-family: var(--font-body);     /* 獅尾四季春（不加糖）*/
+  font-family: var(--font-body);
   font-weight: 500;
   line-height: 1.3;
 }
