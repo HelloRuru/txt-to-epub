@@ -786,15 +786,15 @@
         <div class="bg-pan" id="bg-pan">
           <span class="bg-pan-label">調整畫面<span style="font-size:var(--text-caption); color:var(--color-light); margin-left:6px;">多點幾下可以移更多</span></span>
           <div class="pan-grid">
-            <span></span>
+            <button class="pan-btn reset" data-dir="top-left" style="font-size:10px">左上</button>
             <button class="pan-btn" data-dir="up">上</button>
-            <span></span>
+            <button class="pan-btn reset" data-dir="top-right" style="font-size:10px">右上</button>
             <button class="pan-btn" data-dir="left">左</button>
             <button class="pan-btn reset" data-dir="reset">置中</button>
             <button class="pan-btn" data-dir="right">右</button>
-            <span></span>
+            <button class="pan-btn reset" data-dir="bot-left" style="font-size:10px">左下</button>
             <button class="pan-btn" data-dir="down">下</button>
-            <span></span>
+            <button class="pan-btn reset" data-dir="bot-right" style="font-size:10px">右下</button>
           </div>
         </div>
       </div>
@@ -1198,6 +1198,10 @@
       else if (dir === 'left') bgPanX = Math.min(bgPanX + PAN_STEP, maxX);
       else if (dir === 'right') bgPanX = Math.max(bgPanX - PAN_STEP, -maxX);
       else if (dir === 'reset') { bgPanX = 0; bgPanY = 0; }
+      else if (dir === 'top-left') { bgPanX = maxX; bgPanY = maxY; }
+      else if (dir === 'top-right') { bgPanX = -maxX; bgPanY = maxY; }
+      else if (dir === 'bot-left') { bgPanX = maxX; bgPanY = -maxY; }
+      else if (dir === 'bot-right') { bgPanX = -maxX; bgPanY = -maxY; }
       draw();
     });
   });
