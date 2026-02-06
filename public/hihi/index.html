@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>長輩圖產生器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'GenSenRounded';
+      src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2');
+      font-weight: 500;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'GenSenRounded';
+      src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2');
+      font-weight: 700;
+      font-display: swap;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+      font-weight: 500;
+      background: #FAFAFA;
+      color: #333;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 32px 20px 40px;
+    }
+
+    h1 {
+      font-weight: 700;
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 16px;
+      color: #888;
+      margin-bottom: 32px;
+    }
+
+    /* Steps */
+    .step {
+      margin-bottom: 24px;
+    }
+
+    .step-label {
+      font-size: 20px;
+      font-weight: 700;
+      color: #D4A5A5;
+      margin-bottom: 12px;
+    }
+
+    /* Upload */
+    .upload-area {
+      border: 2px dashed #E8E4E1;
+      border-radius: 24px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #FFF;
+    }
+    .upload-area:hover, .upload-area.dragover {
+      border-color: #D4A5A5;
+      background: #FFF9F9;
+    }
+    .upload-area.has-image {
+      padding: 12px;
+      border-style: solid;
+      border-color: #D4A5A5;
+    }
+    .upload-area svg {
+      width: 48px;
+      height: 48px;
+      color: #D4A5A5;
+      margin-bottom: 12px;
+    }
+    .upload-text {
+      font-size: 18px;
+      color: #888;
+    }
+    .upload-hint {
+      font-size: 14px;
+      color: #AAA;
+      margin-top: 4px;
+    }
+    .upload-area.has-image .upload-placeholder { display: none; }
+    #upload-input { display: none; }
+    #preview-thumb {
+      display: none;
+      max-width: 100%;
+      border-radius: 16px;
+    }
+    .upload-area.has-image #preview-thumb { display: block; }
+
+    /* Text input */
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      border: 2px solid #E8E4E1;
+      border-radius: 16px;
+      padding: 16px;
+      font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: #333;
+      resize: vertical;
+      transition: border-color 0.2s;
+      background: #FFF;
+    }
+    textarea::placeholder { color: #CCC; }
+    textarea:focus {
+      outline: none;
+      border-color: #D4A5A5;
+    }
+
+    /* Color picker row */
+    .color-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .color-row span {
+      font-size: 16px;
+      color: #888;
+    }
+    .color-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .color-dot:hover { transform: scale(1.1); }
+    .color-dot.active { border-color: #333; transform: scale(1.1); }
+
+    /* Size row */
+    .size-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .size-row span {
+      font-size: 16px;
+      color: #888;
+    }
+    .size-btn {
+      padding: 8px 20px;
+      border: 2px solid #E8E4E1;
+      border-radius: 24px;
+      background: #FFF;
+      font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #333;
+    }
+    .size-btn:hover { border-color: #D4A5A5; }
+    .size-btn.active {
+      background: #D4A5A5;
+      border-color: #D4A5A5;
+      color: #FFF;
+    }
+
+    /* Canvas preview */
+    .preview-wrap {
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      background: #FFF;
+    }
+    #canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 24px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 24px;
+      font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn svg {
+      width: 24px;
+      height: 24px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #D4A5A5, #B8A9C9);
+      color: #FFF;
+      box-shadow: 0 4px 16px rgba(212,165,165,0.3);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 8px 24px rgba(212,165,165,0.4);
+      transform: translateY(-1px);
+    }
+    .btn-primary:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #5C5856;
+      color: #FFF;
+      font-size: 16px;
+      padding: 12px 24px;
+      border-radius: 24px;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 32px 0 0;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 14px;
+      color: #888;
+    }
+    .footer a { color: #D4A5A5; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <h1>長輩圖產生器</h1>
+  <p class="subtitle">選背景、打字、下載</p>
+
+  <!-- Step 1: Upload -->
+  <div class="step">
+    <div class="step-label">1. 選一張背景</div>
+    <div class="upload-area" id="upload-area">
+      <div class="upload-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        <div class="upload-text">點這裡選照片</div>
+        <div class="upload-hint">或把圖片拖進來</div>
+      </div>
+      <img id="preview-thumb" alt="背景預覽">
+    </div>
+    <input type="file" id="upload-input" accept="image/*">
+  </div>
+
+  <!-- Step 2: Text -->
+  <div class="step">
+    <div class="step-label">2. 打上文字</div>
+    <textarea id="text-input" placeholder="早安！今天也要開心喔"></textarea>
+    <div class="color-row">
+      <span>文字顏色</span>
+      <div class="color-dot active" data-color="#FFFFFF" style="background:#FFFFFF; border-color:#CCC;"></div>
+      <div class="color-dot" data-color="#FFFF00" style="background:#FFFF00"></div>
+      <div class="color-dot" data-color="#FF6B6B" style="background:#FF6B6B"></div>
+      <div class="color-dot" data-color="#333333" style="background:#333333"></div>
+      <div class="color-dot" data-color="#FFD700" style="background:#FFD700"></div>
+    </div>
+    <div class="size-row">
+      <span>文字大小</span>
+      <button class="size-btn" data-size="36">小</button>
+      <button class="size-btn active" data-size="52">中</button>
+      <button class="size-btn" data-size="72">大</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Preview + Download -->
+  <div class="step">
+    <div class="step-label">3. 預覽和下載</div>
+    <div class="preview-wrap">
+      <canvas id="canvas" width="800" height="800"></canvas>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" id="btn-download" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    下載圖片
+  </button>
+
+  <footer class="footer">
+    <p>&copy; <span id="yr"></span> Kaoru Tsai. All Rights Reserved. | Contact: <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // Footer year
+  const sy = 2026, cy = new Date().getFullYear();
+  document.getElementById('yr').textContent = cy > sy ? `${sy}\u2013${cy}` : `${sy}`;
+
+  // State
+  let bgImage = null;
+  let textColor = '#FFFFFF';
+  let fontSize = 52;
+
+  // DOM
+  const uploadArea = document.getElementById('upload-area');
+  const uploadInput = document.getElementById('upload-input');
+  const previewThumb = document.getElementById('preview-thumb');
+  const textInput = document.getElementById('text-input');
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const btnDownload = document.getElementById('btn-download');
+  const toastEl = document.getElementById('toast');
+
+  // Upload
+  uploadArea.addEventListener('click', () => uploadInput.click());
+  uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+  uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+  uploadArea.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+  uploadInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+  function handleFile(file) {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        bgImage = img;
+        previewThumb.src = e.target.result;
+        uploadArea.classList.add('has-image');
+        btnDownload.disabled = false;
+        draw();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Color dots
+  document.querySelectorAll('.color-dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+      document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+      textColor = dot.dataset.color;
+      if (dot.dataset.color === '#FFFFFF') {
+        dot.style.borderColor = '#CCC';
+      }
+      draw();
+    });
+  });
+
+  // Size buttons
+  document.querySelectorAll('.size-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      fontSize = parseInt(btn.dataset.size);
+      draw();
+    });
+  });
+
+  // Text input
+  textInput.addEventListener('input', draw);
+
+  // Draw
+  function draw() {
+    const w = 800;
+    const h = 800;
+    canvas.width = w;
+    canvas.height = h;
+
+    // Background
+    if (bgImage) {
+      const scale = Math.max(w / bgImage.width, h / bgImage.height);
+      const sw = bgImage.width * scale;
+      const sh = bgImage.height * scale;
+      ctx.drawImage(bgImage, (w - sw) / 2, (h - sh) / 2, sw, sh);
+    } else {
+      ctx.fillStyle = '#F5D0C5';
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    // Text
+    const text = textInput.value.trim();
+    if (!text) return;
+
+    const lines = text.split('\n');
+    const lineH = fontSize * 1.5;
+    const totalH = lines.length * lineH;
+    const startY = (h - totalH) / 2 + fontSize;
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    lines.forEach((line, i) => {
+      const y = startY + i * lineH;
+
+      // Outline / shadow for readability
+      ctx.font = `bold ${fontSize}px "GenSenRounded", "Noto Sans TC", sans-serif`;
+      ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+      ctx.lineWidth = fontSize * 0.12;
+      ctx.lineJoin = 'round';
+      ctx.strokeText(line, w / 2, y);
+
+      // Fill
+      ctx.fillStyle = textColor;
+      ctx.fillText(line, w / 2, y);
+    });
+  }
+
+  // Initial draw
+  draw();
+
+  // Download
+  btnDownload.addEventListener('click', () => {
+    if (!bgImage) { toast('請先選一張背景'); return; }
+    const link = document.createElement('a');
+    link.download = '長輩圖.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('圖片已下載');
+  });
+
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    setTimeout(() => toastEl.classList.remove('show'), 2000);
+  }
+</script>
+</body>
+</html>
