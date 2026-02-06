@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hello Ruru Tools — Icon Generator</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
+    h1 { font-size: 24px; margin-bottom: 8px; }
+    p { color: #666; margin-bottom: 24px; }
+    .icon-row { display: flex; gap: 16px; align-items: end; margin-bottom: 16px; flex-wrap: wrap; }
+    .icon-item { text-align: center; }
+    .icon-item canvas { border: 1px solid #eee; border-radius: 12px; }
+    .icon-item span { display: block; font-size: 12px; color: #888; margin-top: 4px; }
+    button { padding: 12px 24px; background: linear-gradient(135deg, #D4A5A5, #B8A9C9); color: #fff; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; margin-top: 16px; }
+    button:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <h1>Hello Ruru Tools — Icon Generator</h1>
+  <p>生成各裝置需要的 PNG 圖標。點擊下方按鈕逐一下載。</p>
+
+  <div id="icons"></div>
+
+  <script>
+    const SIZES = [
+      { name: 'apple-touch-icon', size: 180 },
+      { name: 'icon-192x192', size: 192 },
+      { name: 'icon-512x512', size: 512 },
+      { name: 'icon-32x32', size: 32 },
+      { name: 'icon-16x16', size: 16 },
+      { name: 'favicon-96x96', size: 96 },
+    ];
+
+    function drawIcon(ctx, s) {
+      // Background with gradient
+      const grad = ctx.createLinearGradient(0, 0, s, s);
+      grad.addColorStop(0, '#D4A5A5');
+      grad.addColorStop(1, '#B8A9C9');
+      const r = s * 0.18;
+      roundRect(ctx, 0, 0, s, s, r);
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Flower petals
+      const cx = s / 2, cy = s * 0.45;
+      const petalR = s * 0.095;
+      const petalL = s * 0.15;
+      const colors = ['#FFFFFF', '#F5D0C5', '#FEDFE1', '#E8B4B8', '#C4B7D7', '#FFFFFF'];
+      for (let i = 0; i < 6; i++) {
+        const angle = (i * 60 - 90) * Math.PI / 180;
+        const px = cx + Math.cos(angle) * petalL;
+        const py = cy + Math.sin(angle) * petalL;
+        ctx.beginPath();
+        ctx.ellipse(px, py, petalR * 0.6, petalR, angle + Math.PI / 2, 0, Math.PI * 2);
+        ctx.fillStyle = colors[i];
+        ctx.globalAlpha = 0.7;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      // Center dot
+      ctx.beginPath();
+      ctx.arc(cx, cy, s * 0.055, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fill();
+
+      // Leaves
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = s * 0.02;
+      ctx.lineCap = 'round';
+      ctx.globalAlpha = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(cx, s * 0.6);
+      ctx.quadraticCurveTo(cx - s * 0.12, s * 0.72, cx - s * 0.2, s * 0.7);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx, s * 0.6);
+      ctx.quadraticCurveTo(cx + s * 0.12, s * 0.72, cx + s * 0.2, s * 0.7);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // "HR" text
+      if (s >= 96) {
+        ctx.font = `bold ${s * 0.1}px system-ui, sans-serif`;
+        ctx.fillStyle = '#FFFFFF';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.globalAlpha = 0.5;
+        ctx.fillText('HR', cx, s * 0.85);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    const container = document.getElementById('icons');
+    SIZES.forEach(({ name, size }) => {
+      const item = document.createElement('div');
+      item.className = 'icon-item';
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const displaySize = Math.min(size, 120);
+      canvas.style.width = displaySize + 'px';
+      canvas.style.height = displaySize + 'px';
+      drawIcon(canvas.getContext('2d'), size);
+      item.appendChild(canvas);
+
+      const label = document.createElement('span');
+      label.textContent = `${name} (${size}x${size})`;
+      item.appendChild(label);
+
+      const btn = document.createElement('button');
+      btn.textContent = '下載';
+      btn.style.fontSize = '14px';
+      btn.style.padding = '8px 16px';
+      btn.addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.download = name + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+      item.appendChild(btn);
+
+      container.appendChild(item);
+    });
+  </script>
+</body>
+</html>

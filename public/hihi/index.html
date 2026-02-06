@@ -107,6 +107,14 @@
   }
   </script>
 
+  <!-- Icons & Theme -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#D4A5A5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="問安圖">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=LXGW+WenKai+TC:wght@400;700&family=Noto+Serif+TC:wght@400;700&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
@@ -244,6 +252,26 @@
       padding: 32px 24px 48px;
     }
 
+    /* ─── Brand ─── */
+    .brand-link {
+      display: inline-block;
+      text-decoration: none;
+      margin-bottom: 8px;
+      transition: transform 0.3s;
+    }
+    .brand-link:hover { transform: scale(1.05); }
+    .brand-logo { filter: drop-shadow(0 2px 8px rgba(212,165,165,0.2)); }
+    .brand-name {
+      font-family: var(--font-heading);
+      font-size: var(--text-h2);
+      font-weight: var(--weight-bold);
+      letter-spacing: 3px;
+      background: var(--gradient-main);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
     /* ─── Header ─── */
     .page-header { text-align: center; margin-bottom: 32px; }
 
@@ -351,6 +379,23 @@
     .greeting-btn.active { background: var(--color-rose); border-color: var(--color-rose); color: #FFF; }
     .wisdom-btn:hover { border-color: var(--color-lavender); }
     .wisdom-btn.active { background: var(--color-lavender); border-color: var(--color-lavender); color: #FFF; }
+
+    /* Random surprise button — unique gradient style */
+    .wisdom-btn.random-btn {
+      border: 2px solid var(--color-nadeshiko);
+      background: var(--gradient-pink-purple);
+      color: #FFF;
+      font-weight: var(--weight-bold);
+    }
+    .wisdom-btn.random-btn:hover {
+      border-color: var(--color-bellflower);
+      box-shadow: 0 2px 12px rgba(143,119,181,0.25);
+    }
+    .wisdom-btn.random-btn.active {
+      background: var(--gradient-main);
+      border-color: var(--color-grey-rose);
+      box-shadow: 0 4px 16px rgba(212,165,165,0.3);
+    }
 
     /* ─── Textarea ─── */
     textarea {
@@ -663,6 +708,22 @@
 
 <div class="page">
   <header class="page-header">
+    <a href="https://tools.helloruru.com/" class="brand-link" aria-label="Hello Ruru Tools 首頁">
+      <svg class="brand-logo" width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="32" cy="32" r="28" stroke="#D4A5A5" stroke-width="0.5" opacity="0.3"/>
+        <circle cx="32" cy="32" r="22" stroke="#B8A9C9" stroke-width="0.5" opacity="0.25"/>
+        <ellipse cx="32" cy="24" rx="4" ry="7" fill="#D4A5A5" opacity="0.6" transform="rotate(0 32 32)"/>
+        <ellipse cx="32" cy="24" rx="4" ry="7" fill="#B8A9C9" opacity="0.5" transform="rotate(60 32 32)"/>
+        <ellipse cx="32" cy="24" rx="4" ry="7" fill="#E8B4B8" opacity="0.5" transform="rotate(120 32 32)"/>
+        <ellipse cx="32" cy="24" rx="4" ry="7" fill="#C4B7D7" opacity="0.5" transform="rotate(180 32 32)"/>
+        <ellipse cx="32" cy="24" rx="4" ry="7" fill="#F5D0C5" opacity="0.5" transform="rotate(240 32 32)"/>
+        <ellipse cx="32" cy="24" rx="4" ry="7" fill="#FEDFE1" opacity="0.5" transform="rotate(300 32 32)"/>
+        <circle cx="32" cy="32" r="4" fill="#D4A5A5" opacity="0.8"/>
+        <path d="M32 42 C28 48, 22 50, 18 48" stroke="#A8B5A0" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.6"/>
+        <path d="M32 42 C36 48, 42 50, 46 48" stroke="#A8B5A0" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.6"/>
+      </svg>
+      <div class="brand-name">Hello Ruru</div>
+    </a>
     <h1>問安圖產生器</h1>
     <p class="greeting-banner" id="greeting-banner"></p>
   </header>
@@ -945,12 +1006,11 @@
     btn.addEventListener('click', () => { clearGreetingActive(); btn.classList.add('active'); fillWisdom(w); });
     document.getElementById('wisdom-row').appendChild(btn);
   });
-  // Random surprise button
+  // Random surprise button — unique gradient style
   (function() {
     const btn = document.createElement('button');
-    btn.className = 'wisdom-btn';
-    btn.textContent = '✨ 隨機驚喜';
-    btn.style.borderColor = 'var(--color-nadeshiko)';
+    btn.className = 'wisdom-btn random-btn';
+    btn.textContent = '隨機驚喜';
     btn.addEventListener('click', () => {
       clearGreetingActive();
       btn.classList.add('active');
