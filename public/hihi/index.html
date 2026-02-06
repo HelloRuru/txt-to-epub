@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
   <title>問安圖產生器｜免費線上早安圖製作工具，7 種字體 + 配件貼紙一鍵下載</title>
   <meta name="description" content="免費問安圖產生器，3 步驟製作早安圖、午安圖、晚安圖。提供 7 種中文字體、6 款花卉蝴蝶配件、一行禪師智慧語錄，自動帶入日期時間，免註冊免安裝，長輩也能輕鬆上手。">
   <meta name="keywords" content="問安圖產生器,早安圖製作,長輩圖產生器,免費早安圖,午安圖,晚安圖,問候圖片製作,線上圖片編輯,早安問候語,長輩圖免費下載">
@@ -44,9 +44,10 @@
       "一行禪師智慧語錄推薦",
       "自動帶入日期時間",
       "文字 9 宮格位置調整",
-      "5 種文字顏色選擇",
+      "分行獨立文字顏色選擇",
       "致 / 來自署名功能",
-      "一鍵下載 PNG 圖片"
+      "一鍵下載 PNG 圖片",
+      "自適應桌面、平板、手機"
     ],
     "author": {
       "@type": "Person",
@@ -110,166 +111,284 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=LXGW+WenKai+TC:wght@400;700&family=Noto+Serif+TC:wght@400;700&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    /* ─── Design System v1.6 Font Faces ─── */
+    @font-face {
+      font-family: 'GenSenRounded';
+      src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2');
+      font-weight: 400; font-style: normal; font-display: swap;
+    }
     @font-face {
       font-family: 'GenSenRounded';
       src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2');
-      font-weight: 500;
-      font-display: swap;
+      font-weight: 500; font-style: normal; font-display: swap;
     }
     @font-face {
       font-family: 'GenSenRounded';
       src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2');
-      font-weight: 700;
-      font-display: swap;
+      font-weight: 700; font-style: normal; font-display: swap;
     }
     @font-face {
       font-family: 'NaniFont';
       src: url('https://cdn.jsdelivr.net/gh/max32002/nanifont@1.046/webfont/NaniFont-Regular.woff2') format('woff2');
-      font-weight: 400;
-      font-display: swap;
+      font-weight: 400; font-display: swap;
     }
     @font-face {
       font-family: 'NaniFont';
       src: url('https://cdn.jsdelivr.net/gh/max32002/nanifont@1.046/webfont/NaniFont-SemiBold.woff2') format('woff2');
-      font-weight: 700;
-      font-display: swap;
+      font-weight: 700; font-display: swap;
     }
-    /* jf 開源粉圓 */
     @font-face {
       font-family: 'jf-openhuninn';
       src: url('https://cdn.jsdelivr.net/gh/justfont/open-huninn-font@2.0/font/jf-openhuninn-2.0.woff2') format('woff2');
-      font-weight: 400;
-      font-display: swap;
+      font-weight: 400; font-display: swap;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* ─── Design System v1.6 CSS Variables ─── */
+    :root {
+      /* Colors */
+      --color-rose: #D4A5A5;
+      --color-lavender: #B8A9C9;
+      --color-blush: #F5D0C5;
+      --color-grey-rose: #C9929A;
+      --color-nadeshiko: #E8B4B8;
+      --color-sakura: #FEDFE1;
+      --color-wisteria: #C4B7D7;
+      --color-bellflower: #8F77B5;
+      --color-sage: #A8B5A0;
+      --color-mist: #E8E4E1;
+      --color-warm-grey: #B5ADA7;
+      --color-charcoal: #5C5856;
+      --color-ink: #333333;
+      --color-body: #4A4A4A;
+      --color-muted: #888888;
+      --color-light: #AAAAAA;
+      --color-bg: #FAFAFA;
+      --color-card: #FFFFFF;
 
+      /* Font Families */
+      --font-heading: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+      --font-body: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+      --font-caption: 'Noto Sans TC', sans-serif;
+
+      /* Font Sizes — Desktop */
+      --text-h1: 2.5rem;
+      --text-h2: 1.75rem;
+      --text-h3: 1.25rem;
+      --text-body: 1rem;
+      --text-small: 0.875rem;
+      --text-caption: 0.75rem;
+
+      /* Font Weights */
+      --weight-regular: 400;
+      --weight-medium: 500;
+      --weight-bold: 700;
+
+      /* Line Heights */
+      --leading-tight: 1.3;
+      --leading-normal: 1.6;
+      --leading-relaxed: 1.8;
+
+      /* Letter Spacing */
+      --tracking-tight: -0.01em;
+      --tracking-normal: 0.02em;
+      --tracking-wide: 0.08em;
+
+      /* Radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 24px;
+      --radius-full: 50%;
+
+      /* Shadows */
+      --shadow-soft: 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+
+      /* Gradients */
+      --gradient-main: linear-gradient(135deg, #D4A5A5, #B8A9C9);
+      --gradient-light: linear-gradient(180deg, #FFFFFF, #FAFAFA);
+      --gradient-pink-purple: linear-gradient(135deg, #F5D0C5, #C4B7D7);
+    }
+
+    /* ─── Mobile Font Size Overrides ─── */
+    @media (max-width: 768px) {
+      :root {
+        --text-h1: 1.875rem;
+        --text-h2: 1.5rem;
+        --text-h3: 1.125rem;
+      }
+    }
+
+    /* ─── Reset ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ─── Base ─── */
     body {
-      font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
-      font-weight: 500;
-      background: #FAFAFA;
-      color: #333;
+      font-family: var(--font-body);
+      font-weight: var(--weight-medium);
+      font-size: var(--text-body);
+      line-height: var(--leading-relaxed);
+      letter-spacing: var(--tracking-normal);
+      background: var(--color-bg);
+      color: var(--color-body);
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-tap-highlight-color: transparent;
     }
 
+    /* ─── Page Container ─── */
     .page {
-      max-width: 480px;
+      max-width: 960px;
       margin: 0 auto;
-      padding: 32px 20px 40px;
+      padding: 32px 24px 48px;
     }
+
+    /* ─── Header ─── */
+    .page-header { text-align: center; margin-bottom: 32px; }
 
     h1 {
-      font-weight: 700;
-      font-size: 28px;
-      text-align: center;
+      font-family: var(--font-heading);
+      font-weight: var(--weight-bold);
+      font-size: var(--text-h1);
+      line-height: var(--leading-tight);
+      letter-spacing: var(--tracking-tight);
+      color: var(--color-ink);
       margin-bottom: 8px;
-      color: #333;
     }
 
     .greeting-banner {
-      text-align: center;
-      font-size: 18px;
-      color: #D4A5A5;
-      font-weight: 700;
-      margin-bottom: 32px;
-      line-height: 1.6;
+      font-family: var(--font-heading);
+      font-size: var(--text-h3);
+      color: var(--color-rose);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-normal);
     }
 
-    .step { margin-bottom: 24px; }
+    /* ─── Two-Column Desktop Layout ─── */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    @media (min-width: 1024px) {
+      .layout {
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        align-items: start;
+      }
+      .preview-col {
+        position: sticky;
+        top: 24px;
+      }
+    }
+
+    /* ─── Steps ─── */
+    .step { margin-bottom: 28px; }
 
     .step-label {
-      font-size: 20px;
-      font-weight: 700;
-      color: #D4A5A5;
+      font-family: var(--font-heading);
+      font-size: var(--text-h3);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-tight);
+      color: var(--color-rose);
       margin-bottom: 12px;
     }
 
-    /* Upload */
+    /* ─── Upload Area ─── */
     .upload-area {
-      border: 2px dashed #E8E4E1;
-      border-radius: 24px;
+      border: 2px dashed var(--color-mist);
+      border-radius: var(--radius-lg);
       padding: 40px 20px;
       text-align: center;
       cursor: pointer;
       transition: all 0.2s;
-      background: #FFF;
+      background: var(--color-card);
     }
     .upload-area:hover, .upload-area.dragover {
-      border-color: #D4A5A5;
+      border-color: var(--color-rose);
       background: #FFF9F9;
     }
     .upload-area.has-image {
       padding: 12px;
       border-style: solid;
-      border-color: #D4A5A5;
+      border-color: var(--color-rose);
     }
-    .upload-area svg { width: 48px; height: 48px; color: #D4A5A5; margin-bottom: 12px; }
-    .upload-text { font-size: 18px; color: #888; }
-    .upload-hint { font-size: 14px; color: #AAA; margin-top: 4px; }
+    .upload-area svg { width: 48px; height: 48px; color: var(--color-rose); margin-bottom: 12px; }
+    .upload-text { font-size: var(--text-h3); color: var(--color-muted); }
+    .upload-hint { font-size: var(--text-small); color: var(--color-light); margin-top: 4px; }
     .upload-area.has-image .upload-placeholder { display: none; }
     #upload-input { display: none; }
-    #preview-thumb { display: none; max-width: 100%; border-radius: 16px; }
+    #preview-thumb { display: none; max-width: 100%; border-radius: calc(var(--radius-lg) - 4px); }
     .upload-area.has-image #preview-thumb { display: block; }
 
-    /* Greeting sections */
+    /* ─── Greeting Sections ─── */
     .greeting-section { margin-bottom: 16px; }
-    .greeting-sub-label { font-size: 14px; color: #888; margin-bottom: 8px; }
+    .greeting-sub-label {
+      font-family: var(--font-caption);
+      font-size: var(--text-small);
+      color: var(--color-muted);
+      margin-bottom: 8px;
+    }
     .greeting-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
     .greeting-btn, .wisdom-btn {
       padding: 10px 18px;
-      border: 2px solid #E8E4E1;
-      border-radius: 24px;
-      background: #FFF;
-      font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
-      font-weight: 500;
+      border: 2px solid var(--color-mist);
+      border-radius: var(--radius-lg);
+      background: var(--color-card);
+      font-family: var(--font-body);
+      font-weight: var(--weight-medium);
       cursor: pointer;
       transition: all 0.2s;
-      color: #333;
+      color: var(--color-ink);
+      min-height: 44px;
     }
-    .greeting-btn { font-size: 16px; }
-    .wisdom-btn { font-size: 14px; }
-    .greeting-btn:hover { border-color: #D4A5A5; }
-    .greeting-btn.active { background: #D4A5A5; border-color: #D4A5A5; color: #FFF; }
-    .wisdom-btn:hover { border-color: #B8A9C9; }
-    .wisdom-btn.active { background: #B8A9C9; border-color: #B8A9C9; color: #FFF; }
+    .greeting-btn { font-size: var(--text-body); }
+    .wisdom-btn { font-size: var(--text-small); }
+    .greeting-btn:hover { border-color: var(--color-rose); }
+    .greeting-btn.active { background: var(--color-rose); border-color: var(--color-rose); color: #FFF; }
+    .wisdom-btn:hover { border-color: var(--color-lavender); }
+    .wisdom-btn.active { background: var(--color-lavender); border-color: var(--color-lavender); color: #FFF; }
 
-    /* Text input */
+    /* ─── Textarea ─── */
     textarea {
       width: 100%;
       min-height: 100px;
-      border: 2px solid #E8E4E1;
-      border-radius: 16px;
+      border: 2px solid var(--color-mist);
+      border-radius: calc(var(--radius-lg) - 8px);
       padding: 16px;
-      font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
-      font-size: 20px;
-      font-weight: 500;
-      color: #333;
+      font-family: var(--font-body);
+      font-size: var(--text-h3);
+      font-weight: var(--weight-medium);
+      color: var(--color-ink);
       resize: vertical;
       transition: border-color 0.2s;
-      background: #FFF;
+      background: var(--color-card);
     }
-    textarea::placeholder { color: #CCC; }
-    textarea:focus { outline: none; border-color: #D4A5A5; }
+    textarea::placeholder { color: var(--color-light); }
+    textarea:focus { outline: none; border-color: var(--color-rose); }
 
+    /* ─── Name Inputs ─── */
     .name-input {
       flex: 1;
       min-width: 0;
       padding: 10px 14px;
-      border: 2px solid #E8E4E1;
-      border-radius: 12px;
-      font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
-      font-size: 16px;
-      font-weight: 500;
-      color: #333;
-      background: #FFF;
+      border: 2px solid var(--color-mist);
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: var(--text-body);
+      font-weight: var(--weight-medium);
+      color: var(--color-ink);
+      background: var(--color-card);
       transition: border-color 0.2s;
+      min-height: 44px;
     }
-    .name-input::placeholder { color: #CCC; }
-    .name-input:focus { outline: none; border-color: #D4A5A5; }
+    .name-input::placeholder { color: var(--color-light); }
+    .name-input:focus { outline: none; border-color: var(--color-rose); }
 
-    /* Option rows */
+    /* ─── Option Rows ─── */
     .option-row {
       display: flex;
       gap: 8px;
@@ -277,27 +396,33 @@
       flex-wrap: wrap;
       align-items: center;
     }
-    .option-label { font-size: 16px; color: #888; min-width: fit-content; }
+    .option-label {
+      font-size: var(--text-body);
+      color: var(--color-muted);
+      min-width: fit-content;
+      font-weight: var(--weight-medium);
+    }
 
-    /* Pill buttons (font, size) */
+    /* ─── Pill Buttons (font, size) ─── */
     .pill-btn {
       padding: 8px 16px;
-      border: 2px solid #E8E4E1;
-      border-radius: 24px;
-      background: #FFF;
-      font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
-      font-size: 15px;
-      font-weight: 500;
+      border: 2px solid var(--color-mist);
+      border-radius: var(--radius-lg);
+      background: var(--color-card);
+      font-family: var(--font-body);
+      font-size: var(--text-small);
+      font-weight: var(--weight-medium);
       cursor: pointer;
       transition: all 0.2s;
-      color: #333;
+      color: var(--color-ink);
+      min-height: 44px;
     }
-    .pill-btn:hover { border-color: #D4A5A5; }
-    .pill-btn.active { background: #D4A5A5; border-color: #D4A5A5; color: #FFF; }
-    .pill-btn.lavender:hover { border-color: #B8A9C9; }
-    .pill-btn.lavender.active { background: #B8A9C9; border-color: #B8A9C9; color: #FFF; }
+    .pill-btn:hover { border-color: var(--color-rose); }
+    .pill-btn.active { background: var(--color-rose); border-color: var(--color-rose); color: #FFF; }
+    .pill-btn.lavender:hover { border-color: var(--color-lavender); }
+    .pill-btn.lavender.active { background: var(--color-lavender); border-color: var(--color-lavender); color: #FFF; }
 
-    /* Font button preview */
+    /* ─── Font Button Preview ─── */
     .font-btn[data-font="gensenrounded"] { font-family: 'GenSenRounded', sans-serif; }
     .font-btn[data-font="wenkai"] { font-family: 'LXGW WenKai TC', serif; }
     .font-btn[data-font="nanifont"] { font-family: 'NaniFont', sans-serif; }
@@ -306,48 +431,48 @@
     .font-btn[data-font="huninn"] { font-family: 'jf-openhuninn', sans-serif; }
     .font-btn[data-font="zenmaru"] { font-family: 'Zen Maru Gothic', sans-serif; }
 
-    /* Color dots */
+    /* ─── Color Dots ─── */
     .color-dot {
-      width: 40px; height: 40px;
-      border-radius: 50%;
+      width: 44px; height: 44px;
+      border-radius: var(--radius-full);
       border: 3px solid transparent;
       cursor: pointer;
       transition: all 0.2s;
     }
     .color-dot:hover { transform: scale(1.1); }
-    .color-dot.active { border-color: #333; transform: scale(1.1); }
+    .color-dot.active { border-color: var(--color-ink); transform: scale(1.1); }
 
-    /* Color cycle button (for 致/來自) */
+    /* ─── Color Cycle Button (致/來自) ─── */
     .color-cycle {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      border: 2px solid #E8E4E1;
+      width: 32px; height: 32px;
+      border-radius: var(--radius-full);
+      border: 2px solid var(--color-mist);
       cursor: pointer;
       transition: all 0.2s;
       flex-shrink: 0;
     }
     .color-cycle:hover { transform: scale(1.15); }
 
-    /* Position grid */
-    .pos-wrap { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+    /* ─── Position Grid ─── */
+    .pos-wrap { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
     .pos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
     .pos-btn {
-      width: 48px; height: 34px;
-      border: 2px solid #E8E4E1;
-      border-radius: 10px;
-      background: #FFF;
-      font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
-      font-size: 12px;
-      font-weight: 500;
+      width: 52px; height: 40px;
+      border: 2px solid var(--color-mist);
+      border-radius: var(--radius-sm);
+      background: var(--color-card);
+      font-family: var(--font-body);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-medium);
       cursor: pointer;
       transition: all 0.2s;
-      color: #333;
+      color: var(--color-ink);
       padding: 0;
     }
-    .pos-btn:hover { border-color: #D4A5A5; }
-    .pos-btn.active { background: #D4A5A5; border-color: #D4A5A5; color: #FFF; }
+    .pos-btn:hover { border-color: var(--color-rose); }
+    .pos-btn.active { background: var(--color-rose); border-color: var(--color-rose); color: #FFF; }
 
-    /* Sticker section */
+    /* ─── Sticker Grid ─── */
     .sticker-grid {
       display: flex;
       gap: 10px;
@@ -355,10 +480,10 @@
       margin-top: 8px;
     }
     .sticker-thumb {
-      width: 60px; height: 60px;
-      border: 2px solid #E8E4E1;
-      border-radius: 16px;
-      background: #FFF;
+      width: 64px; height: 64px;
+      border: 2px solid var(--color-mist);
+      border-radius: calc(var(--radius-lg) - 8px);
+      background: var(--color-card);
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
@@ -366,158 +491,238 @@
       justify-content: center;
       padding: 6px;
     }
-    .sticker-thumb:hover { border-color: #D4A5A5; transform: scale(1.05); }
-    .sticker-thumb.active { border-color: #D4A5A5; background: #FFF5F5; }
+    .sticker-thumb:hover { border-color: var(--color-rose); transform: scale(1.05); }
+    .sticker-thumb.active { border-color: var(--color-rose); background: #FFF5F5; }
     .sticker-thumb img { width: 100%; height: 100%; object-fit: contain; }
-    .sticker-name { font-size: 11px; color: #888; text-align: center; margin-top: 2px; }
-
-    /* Canvas preview */
-    .preview-wrap {
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-      background: #FFF;
+    .sticker-name {
+      font-family: var(--font-caption);
+      font-size: var(--text-caption);
+      color: var(--color-muted);
+      text-align: center;
+      margin-top: 2px;
     }
-    #canvas { display: block; width: 100%; height: auto; border-radius: 24px; }
 
-    /* Download button */
+    /* ─── Canvas Preview ─── */
+    .preview-wrap {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      background: var(--color-card);
+    }
+    #canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: var(--radius-lg);
+    }
+
+    /* ─── Download Button ─── */
     .btn {
       display: flex; align-items: center; justify-content: center;
-      gap: 8px; width: 100%; padding: 16px; border: none; border-radius: 24px;
-      font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
-      font-size: 22px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+      gap: 8px; width: 100%; padding: 16px; border: none;
+      border-radius: var(--radius-lg);
+      font-family: var(--font-heading);
+      font-size: var(--text-h3);
+      font-weight: var(--weight-bold);
+      cursor: pointer; transition: all 0.2s;
+      min-height: 56px;
     }
     .btn svg { width: 24px; height: 24px; }
     .btn-primary {
-      background: linear-gradient(135deg, #D4A5A5, #B8A9C9);
+      background: var(--gradient-main);
       color: #FFF;
       box-shadow: 0 4px 16px rgba(212,165,165,0.3);
     }
-    .btn-primary:hover { box-shadow: 0 8px 24px rgba(212,165,165,0.4); transform: translateY(-1px); }
-    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-primary:hover {
+      box-shadow: 0 8px 24px rgba(212,165,165,0.4);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
+    /* ─── Toast ─── */
     .toast {
       position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(80px);
-      background: #5C5856; color: #FFF; font-size: 16px;
-      padding: 12px 24px; border-radius: 24px;
+      background: var(--color-charcoal); color: #FFF;
+      font-size: var(--text-body); font-weight: var(--weight-medium);
+      padding: 12px 24px; border-radius: var(--radius-lg);
       opacity: 0; transition: all 0.3s; z-index: 10; pointer-events: none;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* ─── Footer ─── */
     .footer {
       text-align: center; padding: 32px 0 0;
-      font-family: 'Noto Sans TC', sans-serif; font-size: 14px; color: #888;
+      font-family: var(--font-caption);
+      font-size: var(--text-small);
+      color: var(--color-muted);
     }
-    .footer a { color: #D4A5A5; text-decoration: none; }
+    .footer a { color: var(--color-rose); text-decoration: none; }
+
+    /* ─── Tablet (768–1023px) ─── */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .page { max-width: 640px; padding: 40px 32px 48px; }
+      .greeting-row { gap: 10px; }
+      .sticker-thumb { width: 72px; height: 72px; }
+    }
+
+    /* ─── Desktop (≥1024px) ─── */
+    @media (min-width: 1024px) {
+      .page { padding: 48px 40px 56px; }
+      .greeting-row { gap: 10px; }
+      .sticker-thumb { width: 72px; height: 72px; }
+      .pos-btn { width: 56px; height: 44px; font-size: var(--text-small); }
+    }
+
+    /* ─── Small Mobile (<400px) ─── */
+    @media (max-width: 400px) {
+      .page { padding: 20px 16px 32px; }
+      .greeting-btn, .wisdom-btn { padding: 8px 14px; font-size: var(--text-small); }
+      .pill-btn { padding: 8px 12px; font-size: var(--text-caption); }
+      .option-row { gap: 6px; }
+      .color-dot { width: 38px; height: 38px; }
+      .sticker-thumb { width: 56px; height: 56px; }
+      .pos-btn { width: 46px; height: 36px; }
+      .name-input { font-size: var(--text-small); padding: 8px 10px; }
+    }
+
+    /* ─── Touch Optimization ─── */
+    @media (hover: none) and (pointer: coarse) {
+      .greeting-btn:hover, .wisdom-btn:hover, .pill-btn:hover,
+      .pos-btn:hover, .sticker-thumb:hover, .color-dot:hover,
+      .color-cycle:hover, .upload-area:hover, .btn-primary:hover {
+        transform: none;
+        box-shadow: inherit;
+      }
+      .greeting-btn:active, .wisdom-btn:active, .pill-btn:active,
+      .pos-btn:active, .sticker-thumb:active {
+        transform: scale(0.96);
+      }
+      .btn-primary:active:not(:disabled) {
+        transform: scale(0.98);
+      }
+    }
   </style>
 </head>
 <body>
 
 <div class="page">
-  <h1>問安圖產生器</h1>
-  <p class="greeting-banner" id="greeting-banner"></p>
+  <header class="page-header">
+    <h1>問安圖產生器</h1>
+    <p class="greeting-banner" id="greeting-banner"></p>
+  </header>
 
-  <!-- Step 1 -->
-  <div class="step">
-    <div class="step-label">1. 選一張背景</div>
-    <div class="upload-area" id="upload-area">
-      <div class="upload-placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-        <div class="upload-text">點這裡選照片</div>
-        <div class="upload-hint">或把圖片拖進來</div>
+  <div class="layout">
+    <!-- ─── Controls Column ─── -->
+    <div class="controls-col">
+
+      <!-- Step 1 -->
+      <div class="step">
+        <div class="step-label">1. 選一張背景</div>
+        <div class="upload-area" id="upload-area">
+          <div class="upload-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            <div class="upload-text">點這裡選照片</div>
+            <div class="upload-hint">或把圖片拖進來</div>
+          </div>
+          <img id="preview-thumb" alt="背景預覽">
+        </div>
+        <input type="file" id="upload-input" accept="image/*">
       </div>
-      <img id="preview-thumb" alt="背景預覽">
-    </div>
-    <input type="file" id="upload-input" accept="image/*">
-  </div>
 
-  <!-- Step 2 -->
-  <div class="step">
-    <div class="step-label">2. 選問候語</div>
+      <!-- Step 2 -->
+      <div class="step">
+        <div class="step-label">2. 選問候語</div>
 
-    <div class="greeting-section">
-      <div class="greeting-sub-label">基本問候</div>
-      <div class="greeting-row" id="basic-row"></div>
-    </div>
-    <div class="greeting-section">
-      <div class="greeting-sub-label">智慧推薦 — 一行禪師</div>
-      <div class="greeting-row" id="wisdom-row"></div>
-    </div>
+        <div class="greeting-section">
+          <div class="greeting-sub-label">基本問候</div>
+          <div class="greeting-row" id="basic-row"></div>
+        </div>
+        <div class="greeting-section">
+          <div class="greeting-sub-label">智慧推薦 — 一行禪師</div>
+          <div class="greeting-row" id="wisdom-row"></div>
+        </div>
 
-    <textarea id="text-input" placeholder="在這裡打字..."></textarea>
+        <textarea id="text-input" placeholder="在這裡打字..."></textarea>
 
-    <div class="option-row" style="margin-top:12px; margin-bottom:0;">
-      <span class="option-label">致</span>
-      <input type="text" id="input-to" class="name-input" placeholder="收件人（選填）">
-      <div class="color-cycle" id="color-to" title="點我換顏色" style="background:#FFFFFF; border-color:#CCC;"></div>
-      <span class="option-label" style="margin-left:4px;">來自</span>
-      <input type="text" id="input-from" class="name-input" placeholder="你的名字（選填）">
-      <div class="color-cycle" id="color-from" title="點我換顏色" style="background:#FFFFFF; border-color:#CCC;"></div>
-    </div>
+        <div class="option-row" style="margin-top:12px; margin-bottom:0;">
+          <span class="option-label">致</span>
+          <input type="text" id="input-to" class="name-input" placeholder="收件人（選填）">
+          <div class="color-cycle" id="color-to" title="點我換顏色" style="background:#FFFFFF; border-color:#CCC;"></div>
+          <span class="option-label" style="margin-left:4px;">來自</span>
+          <input type="text" id="input-from" class="name-input" placeholder="你的名字（選填）">
+          <div class="color-cycle" id="color-from" title="點我換顏色" style="background:#FFFFFF; border-color:#CCC;"></div>
+        </div>
 
-    <div class="option-row">
-      <span class="option-label">字體</span>
-      <button class="pill-btn lavender font-btn active" data-font="gensenrounded">圓體</button>
-      <button class="pill-btn lavender font-btn" data-font="wenkai">楷體</button>
-      <button class="pill-btn lavender font-btn" data-font="nanifont">手寫</button>
-      <button class="pill-btn lavender font-btn" data-font="notoserif">明體</button>
-      <button class="pill-btn lavender font-btn" data-font="notosans">黑體</button>
-      <button class="pill-btn lavender font-btn" data-font="huninn">粉圓</button>
-      <button class="pill-btn lavender font-btn" data-font="zenmaru">日丸</button>
-    </div>
+        <div class="option-row">
+          <span class="option-label">字體</span>
+          <button class="pill-btn lavender font-btn active" data-font="gensenrounded">圓體</button>
+          <button class="pill-btn lavender font-btn" data-font="wenkai">楷體</button>
+          <button class="pill-btn lavender font-btn" data-font="nanifont">手寫</button>
+          <button class="pill-btn lavender font-btn" data-font="notoserif">明體</button>
+          <button class="pill-btn lavender font-btn" data-font="notosans">黑體</button>
+          <button class="pill-btn lavender font-btn" data-font="huninn">粉圓</button>
+          <button class="pill-btn lavender font-btn" data-font="zenmaru">日丸</button>
+        </div>
 
-    <div class="option-row">
-      <span class="option-label">問候語</span>
-      <div class="color-dot active" data-color="#FFFFFF" style="background:#FFFFFF; border-color:#CCC;"></div>
-      <div class="color-dot" data-color="#FFFF00" style="background:#FFFF00"></div>
-      <div class="color-dot" data-color="#FF6B6B" style="background:#FF6B6B"></div>
-      <div class="color-dot" data-color="#333333" style="background:#333333"></div>
-      <div class="color-dot" data-color="#FFD700" style="background:#FFD700"></div>
-    </div>
+        <div class="option-row">
+          <span class="option-label">問候語</span>
+          <div class="color-dot active" data-color="#FFFFFF" style="background:#FFFFFF; border-color:#CCC;"></div>
+          <div class="color-dot" data-color="#FFFF00" style="background:#FFFF00"></div>
+          <div class="color-dot" data-color="#FF6B6B" style="background:#FF6B6B"></div>
+          <div class="color-dot" data-color="#333333" style="background:#333333"></div>
+          <div class="color-dot" data-color="#FFD700" style="background:#FFD700"></div>
+        </div>
 
-    <div class="option-row">
-      <span class="option-label">大小</span>
-      <button class="pill-btn size-btn" data-size="36">小</button>
-      <button class="pill-btn size-btn active" data-size="52">中</button>
-      <button class="pill-btn size-btn" data-size="72">大</button>
-    </div>
+        <div class="option-row">
+          <span class="option-label">大小</span>
+          <button class="pill-btn size-btn" data-size="36">小</button>
+          <button class="pill-btn size-btn active" data-size="52">中</button>
+          <button class="pill-btn size-btn" data-size="72">大</button>
+        </div>
 
-    <div class="pos-wrap">
-      <span class="option-label">位置</span>
-      <div class="pos-grid">
-        <button class="pos-btn" data-pos="tl">左上</button>
-        <button class="pos-btn" data-pos="tc">上</button>
-        <button class="pos-btn" data-pos="tr">右上</button>
-        <button class="pos-btn" data-pos="ml">左</button>
-        <button class="pos-btn active" data-pos="mc">中</button>
-        <button class="pos-btn" data-pos="mr">右</button>
-        <button class="pos-btn" data-pos="bl">左下</button>
-        <button class="pos-btn" data-pos="bc">下</button>
-        <button class="pos-btn" data-pos="br">右下</button>
+        <div class="pos-wrap">
+          <span class="option-label">位置</span>
+          <div class="pos-grid">
+            <button class="pos-btn" data-pos="tl">左上</button>
+            <button class="pos-btn" data-pos="tc">上</button>
+            <button class="pos-btn" data-pos="tr">右上</button>
+            <button class="pos-btn" data-pos="ml">左</button>
+            <button class="pos-btn active" data-pos="mc">中</button>
+            <button class="pos-btn" data-pos="mr">右</button>
+            <button class="pos-btn" data-pos="bl">左下</button>
+            <button class="pos-btn" data-pos="bc">下</button>
+            <button class="pos-btn" data-pos="br">右下</button>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Step 3: Stickers -->
-  <div class="step">
-    <div class="step-label">3. 加個配件</div>
-    <div class="greeting-sub-label">點選即可加到圖上，再點一次取消</div>
-    <div class="sticker-grid" id="sticker-grid"></div>
-  </div>
+      <!-- Step 3: Stickers -->
+      <div class="step">
+        <div class="step-label">3. 加個配件</div>
+        <div class="greeting-sub-label">點選即可加到圖上，再點一次取消</div>
+        <div class="sticker-grid" id="sticker-grid"></div>
+      </div>
 
-  <!-- Step 4: Preview + Download -->
-  <div class="step">
-    <div class="step-label">4. 預覽和下載</div>
-    <div class="preview-wrap">
-      <canvas id="canvas" width="800" height="800"></canvas>
-    </div>
-  </div>
+    </div><!-- /.controls-col -->
 
-  <button class="btn btn-primary" id="btn-download" disabled>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    下載圖片
-  </button>
+    <!-- ─── Preview Column ─── -->
+    <div class="preview-col">
+      <div class="step">
+        <div class="step-label">4. 預覽和下載</div>
+        <div class="preview-wrap">
+          <canvas id="canvas" width="800" height="800"></canvas>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-download" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        下載圖片
+      </button>
+    </div><!-- /.preview-col -->
+
+  </div><!-- /.layout -->
 
   <footer class="footer">
     <p>&copy; <span id="yr"></span> Kaoru Tsai. All Rights Reserved. | Contact: <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
@@ -563,7 +768,7 @@
     zenmaru: '"Zen Maru Gothic", "Noto Sans TC", sans-serif',
   };
 
-  // ─── Sticker Config (external SVG files, sticker style with white bg) ───
+  // ─── Sticker Config ───
   const STICKERS = [
     { id:'lotus', name:'蓮花', src:'stickers/flowers/lotus.svg', cat:'flowers', dx:620, dy:620 },
     { id:'sunflower', name:'向日葵', src:'stickers/flowers/sunflower.svg', cat:'flowers', dx:60, dy:620 },
@@ -635,16 +840,14 @@
   });
   fillBasic(autoG);
 
-  // ─── Sticker Setup (load from external files) ───
+  // ─── Sticker Setup ───
   const stickerGrid = document.getElementById('sticker-grid');
   STICKERS.forEach(s => {
-    // Preload image for canvas
     const img = new Image();
     img.src = s.src;
     img.onload = () => draw();
     stickerImages[s.id] = img;
 
-    // Thumbnail
     const wrap = document.createElement('div');
     wrap.style.textAlign = 'center';
     const thumb = document.createElement('div');
@@ -652,7 +855,6 @@
     const thumbImg = document.createElement('img');
     thumbImg.src = s.src;
     thumbImg.alt = s.name;
-    thumbImg.style.cssText = 'width:100%; height:100%; object-fit:contain;';
     thumb.appendChild(thumbImg);
     thumb.addEventListener('click', () => {
       if (activeStickers.has(s.id)) {
