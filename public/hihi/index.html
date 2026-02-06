@@ -6,9 +6,8 @@
   <title>問安圖產生器 — Hello Ruru</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=LXGW+WenKai+TC:wght@400;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=LXGW+WenKai+TC:wght@400;700&family=Noto+Serif+TC:wght@400;700&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* UI Font */
     @font-face {
       font-family: 'GenSenRounded';
       src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2');
@@ -21,7 +20,6 @@
       font-weight: 700;
       font-display: swap;
     }
-    /* 何某手寫體 */
     @font-face {
       font-family: 'NaniFont';
       src: url('https://cdn.jsdelivr.net/gh/max32002/nanifont@1.046/webfont/NaniFont-Regular.woff2') format('woff2');
@@ -32,6 +30,13 @@
       font-family: 'NaniFont';
       src: url('https://cdn.jsdelivr.net/gh/max32002/nanifont@1.046/webfont/NaniFont-SemiBold.woff2') format('woff2');
       font-weight: 700;
+      font-display: swap;
+    }
+    /* jf 開源粉圓 */
+    @font-face {
+      font-family: 'jf-openhuninn';
+      src: url('https://cdn.jsdelivr.net/gh/justfont/open-huninn-font@2.0/font/jf-openhuninn-2.0.woff2') format('woff2');
+      font-weight: 400;
       font-display: swap;
     }
 
@@ -69,7 +74,6 @@
       line-height: 1.6;
     }
 
-    /* Steps */
     .step { margin-bottom: 24px; }
 
     .step-label {
@@ -98,48 +102,36 @@
       border-style: solid;
       border-color: #D4A5A5;
     }
-    .upload-area svg {
-      width: 48px;
-      height: 48px;
-      color: #D4A5A5;
-      margin-bottom: 12px;
-    }
+    .upload-area svg { width: 48px; height: 48px; color: #D4A5A5; margin-bottom: 12px; }
     .upload-text { font-size: 18px; color: #888; }
     .upload-hint { font-size: 14px; color: #AAA; margin-top: 4px; }
     .upload-area.has-image .upload-placeholder { display: none; }
     #upload-input { display: none; }
-    #preview-thumb {
-      display: none;
-      max-width: 100%;
-      border-radius: 16px;
-    }
+    #preview-thumb { display: none; max-width: 100%; border-radius: 16px; }
     .upload-area.has-image #preview-thumb { display: block; }
 
-    /* Greeting buttons */
-    .greeting-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-    .greeting-btn {
+    /* Greeting sections */
+    .greeting-section { margin-bottom: 16px; }
+    .greeting-sub-label { font-size: 14px; color: #888; margin-bottom: 8px; }
+    .greeting-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .greeting-btn, .wisdom-btn {
       padding: 10px 18px;
       border: 2px solid #E8E4E1;
       border-radius: 24px;
       background: #FFF;
       font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
-      font-size: 16px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
       color: #333;
     }
+    .greeting-btn { font-size: 16px; }
+    .wisdom-btn { font-size: 14px; }
     .greeting-btn:hover { border-color: #D4A5A5; }
-    .greeting-btn.active {
-      background: #D4A5A5;
-      border-color: #D4A5A5;
-      color: #FFF;
-    }
+    .greeting-btn.active { background: #D4A5A5; border-color: #D4A5A5; color: #FFF; }
+    .wisdom-btn:hover { border-color: #B8A9C9; }
+    .wisdom-btn.active { background: #B8A9C9; border-color: #B8A9C9; color: #FFF; }
 
     /* Text input */
     textarea {
@@ -159,6 +151,22 @@
     textarea::placeholder { color: #CCC; }
     textarea:focus { outline: none; border-color: #D4A5A5; }
 
+    .name-input {
+      flex: 1;
+      min-width: 0;
+      padding: 10px 14px;
+      border: 2px solid #E8E4E1;
+      border-radius: 12px;
+      font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+      background: #FFF;
+      transition: border-color 0.2s;
+    }
+    .name-input::placeholder { color: #CCC; }
+    .name-input:focus { outline: none; border-color: #D4A5A5; }
+
     /* Option rows */
     .option-row {
       display: flex;
@@ -167,39 +175,38 @@
       flex-wrap: wrap;
       align-items: center;
     }
-    .option-label {
-      font-size: 16px;
-      color: #888;
-      min-width: fit-content;
-    }
+    .option-label { font-size: 16px; color: #888; min-width: fit-content; }
 
-    /* Font buttons */
-    .font-btn {
+    /* Pill buttons (font, size) */
+    .pill-btn {
       padding: 8px 16px;
       border: 2px solid #E8E4E1;
       border-radius: 24px;
       background: #FFF;
+      font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
       font-size: 15px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
       color: #333;
     }
-    .font-btn:hover { border-color: #B8A9C9; }
-    .font-btn.active {
-      background: #B8A9C9;
-      border-color: #B8A9C9;
-      color: #FFF;
-    }
+    .pill-btn:hover { border-color: #D4A5A5; }
+    .pill-btn.active { background: #D4A5A5; border-color: #D4A5A5; color: #FFF; }
+    .pill-btn.lavender:hover { border-color: #B8A9C9; }
+    .pill-btn.lavender.active { background: #B8A9C9; border-color: #B8A9C9; color: #FFF; }
+
+    /* Font button preview */
     .font-btn[data-font="gensenrounded"] { font-family: 'GenSenRounded', sans-serif; }
     .font-btn[data-font="wenkai"] { font-family: 'LXGW WenKai TC', serif; }
     .font-btn[data-font="nanifont"] { font-family: 'NaniFont', sans-serif; }
     .font-btn[data-font="notoserif"] { font-family: 'Noto Serif TC', serif; }
+    .font-btn[data-font="notosans"] { font-family: 'Noto Sans TC', sans-serif; }
+    .font-btn[data-font="huninn"] { font-family: 'jf-openhuninn', sans-serif; }
+    .font-btn[data-font="zenmaru"] { font-family: 'Zen Maru Gothic', sans-serif; }
 
     /* Color dots */
     .color-dot {
-      width: 40px;
-      height: 40px;
+      width: 40px; height: 40px;
       border-radius: 50%;
       border: 3px solid transparent;
       cursor: pointer;
@@ -208,25 +215,48 @@
     .color-dot:hover { transform: scale(1.1); }
     .color-dot.active { border-color: #333; transform: scale(1.1); }
 
-    /* Size buttons */
-    .size-btn {
-      padding: 8px 20px;
+    /* Position grid */
+    .pos-wrap { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+    .pos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+    .pos-btn {
+      width: 48px; height: 34px;
       border: 2px solid #E8E4E1;
-      border-radius: 24px;
+      border-radius: 10px;
       background: #FFF;
       font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
-      font-size: 16px;
+      font-size: 12px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
       color: #333;
+      padding: 0;
     }
-    .size-btn:hover { border-color: #D4A5A5; }
-    .size-btn.active {
-      background: #D4A5A5;
-      border-color: #D4A5A5;
-      color: #FFF;
+    .pos-btn:hover { border-color: #D4A5A5; }
+    .pos-btn.active { background: #D4A5A5; border-color: #D4A5A5; color: #FFF; }
+
+    /* Sticker section */
+    .sticker-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
     }
+    .sticker-thumb {
+      width: 60px; height: 60px;
+      border: 2px solid #E8E4E1;
+      border-radius: 16px;
+      background: #FFF;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+    }
+    .sticker-thumb:hover { border-color: #D4A5A5; transform: scale(1.05); }
+    .sticker-thumb.active { border-color: #D4A5A5; background: #FFF5F5; }
+    .sticker-thumb svg { width: 100%; height: 100%; }
+    .sticker-name { font-size: 11px; color: #888; text-align: center; margin-top: 2px; }
 
     /* Canvas preview */
     .preview-wrap {
@@ -235,28 +265,14 @@
       box-shadow: 0 4px 16px rgba(0,0,0,0.08);
       background: #FFF;
     }
-    #canvas {
-      display: block;
-      width: 100%;
-      height: auto;
-      border-radius: 24px;
-    }
+    #canvas { display: block; width: 100%; height: auto; border-radius: 24px; }
 
-    /* Buttons */
+    /* Download button */
     .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 16px;
-      border: none;
-      border-radius: 24px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; width: 100%; padding: 16px; border: none; border-radius: 24px;
       font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
-      font-size: 22px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
+      font-size: 22px; font-weight: 700; cursor: pointer; transition: all 0.2s;
     }
     .btn svg { width: 24px; height: 24px; }
     .btn-primary {
@@ -264,44 +280,21 @@
       color: #FFF;
       box-shadow: 0 4px 16px rgba(212,165,165,0.3);
     }
-    .btn-primary:hover {
-      box-shadow: 0 8px 24px rgba(212,165,165,0.4);
-      transform: translateY(-1px);
-    }
-    .btn-primary:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      transform: none;
-    }
+    .btn-primary:hover { box-shadow: 0 8px 24px rgba(212,165,165,0.4); transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-    /* Toast */
     .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
+      position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(80px);
-      background: #5C5856;
-      color: #FFF;
-      font-size: 16px;
-      padding: 12px 24px;
-      border-radius: 24px;
-      opacity: 0;
-      transition: all 0.3s;
-      z-index: 10;
-      pointer-events: none;
+      background: #5C5856; color: #FFF; font-size: 16px;
+      padding: 12px 24px; border-radius: 24px;
+      opacity: 0; transition: all 0.3s; z-index: 10; pointer-events: none;
     }
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* Footer */
     .footer {
-      text-align: center;
-      padding: 32px 0 0;
-      font-family: 'Noto Sans TC', sans-serif;
-      font-size: 14px;
-      color: #888;
+      text-align: center; padding: 32px 0 0;
+      font-family: 'Noto Sans TC', sans-serif; font-size: 14px; color: #888;
     }
     .footer a { color: #D4A5A5; text-decoration: none; }
   </style>
@@ -312,7 +305,7 @@
   <h1>問安圖產生器</h1>
   <p class="greeting-banner" id="greeting-banner"></p>
 
-  <!-- Step 1: Upload -->
+  <!-- Step 1 -->
   <div class="step">
     <div class="step-label">1. 選一張背景</div>
     <div class="upload-area" id="upload-area">
@@ -326,18 +319,37 @@
     <input type="file" id="upload-input" accept="image/*">
   </div>
 
-  <!-- Step 2: Text -->
+  <!-- Step 2 -->
   <div class="step">
     <div class="step-label">2. 選問候語</div>
-    <div class="greeting-row" id="greeting-row"></div>
+
+    <div class="greeting-section">
+      <div class="greeting-sub-label">基本問候</div>
+      <div class="greeting-row" id="basic-row"></div>
+    </div>
+    <div class="greeting-section">
+      <div class="greeting-sub-label">智慧推薦 — 一行禪師</div>
+      <div class="greeting-row" id="wisdom-row"></div>
+    </div>
+
     <textarea id="text-input" placeholder="在這裡打字..."></textarea>
+
+    <div class="option-row" style="margin-top:12px; margin-bottom:0;">
+      <span class="option-label">致</span>
+      <input type="text" id="input-to" class="name-input" placeholder="收件人（選填）">
+      <span class="option-label">來自</span>
+      <input type="text" id="input-from" class="name-input" placeholder="你的名字（選填）">
+    </div>
 
     <div class="option-row">
       <span class="option-label">字體</span>
-      <button class="font-btn active" data-font="gensenrounded">圓體</button>
-      <button class="font-btn" data-font="wenkai">楷體</button>
-      <button class="font-btn" data-font="nanifont">手寫</button>
-      <button class="font-btn" data-font="notoserif">明體</button>
+      <button class="pill-btn lavender font-btn active" data-font="gensenrounded">圓體</button>
+      <button class="pill-btn lavender font-btn" data-font="wenkai">楷體</button>
+      <button class="pill-btn lavender font-btn" data-font="nanifont">手寫</button>
+      <button class="pill-btn lavender font-btn" data-font="notoserif">明體</button>
+      <button class="pill-btn lavender font-btn" data-font="notosans">黑體</button>
+      <button class="pill-btn lavender font-btn" data-font="huninn">粉圓</button>
+      <button class="pill-btn lavender font-btn" data-font="zenmaru">日丸</button>
     </div>
 
     <div class="option-row">
@@ -351,15 +363,37 @@
 
     <div class="option-row">
       <span class="option-label">大小</span>
-      <button class="size-btn" data-size="36">小</button>
-      <button class="size-btn active" data-size="52">中</button>
-      <button class="size-btn" data-size="72">大</button>
+      <button class="pill-btn size-btn" data-size="36">小</button>
+      <button class="pill-btn size-btn active" data-size="52">中</button>
+      <button class="pill-btn size-btn" data-size="72">大</button>
+    </div>
+
+    <div class="pos-wrap">
+      <span class="option-label">位置</span>
+      <div class="pos-grid">
+        <button class="pos-btn" data-pos="tl">左上</button>
+        <button class="pos-btn" data-pos="tc">上</button>
+        <button class="pos-btn" data-pos="tr">右上</button>
+        <button class="pos-btn" data-pos="ml">左</button>
+        <button class="pos-btn active" data-pos="mc">中</button>
+        <button class="pos-btn" data-pos="mr">右</button>
+        <button class="pos-btn" data-pos="bl">左下</button>
+        <button class="pos-btn" data-pos="bc">下</button>
+        <button class="pos-btn" data-pos="br">右下</button>
+      </div>
     </div>
   </div>
 
-  <!-- Step 3: Preview + Download -->
+  <!-- Step 3: Stickers -->
   <div class="step">
-    <div class="step-label">3. 預覽和下載</div>
+    <div class="step-label">3. 加個配件</div>
+    <div class="greeting-sub-label">點選即可加到圖上，再點一次取消</div>
+    <div class="sticker-grid" id="sticker-grid"></div>
+  </div>
+
+  <!-- Step 4: Preview + Download -->
+  <div class="step">
+    <div class="step-label">4. 預覽和下載</div>
     <div class="preview-wrap">
       <canvas id="canvas" width="800" height="800"></canvas>
     </div>
@@ -378,37 +412,63 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // ─── Time Utilities ───
+  // ─── Time ───
   function getTimeGreeting() {
     const h = new Date().getHours();
     if (h >= 5 && h < 12) return '早安';
     if (h >= 12 && h < 18) return '午安';
     return '晚安';
   }
-
   function getDateTimeStr() {
     const now = new Date();
-    const m = now.getMonth() + 1;
-    const d = now.getDate();
-    const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
-    const w = weekDays[now.getDay()];
-    const hours = now.getHours();
-    const mins = String(now.getMinutes()).padStart(2, '0');
-    const period = hours < 12 ? '上午' : '下午';
-    const h12 = hours % 12 || 12;
+    const m = now.getMonth() + 1, d = now.getDate();
+    const w = ['日','一','二','三','四','五','六'][now.getDay()];
+    const hours = now.getHours(), mins = String(now.getMinutes()).padStart(2,'0');
+    const period = hours < 12 ? '上午' : '下午', h12 = hours % 12 || 12;
     return `${m}月${d}日 星期${w} ${period}${h12}:${mins}`;
   }
 
-  // ─── Greeting Phrases ───
-  const GREETINGS = ['早安', '午安', '晚安', '週末愉快', '天天開心', '平安喜樂'];
-
-  // ─── Font Config ───
+  // ─── Data ───
+  const BASIC = ['早安','午安','晚安','吃飽了嗎','天冷記得加衣服','記得多喝水'];
+  const WISDOM = [
+    '呼吸吧，你還活著',
+    '沒有泥巴，就沒有蓮花',
+    '每一步都走在淨土上',
+    '微笑吧，生命是美好的',
+    '當下這一刻，就是奇蹟',
+    '喝茶時，就只是喝茶',
+  ];
   const FONTS = {
-    gensenrounded: { family: '"GenSenRounded", "Noto Sans TC", sans-serif' },
-    wenkai:        { family: '"LXGW WenKai TC", serif' },
-    nanifont:      { family: '"NaniFont", "Noto Sans TC", sans-serif' },
-    notoserif:     { family: '"Noto Serif TC", serif' },
+    gensenrounded: '"GenSenRounded", "Noto Sans TC", sans-serif',
+    wenkai: '"LXGW WenKai TC", serif',
+    nanifont: '"NaniFont", "Noto Sans TC", sans-serif',
+    notoserif: '"Noto Serif TC", serif',
+    notosans: '"Noto Sans TC", sans-serif',
+    huninn: '"jf-openhuninn", "Noto Sans TC", sans-serif',
+    zenmaru: '"Zen Maru Gothic", "Noto Sans TC", sans-serif',
   };
+
+  // ─── Sticker SVGs ───
+  const STICKERS = [
+    { id:'lotus', name:'蓮花',
+      svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100"><ellipse cx="60" cy="35" rx="13" ry="30" fill="#F8B4C8"/><ellipse cx="42" cy="40" rx="12" ry="26" fill="#FCCED8" transform="rotate(-18 42 40)"/><ellipse cx="78" cy="40" rx="12" ry="26" fill="#FCCED8" transform="rotate(18 78 40)"/><ellipse cx="28" cy="50" rx="10" ry="20" fill="#FDE4EC" transform="rotate(-30 28 50)"/><ellipse cx="92" cy="50" rx="10" ry="20" fill="#FDE4EC" transform="rotate(30 92 50)"/><ellipse cx="60" cy="82" rx="28" ry="10" fill="#81C784"/><circle cx="60" cy="52" r="5" fill="#FFD54F"/></svg>',
+      dx:620, dy:620 },
+    { id:'sunflower', name:'向日葵',
+      svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g transform="translate(50,50)"><ellipse rx="7" ry="20" fill="#FFD54F" transform="rotate(0) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFD54F" transform="rotate(30) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFD54F" transform="rotate(60) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFD54F" transform="rotate(90) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFD54F" transform="rotate(120) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFD54F" transform="rotate(150) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFC107" transform="rotate(15) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFC107" transform="rotate(45) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFC107" transform="rotate(75) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFC107" transform="rotate(105) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFC107" transform="rotate(135) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFC107" transform="rotate(165) translate(0,-24)"/></g><circle cx="50" cy="50" r="16" fill="#8D6E63"/><circle cx="50" cy="50" r="12" fill="#A1887F"/></svg>',
+      dx:60, dy:620 },
+    { id:'butterfly', name:'蝴蝶',
+      svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 80"><ellipse cx="30" cy="28" rx="22" ry="17" fill="#CE93D8" opacity="0.9"/><ellipse cx="70" cy="28" rx="22" ry="17" fill="#CE93D8" opacity="0.9"/><ellipse cx="33" cy="52" rx="15" ry="13" fill="#E1BEE7" opacity="0.9"/><ellipse cx="67" cy="52" rx="15" ry="13" fill="#E1BEE7" opacity="0.9"/><ellipse cx="50" cy="40" rx="3.5" ry="22" fill="#5D4037"/><line x1="48" y1="19" x2="34" y2="5" stroke="#5D4037" stroke-width="2.5" stroke-linecap="round"/><line x1="52" y1="19" x2="66" y2="5" stroke="#5D4037" stroke-width="2.5" stroke-linecap="round"/><circle cx="34" cy="5" r="3" fill="#D4A5A5"/><circle cx="66" cy="5" r="3" fill="#D4A5A5"/></svg>',
+      dx:620, dy:60 },
+    { id:'sakura', name:'櫻花',
+      svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="24" r="16" fill="#FEDFE1"/><circle cx="74" cy="42" r="16" fill="#FEDFE1"/><circle cx="65" cy="68" r="16" fill="#FEDFE1"/><circle cx="35" cy="68" r="16" fill="#FEDFE1"/><circle cx="26" cy="42" r="16" fill="#FEDFE1"/><circle cx="50" cy="48" r="10" fill="#F48FB1"/></svg>',
+      dx:60, dy:60 },
+    { id:'heart', name:'愛心',
+      svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 90C45 82 10 60 10 35 10 20 22 10 35 10 42 10 48 14 50 20 52 14 58 10 65 10 78 10 90 20 90 35 90 60 55 82 50 90Z" fill="#E57373"/></svg>',
+      dx:340, dy:640 },
+    { id:'sparkle', name:'星星',
+      svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 8L58 38H90L64 56L72 88L50 70L28 88L36 56L10 38H42Z" fill="#FFD54F"/><path d="M50 20L55 40H76L59 52L65 74L50 62L35 74L41 52L24 40H45Z" fill="#FFE082"/></svg>',
+      dx:340, dy:60 },
+  ];
 
   // ─── Footer Year ───
   const sy = 2026, cy = new Date().getFullYear();
@@ -419,7 +479,9 @@
   let textColor = '#FFFFFF';
   let fontSize = 52;
   let fontKey = 'gensenrounded';
-  let activeGreeting = getTimeGreeting();
+  let textPos = 'mc';
+  const activeStickers = new Set();
+  const stickerImages = {};
 
   // ─── DOM ───
   const uploadArea = document.getElementById('upload-area');
@@ -430,49 +492,81 @@
   const ctx = canvas.getContext('2d');
   const btnDownload = document.getElementById('btn-download');
   const toastEl = document.getElementById('toast');
-  const greetingRow = document.getElementById('greeting-row');
   const bannerEl = document.getElementById('greeting-banner');
+  const inputTo = document.getElementById('input-to');
+  const inputFrom = document.getElementById('input-from');
 
-  // ─── Init: Greeting Banner ───
-  (function initBanner() {
-    const now = new Date();
-    const hours = now.getHours();
-    const mins = String(now.getMinutes()).padStart(2, '0');
-    const period = hours < 12 ? '上午' : '下午';
-    const h12 = hours % 12 || 12;
-    bannerEl.innerHTML =
-      `${getTimeGreeting()}！現在是${period}${h12}點${mins}分<br>幫你來張問安圖`;
+  // ─── Helpers ───
+  function clearGreetingActive() {
+    document.querySelectorAll('.greeting-btn, .wisdom-btn').forEach(b => b.classList.remove('active'));
+  }
+  function fillBasic(t) { textInput.value = `${t}！\n${getDateTimeStr()}`; draw(); }
+  function fillWisdom(t) { textInput.value = `${t}\n— 一行禪師\n${getDateTimeStr()}`; draw(); }
+
+  // ─── Greeting Banner ───
+  (function() {
+    const now = new Date(), hours = now.getHours();
+    const mins = String(now.getMinutes()).padStart(2,'0');
+    const period = hours < 12 ? '上午' : '下午', h12 = hours % 12 || 12;
+    bannerEl.innerHTML = `${getTimeGreeting()}！現在是${period}${h12}點${mins}分<br>幫你來張問安圖`;
   })();
 
-  // ─── Init: Greeting Buttons ───
-  GREETINGS.forEach(g => {
+  // ─── Greeting Buttons ───
+  const autoG = getTimeGreeting();
+  BASIC.forEach(g => {
     const btn = document.createElement('button');
-    btn.className = 'greeting-btn' + (g === activeGreeting ? ' active' : '');
+    btn.className = 'greeting-btn' + (g === autoG ? ' active' : '');
     btn.textContent = g;
-    btn.addEventListener('click', () => {
-      activeGreeting = g;
-      document.querySelectorAll('.greeting-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      fillGreetingText(g);
-    });
-    greetingRow.appendChild(btn);
+    btn.addEventListener('click', () => { clearGreetingActive(); btn.classList.add('active'); fillBasic(g); });
+    document.getElementById('basic-row').appendChild(btn);
   });
+  WISDOM.forEach(w => {
+    const btn = document.createElement('button');
+    btn.className = 'wisdom-btn';
+    btn.textContent = w;
+    btn.addEventListener('click', () => { clearGreetingActive(); btn.classList.add('active'); fillWisdom(w); });
+    document.getElementById('wisdom-row').appendChild(btn);
+  });
+  fillBasic(autoG);
 
-  function fillGreetingText(greeting) {
-    textInput.value = `${greeting}！\n${getDateTimeStr()}`;
-    draw();
-  }
+  // ─── Sticker Setup ───
+  const stickerGrid = document.getElementById('sticker-grid');
+  STICKERS.forEach(s => {
+    // Preload image
+    const img = new Image();
+    img.src = 'data:image/svg+xml,' + encodeURIComponent(s.svg);
+    stickerImages[s.id] = img;
 
-  // ─── Init: Auto-fill Text ───
-  fillGreetingText(activeGreeting);
+    // Thumbnail
+    const wrap = document.createElement('div');
+    wrap.style.textAlign = 'center';
+    const thumb = document.createElement('div');
+    thumb.className = 'sticker-thumb';
+    thumb.innerHTML = s.svg;
+    thumb.addEventListener('click', () => {
+      if (activeStickers.has(s.id)) {
+        activeStickers.delete(s.id);
+        thumb.classList.remove('active');
+      } else {
+        activeStickers.add(s.id);
+        thumb.classList.add('active');
+      }
+      draw();
+    });
+    const label = document.createElement('div');
+    label.className = 'sticker-name';
+    label.textContent = s.name;
+    wrap.appendChild(thumb);
+    wrap.appendChild(label);
+    stickerGrid.appendChild(wrap);
+  });
 
   // ─── Upload ───
   uploadArea.addEventListener('click', () => uploadInput.click());
   uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
   uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
   uploadArea.addEventListener('drop', e => {
-    e.preventDefault();
-    uploadArea.classList.remove('dragover');
+    e.preventDefault(); uploadArea.classList.remove('dragover');
     if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
   });
   uploadInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
@@ -494,22 +588,19 @@
     reader.readAsDataURL(file);
   }
 
-  // ─── Font Buttons ───
+  // ─── Font ───
   document.querySelectorAll('.font-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       fontKey = btn.dataset.font;
-      const family = FONTS[fontKey].family.split(',')[0].trim().replace(/"/g, '');
-      try {
-        await document.fonts.load(`bold ${fontSize}px "${family}"`);
-        await document.fonts.load(`${fontSize}px "${family}"`);
-      } catch (e) { /* font may already be loaded */ }
+      const fam = FONTS[fontKey].split(',')[0].trim().replace(/"/g,'');
+      try { await document.fonts.load(`bold ${fontSize}px "${fam}"`); } catch(e){}
       draw();
     });
   });
 
-  // ─── Color Dots ───
+  // ─── Color ───
   document.querySelectorAll('.color-dot').forEach(dot => {
     dot.addEventListener('click', () => {
       document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
@@ -520,7 +611,7 @@
     });
   });
 
-  // ─── Size Buttons ───
+  // ─── Size ───
   document.querySelectorAll('.size-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
@@ -530,50 +621,90 @@
     });
   });
 
-  // ─── Text Input ───
+  // ─── Position ───
+  document.querySelectorAll('.pos-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      textPos = btn.dataset.pos;
+      draw();
+    });
+  });
+
+  // ─── Text / Name Inputs ───
   textInput.addEventListener('input', draw);
+  inputTo.addEventListener('input', draw);
+  inputFrom.addEventListener('input', draw);
 
   // ─── Draw ───
   function draw() {
     const w = 800, h = 800;
-    canvas.width = w;
-    canvas.height = h;
+    canvas.width = w; canvas.height = h;
 
+    // Background
     if (bgImage) {
-      const scale = Math.max(w / bgImage.width, h / bgImage.height);
-      const sw = bgImage.width * scale;
-      const sh = bgImage.height * scale;
+      const sc = Math.max(w / bgImage.width, h / bgImage.height);
+      const sw = bgImage.width * sc, sh = bgImage.height * sc;
       ctx.drawImage(bgImage, (w - sw) / 2, (h - sh) / 2, sw, sh);
     } else {
       ctx.fillStyle = '#F5D0C5';
       ctx.fillRect(0, 0, w, h);
     }
 
-    const text = textInput.value.trim();
-    if (!text) return;
+    // Stickers (behind text)
+    const stickerSize = 130;
+    STICKERS.forEach(s => {
+      if (!activeStickers.has(s.id)) return;
+      const img = stickerImages[s.id];
+      if (img.complete) ctx.drawImage(img, s.dx, s.dy, stickerSize, stickerSize);
+    });
 
-    const fontFamily = FONTS[fontKey].family;
-    const lines = text.split('\n');
+    // Build all lines
+    const toName = inputTo.value.trim();
+    const fromName = inputFrom.value.trim();
+    const mainText = textInput.value.trim();
+
+    const allLines = [];
+    if (toName) allLines.push({ text: `致 ${toName}`, small: true });
+    if (mainText) mainText.split('\n').forEach(line => {
+      const isSmall = line.startsWith('—') || line.match(/^\d+月/);
+      allLines.push({ text: line, small: isSmall });
+    });
+    if (fromName) allLines.push({ text: `來自 ${fromName}`, small: true });
+
+    if (!allLines.length) return;
+
+    const fontFamily = FONTS[fontKey];
     const lineH = fontSize * 1.5;
-    const totalH = lines.length * lineH;
-    const startY = (h - totalH) / 2 + fontSize;
+    const totalH = allLines.length * lineH;
+    const pad = 40;
 
-    ctx.textAlign = 'center';
+    const col = textPos[1];
+    const hAlign = col === 'l' ? 'left' : col === 'r' ? 'right' : 'center';
+    const xPos = col === 'l' ? pad : col === 'r' ? w - pad : w / 2;
+    const row = textPos[0];
+    let startY;
+    if (row === 't') startY = pad + fontSize;
+    else if (row === 'b') startY = h - totalH - pad + fontSize;
+    else startY = (h - totalH) / 2 + fontSize;
+
+    ctx.textAlign = hAlign;
     ctx.textBaseline = 'middle';
 
-    lines.forEach((line, i) => {
+    allLines.forEach((line, i) => {
       const y = startY + i * lineH;
-      ctx.font = `bold ${fontSize}px ${fontFamily}`;
+      const size = line.small ? Math.round(fontSize * 0.6) : fontSize;
+
+      ctx.font = `bold ${size}px ${fontFamily}`;
       ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-      ctx.lineWidth = fontSize * 0.12;
+      ctx.lineWidth = size * 0.12;
       ctx.lineJoin = 'round';
-      ctx.strokeText(line, w / 2, y);
+      ctx.strokeText(line.text, xPos, y);
       ctx.fillStyle = textColor;
-      ctx.fillText(line, w / 2, y);
+      ctx.fillText(line.text, xPos, y);
     });
   }
 
-  // ─── Wait for Fonts then Draw ───
   document.fonts.ready.then(draw);
 
   // ─── Download ───
