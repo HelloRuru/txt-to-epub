@@ -502,6 +502,60 @@
       margin-top: 2px;
     }
 
+    /* ─── Sticker Controls ─── */
+    .sticker-controls {
+      margin-top: 12px;
+      padding: 16px;
+      background: var(--color-card);
+      border: 2px solid var(--color-mist);
+      border-radius: var(--radius-lg);
+      display: none;
+    }
+    .sticker-controls.show { display: block; }
+    .sticker-controls-title {
+      font-size: var(--text-small);
+      color: var(--color-rose);
+      font-weight: var(--weight-bold);
+      margin-bottom: 10px;
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .slider-row:last-child { margin-bottom: 0; }
+    .slider-label {
+      font-size: var(--text-small);
+      color: var(--color-muted);
+      min-width: 36px;
+    }
+    .slider-row input[type="range"] {
+      flex: 1;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--color-mist);
+      border-radius: 3px;
+      outline: none;
+    }
+    .slider-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 28px; height: 28px;
+      border-radius: var(--radius-full);
+      background: var(--color-rose);
+      cursor: pointer;
+      border: 2px solid var(--color-card);
+      box-shadow: var(--shadow-soft);
+    }
+    .slider-row input[type="range"]::-moz-range-thumb {
+      width: 28px; height: 28px;
+      border-radius: var(--radius-full);
+      background: var(--color-rose);
+      cursor: pointer;
+      border: 2px solid var(--color-card);
+    }
+
     /* ─── Canvas Preview ─── */
     .preview-wrap {
       border-radius: var(--radius-lg);
@@ -703,6 +757,21 @@
         <div class="step-label">3. 加個配件</div>
         <div class="greeting-sub-label">點選即可加到圖上，再點一次取消</div>
         <div class="sticker-grid" id="sticker-grid"></div>
+        <div class="sticker-controls" id="sticker-controls">
+          <div class="sticker-controls-title" id="sticker-controls-title"></div>
+          <div class="slider-row">
+            <span class="slider-label">水平</span>
+            <input type="range" id="sticker-x" min="0" max="700" value="0">
+          </div>
+          <div class="slider-row">
+            <span class="slider-label">垂直</span>
+            <input type="range" id="sticker-y" min="0" max="700" value="0">
+          </div>
+          <div class="slider-row">
+            <span class="slider-label">大小</span>
+            <input type="range" id="sticker-size" min="60" max="350" value="130">
+          </div>
+        </div>
       </div>
 
     </div><!-- /.controls-col -->
@@ -756,7 +825,43 @@
     '每一步都走在淨土上',
     '微笑吧，生命是美好的',
     '當下這一刻，就是奇蹟',
-    '喝茶時，就只是喝茶',
+  ];
+  const WISDOM_POOL = [
+    '呼吸吧，你還活著',
+    '沒有泥巴，就沒有蓮花',
+    '每一步都走在淨土上',
+    '微笑吧，生命是美好的',
+    '當下這一刻，就是奇蹟',
+    '你不需要往外尋找平靜',
+    '傾聽是一種深深的愛',
+    '自由是幸福的基礎',
+    '真正的愛，是理解',
+    '平靜不是沒有風暴，而是在風暴中保持安寧',
+    '讓我們享受每一步路',
+    '你已經足夠好了',
+    '理解即是愛的另一個名字',
+    '真正的家，就是當下',
+    '快樂的根源在於正念',
+    '每一刻都是新的開始',
+    '你的微笑就是你的力量',
+    '走路時，每一步都是親吻大地',
+    '內心的平靜從接納開始',
+    '生命只存在於當下這一刻',
+    '讓憤怒成為你的老師',
+    '吃飯時，就只是吃飯',
+    '苦與樂是同一條河流',
+    '我們是生命的延續',
+    '每一片葉子都是一個奇蹟',
+    '幸福不是個人的事',
+    '我已到了，我到家了',
+    '無所求，即是幸福',
+    '慈悲是最好的保護',
+    '當你愛一朵花，你就會為它澆水',
+    '覺察，是療癒的開始',
+    '你看見花時，花也看見你',
+    '放下，不是放棄，而是放開',
+    '安靜地坐著，什麼都不做，春天來了，草自己長',
+    '你想送給世界最好的禮物，就是你的平靜',
   ];
   const FONTS = {
     gensenrounded: '"GenSenRounded", "Noto Sans TC", sans-serif',
@@ -793,6 +898,8 @@
   let textPos = 'mc';
   const activeStickers = new Set();
   const stickerImages = {};
+  const stickerState = {}; // per-sticker { x, y, size }
+  let selectedSticker = null;
 
   // ─── DOM ───
   const uploadArea = document.getElementById('upload-area');
@@ -838,15 +945,53 @@
     btn.addEventListener('click', () => { clearGreetingActive(); btn.classList.add('active'); fillWisdom(w); });
     document.getElementById('wisdom-row').appendChild(btn);
   });
+  // Random surprise button
+  (function() {
+    const btn = document.createElement('button');
+    btn.className = 'wisdom-btn';
+    btn.textContent = '✨ 隨機驚喜';
+    btn.style.borderColor = 'var(--color-nadeshiko)';
+    btn.addEventListener('click', () => {
+      clearGreetingActive();
+      btn.classList.add('active');
+      const pick = WISDOM_POOL[Math.floor(Math.random() * WISDOM_POOL.length)];
+      fillWisdom(pick);
+    });
+    document.getElementById('wisdom-row').appendChild(btn);
+  })();
   fillBasic(autoG);
 
   // ─── Sticker Setup ───
   const stickerGrid = document.getElementById('sticker-grid');
+  const stickerControlsEl = document.getElementById('sticker-controls');
+  const stickerTitleEl = document.getElementById('sticker-controls-title');
+  const sliderX = document.getElementById('sticker-x');
+  const sliderY = document.getElementById('sticker-y');
+  const sliderSize = document.getElementById('sticker-size');
+
+  function selectStickerControls(id) {
+    if (!id || !activeStickers.has(id)) {
+      selectedSticker = null;
+      stickerControlsEl.classList.remove('show');
+      return;
+    }
+    selectedSticker = id;
+    const s = STICKERS.find(st => st.id === id);
+    const st = stickerState[id];
+    stickerTitleEl.textContent = `調整「${s.name}」`;
+    sliderX.value = st.x;
+    sliderY.value = st.y;
+    sliderSize.value = st.size;
+    stickerControlsEl.classList.add('show');
+  }
+
   STICKERS.forEach(s => {
     const img = new Image();
     img.src = s.src;
     img.onload = () => draw();
     stickerImages[s.id] = img;
+    // Init default state
+    stickerState[s.id] = { x: s.dx, y: s.dy, size: 130 };
 
     const wrap = document.createElement('div');
     wrap.style.textAlign = 'center';
@@ -858,11 +1003,14 @@
     thumb.appendChild(thumbImg);
     thumb.addEventListener('click', () => {
       if (activeStickers.has(s.id)) {
+        // If clicking the same active sticker, deactivate
         activeStickers.delete(s.id);
         thumb.classList.remove('active');
+        if (selectedSticker === s.id) selectStickerControls(null);
       } else {
         activeStickers.add(s.id);
         thumb.classList.add('active');
+        selectStickerControls(s.id);
       }
       draw();
     });
@@ -872,6 +1020,23 @@
     wrap.appendChild(thumb);
     wrap.appendChild(label);
     stickerGrid.appendChild(wrap);
+  });
+
+  // Slider event handlers
+  sliderX.addEventListener('input', () => {
+    if (!selectedSticker) return;
+    stickerState[selectedSticker].x = parseInt(sliderX.value);
+    draw();
+  });
+  sliderY.addEventListener('input', () => {
+    if (!selectedSticker) return;
+    stickerState[selectedSticker].y = parseInt(sliderY.value);
+    draw();
+  });
+  sliderSize.addEventListener('input', () => {
+    if (!selectedSticker) return;
+    stickerState[selectedSticker].size = parseInt(sliderSize.value);
+    draw();
   });
 
   // ─── Upload ───
@@ -984,12 +1149,12 @@
       ctx.fillRect(0, 0, w, h);
     }
 
-    // Stickers (behind text)
-    const stickerSize = 130;
+    // Stickers (behind text) — use per-sticker state
     STICKERS.forEach(s => {
       if (!activeStickers.has(s.id)) return;
       const img = stickerImages[s.id];
-      if (img.complete) ctx.drawImage(img, s.dx, s.dy, stickerSize, stickerSize);
+      const st = stickerState[s.id];
+      if (img.complete) ctx.drawImage(img, st.x, st.y, st.size, st.size);
     });
 
     // Build all lines with type for per-line coloring
