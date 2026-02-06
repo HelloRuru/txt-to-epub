@@ -347,6 +347,45 @@
     .upload-text { font-size: var(--text-h3); color: var(--color-muted); }
     .upload-hint { font-size: var(--text-small); color: var(--color-light); margin-top: 4px; }
     .upload-area.has-image .upload-placeholder { display: none; }
+
+    /* ─── Background Pan Controls ─── */
+    .bg-pan {
+      display: none;
+      margin-top: 12px;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .bg-pan.show { display: flex; }
+    .bg-pan-label {
+      font-size: var(--text-small);
+      color: var(--color-muted);
+      font-weight: var(--weight-medium);
+    }
+    .pan-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+    }
+    .pan-btn {
+      width: 44px; height: 38px;
+      border: 2px solid var(--color-mist);
+      border-radius: var(--radius-sm);
+      background: var(--color-card);
+      font-family: var(--font-body);
+      font-size: var(--text-small);
+      font-weight: var(--weight-medium);
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--color-ink);
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pan-btn:hover { border-color: var(--color-rose); }
+    .pan-btn:active { background: var(--color-rose); color: #FFF; }
+    .pan-btn.reset { font-size: var(--text-caption); color: var(--color-muted); }
     #upload-input { display: none; }
     #preview-thumb { display: none; max-width: 100%; border-radius: calc(var(--radius-lg) - 4px); }
     .upload-area.has-image #preview-thumb { display: block; }
@@ -744,6 +783,20 @@
           <img id="preview-thumb" alt="背景預覽">
         </div>
         <input type="file" id="upload-input" accept="image/*">
+        <div class="bg-pan" id="bg-pan">
+          <span class="bg-pan-label">調整畫面</span>
+          <div class="pan-grid">
+            <span></span>
+            <button class="pan-btn" data-dir="up">上</button>
+            <span></span>
+            <button class="pan-btn" data-dir="left">左</button>
+            <button class="pan-btn reset" data-dir="reset">置中</button>
+            <button class="pan-btn" data-dir="right">右</button>
+            <span></span>
+            <button class="pan-btn" data-dir="down">下</button>
+            <span></span>
+          </div>
+        </div>
       </div>
 
       <!-- Step 2 -->
@@ -950,6 +1003,8 @@
 
   // ─── State ───
   let bgImage = null;
+  let bgPanX = 0; // px offset, 0 = centered
+  let bgPanY = 0;
   let greetingColor = '#FFFFFF';
   let toColor = '#FFFFFF';
   let fromColor = '#FFFFFF';
@@ -1116,15 +1171,36 @@
       const img = new Image();
       img.onload = () => {
         bgImage = img;
+        bgPanX = 0; bgPanY = 0;
         previewThumb.src = e.target.result;
         uploadArea.classList.add('has-image');
         btnDownload.disabled = false;
+        document.getElementById('bg-pan').classList.add('show');
         draw();
       };
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   }
+
+  // ─── Background Pan ───
+  const PAN_STEP = 40;
+  document.querySelectorAll('.pan-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!bgImage) return;
+      const dir = btn.dataset.dir;
+      const w = 800, h = 800;
+      const sc = Math.max(w / bgImage.width, h / bgImage.height);
+      const sw = bgImage.width * sc, sh = bgImage.height * sc;
+      const maxX = (sw - w) / 2, maxY = (sh - h) / 2;
+      if (dir === 'up') bgPanY = Math.min(bgPanY + PAN_STEP, maxY);
+      else if (dir === 'down') bgPanY = Math.max(bgPanY - PAN_STEP, -maxY);
+      else if (dir === 'left') bgPanX = Math.min(bgPanX + PAN_STEP, maxX);
+      else if (dir === 'right') bgPanX = Math.max(bgPanX - PAN_STEP, -maxX);
+      else if (dir === 'reset') { bgPanX = 0; bgPanY = 0; }
+      draw();
+    });
+  });
 
   // ─── Font ───
   document.querySelectorAll('.font-btn').forEach(btn => {
@@ -1199,11 +1275,11 @@
     const w = 800, h = 800;
     canvas.width = w; canvas.height = h;
 
-    // Background
+    // Background (with pan offset)
     if (bgImage) {
       const sc = Math.max(w / bgImage.width, h / bgImage.height);
       const sw = bgImage.width * sc, sh = bgImage.height * sc;
-      ctx.drawImage(bgImage, (w - sw) / 2, (h - sh) / 2, sw, sh);
+      ctx.drawImage(bgImage, (w - sw) / 2 + bgPanX, (h - sh) / 2 + bgPanY, sw, sh);
     } else {
       ctx.fillStyle = '#F5D0C5';
       ctx.fillRect(0, 0, w, h);
