@@ -317,6 +317,17 @@
     .color-dot:hover { transform: scale(1.1); }
     .color-dot.active { border-color: #333; transform: scale(1.1); }
 
+    /* Color cycle button (for 致/來自) */
+    .color-cycle {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2px solid #E8E4E1;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .color-cycle:hover { transform: scale(1.15); }
+
     /* Position grid */
     .pos-wrap { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
     .pos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
@@ -357,7 +368,7 @@
     }
     .sticker-thumb:hover { border-color: #D4A5A5; transform: scale(1.05); }
     .sticker-thumb.active { border-color: #D4A5A5; background: #FFF5F5; }
-    .sticker-thumb svg { width: 100%; height: 100%; }
+    .sticker-thumb img { width: 100%; height: 100%; object-fit: contain; }
     .sticker-name { font-size: 11px; color: #888; text-align: center; margin-top: 2px; }
 
     /* Canvas preview */
@@ -439,8 +450,10 @@
     <div class="option-row" style="margin-top:12px; margin-bottom:0;">
       <span class="option-label">致</span>
       <input type="text" id="input-to" class="name-input" placeholder="收件人（選填）">
-      <span class="option-label">來自</span>
+      <div class="color-cycle" id="color-to" title="點我換顏色" style="background:#FFFFFF; border-color:#CCC;"></div>
+      <span class="option-label" style="margin-left:4px;">來自</span>
       <input type="text" id="input-from" class="name-input" placeholder="你的名字（選填）">
+      <div class="color-cycle" id="color-from" title="點我換顏色" style="background:#FFFFFF; border-color:#CCC;"></div>
     </div>
 
     <div class="option-row">
@@ -455,7 +468,7 @@
     </div>
 
     <div class="option-row">
-      <span class="option-label">顏色</span>
+      <span class="option-label">問候語</span>
       <div class="color-dot active" data-color="#FFFFFF" style="background:#FFFFFF; border-color:#CCC;"></div>
       <div class="color-dot" data-color="#FFFF00" style="background:#FFFF00"></div>
       <div class="color-dot" data-color="#FF6B6B" style="background:#FF6B6B"></div>
@@ -550,26 +563,14 @@
     zenmaru: '"Zen Maru Gothic", "Noto Sans TC", sans-serif',
   };
 
-  // ─── Sticker SVGs ───
+  // ─── Sticker Config (external SVG files, sticker style with white bg) ───
   const STICKERS = [
-    { id:'lotus', name:'蓮花',
-      svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100"><ellipse cx="60" cy="35" rx="13" ry="30" fill="#F8B4C8"/><ellipse cx="42" cy="40" rx="12" ry="26" fill="#FCCED8" transform="rotate(-18 42 40)"/><ellipse cx="78" cy="40" rx="12" ry="26" fill="#FCCED8" transform="rotate(18 78 40)"/><ellipse cx="28" cy="50" rx="10" ry="20" fill="#FDE4EC" transform="rotate(-30 28 50)"/><ellipse cx="92" cy="50" rx="10" ry="20" fill="#FDE4EC" transform="rotate(30 92 50)"/><ellipse cx="60" cy="82" rx="28" ry="10" fill="#81C784"/><circle cx="60" cy="52" r="5" fill="#FFD54F"/></svg>',
-      dx:620, dy:620 },
-    { id:'sunflower', name:'向日葵',
-      svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g transform="translate(50,50)"><ellipse rx="7" ry="20" fill="#FFD54F" transform="rotate(0) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFD54F" transform="rotate(30) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFD54F" transform="rotate(60) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFD54F" transform="rotate(90) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFD54F" transform="rotate(120) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFD54F" transform="rotate(150) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFC107" transform="rotate(15) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFC107" transform="rotate(45) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFC107" transform="rotate(75) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFC107" transform="rotate(105) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFC107" transform="rotate(135) translate(0,-24)"/><ellipse rx="7" ry="20" fill="#FFC107" transform="rotate(165) translate(0,-24)"/></g><circle cx="50" cy="50" r="16" fill="#8D6E63"/><circle cx="50" cy="50" r="12" fill="#A1887F"/></svg>',
-      dx:60, dy:620 },
-    { id:'butterfly', name:'蝴蝶',
-      svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 80"><ellipse cx="30" cy="28" rx="22" ry="17" fill="#CE93D8" opacity="0.9"/><ellipse cx="70" cy="28" rx="22" ry="17" fill="#CE93D8" opacity="0.9"/><ellipse cx="33" cy="52" rx="15" ry="13" fill="#E1BEE7" opacity="0.9"/><ellipse cx="67" cy="52" rx="15" ry="13" fill="#E1BEE7" opacity="0.9"/><ellipse cx="50" cy="40" rx="3.5" ry="22" fill="#5D4037"/><line x1="48" y1="19" x2="34" y2="5" stroke="#5D4037" stroke-width="2.5" stroke-linecap="round"/><line x1="52" y1="19" x2="66" y2="5" stroke="#5D4037" stroke-width="2.5" stroke-linecap="round"/><circle cx="34" cy="5" r="3" fill="#D4A5A5"/><circle cx="66" cy="5" r="3" fill="#D4A5A5"/></svg>',
-      dx:620, dy:60 },
-    { id:'sakura', name:'櫻花',
-      svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="24" r="16" fill="#FEDFE1"/><circle cx="74" cy="42" r="16" fill="#FEDFE1"/><circle cx="65" cy="68" r="16" fill="#FEDFE1"/><circle cx="35" cy="68" r="16" fill="#FEDFE1"/><circle cx="26" cy="42" r="16" fill="#FEDFE1"/><circle cx="50" cy="48" r="10" fill="#F48FB1"/></svg>',
-      dx:60, dy:60 },
-    { id:'heart', name:'愛心',
-      svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 90C45 82 10 60 10 35 10 20 22 10 35 10 42 10 48 14 50 20 52 14 58 10 65 10 78 10 90 20 90 35 90 60 55 82 50 90Z" fill="#E57373"/></svg>',
-      dx:340, dy:640 },
-    { id:'sparkle', name:'星星',
-      svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 8L58 38H90L64 56L72 88L50 70L28 88L36 56L10 38H42Z" fill="#FFD54F"/><path d="M50 20L55 40H76L59 52L65 74L50 62L35 74L41 52L24 40H45Z" fill="#FFE082"/></svg>',
-      dx:340, dy:60 },
+    { id:'lotus', name:'蓮花', src:'stickers/flowers/lotus.svg', cat:'flowers', dx:620, dy:620 },
+    { id:'sunflower', name:'向日葵', src:'stickers/flowers/sunflower.svg', cat:'flowers', dx:60, dy:620 },
+    { id:'sakura', name:'櫻花', src:'stickers/flowers/sakura.svg', cat:'flowers', dx:60, dy:60 },
+    { id:'butterfly', name:'蝴蝶', src:'stickers/animals/butterfly.svg', cat:'animals', dx:620, dy:60 },
+    { id:'heart', name:'愛心', src:'stickers/symbols/heart.svg', cat:'symbols', dx:340, dy:640 },
+    { id:'sparkle', name:'星星', src:'stickers/symbols/sparkle.svg', cat:'symbols', dx:340, dy:60 },
   ];
 
   // ─── Footer Year ───
@@ -578,7 +579,10 @@
 
   // ─── State ───
   let bgImage = null;
-  let textColor = '#FFFFFF';
+  let greetingColor = '#FFFFFF';
+  let toColor = '#FFFFFF';
+  let fromColor = '#FFFFFF';
+  const COLORS = ['#FFFFFF', '#FFFF00', '#FF6B6B', '#333333', '#FFD700'];
   let fontSize = 52;
   let fontKey = 'gensenrounded';
   let textPos = 'mc';
@@ -631,12 +635,13 @@
   });
   fillBasic(autoG);
 
-  // ─── Sticker Setup ───
+  // ─── Sticker Setup (load from external files) ───
   const stickerGrid = document.getElementById('sticker-grid');
   STICKERS.forEach(s => {
-    // Preload image
+    // Preload image for canvas
     const img = new Image();
-    img.src = 'data:image/svg+xml,' + encodeURIComponent(s.svg);
+    img.src = s.src;
+    img.onload = () => draw();
     stickerImages[s.id] = img;
 
     // Thumbnail
@@ -644,7 +649,11 @@
     wrap.style.textAlign = 'center';
     const thumb = document.createElement('div');
     thumb.className = 'sticker-thumb';
-    thumb.innerHTML = s.svg;
+    const thumbImg = document.createElement('img');
+    thumbImg.src = s.src;
+    thumbImg.alt = s.name;
+    thumbImg.style.cssText = 'width:100%; height:100%; object-fit:contain;';
+    thumb.appendChild(thumbImg);
     thumb.addEventListener('click', () => {
       if (activeStickers.has(s.id)) {
         activeStickers.delete(s.id);
@@ -702,15 +711,35 @@
     });
   });
 
-  // ─── Color ───
+  // ─── Color (greeting) ───
   document.querySelectorAll('.color-dot').forEach(dot => {
     dot.addEventListener('click', () => {
       document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
       dot.classList.add('active');
-      textColor = dot.dataset.color;
+      greetingColor = dot.dataset.color;
       if (dot.dataset.color === '#FFFFFF') dot.style.borderColor = '#CCC';
       draw();
     });
+  });
+
+  // ─── Color cycle (致 / 來自) ───
+  function cycleColor(current) {
+    const idx = COLORS.indexOf(current);
+    return COLORS[(idx + 1) % COLORS.length];
+  }
+  function updateCycleDot(el, color) {
+    el.style.background = color;
+    el.style.borderColor = color === '#FFFFFF' ? '#CCC' : 'transparent';
+  }
+  document.getElementById('color-to').addEventListener('click', function() {
+    toColor = cycleColor(toColor);
+    updateCycleDot(this, toColor);
+    draw();
+  });
+  document.getElementById('color-from').addEventListener('click', function() {
+    fromColor = cycleColor(fromColor);
+    updateCycleDot(this, fromColor);
+    draw();
   });
 
   // ─── Size ───
@@ -761,18 +790,18 @@
       if (img.complete) ctx.drawImage(img, s.dx, s.dy, stickerSize, stickerSize);
     });
 
-    // Build all lines
+    // Build all lines with type for per-line coloring
     const toName = inputTo.value.trim();
     const fromName = inputFrom.value.trim();
     const mainText = textInput.value.trim();
 
     const allLines = [];
-    if (toName) allLines.push({ text: `致 ${toName}`, small: true });
+    if (toName) allLines.push({ text: `致 ${toName}`, small: true, type: 'to' });
     if (mainText) mainText.split('\n').forEach(line => {
       const isSmall = line.startsWith('—') || line.match(/^\d+月/);
-      allLines.push({ text: line, small: isSmall });
+      allLines.push({ text: line, small: isSmall, type: 'greeting' });
     });
-    if (fromName) allLines.push({ text: `來自 ${fromName}`, small: true });
+    if (fromName) allLines.push({ text: `來自 ${fromName}`, small: true, type: 'from' });
 
     if (!allLines.length) return;
 
@@ -802,7 +831,7 @@
       ctx.lineWidth = size * 0.12;
       ctx.lineJoin = 'round';
       ctx.strokeText(line.text, xPos, y);
-      ctx.fillStyle = textColor;
+      ctx.fillStyle = line.type === 'to' ? toColor : line.type === 'from' ? fromColor : greetingColor;
       ctx.fillText(line.text, xPos, y);
     });
   }
