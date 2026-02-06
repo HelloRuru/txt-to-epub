@@ -20,12 +20,12 @@ const tools = [
     color: 'lavender',
   },
   {
-    id: 'image',
-    name: '圖片工具',
-    description: '壓縮、轉檔、調整尺寸，滿足日常圖片處理需求。',
-    path: '/image',
-    ready: false,
-    color: 'sage',
+    id: 'bg-removal',
+    name: '批次去背',
+    description: '上傳多張圖片，AI 自動去除背景。全程本機處理，不限解析度，完全免費。',
+    path: '/bg-removal',
+    ready: true,
+    color: 'lavender',
   },
 ]
 
@@ -49,11 +49,13 @@ const ConvertIcon = () => (
   </svg>
 )
 
-const ImageIcon = () => (
+const ScissorsIcon = () => (
   <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-    <circle cx="8.5" cy="8.5" r="1.5"/>
-    <polyline points="21 15 16 10 5 21"/>
+    <circle cx="6" cy="6" r="3"/>
+    <circle cx="6" cy="18" r="3"/>
+    <line x1="20" y1="4" x2="8.12" y2="15.88"/>
+    <line x1="14.47" y1="14.48" x2="20" y2="20"/>
+    <line x1="8.12" y1="8.12" x2="12" y2="12"/>
   </svg>
 )
 
@@ -108,7 +110,7 @@ const getIcon = (id) => {
   switch (id) {
     case 'epub': return <BookIcon />
     case 'epub-convert': return <ConvertIcon />
-    case 'image': return <ImageIcon />
+    case 'bg-removal': return <ScissorsIcon />
     default: return <BookIcon />
   }
 }

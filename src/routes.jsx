@@ -4,6 +4,7 @@ import { lazy } from 'react'
 const Home = lazy(() => import('./pages/Home'))
 const EpubTool = lazy(() => import('./pages/EpubTool'))
 const EpubConvert = lazy(() => import('./pages/EpubConvert'))
+const BgRemoval = lazy(() => import('./pages/BgRemoval'))
 
 /**
  * 路由設定
@@ -24,6 +25,11 @@ export const routes = [
     path: '/epub-convert',
     element: EpubConvert,
     title: 'EPUB 簡轉繁',
+  },
+  {
+    path: '/bg-removal',
+    element: BgRemoval,
+    title: '批次去背',
   },
 ]
 

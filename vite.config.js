@@ -25,10 +25,14 @@ export default defineConfig({
             if (id.includes('fonteditor')) {
               return 'vendor-font'
             }
+            // AI 去背（ONNX + WASM）
+            if (id.includes('@imgly/background-removal') || id.includes('onnxruntime')) {
+              return 'vendor-bgremoval'
+            }
           }
         },
       },
     },
-    chunkSizeWarningLimit: 600,
+    chunkSizeWarningLimit: 1000,
   },
 })

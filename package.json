@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@imgly/background-removal": "^1.7.0",
     "file-saver": "^2.0.5",
     "fonteditor-core": "^2.6.3",
     "jszip": "^3.10.1",
