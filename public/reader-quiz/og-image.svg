@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4A5A5"/>
+      <stop offset="100%" stop-color="#B8A9C9"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#FAFAFA"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="100" cy="530" r="180" fill="#FFFFFF" opacity="0.06"/>
+  <circle cx="1100" cy="100" r="140" fill="#FFFFFF" opacity="0.06"/>
+
+  <!-- Center card -->
+  <rect x="120" y="80" width="960" height="470" rx="32" fill="url(#card)" opacity="0.95"/>
+
+  <!-- Book icon -->
+  <g transform="translate(600, 210)">
+    <!-- Open book shape -->
+    <path d="M-40,-30 Q-40,-45 -25,-45 L-5,-45 Q0,-45 0,-40 L0,25 Q0,30 -5,30 L-30,30 Q-40,30 -40,20 Z" fill="#FEDFE1" opacity="0.8"/>
+    <path d="M40,-30 Q40,-45 25,-45 L5,-45 Q0,-45 0,-40 L0,25 Q0,30 5,30 L30,30 Q40,30 40,20 Z" fill="#C4B7D7" opacity="0.8"/>
+    <!-- Book spine -->
+    <line x1="0" y1="-45" x2="0" y2="30" stroke="#E8B4B8" stroke-width="2"/>
+    <!-- Page lines -->
+    <line x1="-30" y1="-30" x2="-10" y2="-30" stroke="#D4A5A5" stroke-width="1.5" opacity="0.4"/>
+    <line x1="-30" y1="-18" x2="-10" y2="-18" stroke="#D4A5A5" stroke-width="1.5" opacity="0.4"/>
+    <line x1="-30" y1="-6" x2="-10" y2="-6" stroke="#D4A5A5" stroke-width="1.5" opacity="0.4"/>
+    <line x1="10" y1="-30" x2="30" y2="-30" stroke="#B8A9C9" stroke-width="1.5" opacity="0.4"/>
+    <line x1="10" y1="-18" x2="30" y2="-18" stroke="#B8A9C9" stroke-width="1.5" opacity="0.4"/>
+    <line x1="10" y1="-6" x2="30" y2="-6" stroke="#B8A9C9" stroke-width="1.5" opacity="0.4"/>
+  </g>
+
+  <!-- Title -->
+  <text x="600" y="330" text-anchor="middle" font-family="Noto Sans CJK TC, Noto Sans TC, sans-serif" font-weight="700" font-size="48" fill="#333333" letter-spacing="3">電子書閱讀器選購測驗</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="390" text-anchor="middle" font-family="Noto Sans CJK TC, Noto Sans TC, sans-serif" font-weight="500" font-size="26" fill="#888888">2026 最新｜34 款機型，3 分鐘找到最適合你的閱讀器</text>
+
+  <!-- Brand badges -->
+  <text x="600" y="450" text-anchor="middle" font-family="Noto Sans CJK TC, Noto Sans TC, sans-serif" font-weight="400" font-size="20" fill="#B5ADA7">Kobo ・ Readmoo ・ HyRead ・ Boox ・ Kindle ・ iReader</text>
+
+  <!-- Brand footer -->
+  <text x="600" y="600" text-anchor="middle" font-family="Noto Sans CJK TC, Noto Sans TC, sans-serif" font-weight="700" font-size="20" fill="#FFFFFF" opacity="0.7" letter-spacing="2">Hello Ruru Tools</text>
+</svg>
