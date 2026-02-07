@@ -155,7 +155,7 @@ export default function EmojiPicker({ onSelect }) {
       {/* 格子 */}
       <div
         className="overflow-y-auto overflow-x-hidden rounded-lg"
-        style={{ maxHeight: '140px' }}
+        style={{ height: '140px' }}
       >
         <div className={`grid gap-0.5 ${isWide ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-8'}`}>
           {currentCategory.emojis.map((item, i) => (

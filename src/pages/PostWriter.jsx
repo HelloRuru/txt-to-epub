@@ -252,11 +252,17 @@ export default function PostWriter() {
         )}
 
         {/* ═══ Footer ═══════════════════════════════════ */}
-        <footer className="mt-12 sm:mt-16 pt-8 text-center" style={{ borderTop: '1px solid var(--border)' }}>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+        <footer className="mt-24 sm:mt-32 pt-12 pb-8 text-center">
+          {/* 裝飾分隔 */}
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <div className="h-px flex-1 max-w-[80px]" style={{ background: 'var(--border)' }} />
+            <span className="text-xs tracking-widest" style={{ color: 'var(--border)' }}>✦</span>
+            <div className="h-px flex-1 max-w-[80px]" style={{ background: 'var(--border)' }} />
+          </div>
+          <p className="text-xs" style={{ color: 'var(--text-muted)', opacity: 0.6 }}>
             全程本機處理，文字不會上傳到任何伺服器
           </p>
-          <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
+          <p className="text-xs mt-2" style={{ color: 'var(--text-muted)', opacity: 0.6 }}>
             © {new Date().getFullYear()} Kaoru Tsai · <a href="https://helloruru.com" style={{ color: 'var(--accent-primary)' }}>HelloRuru</a>
           </p>
         </footer>
@@ -379,7 +385,7 @@ function EditorMode({
           boxShadow: 'var(--shadow)',
         }}
       >
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-3">
           <EditIcon />
           <span className="text-sm font-medium">編輯區</span>
           <button
@@ -395,6 +401,10 @@ function EditorMode({
           </button>
         </div>
 
+        <div className="mb-4 pb-3" style={{ borderBottom: '1px solid var(--border)' }}>
+          <StatsBar stats={stats} statusColor={statusColor} platform={platform} />
+        </div>
+
         <PostEditor
           value={text}
           onChange={onTextChange}
@@ -406,9 +416,6 @@ function EditorMode({
           <EmojiPicker onSelect={onEmojiInsert} />
         </div>
 
-        <div className="mt-5 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
-          <StatsBar stats={stats} statusColor={statusColor} platform={platform} />
-        </div>
       </div>
     </div>
   )
