@@ -27,6 +27,14 @@ const tools = [
     ready: true,
     color: 'lavender',
   },
+  {
+    id: 'post-writer',
+    name: '社群貼文排版',
+    description: '解決 FB、IG、Threads 換行消失問題。即時預覽、多平台支援、雜誌感設計與 Broetry 排版模式。',
+    path: '/post-writer',
+    ready: true,
+    color: 'sage',
+  },
 ]
 
 // SVG Icons
@@ -106,11 +114,22 @@ const GitHubIcon = () => (
   </svg>
 )
 
+const PostWriterIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <line x1="8" y1="13" x2="16" y2="13"/>
+    <line x1="8" y1="17" x2="12" y2="17"/>
+    <path d="M10 9H8"/>
+  </svg>
+)
+
 const getIcon = (id) => {
   switch (id) {
     case 'epub': return <BookIcon />
     case 'epub-convert': return <ConvertIcon />
     case 'bg-removal': return <ScissorsIcon />
+    case 'post-writer': return <PostWriterIcon />
     default: return <BookIcon />
   }
 }

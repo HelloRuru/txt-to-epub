@@ -5,6 +5,7 @@ const Home = lazy(() => import('./pages/Home'))
 const EpubTool = lazy(() => import('./pages/EpubTool'))
 const EpubConvert = lazy(() => import('./pages/EpubConvert'))
 const BgRemoval = lazy(() => import('./pages/BgRemoval'))
+const PostWriter = lazy(() => import('./pages/PostWriter'))
 
 /**
  * 路由設定
@@ -30,6 +31,11 @@ export const routes = [
     path: '/bg-removal',
     element: BgRemoval,
     title: '批次去背',
+  },
+  {
+    path: '/post-writer',
+    element: PostWriter,
+    title: '社群貼文排版',
   },
 ]
 
