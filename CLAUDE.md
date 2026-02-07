@@ -212,7 +212,7 @@
 |------|-----------|----------|
 | `tools.helloruru.com/hihi/` | 問安圖產生器 | 必要 |
 | `tools.helloruru.com/reader-quiz/` | 電子書閱讀器選購測驗 | 必要 |
-| `tools.helloruru.com/prompt-gen/` | SD 咒語產生器 | 必要 |
+| `tools.helloruru.com/spell/` | SD 咒語產生器 | 必要 |
 | `newday.helloruru.com` | 離職全能導航幫手 | 必要 |
 | `lab.helloruru.com` | —（已有完整花朵 Hero） | 不需要 |
 
@@ -425,6 +425,6 @@ public/reader-quiz/
 - Design System v1.7 完整文件：https://github.com/HelloRuru/helloruru.github.io/blob/main/docs/DESIGN-SYSTEM.md
 - 品牌頁首 Web Component：`https://lab.helloruru.com/shared/brand-header.js`
 - 線上版（閱讀器測驗）：https://tools.helloruru.com/reader-quiz/
-- 線上版（SD 咒語產生器）：https://tools.helloruru.com/prompt-gen/
+- 線上版（SD 咒語產生器）：https://tools.helloruru.com/spell/
 - 品牌主站：https://lab.helloruru.com
 - 工具站：https://newday.helloruru.com
