@@ -729,6 +729,49 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* ─── Save Overlay (for LINE / in-app browsers) ─── */
+    .save-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 100;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .save-overlay.show { opacity: 1; pointer-events: auto; }
+    .save-overlay-hint {
+      color: #FFF;
+      font-family: var(--font-heading);
+      font-size: 1.3rem;
+      font-weight: var(--weight-bold);
+      text-align: center;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .save-overlay img {
+      max-width: 92vw;
+      max-height: 65vh;
+      border-radius: var(--radius-md);
+      box-shadow: 0 0 30px rgba(255,255,255,0.15);
+      -webkit-touch-callout: default !important;
+    }
+    .save-overlay-close {
+      margin-top: 20px;
+      padding: 14px 40px;
+      border: 2px solid #FFF;
+      border-radius: var(--radius-lg);
+      background: transparent;
+      color: #FFF;
+      font-family: var(--font-heading);
+      font-size: var(--text-h3);
+      font-weight: var(--weight-bold);
+      cursor: pointer;
+      min-height: 50px;
+    }
+    .save-overlay-close:active { background: rgba(255,255,255,0.2); }
+
     /* ─── Footer ─── */
     .footer {
       text-align: center; padding: 32px 0 0;
@@ -952,6 +995,11 @@
   </footer>
 </div>
 
+<div class="save-overlay" id="save-overlay">
+  <div class="save-overlay-hint" id="save-overlay-hint"></div>
+  <img id="save-overlay-img" alt="問安圖">
+  <button class="save-overlay-close" id="save-overlay-close">關閉</button>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1385,13 +1433,77 @@
 
   document.fonts.ready.then(draw);
 
+  // ─── Save Overlay (for LINE / in-app browsers) ───
+  const saveOverlay = document.getElementById('save-overlay');
+  const saveOverlayImg = document.getElementById('save-overlay-img');
+  const saveOverlayHint = document.getElementById('save-overlay-hint');
+  const saveOverlayClose = document.getElementById('save-overlay-close');
+
+  function showImageForSave(dataUrl) {
+    saveOverlayImg.src = dataUrl;
+    const isAndroid = /android/i.test(navigator.userAgent);
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (isIOS) {
+      saveOverlayHint.innerHTML = '👆 長按下方圖片<br>選「儲存圖片」即可';
+    } else if (isAndroid) {
+      saveOverlayHint.innerHTML = '👆 長按下方圖片<br>選「下載圖片」即可';
+    } else {
+      saveOverlayHint.innerHTML = '👆 長按圖片儲存<br>或按右鍵另存圖片';
+    }
+    saveOverlay.classList.add('show');
+  }
+
+  saveOverlayClose.addEventListener('click', () => {
+    saveOverlay.classList.remove('show');
+    saveOverlayImg.src = '';
+  });
+  saveOverlay.addEventListener('click', (e) => {
+    if (e.target === saveOverlay) {
+      saveOverlay.classList.remove('show');
+      saveOverlayImg.src = '';
+    }
+  });
+
   // ─── Download ───
-  btnDownload.addEventListener('click', () => {
+  function isInAppBrowser() {
+    const ua = navigator.userAgent || '';
+    return /Line\//i.test(ua) || /FBAN|FBAV|Instagram|MicroMessenger|Twitter|Threads/i.test(ua);
+  }
+
+  btnDownload.addEventListener('click', async () => {
     if (!bgImage) { toast('請先選一張背景'); return; }
+
+    const dataUrl = canvas.toDataURL('image/png');
+
+    // 1. Try Web Share API (best UX on mobile — can share/save directly)
+    if (navigator.share && navigator.canShare) {
+      try {
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const file = new File([blob], '問安圖.png', { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file] });
+          toast('分享成功');
+          return;
+        }
+      } catch (e) {
+        if (e.name === 'AbortError') return; // user cancelled
+        // Fall through to other methods
+      }
+    }
+
+    // 2. In-app browser (LINE etc.) — show image for long-press save
+    if (isInAppBrowser()) {
+      showImageForSave(dataUrl);
+      return;
+    }
+
+    // 3. Standard browser download
     const link = document.createElement('a');
     link.download = '問安圖.png';
-    link.href = canvas.toDataURL('image/png');
+    link.href = dataUrl;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
     toast('圖片已下載');
   });
 
