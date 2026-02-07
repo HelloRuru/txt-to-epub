@@ -1,0 +1,235 @@
+{
+  "categories": [
+    {
+      "id": "quality",
+      "name": "品質標籤",
+      "icon": "sparkles",
+      "description": "控制生成品質的元標籤（依模型自動切換）",
+      "presets": {
+        "illustrious": [
+          { "tag": "masterpiece", "label": "傑作", "default": true },
+          { "tag": "best quality", "label": "最佳品質", "default": true },
+          { "tag": "very aesthetic", "label": "高美感", "default": true },
+          { "tag": "absurdres", "label": "超高解析度", "default": false },
+          { "tag": "newest", "label": "最新風格", "default": true },
+          { "tag": "amazing quality", "label": "驚人品質", "default": false },
+          { "tag": "highres", "label": "高解析度", "default": false }
+        ],
+        "pony-score": [
+          { "tag": "score_9", "label": "評分 9", "default": true },
+          { "tag": "score_8_up", "label": "評分 8+", "default": true },
+          { "tag": "score_7_up", "label": "評分 7+", "default": true },
+          { "tag": "score_6_up", "label": "評分 6+", "default": false },
+          { "tag": "source_anime", "label": "動漫來源", "default": true }
+        ],
+        "sd15-standard": [
+          { "tag": "masterpiece", "label": "傑作", "default": true },
+          { "tag": "best quality", "label": "最佳品質", "default": true },
+          { "tag": "high resolution", "label": "高解析度", "default": true },
+          { "tag": "ultra-detailed", "label": "超細緻", "default": true },
+          { "tag": "beautiful detailed eyes", "label": "精緻眼睛", "default": false }
+        ]
+      }
+    },
+    {
+      "id": "composition",
+      "name": "構圖",
+      "icon": "frame",
+      "tags": [
+        { "tag": "portrait", "label": "肖像" },
+        { "tag": "upper body", "label": "上半身" },
+        { "tag": "cowboy shot", "label": "牛仔鏡頭" },
+        { "tag": "full body", "label": "全身" },
+        { "tag": "close-up", "label": "特寫" },
+        { "tag": "from above", "label": "俯視" },
+        { "tag": "from below", "label": "仰視" },
+        { "tag": "from side", "label": "側面" },
+        { "tag": "dynamic angle", "label": "動態角度" },
+        { "tag": "dutch angle", "label": "傾斜角度" },
+        { "tag": "wide shot", "label": "廣角" }
+      ]
+    },
+    {
+      "id": "character",
+      "name": "角色特徵",
+      "icon": "user",
+      "subcategories": [
+        {
+          "name": "人數",
+          "tags": [
+            { "tag": "1girl", "label": "1 女孩" },
+            { "tag": "1boy", "label": "1 男孩" },
+            { "tag": "multiple girls", "label": "多名女孩" },
+            { "tag": "multiple boys", "label": "多名男孩" },
+            { "tag": "solo", "label": "單人" }
+          ]
+        },
+        {
+          "name": "髮型",
+          "tags": [
+            { "tag": "long hair", "label": "長髮" },
+            { "tag": "short hair", "label": "短髮" },
+            { "tag": "medium hair", "label": "中長髮" },
+            { "tag": "twintails", "label": "雙馬尾" },
+            { "tag": "ponytail", "label": "馬尾" },
+            { "tag": "braids", "label": "辮子" },
+            { "tag": "bob cut", "label": "鮑伯頭" },
+            { "tag": "messy hair", "label": "凌亂髮型" },
+            { "tag": "hair ornament", "label": "髮飾" }
+          ]
+        },
+        {
+          "name": "髮色",
+          "tags": [
+            { "tag": "black hair", "label": "黑髮" },
+            { "tag": "blonde hair", "label": "金髮" },
+            { "tag": "brown hair", "label": "棕髮" },
+            { "tag": "blue hair", "label": "藍髮" },
+            { "tag": "pink hair", "label": "粉髮" },
+            { "tag": "silver hair", "label": "銀髮" },
+            { "tag": "red hair", "label": "紅髮" },
+            { "tag": "white hair", "label": "白髮" },
+            { "tag": "purple hair", "label": "紫髮" },
+            { "tag": "green hair", "label": "綠髮" }
+          ]
+        },
+        {
+          "name": "眼睛",
+          "tags": [
+            { "tag": "blue eyes", "label": "藍眼" },
+            { "tag": "red eyes", "label": "紅眼" },
+            { "tag": "green eyes", "label": "綠眼" },
+            { "tag": "brown eyes", "label": "棕眼" },
+            { "tag": "golden eyes", "label": "金眼" },
+            { "tag": "purple eyes", "label": "紫眼" },
+            { "tag": "heterochromia", "label": "異色瞳" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clothing",
+      "name": "服裝",
+      "icon": "shirt",
+      "tags": [
+        { "tag": "school uniform", "label": "校服" },
+        { "tag": "serafuku", "label": "水手服" },
+        { "tag": "dress", "label": "洋裝" },
+        { "tag": "white dress", "label": "白色洋裝" },
+        { "tag": "kimono", "label": "和服" },
+        { "tag": "maid outfit", "label": "女僕裝" },
+        { "tag": "armor", "label": "鎧甲" },
+        { "tag": "hoodie", "label": "帽T" },
+        { "tag": "casual clothes", "label": "便服" },
+        { "tag": "white shirt", "label": "白襯衫" },
+        { "tag": "pleated skirt", "label": "百褶裙" },
+        { "tag": "ribbon", "label": "緞帶" }
+      ]
+    },
+    {
+      "id": "expression",
+      "name": "表情",
+      "icon": "smile",
+      "tags": [
+        { "tag": "smile", "label": "微笑" },
+        { "tag": "grin", "label": "露齒笑" },
+        { "tag": "blush", "label": "臉紅" },
+        { "tag": "closed eyes", "label": "閉眼" },
+        { "tag": "crying", "label": "哭泣" },
+        { "tag": "serious", "label": "嚴肅" },
+        { "tag": "surprised", "label": "驚訝" },
+        { "tag": "looking at viewer", "label": "看向觀者" },
+        { "tag": "looking away", "label": "看向別處" }
+      ]
+    },
+    {
+      "id": "pose",
+      "name": "動作",
+      "icon": "move",
+      "tags": [
+        { "tag": "standing", "label": "站立" },
+        { "tag": "sitting", "label": "坐姿" },
+        { "tag": "walking", "label": "行走" },
+        { "tag": "running", "label": "奔跑" },
+        { "tag": "fighting stance", "label": "戰鬥姿勢" },
+        { "tag": "hand on hip", "label": "手叉腰" },
+        { "tag": "arms behind back", "label": "背手" },
+        { "tag": "leaning forward", "label": "前傾" },
+        { "tag": "jumping", "label": "跳躍" },
+        { "tag": "holding", "label": "持物" }
+      ]
+    },
+    {
+      "id": "background",
+      "name": "背景",
+      "icon": "image",
+      "tags": [
+        { "tag": "outdoors", "label": "戶外" },
+        { "tag": "indoors", "label": "室內" },
+        { "tag": "school", "label": "學校" },
+        { "tag": "classroom", "label": "教室" },
+        { "tag": "city", "label": "城市" },
+        { "tag": "forest", "label": "森林" },
+        { "tag": "beach", "label": "海灘" },
+        { "tag": "cherry blossoms", "label": "櫻花" },
+        { "tag": "night sky", "label": "夜空" },
+        { "tag": "starry sky", "label": "星空" },
+        { "tag": "sunset", "label": "夕陽" },
+        { "tag": "rain", "label": "雨天" },
+        { "tag": "snow", "label": "下雪" },
+        { "tag": "cafe", "label": "咖啡廳" },
+        { "tag": "fantasy", "label": "奇幻場景" },
+        { "tag": "simple background", "label": "簡單背景" },
+        { "tag": "white background", "label": "白色背景" }
+      ]
+    },
+    {
+      "id": "lighting",
+      "name": "光影",
+      "icon": "sun",
+      "tags": [
+        { "tag": "volumetric lighting", "label": "體積光" },
+        { "tag": "dramatic lighting", "label": "戲劇光" },
+        { "tag": "backlighting", "label": "逆光" },
+        { "tag": "soft lighting", "label": "柔光" },
+        { "tag": "rim lighting", "label": "輪廓光" },
+        { "tag": "golden hour", "label": "黃金時刻" },
+        { "tag": "moonlight", "label": "月光" },
+        { "tag": "neon lights", "label": "霓虹燈" },
+        { "tag": "cinematic lighting", "label": "電影光" }
+      ]
+    },
+    {
+      "id": "style",
+      "name": "風格",
+      "icon": "palette",
+      "tags": [
+        { "tag": "anime", "label": "動漫" },
+        { "tag": "illustration", "label": "插畫" },
+        { "tag": "watercolor", "label": "水彩" },
+        { "tag": "oil painting", "label": "油畫" },
+        { "tag": "cel shading", "label": "賽璐璐" },
+        { "tag": "flat color", "label": "平塗" },
+        { "tag": "pastel colors", "label": "粉彩色系" },
+        { "tag": "detailed", "label": "細緻" },
+        { "tag": "sketch", "label": "素描" },
+        { "tag": "lineart", "label": "線稿" },
+        { "tag": "thick outlines", "label": "粗線條" }
+      ]
+    },
+    {
+      "id": "color",
+      "name": "色調",
+      "icon": "droplet",
+      "tags": [
+        { "tag": "warm colors", "label": "暖色調" },
+        { "tag": "cool colors", "label": "冷色調" },
+        { "tag": "vibrant colors", "label": "鮮豔色彩" },
+        { "tag": "muted colors", "label": "低飽和" },
+        { "tag": "monochrome", "label": "單色" },
+        { "tag": "high contrast", "label": "高對比" },
+        { "tag": "colorful", "label": "繽紛多彩" }
+      ]
+    }
+  ]
+}

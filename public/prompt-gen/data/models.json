@@ -1,0 +1,97 @@
+[
+  {
+    "id": "novaAnimeXL-il-v160",
+    "name": "Nova Anime XL IL v16.0",
+    "shortName": "NovaAnimeXL",
+    "architecture": "SDXL",
+    "description": "基於 Illustrious 的高品質動漫模型，支援豐富的 Danbooru 標籤",
+    "tagSystem": "danbooru",
+    "qualityPreset": "illustrious",
+    "negativePreset": "illustrious-default",
+    "recommendedSettings": {
+      "steps": 25,
+      "cfgScale": 5,
+      "sampler": "DPM++ 2M Karras",
+      "resolution": "1024x1024",
+      "alternateResolutions": ["832x1216", "1216x832"],
+      "clipSkip": 2
+    },
+    "tips": "使用 Danbooru 標籤效果最佳。品質標籤放最前面，角色描述放中間，場景放最後。"
+  },
+  {
+    "id": "illustriousXL-v20",
+    "name": "Illustrious XL 2.0",
+    "shortName": "IllustriousXL",
+    "architecture": "SDXL",
+    "description": "插畫風格 SDXL 模型，擅長精細的角色繪製與豐富色彩",
+    "tagSystem": "danbooru",
+    "qualityPreset": "illustrious",
+    "negativePreset": "illustrious-default",
+    "recommendedSettings": {
+      "steps": 28,
+      "cfgScale": 5,
+      "sampler": "DPM++ 2M Karras",
+      "resolution": "1024x1024",
+      "alternateResolutions": ["832x1216", "1216x832"],
+      "clipSkip": 2
+    },
+    "tips": "適合需要精細線條和鮮豔色彩的插畫。建議搭配 very aesthetic 標籤。"
+  },
+  {
+    "id": "waiANIPONYXL-v140",
+    "name": "WAI-ANI-PONYXL v14.0",
+    "shortName": "waiANIPONY",
+    "architecture": "SDXL",
+    "description": "基於 Pony Diffusion 的動漫模型，使用 score 評分標籤系統",
+    "tagSystem": "pony-score",
+    "qualityPreset": "pony-score",
+    "negativePreset": "pony-default",
+    "recommendedSettings": {
+      "steps": 28,
+      "cfgScale": 7,
+      "sampler": "DPM++ 2M Karras",
+      "resolution": "1024x1024",
+      "alternateResolutions": ["832x1216", "1216x832"],
+      "clipSkip": 2
+    },
+    "tips": "使用 score_9, score_8_up 評分標籤放在最前面，模型對前面的 token 給予更高權重。"
+  },
+  {
+    "id": "counterfeit-v25",
+    "name": "Counterfeit V2.5",
+    "shortName": "Counterfeit",
+    "architecture": "SD1.5",
+    "description": "經典的高品質動漫模型，色彩飽和、線條銳利",
+    "tagSystem": "sd15-standard",
+    "qualityPreset": "sd15-standard",
+    "negativePreset": "sd15-anime",
+    "recommendedSettings": {
+      "steps": 20,
+      "cfgScale": 7,
+      "sampler": "DPM++ 2M Karras",
+      "resolution": "512x512",
+      "alternateResolutions": ["512x768", "768x512"],
+      "clipSkip": 2
+    },
+    "tips": "SD1.5 模型，建議使用 512x512 或 512x768 解析度。EasyNegative embedding 可大幅提升品質。"
+  },
+  {
+    "id": "dreamshaper-8",
+    "name": "DreamShaper 8",
+    "shortName": "DreamShaper",
+    "architecture": "SD1.5",
+    "description": "多功能 SD1.5 模型，支援動漫與半寫實風格",
+    "tagSystem": "sd15-standard",
+    "qualityPreset": "sd15-standard",
+    "negativePreset": "sd15-anime",
+    "recommendedSettings": {
+      "steps": 25,
+      "cfgScale": 7,
+      "sampler": "DPM++ SDE Karras",
+      "resolution": "512x512",
+      "alternateResolutions": ["512x768", "768x512"],
+      "clipSkip": 1
+    },
+    "tips": "多功能模型，動漫和半寫實都能處理。CFG 7-8 適合動漫，5-6 適合寫實。"
+  }
+]

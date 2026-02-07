@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+
+  <!-- SEO Meta Tags -->
+  <title>SD 咒語產生器｜Stable Diffusion Prompt Generator | Hello Ruru Tools</title>
+  <meta name="description" content="免費 Stable Diffusion 提詞產生器！支援 NovaAnimeXL、IllustriousXL、waiANIPONYXL 等主流動漫模型，中文介面一鍵選標籤、組合 Prompt，自動匹配模型專屬品質標籤與反向提詞。">
+  <meta name="keywords" content="Stable Diffusion,SD Prompt,提詞產生器,咒語產生器,NovaAnimeXL,IllustriousXL,SDXL,動漫AI,AI繪圖,Danbooru標籤,反向提詞,negative prompt">
+  <meta name="author" content="Hello Ruru">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://tools.helloruru.com/prompt-gen/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="SD 咒語產生器｜Stable Diffusion Prompt Generator">
+  <meta property="og:description" content="免費 SD 提詞產生器！支援主流動漫模型，中文介面一鍵選標籤、組合 Prompt。">
+  <meta property="og:url" content="https://tools.helloruru.com/prompt-gen/">
+  <meta property="og:site_name" content="Hello Ruru Tools">
+  <meta property="og:locale" content="zh_TW">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SD 咒語產生器｜Stable Diffusion Prompt Generator">
+  <meta name="twitter:description" content="免費 SD 提詞產生器！支援主流動漫模型，中文介面一鍵組合 Prompt。">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- JSON-LD: WebApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "SD 咒語產生器",
+    "alternateName": "Stable Diffusion Prompt Generator",
+    "description": "免費 Stable Diffusion 提詞產生器，支援 NovaAnimeXL、IllustriousXL、waiANIPONYXL 等主流動漫模型",
+    "url": "https://tools.helloruru.com/prompt-gen/",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web",
+    "inLanguage": "zh-TW",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "TWD"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Hello Ruru",
+      "url": "https://helloruru.com"
+    }
+  }
+  </script>
+
+  <!-- JSON-LD: HowTo -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "如何使用 SD 咒語產生器",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "選擇模型",
+        "text": "從模型列表中選擇你正在使用的 Stable Diffusion 模型，系統會自動匹配對應的品質標籤系統"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "選擇標籤",
+        "text": "從 10 大分類（品質、構圖、角色、服裝、表情、動作、背景、光影、風格、色調）中點選需要的標籤"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "複製提詞",
+        "text": "系統即時組合正向與反向提詞，一鍵複製到剪貼簿，直接貼到 Stable Diffusion 使用"
+      }
+    ]
+  }
+  </script>
+
+  <!-- JSON-LD: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "什麼是 Stable Diffusion Prompt？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Prompt（提詞/咒語）是給 AI 繪圖模型的文字描述指令，用來控制生成圖片的內容、風格和品質。好的 Prompt 組合能大幅提升出圖品質。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "不同模型的 Prompt 有什麼差異？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "不同模型系列使用不同的品質標籤系統。例如 Illustrious 系列使用 masterpiece、best quality 等 Danbooru 標籤，而 Pony 系列使用 score_9、score_8_up 等評分標籤。本工具會根據選擇的模型自動切換。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Negative Prompt（反向提詞）是什麼？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "反向提詞用來告訴 AI 不要生成的內容，例如 worst quality、bad anatomy 等。正確的反向提詞能有效避免畸形、低品質等常見問題。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "標籤的權重（如 1.2、1.4）有什麼作用？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "權重數值越高，AI 越重視該標籤。預設權重 1.0，可調整為 1.2（強調）或 1.4（非常強調）。格式為 (tag:1.2)。過高的權重可能導致畫面失真，建議謹慎使用。"
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Hero -->
+  <header class="hero">
+    <h1 class="hero__title">SD 咒語產生器</h1>
+    <p class="hero__subtitle">選擇模型，組合標籤，一鍵複製完美提詞</p>
+  </header>
+
+  <!-- App -->
+  <main class="container">
+    <div id="app">
+      <div class="error-msg">
+        <p>載入中...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p>&copy; <span id="footer-year"></span> Kaoru Tsai. All Rights Reserved. | Contact: <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
+  </footer>
+
+  <script>
+    const startYear = 2026;
+    const currentYear = new Date().getFullYear();
+    document.getElementById('footer-year').textContent =
+      currentYear > startYear ? `${startYear}\u2013${currentYear}` : `${startYear}`;
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

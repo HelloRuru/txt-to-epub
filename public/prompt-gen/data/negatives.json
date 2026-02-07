@@ -1,0 +1,57 @@
+{
+  "presets": {
+    "illustrious-default": {
+      "name": "Illustrious 預設反向提詞",
+      "tags": [
+        "worst quality", "bad quality", "low quality",
+        "lowres", "bad anatomy", "bad hands",
+        "missing fingers", "extra digits", "fewer digits",
+        "text", "signature", "watermark", "username",
+        "cropped", "jpeg artifacts",
+        "ugly", "deformed", "mutated",
+        "extra limbs", "bad proportions"
+      ]
+    },
+    "pony-default": {
+      "name": "Pony 預設反向提詞",
+      "tags": [
+        "worst quality", "bad quality", "low quality",
+        "normal quality", "text", "signature", "watermark",
+        "bad anatomy", "bad hands", "missing fingers",
+        "extra digits", "fewer digits", "cropped",
+        "3d", "realistic", "photo"
+      ]
+    },
+    "sd15-anime": {
+      "name": "SD1.5 動漫反向提詞",
+      "tags": [
+        "EasyNegative", "worst quality", "low quality",
+        "bad anatomy", "bad hands", "missing fingers",
+        "extra fingers", "fewer digits",
+        "lowres", "cropped", "text", "watermark"
+      ]
+    }
+  },
+  "additional": {
+    "anti-realistic": {
+      "name": "排除寫實",
+      "tags": ["3d", "realistic", "photo", "cgi"]
+    },
+    "anti-artifact": {
+      "name": "排除雜訊",
+      "tags": ["jpeg artifacts", "blurry", "noise", "pixelated"]
+    },
+    "anti-anatomy": {
+      "name": "排除畸形",
+      "tags": ["bad anatomy", "bad proportions", "deformed", "disfigured", "mutated", "extra limbs", "missing limbs"]
+    },
+    "anti-hands": {
+      "name": "排除手部問題",
+      "tags": ["bad hands", "missing fingers", "extra fingers", "extra digits", "fewer digits", "fused fingers"]
+    },
+    "anti-text": {
+      "name": "排除文字",
+      "tags": ["text", "signature", "watermark", "username", "logo", "copyright"]
+    }
+  }
+}
