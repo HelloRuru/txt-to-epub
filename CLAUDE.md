@@ -37,7 +37,7 @@
 
 ## Design System v1.7（完整摘要）
 
-完整規格見 Google Docs：https://docs.google.com/document/d/1Y02uCW7yl0rz1gdLw8tVXDsgujIPFhjtasaz4tm514s
+完整規格見 GitHub：https://github.com/HelloRuru/helloruru.github.io/blob/main/docs/DESIGN-SYSTEM.md
 
 > **v1.7 更新（2026-02-07）**：字重修正（禁用 300）、品牌頁首 Web Component 標準化、Icon 系統規範
 >
@@ -422,7 +422,7 @@ public/reader-quiz/
 
 ## 相關資源
 
-- Design System v1.7 完整文件：https://docs.google.com/document/d/1Y02uCW7yl0rz1gdLw8tVXDsgujIPFhjtasaz4tm514s
+- Design System v1.7 完整文件：https://github.com/HelloRuru/helloruru.github.io/blob/main/docs/DESIGN-SYSTEM.md
 - 品牌頁首 Web Component：`https://lab.helloruru.com/shared/brand-header.js`
 - 線上版（閱讀器測驗）：https://tools.helloruru.com/reader-quiz/
 - 線上版（SD 咒語產生器）：https://tools.helloruru.com/prompt-gen/
