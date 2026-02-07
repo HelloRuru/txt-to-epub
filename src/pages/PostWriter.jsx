@@ -6,61 +6,15 @@ import PostEditor from '../components/PostEditor'
 import PostPreview from '../components/PostPreview'
 import EmojiPicker from '../components/EmojiPicker'
 import TemplateControls from '../components/TemplateControls'
+import StatsBar from '../components/StatsBar'
+import {
+  CopyIcon, CheckIcon, ZapIcon, EditIcon,
+  EyeIcon, TextIcon, PasteIcon, HeaderIcon,
+} from '../components/PostIcons'
 import { DEFAULT_PLATFORM, computeStats } from '../utils/platformLimits'
 import { applyTemplate, validateTemplate } from '../utils/templateAdapter'
 import { transform } from '../utils/postConverter'
 import { copyDecorator } from '../utils/copyDecorator'
-
-// ─── SVG Icons ─────────────────────────────────────────
-
-const CopyIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-  </svg>
-)
-
-const CheckIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <polyline points="20 6 9 17 4 12"/>
-  </svg>
-)
-
-const ZapIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-  </svg>
-)
-
-const EditIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-  </svg>
-)
-
-const EyeIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-    <circle cx="12" cy="12" r="3"/>
-  </svg>
-)
-
-const TextIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-    <polyline points="14 2 14 8 20 8"/>
-    <line x1="16" y1="13" x2="8" y2="13"/>
-    <line x1="16" y1="17" x2="8" y2="17"/>
-  </svg>
-)
-
-const PasteIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
-  </svg>
-)
 
 // ─── 主組件 ────────────────────────────────────────────
 
@@ -76,7 +30,7 @@ export default function PostWriter() {
   const [manualTitle, setManualTitle] = useState('')
   const [fullWidthDigit, setFullWidthDigit] = useState(false)
   const [copyState, setCopyState] = useState('idle')
-  const [previewTab, setPreviewTab] = useState('platform') // 'platform' | 'result'
+  const [previewTab, setPreviewTab] = useState('platform')
   const textareaRef = useRef(null)
 
   const templateOptions = useMemo(() => ({
@@ -144,13 +98,7 @@ export default function PostWriter() {
                   boxShadow: '0 4px 20px rgba(212, 165, 165, 0.3)',
                 }}
               >
-                <svg viewBox="0 0 24 24" className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="white">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                  <line x1="8" y1="13" x2="16" y2="13"/>
-                  <line x1="8" y1="17" x2="12" y2="17"/>
-                  <path d="M10 9H8"/>
-                </svg>
+                <HeaderIcon />
               </div>
             </Link>
             <div>
@@ -243,138 +191,27 @@ export default function PostWriter() {
 
         {/* ═══ 主內容區 ═══════════════════════════════════ */}
         {viewMode === 'quick' ? (
-          <div className="animate-fadeInUp">
-            <div
-              className="rounded-3xl p-6 sm:p-8"
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                boxShadow: 'var(--shadow)',
-              }}
-            >
-              <textarea
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="貼上你的文字，一鍵轉換..."
-                className="w-full resize-none p-4 sm:p-5 rounded-2xl text-sm leading-relaxed outline-none transition-all duration-300 focus:ring-2"
-                style={{
-                  background: 'var(--bg-secondary)',
-                  color: 'var(--text-primary)',
-                  border: '1px solid var(--border)',
-                  fontFamily: "'GenSenRounded', 'Noto Sans TC', sans-serif",
-                  fontWeight: 500,
-                  minHeight: '280px',
-                  '--tw-ring-color': 'var(--accent-primary)',
-                }}
-                spellCheck={false}
-              />
-              <div className="mt-4">
-                <StatsBar stats={stats} statusColor={statusColor} platform={platform} />
-              </div>
-            </div>
-          </div>
+          <QuickMode
+            text={text}
+            onTextChange={setText}
+            stats={stats}
+            statusColor={statusColor}
+            platform={platform}
+          />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 animate-fadeInUp">
-            {/* 左：預覽區 */}
-            <div
-              className="rounded-3xl p-5 sm:p-7"
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                boxShadow: 'var(--shadow)',
-              }}
-            >
-              {/* 預覽標籤切換 */}
-              <div className="flex items-center gap-2 mb-4">
-                <div
-                  className="flex rounded-lg p-0.5"
-                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
-                >
-                  <button
-                    onClick={() => setPreviewTab('platform')}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200"
-                    style={{
-                      background: previewTab === 'platform' ? 'var(--bg-card)' : 'transparent',
-                      color: previewTab === 'platform' ? 'var(--text-primary)' : 'var(--text-muted)',
-                      boxShadow: previewTab === 'platform' ? 'var(--shadow)' : 'none',
-                    }}
-                  >
-                    <EyeIcon /> 平台模擬
-                  </button>
-                  <button
-                    onClick={() => setPreviewTab('result')}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200"
-                    style={{
-                      background: previewTab === 'result' ? 'var(--bg-card)' : 'transparent',
-                      color: previewTab === 'result' ? 'var(--text-primary)' : 'var(--text-muted)',
-                      boxShadow: previewTab === 'result' ? 'var(--shadow)' : 'none',
-                    }}
-                  >
-                    <TextIcon /> 轉換結果
-                  </button>
-                </div>
-              </div>
-
-              {previewTab === 'platform' ? (
-                <PostPreview text={transformed} platform={platform} />
-              ) : (
-                <div
-                  className="rounded-2xl p-4 text-sm leading-relaxed whitespace-pre-wrap break-words overflow-auto"
-                  style={{
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border)',
-                    color: 'var(--text-primary)',
-                    fontFamily: "'GenSenRounded', 'Noto Sans TC', sans-serif",
-                    minHeight: '240px',
-                    maxHeight: '500px',
-                  }}
-                >
-                  {transformed || <span style={{ color: 'var(--text-muted)' }}>轉換結果將在這裡顯示...</span>}
-                </div>
-              )}
-            </div>
-
-            {/* 右：編輯區 */}
-            <div
-              className="rounded-3xl p-5 sm:p-7"
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                boxShadow: 'var(--shadow)',
-              }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <EditIcon />
-                <span className="text-sm font-medium">編輯區</span>
-                <button
-                  onClick={handlePaste}
-                  className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 hover:scale-105 active:scale-95"
-                  style={{
-                    background: 'var(--bg-secondary)',
-                    color: 'var(--text-muted)',
-                    border: '1px solid var(--border)',
-                  }}
-                >
-                  <PasteIcon /> 貼上
-                </button>
-              </div>
-
-              <PostEditor
-                value={text}
-                onChange={setText}
-                placeholder="在這裡輸入或貼上你的貼文..."
-                textareaRef={textareaRef}
-              />
-
-              <div className="mt-5">
-                <EmojiPicker onSelect={handleEmojiInsert} />
-              </div>
-
-              <div className="mt-5 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
-                <StatsBar stats={stats} statusColor={statusColor} platform={platform} />
-              </div>
-            </div>
-          </div>
+          <EditorMode
+            text={text}
+            onTextChange={setText}
+            transformed={transformed}
+            platform={platform}
+            stats={stats}
+            statusColor={statusColor}
+            previewTab={previewTab}
+            onPreviewTabChange={setPreviewTab}
+            textareaRef={textareaRef}
+            onEmojiInsert={handleEmojiInsert}
+            onPaste={handlePaste}
+          />
         )}
 
         {/* ═══ 複製按鈕 ═══════════════════════════════════ */}
@@ -428,61 +265,150 @@ export default function PostWriter() {
   )
 }
 
-// ─── 統計列子組件 ──────────────────────────────────────
+// ─── 快速模式 ─────────────────────────────────────────
 
-function StatsBar({ stats, statusColor, platform }) {
-  if (!stats) return null
-
+function QuickMode({ text, onTextChange, stats, statusColor, platform }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-      {/* 進度條 */}
-      <div className="flex-1 min-w-[100px]">
-        <div
-          className="w-full h-1.5 rounded-full overflow-hidden"
-          style={{ background: 'var(--bg-secondary)' }}
-        >
-          <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{
-              width: `${Math.min(stats.charPercent, 100)}%`,
-              background: statusColor,
-            }}
-          />
+    <div className="animate-fadeInUp">
+      <div
+        className="rounded-3xl p-6 sm:p-8"
+        style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow)',
+        }}
+      >
+        <textarea
+          value={text}
+          onChange={(e) => onTextChange(e.target.value)}
+          placeholder="貼上你的文字，一鍵轉換..."
+          className="w-full resize-none p-4 sm:p-5 rounded-2xl text-sm leading-relaxed outline-none transition-all duration-300 focus:ring-2"
+          style={{
+            background: 'var(--bg-secondary)',
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border)',
+            fontFamily: "'GenSenRounded', 'Noto Sans TC', sans-serif",
+            fontWeight: 500,
+            minHeight: '280px',
+            '--tw-ring-color': 'var(--accent-primary)',
+          }}
+          spellCheck={false}
+        />
+        <div className="mt-4">
+          <StatsBar stats={stats} statusColor={statusColor} platform={platform} />
         </div>
       </div>
+    </div>
+  )
+}
 
-      {/* 數字 + 標籤 */}
-      <div className="flex flex-wrap items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
-        <span style={{ color: statusColor, fontWeight: 600 }}>{stats.charCount.toLocaleString()}</span>
-        <span>/ {stats.maxChars.toLocaleString()} 字</span>
-        <span style={{ opacity: 0.4 }}>·</span>
-        <span>{stats.lineCount} 行</span>
-        <span style={{ opacity: 0.4 }}>·</span>
-        <span>{stats.paragraphCount} 段</span>
+// ─── 編輯器模式 ───────────────────────────────────────
 
-        {stats.showMoreTriggered && (
-          <span className="px-2 py-0.5 rounded-full" style={{ background: 'rgba(212,165,50,0.1)', color: '#C8A020' }}>
-            超過 5 行將折疊
-          </span>
-        )}
+function EditorMode({
+  text, onTextChange, transformed, platform,
+  stats, statusColor, previewTab, onPreviewTabChange,
+  textareaRef, onEmojiInsert, onPaste,
+}) {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 animate-fadeInUp">
+      {/* 左：預覽區 */}
+      <div
+        className="rounded-3xl p-5 sm:p-7"
+        style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow)',
+        }}
+      >
+        {/* 預覽標籤切換 */}
+        <div className="flex items-center gap-2 mb-4">
+          <div
+            className="flex rounded-lg p-0.5"
+            style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
+          >
+            <button
+              onClick={() => onPreviewTabChange('platform')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200"
+              style={{
+                background: previewTab === 'platform' ? 'var(--bg-card)' : 'transparent',
+                color: previewTab === 'platform' ? 'var(--text-primary)' : 'var(--text-muted)',
+                boxShadow: previewTab === 'platform' ? 'var(--shadow)' : 'none',
+              }}
+            >
+              <EyeIcon /> 平台模擬
+            </button>
+            <button
+              onClick={() => onPreviewTabChange('result')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200"
+              style={{
+                background: previewTab === 'result' ? 'var(--bg-card)' : 'transparent',
+                color: previewTab === 'result' ? 'var(--text-primary)' : 'var(--text-muted)',
+                boxShadow: previewTab === 'result' ? 'var(--shadow)' : 'none',
+              }}
+            >
+              <TextIcon /> 轉換結果
+            </button>
+          </div>
+        </div>
 
-        {platform === 'instagram' && stats.hashtagCount > 0 && (
-          <span
-            className="px-2 py-0.5 rounded-full"
+        {previewTab === 'platform' ? (
+          <PostPreview text={transformed} platform={platform} />
+        ) : (
+          <div
+            className="rounded-2xl p-4 text-sm leading-relaxed whitespace-pre-wrap break-words overflow-auto"
             style={{
-              background: stats.hashtagOver ? 'rgba(232,85,85,0.1)' : 'rgba(168,181,160,0.15)',
-              color: stats.hashtagOver ? '#E85555' : 'var(--sage)',
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-primary)',
+              fontFamily: "'GenSenRounded', 'Noto Sans TC', sans-serif",
+              minHeight: '240px',
+              maxHeight: '500px',
             }}
           >
-            #{stats.hashtagCount}/{stats.hashtagLimit}
-          </span>
+            {transformed || <span style={{ color: 'var(--text-muted)' }}>轉換結果將在這裡顯示...</span>}
+          </div>
         )}
+      </div>
 
-        {stats.threadSplits && (
-          <span className="px-2 py-0.5 rounded-full" style={{ background: 'rgba(184,169,201,0.15)', color: 'var(--lavender)' }}>
-            建議拆為 {stats.threadSplits.length} 則串文
-          </span>
-        )}
+      {/* 右：編輯區 */}
+      <div
+        className="rounded-3xl p-5 sm:p-7"
+        style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow)',
+        }}
+      >
+        <div className="flex items-center gap-2 mb-4">
+          <EditIcon />
+          <span className="text-sm font-medium">編輯區</span>
+          <button
+            onClick={onPaste}
+            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+            style={{
+              background: 'var(--bg-secondary)',
+              color: 'var(--text-muted)',
+              border: '1px solid var(--border)',
+            }}
+          >
+            <PasteIcon /> 貼上
+          </button>
+        </div>
+
+        <PostEditor
+          value={text}
+          onChange={onTextChange}
+          placeholder="在這裡輸入或貼上你的貼文..."
+          textareaRef={textareaRef}
+        />
+
+        <div className="mt-5">
+          <EmojiPicker onSelect={onEmojiInsert} />
+        </div>
+
+        <div className="mt-5 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
+          <StatsBar stats={stats} statusColor={statusColor} platform={platform} />
+        </div>
       </div>
     </div>
   )
