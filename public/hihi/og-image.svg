@@ -20,7 +20,7 @@
   <!-- Center card -->
   <rect x="120" y="80" width="960" height="470" rx="32" fill="url(#card)" opacity="0.95"/>
 
-  <!-- Flower icon (simplified) -->
+  <!-- Flower icon -->
   <g transform="translate(600, 220)">
     <ellipse cx="0" cy="-48" rx="16" ry="32" fill="#FEDFE1" opacity="0.7" transform="rotate(0 0 0)"/>
     <ellipse cx="0" cy="-48" rx="16" ry="32" fill="#F5D0C5" opacity="0.6" transform="rotate(60 0 0)"/>
@@ -32,14 +32,14 @@
   </g>
 
   <!-- Title -->
-  <text x="600" y="340" text-anchor="middle" font-family="system-ui, 'Noto Sans TC', sans-serif" font-weight="700" font-size="52" fill="#333333" letter-spacing="3">問安圖產生器</text>
+  <text x="600" y="340" text-anchor="middle" font-family="GenSenRounded" font-weight="700" font-size="52" fill="#333333" letter-spacing="3">問安圖產生器</text>
 
   <!-- Subtitle -->
-  <text x="600" y="400" text-anchor="middle" font-family="system-ui, 'Noto Sans TC', sans-serif" font-weight="500" font-size="26" fill="#888888">早安午安晚安圖，3 步驟免費製作</text>
+  <text x="600" y="400" text-anchor="middle" font-family="GenSenRounded" font-weight="500" font-size="26" fill="#888888">早安午安晚安圖，3 步驟免費製作</text>
 
   <!-- Features row -->
-  <text x="600" y="460" text-anchor="middle" font-family="system-ui, 'Noto Sans TC', sans-serif" font-weight="400" font-size="20" fill="#B5ADA7">7 種字體 ・ 配件貼紙 ・ 智慧語錄 ・ 一鍵下載</text>
+  <text x="600" y="460" text-anchor="middle" font-family="GenSenRounded" font-weight="500" font-size="20" fill="#B5ADA7">7 種字體 ・ 配件貼紙 ・ 智慧語錄 ・ 一鍵下載</text>
 
   <!-- Brand footer -->
-  <text x="600" y="600" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="20" fill="#FFFFFF" opacity="0.7" letter-spacing="2">Hello Ruru Tools</text>
+  <text x="600" y="600" text-anchor="middle" font-family="GenSenRounded" font-weight="700" font-size="20" fill="#FFFFFF" opacity="0.7" letter-spacing="2">Hello Ruru Tools</text>
 </svg>
