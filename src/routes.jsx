@@ -139,7 +139,7 @@ export const routes = [
     },
   },
   {
-    path: '/bg-removal',
+    path: '/bg-remove',
     element: BgRemoval,
     title: '批次去背',
     seo: {

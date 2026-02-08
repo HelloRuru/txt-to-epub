@@ -23,7 +23,7 @@ const tools = [
     id: 'bg-removal',
     name: '批次去背',
     description: '上傳多張圖片，AI 自動去除背景。全程本機處理，不限解析度，完全免費。',
-    path: '/bg-removal',
+    path: '/bg-remove',
     ready: true,
     color: 'lavender',
   },
