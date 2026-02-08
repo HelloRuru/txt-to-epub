@@ -216,11 +216,28 @@
 | `newday.helloruru.com` | 離職全能導航幫手 | 必要 |
 | `lab.helloruru.com` | —（已有完整花朵 Hero） | 不需要 |
 
+### 間距規範
+
+> **v1.7 新增（2026-02-08）**
+
+品牌頁首與主內容之間必須保持至少 **24px** 間距，禁止緊貼。
+
+```css
+hello-ruru-header {
+  display: block;
+  margin-bottom: 28px;   /* 至少 24px，建議 28px */
+}
+```
+
+- 品牌頁首使用 Shadow DOM，間距須由外部元素控制
+- 所有工具站（tools、newday）皆須遵守
+
 ### 禁止事項
 
 - 禁止各站自行實作品牌 Logo / Header（統一使用 Web Component）
 - 禁止修改 Web Component 的 Shadow DOM 內部樣式
 - 禁止移除品牌頁首
+- 禁止主內容緊貼品牌頁首（至少 24px 間距）
 
 ---
 
@@ -417,6 +434,7 @@ public/reader-quiz/
 11. 禁止非標準 Footer 格式
 12. 禁止使用 `font-weight: 300` 或其他 GenSenRounded 不支援的字重（僅限 400/500/700）
 13. 禁止各站自行實作品牌 Header（必須使用 `<hello-ruru-header>` Web Component）
+14. 禁止主內容緊貼品牌頁首（至少保持 24px 間距）
 
 ---
 

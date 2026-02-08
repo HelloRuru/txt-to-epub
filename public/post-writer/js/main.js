@@ -1,0 +1,317 @@
+/**
+ * 社群貼文排版 — 進入點 + 狀態管理 + 事件處理
+ *
+ * 流程：init → loadData → render → bindEvents
+ * 更新：textarea input → refreshPreview（部分更新，保留游標）
+ *       其他操作 → render（全量重繪）
+ */
+
+import { renderApp, updateStatsBar, updatePreviewContent, updateProgressBar, updatePicker } from './render.js'
+import { computeStats, applyTemplate, validateTemplate, DEFAULT_PLATFORM } from './platforms.js'
+// converter.js 由 render.js 和 clipboard.js 內部引用
+import { copyResult } from './clipboard.js'
+import { icons } from './icons.js'
+
+// ─── 全域狀態 ───────────────────────────────────────────
+
+const state = {
+  text: '',
+  platform: DEFAULT_PLATFORM,
+  viewMode: 'editor',
+  mode: 'original',
+  titleStyle: 'checkerboard',
+  fullWidthPunctuation: false,
+  sentenceCase: false,
+  fullWidthDigit: false,
+  titleDetect: 'auto',
+  manualTitle: '',
+  previewTab: 'platform',
+  previewDevice: 'ios',
+  previewExpanded: false,
+  pickerTab: 'emoji',
+  pickerCategory: 'smileys',
+  copyState: 'idle',
+  isDark: false,
+  // Computed（由 recalculate 填入）
+  transformed: '',
+  stats: null,
+  validation: { valid: true, warnings: [] },
+}
+
+// ─── 資料容器 ───────────────────────────────────────────
+
+let data = { emoji: null, symbols: null, kaomoji: null }
+
+// ─── 載入工具 ───────────────────────────────────────────
+
+async function loadJSON(path) {
+  const res = await fetch(path)
+  if (!res.ok) throw new Error(`載入 ${path} 失敗（${res.status}）`)
+  return res.json()
+}
+
+async function loadData() {
+  const [emoji, symbols, kaomoji] = await Promise.all([
+    loadJSON('data/emoji.json'),
+    loadJSON('data/symbols.json'),
+    loadJSON('data/kaomoji.json'),
+  ])
+  return { emoji, symbols, kaomoji }
+}
+
+// ─── 核心計算 ───────────────────────────────────────────
+
+function recalculate() {
+  const templateOptions = {
+    titleStyle: state.titleStyle,
+    titleDetect: state.titleDetect,
+    manualTitle: state.manualTitle,
+    fullWidthPunctuation: state.fullWidthPunctuation,
+    sentenceCase: state.sentenceCase,
+    fullWidthDigit: state.fullWidthDigit,
+  }
+  state.transformed = applyTemplate(state.text, state.mode, templateOptions)
+  state.stats = computeStats(state.text, state.platform)
+  state.validation = validateTemplate(state.text, state.mode)
+}
+
+// ─── 渲染 ───────────────────────────────────────────────
+
+/**
+ * 全量重繪（innerHTML 替換 #app，重新綁定事件）
+ */
+function render() {
+  recalculate()
+  const app = document.getElementById('app')
+  app.innerHTML = renderApp(state, data)
+  bindEvents()
+}
+
+/**
+ * 部分更新（不觸發 innerHTML，保留 textarea 游標位置）
+ */
+function refreshPreview() {
+  recalculate()
+  updateStatsBar(state)
+  updatePreviewContent(state)
+  updateProgressBar(state)
+}
+
+// ─── 事件綁定 ───────────────────────────────────────────
+
+function bindEvents() {
+  const app = document.getElementById('app')
+
+  // 統一 click 委派
+  app.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]')
+    if (!btn) return
+
+    const action = btn.dataset.action
+
+    switch (action) {
+      case 'set-platform':
+        state.platform = btn.dataset.platform
+        render()
+        break
+
+      case 'set-view':
+        state.viewMode = btn.dataset.view
+        render()
+        break
+
+      case 'set-mode':
+        state.mode = btn.dataset.mode
+        render()
+        break
+
+      case 'set-title-detect':
+        state.titleDetect = btn.dataset.detect
+        render()
+        break
+
+      case 'toggle-option': {
+        const opt = btn.dataset.option
+        state[opt] = !state[opt]
+        refreshPreview()
+        // toggle 按鈕視覺狀態需要全量重繪
+        render()
+        break
+      }
+
+      case 'set-picker-tab': {
+        state.pickerTab = btn.dataset.pickerTab
+        const defaults = { emoji: 'smileys', symbols: 'bullets', kaomoji: 'happy' }
+        state.pickerCategory = defaults[state.pickerTab] || state.pickerCategory
+        updatePicker(state, data)
+        break
+      }
+
+      case 'set-picker-category':
+        state.pickerCategory = btn.dataset.pickerCategory
+        updatePicker(state, data)
+        break
+
+      case 'insert-item':
+        insertAtCursor(btn.dataset.item)
+        break
+
+      case 'insert-separator':
+        insertAtCursor('\n' + btn.dataset.sep + '\n')
+        break
+
+      case 'set-device':
+        state.previewDevice = btn.dataset.device
+        render()
+        break
+
+      case 'set-preview-tab':
+        state.previewTab = btn.dataset.tab
+        render()
+        break
+
+      case 'toggle-expand':
+        state.previewExpanded = !state.previewExpanded
+        render()
+        break
+
+      case 'paste-text':
+        handlePaste()
+        break
+
+      case 'copy-result':
+        handleCopy()
+        break
+
+      case 'toggle-theme':
+        state.isDark = !state.isDark
+        document.body.classList.toggle('dark', state.isDark)
+        localStorage.setItem('post-writer-theme', state.isDark ? 'dark' : 'light')
+        render()
+        break
+    }
+  })
+
+  // Textarea 即時輸入（直接綁定，不走委派）
+  const textarea = document.getElementById('post-textarea')
+  if (textarea) {
+    textarea.addEventListener('input', (e) => {
+      state.text = e.target.value
+      refreshPreview()
+    })
+    // 全量重繪後恢復文字內容
+    textarea.value = state.text
+  }
+
+  // 手動標題輸入
+  const titleInput = document.getElementById('manual-title-input')
+  if (titleInput) {
+    titleInput.addEventListener('input', (e) => {
+      state.manualTitle = e.target.value
+      refreshPreview()
+    })
+    titleInput.value = state.manualTitle
+  }
+
+  // 標題樣式下拉選單
+  const styleSelect = document.getElementById('title-style-select')
+  if (styleSelect) {
+    styleSelect.addEventListener('change', (e) => {
+      state.titleStyle = e.target.value
+      refreshPreview()
+    })
+  }
+}
+
+// ─── 插入工具 ───────────────────────────────────────────
+
+function insertAtCursor(text) {
+  const textarea = document.getElementById('post-textarea')
+  if (!textarea) return
+
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+
+  state.text = state.text.slice(0, start) + text + state.text.slice(end)
+  textarea.value = state.text
+
+  requestAnimationFrame(() => {
+    const pos = start + text.length
+    textarea.selectionStart = pos
+    textarea.selectionEnd = pos
+    textarea.focus()
+  })
+
+  refreshPreview()
+}
+
+// ─── 貼上 ───────────────────────────────────────────────
+
+async function handlePaste() {
+  try {
+    const text = await navigator.clipboard.readText()
+    if (text) {
+      state.text = text
+      render()
+    }
+  } catch {
+    // Fallback：聚焦 textarea 讓使用者手動貼上
+    const textarea = document.getElementById('post-textarea')
+    if (textarea) textarea.focus()
+  }
+}
+
+// ─── 複製 ───────────────────────────────────────────────
+
+async function handleCopy() {
+  if (!state.text && !(state.titleDetect === 'manual' && state.manualTitle.trim())) return
+
+  const templateOptions = {
+    titleStyle: state.titleStyle,
+    titleDetect: state.titleDetect,
+    manualTitle: state.manualTitle,
+    fullWidthPunctuation: state.fullWidthPunctuation,
+    sentenceCase: state.sentenceCase,
+    fullWidthDigit: state.fullWidthDigit,
+  }
+
+  const result = await copyResult(state.text, state.platform, state.mode, templateOptions)
+
+  if (result.success) {
+    state.copyState = 'success'
+    render()
+    setTimeout(() => {
+      state.copyState = 'idle'
+      const btn = document.querySelector('.copy-btn')
+      if (btn) {
+        btn.classList.remove('copy-btn--success')
+        btn.innerHTML = icons.copy + ' 複製並套用格式'
+      }
+    }, 2000)
+  }
+}
+
+// ─── 主題 ───────────────────────────────────────────────
+
+function initTheme() {
+  const saved = localStorage.getItem('post-writer-theme')
+  if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    state.isDark = true
+    document.body.classList.add('dark')
+  }
+}
+
+// ─── 初始化 ─────────────────────────────────────────────
+
+async function init() {
+  initTheme()
+  try {
+    data = await loadData()
+    render()
+  } catch (err) {
+    document.getElementById('app').innerHTML =
+      `<div class="error-msg"><p>載入失敗：${err.message}</p></div>`
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init)
