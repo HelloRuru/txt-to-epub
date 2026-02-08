@@ -152,9 +152,13 @@ function handleAppClick(e) {
       insertAtCursor(btn.dataset.item)
       break
 
-    case 'insert-separator':
-      insertAtCursor('\n' + btn.dataset.sep + '\n')
+    case 'insert-separator': {
+      const sep = btn.dataset.sep
+      const textarea = document.getElementById('post-textarea')
+      const atStart = !textarea || textarea.selectionStart === 0
+      insertAtCursor(atStart ? sep + '\n' : '\n' + sep + '\n')
       break
+    }
 
     case 'set-device':
       state.previewDevice = btn.dataset.device
@@ -246,7 +250,10 @@ function insertAtCursor(text) {
     const pos = start + text.length
     textarea.selectionStart = pos
     textarea.selectionEnd = pos
-    textarea.focus()
+    // 觸控裝置不 focus，避免鍵盤彈出遮住 picker
+    if (!('ontouchstart' in window)) {
+      textarea.focus()
+    }
   })
 
   refreshPreview()
@@ -275,7 +282,10 @@ let copying = false
 
 async function handleCopy() {
   if (copying) return
-  if (!state.text && !(state.titleDetect === 'manual' && state.manualTitle.trim())) return
+  if (!state.text && !(state.titleDetect === 'manual' && state.manualTitle.trim())) {
+    showToast('請先輸入貼文內容')
+    return
+  }
 
   copying = true
   try {
