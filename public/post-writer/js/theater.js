@@ -26,7 +26,7 @@ const EMOJI_MAP = new Map([
 const EMOJI_REGEX = /\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu
 const CJK_BEFORE_REGEX = /(?<=[\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF\u3000-\u303F\uFF00-\uFFEF]):/g
 const CJK_BEFORE_PIPE_REGEX = /(?<=[\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF\u3000-\u303F\uFF00-\uFFEF])\|/g
-const URL_REGEX = /https?:\/\/[^\s]+/g
+const URL_REGEX = /https?:\/\/[^\s\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF\u3000-\u303F\uFF01-\uFF60，。！？；：）」』】>]+/g
 const HEADING_REGEX = /^#\s*(.+)$/gm
 const FIELD_LINE_REGEX = /^(.+?)(：|｜)(.*)$/
 const SENTENCE_END_REGEX = /[。！？!?.，,;；…]$/

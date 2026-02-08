@@ -47,7 +47,11 @@ let data = { emoji: null, symbols: null, kaomoji: null }
 async function loadJSON(path) {
   const res = await fetch(path)
   if (!res.ok) throw new Error(`載入 ${path} 失敗（${res.status}）`)
-  return res.json()
+  try {
+    return await res.json()
+  } catch {
+    throw new Error(`${path} 格式錯誤`)
+  }
 }
 
 async function loadData() {

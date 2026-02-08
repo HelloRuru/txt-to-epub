@@ -43,6 +43,9 @@ export function computeStats(text, platformId) {
   if (!platform) return null
 
   const charCount = text.length
+  // ZWSP 估算：每個 double-break 加 1 字元
+  const breakCount = (text.match(/\n\n+/g) || []).length
+  const estimatedCopyLength = charCount + breakCount
   const lineCount = text ? text.split('\n').length : 0
   const paragraphCount = text ? text.split(/\n\s*\n/).filter(p => p.trim()).length : 0
   const hashtagCount = (text.match(/#[\w\u4e00-\u9fff]+/g) || []).length
@@ -65,9 +68,15 @@ export function computeStats(text, platformId) {
     hashtagOver = hashtagCount > platform.hashtagLimit
   }
 
+  // Threads ZWSP 超標偵測
   let threadSplits = null
-  if (platformId === 'threads' && charCount > platform.maxChars) {
-    threadSplits = suggestThreadSplits(text, platform.maxChars)
+  let zwspOverflow = false
+  if (platformId === 'threads') {
+    if (charCount > platform.maxChars) {
+      threadSplits = suggestThreadSplits(text, platform.maxChars)
+    } else if (estimatedCopyLength > platform.maxChars && charCount <= platform.maxChars) {
+      zwspOverflow = true
+    }
   }
 
   return {
@@ -83,6 +92,7 @@ export function computeStats(text, platformId) {
     hashtagOver,
     hashtagLimit: platform.hashtagLimit,
     threadSplits,
+    zwspOverflow,
   }
 }
 

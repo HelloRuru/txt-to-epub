@@ -142,6 +142,7 @@ export function renderTemplateControls(state) {
             class="manual-title-input"
             id="manual-title-input"
             placeholder="輸入標題..."
+            maxlength="60"
             value="${escapeAttr(state.manualTitle || '')}"
           />
         </div>
@@ -376,7 +377,7 @@ export function renderSeparatorBar() {
   return `
     <div class="separator-bar">
       ${SEPARATORS.map(sep => `
-        <button class="separator-bar__btn" data-action="insert-separator" data-sep="${escapeAttr(sep)}">
+        <button class="separator-bar__btn" data-action="insert-separator" data-sep="${escapeAttr(sep)}" aria-label="插入分隔線 ${escapeAttr(sep)}">
           ${escapeHtml(sep)}
         </button>
       `).join('')}
@@ -627,6 +628,14 @@ function renderPlatformBadges(platformId, stats) {
     badges.push(`
       <span class="stats-badge stats-badge--warning">
         ${icons.alertTriangle} 建議拆為 ${stats.threadSplits.length} 則串文
+      </span>
+    `)
+  }
+
+  if (platformId === 'threads' && stats.zwspOverflow) {
+    badges.push(`
+      <span class="stats-badge stats-badge--warning">
+        ${icons.alertTriangle} 換行符可能導致超過 500 字
       </span>
     `)
   }
