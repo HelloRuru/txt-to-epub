@@ -82,9 +82,11 @@ function recalculate() {
  */
 function render() {
   recalculate()
+  const scrollY = window.scrollY
   const app = document.getElementById('app')
   app.innerHTML = renderApp(state, data)
   bindEvents()
+  requestAnimationFrame(() => window.scrollTo(0, scrollY))
 }
 
 /**
@@ -267,12 +269,14 @@ async function handlePaste() {
     if (text) {
       state.text = text
       render()
+    } else {
+      showToast('剪貼簿是空的')
     }
   } catch {
     // iOS 等不支援 readText 的環境：聚焦 textarea 提示手動貼上
     const textarea = document.getElementById('post-textarea')
     if (textarea) textarea.focus()
-    showToast('請使用 Ctrl+V 或長按貼上')
+    showToast('請長按貼上')
   }
 }
 
