@@ -1216,6 +1216,9 @@ body.dark .copy-btn:hover {
 
   z-index: 1000;
   white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .toast--visible {

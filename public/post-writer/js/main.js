@@ -9,7 +9,7 @@
 import { renderApp, updateStatsBar, updatePreviewContent, updateProgressBar, updatePicker } from './render.js'
 import { computeStats, applyTemplate, validateTemplate, DEFAULT_PLATFORM } from './platforms.js'
 // converter.js 由 render.js 和 clipboard.js 內部引用
-import { copyResult } from './clipboard.js'
+import { copyResult, showToast } from './clipboard.js'
 import { icons } from './icons.js'
 
 // ─── 全域狀態 ───────────────────────────────────────────
@@ -97,102 +97,109 @@ function refreshPreview() {
   updateProgressBar(state)
 }
 
+// ─── Click 委派（只綁定一次） ────────────────────────────
+
+function handleAppClick(e) {
+  const btn = e.target.closest('[data-action]')
+  if (!btn) return
+
+  const action = btn.dataset.action
+
+  switch (action) {
+    case 'set-platform':
+      state.platform = btn.dataset.platform
+      render()
+      break
+
+    case 'set-view':
+      state.viewMode = btn.dataset.view
+      render()
+      break
+
+    case 'set-mode':
+      state.mode = btn.dataset.mode
+      render()
+      break
+
+    case 'set-title-detect':
+      state.titleDetect = btn.dataset.detect
+      render()
+      break
+
+    case 'toggle-option': {
+      const opt = btn.dataset.option
+      state[opt] = !state[opt]
+      refreshPreview()
+      // toggle 按鈕視覺狀態需要全量重繪
+      render()
+      break
+    }
+
+    case 'set-picker-tab': {
+      state.pickerTab = btn.dataset.pickerTab
+      const defaults = { emoji: 'smileys', symbols: 'bullets', kaomoji: 'happy' }
+      state.pickerCategory = defaults[state.pickerTab] || state.pickerCategory
+      updatePicker(state, data)
+      break
+    }
+
+    case 'set-picker-category':
+      state.pickerCategory = btn.dataset.pickerCategory
+      updatePicker(state, data)
+      break
+
+    case 'insert-item':
+      insertAtCursor(btn.dataset.item)
+      break
+
+    case 'insert-separator':
+      insertAtCursor('\n' + btn.dataset.sep + '\n')
+      break
+
+    case 'set-device':
+      state.previewDevice = btn.dataset.device
+      render()
+      break
+
+    case 'set-preview-tab':
+      state.previewTab = btn.dataset.tab
+      render()
+      break
+
+    case 'toggle-expand':
+      state.previewExpanded = !state.previewExpanded
+      render()
+      break
+
+    case 'paste-text':
+      handlePaste()
+      break
+
+    case 'copy-result':
+      handleCopy()
+      break
+
+    case 'toggle-theme':
+      state.isDark = !state.isDark
+      document.body.classList.toggle('dark', state.isDark)
+      localStorage.setItem('post-writer-theme', state.isDark ? 'dark' : 'light')
+      render()
+      break
+  }
+}
+
 // ─── 事件綁定 ───────────────────────────────────────────
 
 function bindEvents() {
   const app = document.getElementById('app')
 
-  // 統一 click 委派
-  app.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-action]')
-    if (!btn) return
+  // Click 委派只綁定一次（app 元素不會被 innerHTML 替換）
+  if (!app._clickBound) {
+    app.addEventListener('click', handleAppClick)
+    app._clickBound = true
+  }
 
-    const action = btn.dataset.action
-
-    switch (action) {
-      case 'set-platform':
-        state.platform = btn.dataset.platform
-        render()
-        break
-
-      case 'set-view':
-        state.viewMode = btn.dataset.view
-        render()
-        break
-
-      case 'set-mode':
-        state.mode = btn.dataset.mode
-        render()
-        break
-
-      case 'set-title-detect':
-        state.titleDetect = btn.dataset.detect
-        render()
-        break
-
-      case 'toggle-option': {
-        const opt = btn.dataset.option
-        state[opt] = !state[opt]
-        refreshPreview()
-        // toggle 按鈕視覺狀態需要全量重繪
-        render()
-        break
-      }
-
-      case 'set-picker-tab': {
-        state.pickerTab = btn.dataset.pickerTab
-        const defaults = { emoji: 'smileys', symbols: 'bullets', kaomoji: 'happy' }
-        state.pickerCategory = defaults[state.pickerTab] || state.pickerCategory
-        updatePicker(state, data)
-        break
-      }
-
-      case 'set-picker-category':
-        state.pickerCategory = btn.dataset.pickerCategory
-        updatePicker(state, data)
-        break
-
-      case 'insert-item':
-        insertAtCursor(btn.dataset.item)
-        break
-
-      case 'insert-separator':
-        insertAtCursor('\n' + btn.dataset.sep + '\n')
-        break
-
-      case 'set-device':
-        state.previewDevice = btn.dataset.device
-        render()
-        break
-
-      case 'set-preview-tab':
-        state.previewTab = btn.dataset.tab
-        render()
-        break
-
-      case 'toggle-expand':
-        state.previewExpanded = !state.previewExpanded
-        render()
-        break
-
-      case 'paste-text':
-        handlePaste()
-        break
-
-      case 'copy-result':
-        handleCopy()
-        break
-
-      case 'toggle-theme':
-        state.isDark = !state.isDark
-        document.body.classList.toggle('dark', state.isDark)
-        localStorage.setItem('post-writer-theme', state.isDark ? 'dark' : 'light')
-        render()
-        break
-    }
-  })
-
-  // Textarea 即時輸入（直接綁定，不走委派）
+  // 以下元素每次 render 都會被 innerHTML 重建，安全重新綁定
   const textarea = document.getElementById('post-textarea')
   if (textarea) {
     textarea.addEventListener('input', (e) => {
@@ -255,39 +262,48 @@ async function handlePaste() {
       render()
     }
   } catch {
-    // Fallback：聚焦 textarea 讓使用者手動貼上
+    // iOS 等不支援 readText 的環境：聚焦 textarea 提示手動貼上
     const textarea = document.getElementById('post-textarea')
     if (textarea) textarea.focus()
+    showToast('請使用 Ctrl+V 或長按貼上')
   }
 }
 
 // ─── 複製 ───────────────────────────────────────────────
 
+let copying = false
+
 async function handleCopy() {
+  if (copying) return
   if (!state.text && !(state.titleDetect === 'manual' && state.manualTitle.trim())) return
 
-  const templateOptions = {
-    titleStyle: state.titleStyle,
-    titleDetect: state.titleDetect,
-    manualTitle: state.manualTitle,
-    fullWidthPunctuation: state.fullWidthPunctuation,
-    sentenceCase: state.sentenceCase,
-    fullWidthDigit: state.fullWidthDigit,
-  }
+  copying = true
+  try {
+    const templateOptions = {
+      titleStyle: state.titleStyle,
+      titleDetect: state.titleDetect,
+      manualTitle: state.manualTitle,
+      fullWidthPunctuation: state.fullWidthPunctuation,
+      sentenceCase: state.sentenceCase,
+      fullWidthDigit: state.fullWidthDigit,
+    }
 
-  const result = await copyResult(state.text, state.platform, state.mode, templateOptions)
+    const result = await copyResult(state.text, state.platform, state.mode, templateOptions)
 
-  if (result.success) {
-    state.copyState = 'success'
-    render()
-    setTimeout(() => {
-      state.copyState = 'idle'
-      const btn = document.querySelector('.copy-btn')
-      if (btn) {
-        btn.classList.remove('copy-btn--success')
-        btn.innerHTML = icons.copy + ' 複製並套用格式'
-      }
-    }, 2000)
+    if (result.success) {
+      state.copyState = 'success'
+      render()
+      setTimeout(() => {
+        state.copyState = 'idle'
+        const btn = document.querySelector('.copy-btn')
+        if (btn) {
+          btn.classList.remove('copy-btn--success')
+          btn.innerHTML = icons.copy + ' 複製並套用格式'
+        }
+      }, 2000)
+    }
+  } finally {
+    copying = false
   }
 }
 
