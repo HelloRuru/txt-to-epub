@@ -104,7 +104,7 @@ body {
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.5s ease, color 0.5s ease;
+
   position: relative;
   overflow-x: hidden;
 }
@@ -259,7 +259,7 @@ hello-ruru-header {
   letter-spacing: 0.02em;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.25s ease;
+
 }
 
 .view-switcher__btn svg {
@@ -303,7 +303,7 @@ hello-ruru-header {
   letter-spacing: 0.02em;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.25s ease;
+
 }
 
 .platform-pills__btn svg {
@@ -349,7 +349,7 @@ hello-ruru-header {
   letter-spacing: 0.02em;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.25s ease;
+
 }
 
 .template-modes__btn:hover {
@@ -411,7 +411,7 @@ hello-ruru-header {
   background: var(--bg-secondary);
   border: 1.5px solid var(--border);
   border-radius: 11px;
-  transition: all 0.25s ease;
+
 }
 
 .toggle-switch__knob {
@@ -423,7 +423,7 @@ hello-ruru-header {
   background: #FFFFFF;
   border-radius: 50%;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-  transition: transform 0.25s ease;
+
 }
 
 .toggle-switch input:checked + .toggle-switch__track {
@@ -455,7 +455,7 @@ hello-ruru-header {
   font-weight: 400;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.25s ease;
+
 }
 
 .title-detect-opts__btn:hover {
@@ -494,7 +494,7 @@ hello-ruru-header {
   font-weight: 400;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.25s ease;
+
 }
 
 .title-style-opts__btn:hover {
@@ -548,7 +548,7 @@ body.dark .warning-badge {
   font-weight: 500;
   color: var(--text-primary);
   outline: none;
-  transition: border-color 0.25s ease;
+
 }
 
 .manual-title-input::placeholder {
@@ -574,7 +574,7 @@ body.dark .warning-badge {
   border-radius: 24px;
   padding: 28px;
   box-shadow: var(--shadow);
-  transition: box-shadow 0.3s ease;
+
 }
 
 .editor-pane:hover {
@@ -587,7 +587,7 @@ body.dark .warning-badge {
   border-radius: 24px;
   padding: 28px;
   box-shadow: var(--shadow);
-  transition: box-shadow 0.3s ease;
+
 }
 
 .preview-pane:hover {
@@ -642,7 +642,7 @@ body.dark .warning-badge {
   color: var(--text-primary);
   resize: vertical;
   outline: none;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+
 }
 
 .post-textarea::placeholder {
@@ -680,7 +680,7 @@ body.dark .post-textarea:focus {
   font-weight: 400;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+
 }
 
 .separator-bar__btn:hover {
@@ -688,9 +688,6 @@ body.dark .post-textarea:focus {
   color: #FFFFFF;
 }
 
-.separator-bar__btn:active {
-  transform: scale(0.95);
-}
 
 /* ─── 14. Unified Picker ─────────────────────────────── */
 
@@ -728,7 +725,7 @@ body.dark .post-textarea:focus {
   letter-spacing: 0.02em;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.25s ease;
+
 }
 
 .picker__top-tab svg {
@@ -775,7 +772,7 @@ body.dark .picker__top-tab--active {
   font-weight: 400;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.2s ease;
+
 }
 
 .picker__sub-tab:hover {
@@ -821,16 +818,14 @@ body.dark .picker__top-tab--active {
   background: transparent;
   font-size: 20px;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.15s ease;
+
 }
 
 .picker__item:hover {
   background: var(--bg-secondary);
-  transform: scale(1.1);
 }
 
 .picker__item:active {
-  transform: scale(0.95);
 }
 
 .picker__item--wide {
@@ -848,7 +843,6 @@ body.dark .picker__top-tab--active {
 .picker__item--wide:hover {
   background: var(--bg-card);
   border-color: var(--accent-primary);
-  transform: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
@@ -872,7 +866,7 @@ body.dark .picker__top-tab--active {
   height: 100%;
   border-radius: 2px;
   background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-  transition: width 0.4s ease;
+
 }
 
 .stats-progress__fill--warning {
@@ -954,7 +948,7 @@ body.dark .stats-badge--danger {
   color: var(--text-muted);
   cursor: pointer;
   position: relative;
-  transition: color 0.25s ease;
+
 }
 
 .preview-tabs__btn:hover {
@@ -998,7 +992,7 @@ body.dark .stats-badge--danger {
   font-weight: 400;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.2s ease;
+
 }
 
 .device-switcher__btn svg {
@@ -1178,7 +1172,7 @@ body.dark .stats-badge--danger {
   color: #FFFFFF;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(212, 165, 165, 0.3);
-  transition: all 0.25s ease;
+
 }
 
 .copy-btn svg {
@@ -1187,12 +1181,7 @@ body.dark .stats-badge--danger {
 }
 
 .copy-btn:hover {
-  transform: translateY(-2px);
   box-shadow: 0 8px 32px rgba(212, 165, 165, 0.4);
-}
-
-.copy-btn:active {
-  transform: scale(0.98);
 }
 
 .copy-btn--success {
@@ -1224,7 +1213,7 @@ body.dark .copy-btn:hover {
   box-shadow: 0 8px 32px rgba(212, 165, 165, 0.3);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 300ms ease, transform 300ms ease;
+
   z-index: 1000;
   white-space: nowrap;
 }
@@ -1252,7 +1241,7 @@ body.dark .toast {
   background: var(--bg-card);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: all 0.25s ease;
+
   flex-shrink: 0;
 }
 
@@ -1264,7 +1253,6 @@ body.dark .toast {
 
 .theme-toggle:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  transform: rotate(15deg);
 }
 
 /* ─── 20. Footer ─────────────────────────────────────── */
@@ -1284,7 +1272,7 @@ body.dark .toast {
 .site-footer a {
   color: var(--accent-primary);
   text-decoration: none;
-  transition: color 0.2s ease;
+
 }
 
 .site-footer a:hover {
@@ -1330,42 +1318,6 @@ body.dark ::selection {
   background: rgba(232, 180, 184, 0.3);
 }
 
-/* ─── 23. Animations ─────────────────────────────────── */
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
-
-.hero {
-  animation: fadeInUp 0.6s ease both;
-}
-
-.toolbar {
-  animation: fadeInUp 0.6s ease 0.1s both;
-}
-
-.editor-layout,
-.quick-mode {
-  animation: fadeInUp 0.6s ease 0.2s both;
-}
 
 /* ─── 24. Responsive ─────────────────────────────────── */
 
