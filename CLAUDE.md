@@ -12,8 +12,47 @@
 - **擁有者**：Kaoru Tsai (Ruru)
 - **調性**：溫柔、質感、日系文青、簡約
 - **語言**：繁體中文（台灣），所有使用者面向文字皆使用繁體中文
-- **技術棧**：Vite + Tailwind CSS + 純 JavaScript（非 React）
+- **技術棧**：純 HTML + CSS + JavaScript
 - **Design System**：v1.7（字重修正 + 品牌頁首）
+
+---
+
+## 架構原則（最高優先）
+
+> **每個工具/網站必須是完全獨立的靜態站點。無例外。**
+
+### 標準結構
+
+每個工具擁有獨立資料夾，包含自己的 `index.html`、`style.css`、`js/`、`data/`：
+
+```
+public/工具名/
+├── index.html       ← 獨立入口
+├── style.css        ← 獨立樣式
+├── js/              ← 獨立邏輯
+│   ├── main.js
+│   └── ...
+└── data/            ← 獨立資料（如需要）
+```
+
+### 正確範例
+
+| 工具 | 位置 |
+|------|------|
+| SD 咒語產生器 | `tools/public/spell/` |
+| 問安圖產生器 | `tools/public/hihi/` |
+| 閱讀器選購測驗 | `tools/public/reader-quiz/` |
+
+### 禁止事項
+
+- **禁止**將多個工具整合進同一個框架（React、Vue 等）或共用入口
+- **禁止**讓工具之間共用路由、狀態管理、或打包流程
+- **禁止**未經 Ruru 確認就決定工具的架構方式
+
+### 已完成遷移
+
+- Post Writer 已從 React SPA 抽出為 `public/post-writer/` 獨立版（2026-02-08）
+- `src/` 內 React 版殘留檔案待清理
 
 ---
 
@@ -434,7 +473,9 @@ public/reader-quiz/
 11. 禁止非標準 Footer 格式
 12. 禁止使用 `font-weight: 300` 或其他 GenSenRounded 不支援的字重（僅限 400/500/700）
 13. 禁止各站自行實作品牌 Header（必須使用 `<hello-ruru-header>` Web Component）
-14. 禁止主內容緊貼品牌頁首（至少保持 24px 間距）
+14. 禁止將工具整合進共用框架或共用入口頁面（每個工具必須獨立）
+15. 禁止主內容緊貼品牌頁首（至少保持 24px 間距）
+16. 若不確定架構方式，必須先與 Ruru 確認
 
 ---
 
