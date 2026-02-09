@@ -42,7 +42,8 @@ export function computeStats(text, platformId) {
   const platform = PLATFORMS[platformId]
   if (!platform) return null
 
-  const charCount = text.length
+  // 用展開運算子精確計算（Emoji/多位元組字元算 1 個）
+  const charCount = [...text].length
   // ZWSP 估算：每個 double-break 加 1 字元
   const breakCount = (text.match(/\n\n+/g) || []).length
   const estimatedCopyLength = charCount + breakCount

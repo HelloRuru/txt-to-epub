@@ -187,6 +187,7 @@ export function renderQuickMode(state, data) {
       <textarea
         id="post-textarea"
         class="post-textarea"
+        aria-label="貼文內容"
         placeholder="在這裡輸入或貼上你的貼文內容..."
       >${escapeHtml(state.text)}</textarea>
       ${renderSeparatorBar()}
@@ -264,6 +265,7 @@ export function renderEditorPane(state, data) {
       <textarea
         id="post-textarea"
         class="post-textarea"
+        aria-label="貼文內容"
         placeholder="在這裡輸入或貼上你的貼文內容..."
       >${escapeHtml(state.text)}</textarea>
       ${renderSeparatorBar()}
@@ -435,9 +437,9 @@ function renderFacebookPreview(previewHtml, lines, deviceWidth, state) {
         <button class="post-card__show-more" data-action="toggle-expand">顯示更多</button>
       ` : ''}
       <div class="post-card__actions">
-        <span class="post-card__action">👍 讚</span>
-        <span class="post-card__action">💬 留言</span>
-        <span class="post-card__action">↗️ 分享</span>
+        <span class="post-card__action">${icons.thumbsUp} 讚</span>
+        <span class="post-card__action">${icons.messageCircle} 留言</span>
+        <span class="post-card__action">${icons.share} 分享</span>
       </div>
     </div>
   `
@@ -461,9 +463,9 @@ function renderInstagramPreview(previewHtml, transformedText, deviceWidth, state
       </div>
       <div style="background:var(--bg-secondary);aspect-ratio:1;border-radius:8px;margin-bottom:12px;"></div>
       <div class="post-card__actions" style="border-top:none;padding-top:0;">
-        <span class="post-card__action">♡</span>
-        <span class="post-card__action">💬</span>
-        <span class="post-card__action">↗</span>
+        <span class="post-card__action">${icons.heart}</span>
+        <span class="post-card__action">${icons.messageCircle}</span>
+        <span class="post-card__action">${icons.share}</span>
       </div>
       <div class="post-card__content">
         <strong>preview</strong> ${visibleHtml}${shouldTruncate ? `<button class="post-card__show-more" data-action="toggle-expand">...更多</button>` : ''}

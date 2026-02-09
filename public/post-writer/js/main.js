@@ -206,6 +206,13 @@ function bindEvents() {
   // Click 委派只綁定一次（app 元素不會被 innerHTML 替換）
   if (!app._clickBound) {
     app.addEventListener('click', handleAppClick)
+    // Cmd/Ctrl + Enter 快捷鍵複製
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault()
+        handleCopy()
+      }
+    })
     app._clickBound = true
   }
 
@@ -214,6 +221,19 @@ function bindEvents() {
   if (textarea) {
     textarea.addEventListener('input', (e) => {
       state.text = e.target.value
+      refreshPreview()
+    })
+    // 攔截貼上事件：強制純文字，防止 Notion/Google Docs RTF 污染
+    textarea.addEventListener('paste', (e) => {
+      e.preventDefault()
+      const plain = (e.clipboardData || window.clipboardData).getData('text/plain')
+      const start = textarea.selectionStart
+      const end = textarea.selectionEnd
+      state.text = state.text.slice(0, start) + plain + state.text.slice(end)
+      textarea.value = state.text
+      const pos = start + plain.length
+      textarea.selectionStart = pos
+      textarea.selectionEnd = pos
       refreshPreview()
     })
     // 全量重繪後恢復文字內容
@@ -343,9 +363,30 @@ async function init() {
     data = await loadData()
     render()
   } catch (err) {
+    const safeMsg = (err.message || '未知錯誤').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#039;'}[c]))
     document.getElementById('app').innerHTML =
-      `<div class="error-msg"><p>載入失敗：${err.message}</p></div>`
+      `<div class="error-msg"><p>載入失敗：${safeMsg}</p></div>`
   }
 }
 
-document.addEventListener('DOMContentLoaded', init)
+// ─── iOS 鍵盤收合防跳 ──────────────────────────────────
+
+function initViewportStability() {
+  if (!window.visualViewport) return
+  let lastHeight = window.visualViewport.height
+
+  window.visualViewport.addEventListener('resize', () => {
+    const newHeight = window.visualViewport.height
+    // 鍵盤收合（高度增加）時鎖定滾動位置
+    if (newHeight > lastHeight) {
+      const scrollY = window.scrollY
+      requestAnimationFrame(() => window.scrollTo(0, scrollY))
+    }
+    lastHeight = newHeight
+  })
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initViewportStability()
+  init()
+})

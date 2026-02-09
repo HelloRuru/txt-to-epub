@@ -43,8 +43,31 @@ export async function copyResult(text, platformId, modeId = 'original', template
     return { success: true, platform: platformId }
   }
 
-  showToast('複製失敗，請手動選取文字複製')
+  // WebView 環境：兩種策略都失敗，顯示可選取的文字讓使用者手動複製
+  showManualCopyFallback(result)
+  showToast('請長按選取下方文字，手動複製')
   return { success: false, platform: 'error' }
+}
+
+function showManualCopyFallback(text) {
+  let fallback = document.getElementById('manual-copy-fallback')
+  if (!fallback) {
+    fallback = document.createElement('textarea')
+    fallback.id = 'manual-copy-fallback'
+    fallback.readOnly = true
+    fallback.style.cssText = 'position:fixed;bottom:0;left:0;right:0;height:40vh;z-index:9999;padding:16px;font-size:16px;border:2px solid var(--accent-primary,#D4A5A5);border-radius:16px 16px 0 0;background:var(--bg-card,#fff);color:var(--text-primary,#333);resize:none;'
+    document.body.appendChild(fallback)
+    // 點擊外部關閉
+    document.addEventListener('click', function handler(e) {
+      if (!fallback.contains(e.target)) {
+        fallback.remove()
+        document.removeEventListener('click', handler)
+      }
+    }, { once: false })
+  }
+  fallback.value = text
+  fallback.focus()
+  fallback.select()
 }
 
 function cleanOutput(text) {

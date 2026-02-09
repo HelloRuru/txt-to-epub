@@ -395,6 +395,7 @@ hello-ruru-header {
   font-size: 13px;
   font-weight: 400;
   color: var(--text-secondary);
+  min-height: 44px;
 }
 
 .toggle-switch input {
@@ -826,6 +827,8 @@ body.dark .picker__top-tab--active {
 }
 
 .picker__item:active {
+  background: rgba(212, 165, 165, 0.2);
+  transform: scale(0.9);
 }
 
 .picker__item--wide {
@@ -1168,7 +1171,7 @@ body.dark .stats-badge--danger {
   margin: 20px 0 0;
   padding: 14px 32px;
   border: none;
-  border-radius: 14px;
+  border-radius: 24px;
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
   font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
   font-size: 16px;
@@ -1218,6 +1221,7 @@ body.dark .copy-btn:hover {
   opacity: 0;
   pointer-events: none;
 
+  transition: opacity 0.3s ease, transform 0.3s ease;
   z-index: 1000;
   white-space: nowrap;
   max-width: 90vw;
@@ -1229,6 +1233,7 @@ body.dark .copy-btn:hover {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
   pointer-events: auto;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 body.dark .toast {
@@ -1241,8 +1246,8 @@ body.dark .toast {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border: 1px solid var(--border);
   border-radius: 50%;
   background: var(--bg-card);
@@ -1479,7 +1484,7 @@ body.dark ::selection {
   }
 
   .picker__sub-tab {
-    padding: 8px 14px;
+    padding: 10px 14px;
     font-size: 13px;
   }
 
@@ -1497,14 +1502,14 @@ body.dark ::selection {
   }
 
   .copy-btn {
-    padding: 12px 24px;
+    padding: 14px 24px;
     font-size: 15px;
-    border-radius: 12px;
+    border-radius: 24px;
   }
 
   .theme-toggle {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
 
   .theme-toggle svg {
@@ -1530,7 +1535,7 @@ body.dark ::selection {
   }
 
   .title-detect-opts__btn {
-    padding: 8px 14px;
+    padding: 10px 14px;
     font-size: 13px;
   }
 
@@ -1540,8 +1545,9 @@ body.dark ::selection {
   }
 
   .device-switcher__btn {
-    padding: 8px 14px;
+    padding: 10px 14px;
     font-size: 12px;
+    min-height: 44px;
   }
 
   .separator-bar {
@@ -1549,7 +1555,7 @@ body.dark ::selection {
   }
 
   .separator-bar__btn {
-    padding: 8px 12px;
+    padding: 10px 12px;
     font-size: 13px;
   }
 
@@ -1566,6 +1572,21 @@ body.dark ::selection {
   .result-preview {
     max-height: 280px;
     font-size: 12px;
+  }
+}
+
+/* --- Mobile: sticky copy button --- */
+
+@media (max-width: 767px) {
+  .copy-btn {
+    position: sticky;
+    bottom: 16px;
+    z-index: 50;
+    box-shadow: 0 -2px 16px rgba(212, 165, 165, 0.2), 0 4px 16px rgba(212, 165, 165, 0.3);
+  }
+
+  body.dark .copy-btn {
+    box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(232, 180, 184, 0.2);
   }
 }
 
