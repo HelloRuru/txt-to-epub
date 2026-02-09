@@ -64,6 +64,38 @@
   --transition: 250ms ease;
 }
 
+/* ─── Dark Mode Variables ──────────────── */
+
+[data-theme="dark"] {
+  --color-bg: #1A1A1A;
+  --color-surface: #2D2D2D;
+  --color-text: #E8E8E8;
+  --color-text-body: #D0D0D0;
+  --color-text-muted: #A0A0A0;
+  --color-text-placeholder: #808080;
+  --color-border: #404040;
+  --color-border-disabled: #606060;
+
+  /* 品牌色在暗色模式下稍微調亮 */
+  --color-primary: #E8B4B8;
+  --color-secondary: #C4B7D7;
+  --color-primary-light: #F2C9CD;
+  --color-primary-dark: #D4A5A5;
+  --color-secondary-light: #D9CDE8;
+  --color-secondary-dark: #B8A9C9;
+
+  /* 裝飾色調整 */
+  --color-blush: #3D2F2F;
+  --color-sakura: #3A2F3A;
+  --color-fuji: #2F2F3A;
+  --color-success: #4A5A4A;
+
+  /* 陰影調整為更適合暗色背景 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
 /* ─── Reset ────────────────────────────── */
 
 *, *::before, *::after {
@@ -97,10 +129,28 @@ hello-ruru-header {
 /* ─── Hero ─────────────────────────────── */
 
 .hero {
-  text-align: center;
   padding: 48px 24px 40px;
   background: linear-gradient(180deg, #FFF5F5 0%, #F5F0FA 50%, var(--color-bg) 100%);
   position: relative;
+}
+
+[data-theme="dark"] .hero {
+  background: linear-gradient(180deg, #2A1F1F 0%, #2A1F2A 50%, var(--color-bg) 100%);
+}
+
+.hero__header {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.hero__title-group {
+  text-align: center;
+  flex: 1;
 }
 
 .hero::before {
@@ -135,6 +185,76 @@ hello-ruru-header {
   color: var(--color-text-muted);
   line-height: 1.6;
   position: relative;
+}
+
+/* ─── Theme Toggle ─────────────────────── */
+
+.theme-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.theme-toggle:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.2);
+}
+
+.theme-toggle:active {
+  transform: scale(0.96);
+}
+
+.theme-toggle__icon {
+  transition: var(--transition);
+  opacity: 0;
+  position: absolute;
+}
+
+/* Light mode: 顯示太陽圖標 */
+:root .theme-toggle__icon--sun,
+[data-theme="light"] .theme-toggle__icon--sun {
+  opacity: 1;
+}
+
+/* Dark mode: 顯示月亮圖標 */
+[data-theme="dark"] .theme-toggle__icon--moon {
+  opacity: 1;
+}
+
+[data-theme="dark"] .theme-toggle__icon--sun {
+  opacity: 0;
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+  .hero__header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .theme-toggle {
+    position: static;
+    margin-top: 20px;
+  }
 }
 
 /* ─── Container ────────────────────────── */

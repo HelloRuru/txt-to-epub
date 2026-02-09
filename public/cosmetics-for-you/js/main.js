@@ -287,11 +287,73 @@ function executeSearch() {
   render()
 }
 
+/* ─── Theme Management ────────────────────── */
+
+const STORAGE_KEY = 'cosmetics-theme'
+
+function getPreferredTheme() {
+  const stored = localStorage.getItem(STORAGE_KEY)
+  if (stored) {
+    return stored
+  }
+
+  // 檢測系統偏好
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme)
+  localStorage.setItem(STORAGE_KEY, theme)
+
+  // 更新按鈕 aria-label
+  const toggleBtn = document.getElementById('theme-toggle')
+  if (toggleBtn) {
+    toggleBtn.setAttribute('aria-label',
+      theme === 'dark' ? '切換至淺色模式' : '切換至深色模式'
+    )
+  }
+}
+
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light'
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
+  setTheme(newTheme)
+}
+
+function initTheme() {
+  const preferredTheme = getPreferredTheme()
+  setTheme(preferredTheme)
+
+  // 監聽系統主題變化
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem(STORAGE_KEY)) {
+      setTheme(e.matches ? 'dark' : 'light')
+    }
+  })
+}
+
+function bindThemeToggle() {
+  const toggleBtn = document.getElementById('theme-toggle')
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', toggleTheme)
+
+    // 鍵盤支援
+    toggleBtn.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        toggleTheme()
+      }
+    })
+  }
+}
+
 /* ─── Init ────────────────────────────────── */
 
 function init() {
+  initTheme()
   render()
   bindEvents()
+  bindThemeToggle()
 }
 
 if (document.readyState === 'loading') {
