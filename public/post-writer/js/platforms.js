@@ -101,13 +101,15 @@ function suggestThreadSplits(text, maxChars) {
   const splits = []
   let remaining = text
 
-  while (remaining.length > 0) {
-    if (remaining.length <= maxChars) {
+  while ([...remaining].length > 0) {
+    if ([...remaining].length <= maxChars) {
       splits.push(remaining)
       break
     }
 
-    const chunk = remaining.slice(0, maxChars)
+    // 用展開運算子精確切割位置（Emoji 等多位元組字元算 1 個）
+    const chars = [...remaining]
+    const chunk = chars.slice(0, maxChars).join('')
 
     let cutIndex = chunk.lastIndexOf('\n\n')
     if (cutIndex < maxChars * 0.3) {

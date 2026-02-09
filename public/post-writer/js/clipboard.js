@@ -107,6 +107,8 @@ export function showToast(message) {
     toast = document.createElement('div')
     toast.id = 'copy-toast'
     toast.className = 'toast'
+    toast.setAttribute('role', 'alert')
+    toast.setAttribute('aria-live', 'polite')
     document.body.appendChild(toast)
   }
 

@@ -135,8 +135,6 @@ function handleAppClick(e) {
     case 'toggle-option': {
       const opt = btn.dataset.option
       state[opt] = !state[opt]
-      refreshPreview()
-      // toggle 按鈕視覺狀態需要全量重繪
       render()
       break
     }
@@ -183,6 +181,20 @@ function handleAppClick(e) {
 
     case 'paste-text':
       handlePaste()
+      break
+
+    case 'clear-text':
+      if (state.text || state.manualTitle) {
+        state.text = ''
+        state.manualTitle = ''
+        state.previewExpanded = false
+        render()
+        showToast('已清空')
+        const ta = document.getElementById('post-textarea')
+        if (ta) ta.focus()
+      } else {
+        showToast('已經是空的')
+      }
       break
 
     case 'copy-result':

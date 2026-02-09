@@ -183,6 +183,17 @@ export function renderTemplateControls(state) {
 export function renderQuickMode(state, data) {
   return `
     <div class="quick-mode">
+      <div class="pane__header">
+        <span class="pane__title">${icons.zap} 快速模式</span>
+        <div style="display:flex;gap:6px;">
+          <button class="separator-bar__btn" data-action="paste-text" aria-label="貼上">
+            ${icons.paste} 貼上
+          </button>
+          <button class="separator-bar__btn" data-action="clear-text" aria-label="清空">
+            ${icons.trash} 清空
+          </button>
+        </div>
+      </div>
       ${renderStatsBar(state)}
       <textarea
         id="post-textarea"
@@ -257,9 +268,14 @@ export function renderEditorPane(state, data) {
     <div class="editor-pane">
       <div class="pane__header">
         <span class="pane__title">${icons.edit} 編輯</span>
-        <button class="separator-bar__btn" data-action="paste-text">
-          ${icons.paste} 貼上
-        </button>
+        <div style="display:flex;gap:6px;">
+          <button class="separator-bar__btn" data-action="paste-text" aria-label="貼上">
+            ${icons.paste} 貼上
+          </button>
+          <button class="separator-bar__btn" data-action="clear-text" aria-label="清空">
+            ${icons.trash} 清空
+          </button>
+        </div>
       </div>
       ${renderStatsBar(state)}
       <textarea
