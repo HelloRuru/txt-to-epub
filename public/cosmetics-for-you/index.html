@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+  <title>Cosmetics For You — 色號試色搜尋引擎 | Hello Ruru Tools</title>
+  <meta name="description" content="輸入品牌和色號，自動搜尋日本＆台灣權威美妝來源的試色評測。支援 @cosme、LIPS、Dcard 等可信來源，依權威性分級顯示。">
+  <meta name="keywords" content="色號查詢, 試色搜尋, 美妝色號, swatch, コスメ, 唇膏試色, Dior, Chanel, CANMAKE">
+  <meta name="author" content="Hello Ruru">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://tools.helloruru.com/cosmetics-for-you/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Cosmetics For You — 色號試色搜尋引擎">
+  <meta property="og:description" content="輸入品牌和色號，自動搜尋日本＆台灣權威美妝來源的試色評測。">
+  <meta property="og:url" content="https://tools.helloruru.com/cosmetics-for-you/">
+  <meta property="og:site_name" content="Hello Ruru Tools">
+  <meta property="og:locale" content="zh_TW">
+  <meta property="og:image" content="https://tools.helloruru.com/cosmetics-for-you/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Cosmetics For You — 色號試色搜尋引擎">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cosmetics For You — 色號試色搜尋引擎">
+  <meta name="twitter:description" content="輸入品牌和色號，自動搜尋日本＆台灣權威美妝來源的試色評測。">
+  <meta name="twitter:image" content="https://tools.helloruru.com/cosmetics-for-you/og-image.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Cosmetics For You",
+    "description": "色號試色搜尋引擎：輸入品牌和色號，自動搜尋日本＆台灣權威美妝來源的試色評測。",
+    "url": "https://tools.helloruru.com/cosmetics-for-you/",
+    "applicationCategory": "UtilitiesApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "TWD"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Brand Header -->
+  <script src="https://lab.helloruru.com/shared/brand-header.js"></script>
+  <hello-ruru-header title="色號試色搜尋引擎"></hello-ruru-header>
+
+  <!-- Hero -->
+  <header class="hero">
+    <h1 class="hero__title">Cosmetics For You</h1>
+    <p class="hero__subtitle">從日本＆台灣最可靠的美妝來源，幫你找到最真實的試色</p>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container">
+    <div id="app">
+      <p class="loading">載入中...</p>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p>&copy; <span id="footer-year"></span> Kaoru Tsai. All Rights Reserved. | Contact: <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
+  </footer>
+  <script>
+    const startYear = 2026;
+    const currentYear = new Date().getFullYear();
+    document.getElementById('footer-year').textContent =
+      currentYear > startYear ? `${startYear}\u2013${currentYear}` : `${startYear}`;
+  </script>
+
+  <!-- App -->
+  <script type="module" src="js/main.js"></script>
+
+</body>
+</html>
