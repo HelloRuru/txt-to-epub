@@ -41,6 +41,7 @@ export const DEFAULT_PLATFORM = 'facebook'
 export function computeStats(text, platformId) {
   const platform = PLATFORMS[platformId]
   if (!platform) return null
+  if (!text) text = ''
 
   // 用展開運算子精確計算（Emoji/多位元組字元算 1 個）
   const charCount = [...text].length

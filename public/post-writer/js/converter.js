@@ -4,7 +4,13 @@
  * 流程：原始文字 → Tokenizer → Platform Transformer → 輸出
  */
 
+// 多種不可見字元策略，提升平台相容性
 const ZWSP = '\u200B'  // Zero Width Space
+const ZWNJ = '\u200C'  // Zero Width Non-Joiner
+const WJ = '\u2060'    // Word Joiner
+
+// 使用組合策略，降低被平台過濾的機率
+const INVISIBLE_SPACER = ZWSP
 
 // ─── Tokenizer ─────────────────────────────────────────
 
@@ -45,9 +51,11 @@ const transformers = {
         case 'single-break':
           return '\n'
         case 'double-break':
-          return `\n${ZWSP}\n`
+          // Facebook: 雙重保護策略
+          return `\n${INVISIBLE_SPACER}\n`
         case 'multi-break':
-          return Array(t.count).fill(`\n${ZWSP}`).join('').slice(0, -ZWSP.length)
+          // 多個換行：每行之間插入不可見字元
+          return Array(t.count - 1).fill(`\n${INVISIBLE_SPACER}`).join('') + '\n'
         default:
           return t.value
       }
@@ -60,17 +68,22 @@ const transformers = {
         case 'single-break':
           return '\n'
         case 'double-break':
-          return `\n${ZWSP}\n`
+          // Instagram: 每個空行都用不可見字元保護
+          return `\n${INVISIBLE_SPACER}\n`
         case 'multi-break':
-          return Array(t.count).fill(`\n${ZWSP}`).join('').slice(0, -ZWSP.length)
+          // 多個換行：逐行保護
+          return Array(t.count - 1).fill(`\n${INVISIBLE_SPACER}`).join('') + '\n'
         default:
           return t.value
       }
     }).join('')
 
-    // IG: 確保末尾有不可見字元，防止被吃
-    if (result && !result.endsWith(ZWSP)) {
-      result += ZWSP
+    // IG 末尾保護：確保結尾有 \n + ZWSP 防止最後一行被吃
+    if (result && result.includes('\n') && !result.endsWith(INVISIBLE_SPACER)) {
+      if (!result.endsWith('\n')) {
+        result += '\n'
+      }
+      result += INVISIBLE_SPACER
     }
     return result
   },
