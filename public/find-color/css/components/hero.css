@@ -14,10 +14,7 @@
   line-height: 1.1;
   margin: 0;
   letter-spacing: 0.04em;
-  background: linear-gradient(135deg, #D4A5A5, #B8A9C9);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #8F77B5;  /* 桔梗紫 — 單色深紫（簡約優雅）*/
 }
 
 .subtitle {
