@@ -1,0 +1,33 @@
+/* ========================================
+   Layout — 容器佈局
+   ======================================== */
+
+/* Brand Header Spacing */
+hello-ruru-header {
+  display: block;
+  margin-bottom: 28px;
+}
+
+/* Main Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+/* Sections */
+section {
+  margin-bottom: var(--spacing-2xl);
+}
+
+section h2 {
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.section-desc {
+  text-align: center;
+  color: #888888;
+  font-size: var(--font-size-small);
+  margin-bottom: var(--spacing-xl);
+}

@@ -1,0 +1,70 @@
+/* ========================================
+   Responsive — 響應式佈局
+   ======================================== */
+
+/* Tablet (768px - 1023px) */
+@media (max-width: 1023px) {
+  :root {
+    --font-size-h1: 34px;
+    --font-size-h2: 24px;
+    --font-size-h3: 18px;
+  }
+
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+
+  .palettes-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+}
+
+/* Mobile (<768px) */
+@media (max-width: 767px) {
+  :root {
+    --font-size-h1: 30px;
+    --font-size-h2: 24px;
+    --font-size-h3: 18px;
+    --spacing-2xl: 32px;
+  }
+
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+
+  hello-ruru-header {
+    margin-bottom: 20px;
+  }
+
+  .features {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .palettes-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .color-swatches {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+  }
+
+  .text-demo {
+    padding: var(--spacing-md);
+  }
+
+  .demo-line-1 {
+    font-size: 16px;
+  }
+
+  .demo-line-2 {
+    font-size: 18px;
+  }
+
+  .preview-demo {
+    padding: var(--spacing-md);
+  }
+}

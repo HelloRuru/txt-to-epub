@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background -->
+  <rect width="100" height="100" fill="#FAFAFA" rx="16"/>
+
+  <!-- 2×2 Color Palette Grid (代表 2026 流行色) -->
+  <!-- Top Left: Cloud Dancer (Global) -->
+  <rect x="12" y="12" width="36" height="36" rx="6" fill="#D4D0CC" stroke="#888" stroke-width="1"/>
+
+  <!-- Top Right: Plum Noir (Western) -->
+  <rect x="52" y="12" width="36" height="36" rx="6" fill="#C19AA8" stroke="#888" stroke-width="1"/>
+
+  <!-- Bottom Left: Sakura Beige (Japanese) -->
+  <rect x="12" y="52" width="36" height="36" rx="6" fill="#F5D0C5" stroke="#888" stroke-width="1"/>
+
+  <!-- Bottom Right: Cool Blue (Nordic) -->
+  <rect x="52" y="52" width="36" height="36" rx="6" fill="#A3C9D9" stroke="#888" stroke-width="1"/>
+</svg>
