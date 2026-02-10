@@ -1,0 +1,24 @@
+    .btn {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; width: 100%; padding: 16px; border: none;
+      border-radius: var(--radius-lg);
+      font-family: var(--font-heading);
+      font-size: var(--text-h3);
+      font-weight: var(--weight-bold);
+      cursor: pointer; transition: all 0.2s;
+      min-height: 56px;
+    }
+    .btn svg { width: 24px; height: 24px; }
+    .btn-primary {
+      background: var(--gradient-main);
+      color: #FFF;
+      box-shadow: 0 4px 16px rgba(212,165,165,0.3);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 8px 24px rgba(212,165,165,0.4);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ─── Toast ─── */

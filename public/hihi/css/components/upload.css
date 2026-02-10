@@ -1,0 +1,24 @@
+    .upload-area {
+      border: 2px dashed var(--color-mist);
+      border-radius: var(--radius-lg);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--color-card);
+    }
+    .upload-area:hover, .upload-area.dragover {
+      border-color: var(--color-rose);
+      background: #FFF9F9;
+    }
+    .upload-area.has-image {
+      padding: 12px;
+      border-style: solid;
+      border-color: var(--color-rose);
+    }
+    .upload-area svg { width: 48px; height: 48px; color: var(--color-rose); margin-bottom: 12px; }
+    .upload-text { font-size: var(--text-h3); color: var(--color-muted); }
+    .upload-hint { font-size: var(--text-small); color: var(--color-light); margin-top: 4px; }
+    .upload-area.has-image .upload-placeholder { display: none; }
+
+    /* ─── Background Pan Controls ─── */

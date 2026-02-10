@@ -1,0 +1,47 @@
+/* Post Writer - Platform Selector */
+/* ─── 8. Platform Selector ───────────────────────────── */
+
+.platform-pills {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.platform-pills__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: 9999px;
+  background: var(--bg-card);
+  font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+  cursor: pointer;
+
+}
+
+.platform-pills__btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.platform-pills__btn:hover {
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+.platform-pills__btn--active {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border-color: transparent;
+  color: #FFFFFF;
+  box-shadow: 0 2px 12px rgba(212, 165, 165, 0.3);
+}
+
+.platform-pills__btn--active:hover {
+  color: #FFFFFF;
+}
+

@@ -1,0 +1,42 @@
+    .bg-pan {
+      display: none;
+      margin-top: 12px;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .bg-pan.show { display: flex; }
+    .bg-pan-label {
+      font-size: var(--text-small);
+      color: var(--color-muted);
+      font-weight: var(--weight-medium);
+    }
+    .pan-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+    }
+    .pan-btn {
+      width: 44px; height: 38px;
+      border: 2px solid var(--color-mist);
+      border-radius: var(--radius-sm);
+      background: var(--color-card);
+      font-family: var(--font-body);
+      font-size: var(--text-small);
+      font-weight: var(--weight-medium);
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--color-ink);
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pan-btn:hover { border-color: var(--color-rose); }
+    .pan-btn:active { background: var(--color-rose); color: #FFF; }
+    .pan-btn.reset { font-size: var(--text-caption); color: var(--color-muted); }
+    #upload-input { display: none; }
+    #preview-thumb { display: none; max-width: 100%; border-radius: calc(var(--radius-lg) - 4px); }
+    .upload-area.has-image #preview-thumb { display: block; }
+
+    /* ─── Greeting Sections ─── */

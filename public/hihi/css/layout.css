@@ -1,0 +1,72 @@
+/**
+ * 問安圖產生器 - Layout
+ * Page Container + Two-Column Desktop Layout
+ */
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+
+    /* ─── Brand ─── */
+    .brand-link {
+      display: inline-block;
+      text-decoration: none;
+      margin-bottom: 8px;
+      transition: transform 0.3s;
+    }
+    .brand-link:hover { transform: scale(1.05); }
+    .brand-logo { filter: drop-shadow(0 2px 8px rgba(212,165,165,0.2)); }
+    .brand-name {
+      font-family: var(--font-heading);
+      font-size: var(--text-h2);
+      font-weight: var(--weight-bold);
+      letter-spacing: 3px;
+      background: var(--gradient-main);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── Header ─── */
+    .page-header { text-align: center; margin-bottom: 32px; }
+
+    h1 {
+      font-family: var(--font-heading);
+      font-weight: var(--weight-bold);
+      font-size: var(--text-h1);
+      line-height: var(--leading-tight);
+      letter-spacing: var(--tracking-tight);
+      color: var(--color-ink);
+      margin-bottom: 8px;
+    }
+
+    .greeting-banner {
+      font-family: var(--font-heading);
+      font-size: var(--text-h3);
+      color: var(--color-rose);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-normal);
+    }
+
+    /* ─── Two-Column Desktop Layout ─── */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    @media (min-width: 1024px) {
+      .layout {
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        align-items: start;
+      }
+      .preview-col {
+        position: sticky;
+        top: 24px;
+      }
+    }
+
+    /* ─── Steps ─── */

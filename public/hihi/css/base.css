@@ -1,0 +1,127 @@
+    /* ─── Design System v1.6 Font Faces ─── */
+    @font-face {
+      font-family: 'GenSenRounded';
+      src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2');
+      font-weight: 400; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'GenSenRounded';
+      src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2');
+      font-weight: 500; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'GenSenRounded';
+      src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2');
+      font-weight: 700; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'NaniFont';
+      src: url('https://cdn.jsdelivr.net/gh/max32002/nanifont@1.046/webfont/NaniFont-Regular.woff2') format('woff2');
+      font-weight: 400; font-display: swap;
+    }
+    @font-face {
+      font-family: 'NaniFont';
+      src: url('https://cdn.jsdelivr.net/gh/max32002/nanifont@1.046/webfont/NaniFont-SemiBold.woff2') format('woff2');
+      font-weight: 700; font-display: swap;
+    }
+    @font-face {
+      font-family: 'jf-openhuninn';
+      src: url('https://cdn.jsdelivr.net/gh/justfont/open-huninn-font@2.0/font/jf-openhuninn-2.0.woff2') format('woff2');
+      font-weight: 400; font-display: swap;
+    }
+
+    /* ─── Design System v1.6 CSS Variables ─── */
+    :root {
+      /* Colors */
+      --color-rose: #D4A5A5;
+      --color-lavender: #B8A9C9;
+      --color-blush: #F5D0C5;
+      --color-grey-rose: #C9929A;
+      --color-nadeshiko: #E8B4B8;
+      --color-sakura: #FEDFE1;
+      --color-wisteria: #C4B7D7;
+      --color-bellflower: #8F77B5;
+      --color-sage: #A8B5A0;
+      --color-mist: #E8E4E1;
+      --color-warm-grey: #B5ADA7;
+      --color-charcoal: #5C5856;
+      --color-ink: #333333;
+      --color-body: #4A4A4A;
+      --color-muted: #888888;
+      --color-light: #AAAAAA;
+      --color-bg: #FAFAFA;
+      --color-card: #FFFFFF;
+
+      /* Font Families */
+      --font-heading: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+      --font-body: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+      --font-caption: 'Noto Sans TC', sans-serif;
+
+      /* Font Sizes — Desktop */
+      --text-h1: 2.5rem;
+      --text-h2: 1.75rem;
+      --text-h3: 1.25rem;
+      --text-body: 1rem;
+      --text-small: 0.875rem;
+      --text-caption: 0.75rem;
+
+      /* Font Weights */
+      --weight-regular: 400;
+      --weight-medium: 500;
+      --weight-bold: 700;
+
+      /* Line Heights */
+      --leading-tight: 1.3;
+      --leading-normal: 1.6;
+      --leading-relaxed: 1.8;
+
+      /* Letter Spacing */
+      --tracking-tight: -0.01em;
+      --tracking-normal: 0.02em;
+      --tracking-wide: 0.08em;
+
+      /* Radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 24px;
+      --radius-full: 50%;
+
+      /* Shadows */
+      --shadow-soft: 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+
+      /* Gradients */
+      --gradient-main: linear-gradient(135deg, #D4A5A5, #B8A9C9);
+      --gradient-light: linear-gradient(180deg, #FFFFFF, #FAFAFA);
+      --gradient-pink-purple: linear-gradient(135deg, #F5D0C5, #C4B7D7);
+    }
+
+    /* ─── Mobile Font Size Overrides ─── */
+    @media (max-width: 768px) {
+      :root {
+        --text-h1: 1.875rem;
+        --text-h2: 1.5rem;
+        --text-h3: 1.125rem;
+      }
+    }
+
+    /* ─── Reset ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ─── Base ─── */
+    body {
+      font-family: var(--font-body);
+      font-weight: var(--weight-medium);
+      font-size: var(--text-body);
+      line-height: var(--leading-relaxed);
+      letter-spacing: var(--tracking-normal);
+      background: var(--color-bg);
+      color: var(--color-body);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ─── Page Container ─── */

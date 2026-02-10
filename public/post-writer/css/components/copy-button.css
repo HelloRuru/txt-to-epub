@@ -1,0 +1,44 @@
+/* Post Writer - Copy Button */
+/* ─── 17. Copy Button ────────────────────────────────── */
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin: 20px 0 0;
+  padding: 14px 32px;
+  border: none;
+  border-radius: 24px;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #FFFFFF;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(212, 165, 165, 0.3);
+
+}
+
+.copy-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.copy-btn:hover {
+  box-shadow: 0 8px 32px rgba(212, 165, 165, 0.4);
+}
+
+.copy-btn--success {
+  background: linear-gradient(135deg, var(--sage), #8CA088);
+}
+
+body.dark .copy-btn {
+  box-shadow: 0 4px 16px rgba(232, 180, 184, 0.2);
+}
+
+body.dark .copy-btn:hover {
+  box-shadow: 0 8px 32px rgba(232, 180, 184, 0.3);
+}
+

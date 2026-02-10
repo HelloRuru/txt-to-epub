@@ -1,0 +1,20 @@
+/* === Badge === */
+.badge {
+  font-family: var(--font-small);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.5px;
+}
+
+.badge--sdxl {
+  background: rgba(184,169,201,0.2);
+  color: var(--color-secondary-dark);
+}
+
+.badge--sd1\.5 {
+  background: rgba(212,165,165,0.2);
+  color: var(--color-primary-dark);
+}
+

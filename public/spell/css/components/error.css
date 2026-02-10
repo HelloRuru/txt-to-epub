@@ -1,0 +1,14 @@
+/* === Error === */
+.error-msg {
+  text-align: center;
+  padding: 48px;
+  color: var(--color-text-muted);
+}
+
+.error-detail {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin-top: 8px;
+  color: var(--color-primary-dark);
+}
+

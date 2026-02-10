@@ -1,0 +1,46 @@
+/* === Responsive === */
+@media (max-width: 1023px) {
+  .generator {
+    grid-template-columns: 1fr;
+  }
+
+  .generator__right {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    padding: 0;
+  }
+
+  .preview {
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.1);
+    max-height: 45vh;
+    overflow-y: auto;
+  }
+
+  .generator__left {
+    padding-bottom: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero { padding: 32px 16px 24px; }
+  .hero__title { font-size: 30px; }
+  .container { padding: 0 16px; }
+
+  .model-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .preview__actions {
+    flex-direction: column;
+  }
+
+  .btn { width: 100%; }
+}

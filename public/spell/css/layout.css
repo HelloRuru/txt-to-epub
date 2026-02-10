@@ -1,0 +1,40 @@
+/**
+ * SD 咒語產生器 - Layout
+ * Container + Generator Grid Structure
+ */
+
+/* === Container === */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* === Generator Layout === */
+.generator {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin: 24px 0 48px;
+}
+
+/* === Container === */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* === Generator Layout === */
+.generator {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+  align-items: start;
+}
+
+.generator__right {
+  position: sticky;
+  top: 24px;
+}
+

@@ -1,0 +1,28 @@
+/* Post Writer - Theme Toggle */
+/* ─── 19. Theme Toggle ───────────────────────────────── */
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-card);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  flex-shrink: 0;
+}
+
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--icon-stroke);
+}
+
+.theme-toggle:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+

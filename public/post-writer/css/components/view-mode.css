@@ -1,0 +1,48 @@
+/* Post Writer - View Mode Switcher */
+/* ─── 7. View Mode Switcher ──────────────────────────── */
+
+.view-switcher {
+  display: inline-flex;
+  flex-wrap: wrap;
+  background: var(--bg-secondary);
+  border-radius: 9999px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.view-switcher__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  cursor: pointer;
+
+}
+
+.view-switcher__btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.view-switcher__btn:hover {
+  color: var(--text-primary);
+}
+
+.view-switcher__btn--active {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(212, 165, 165, 0.3);
+}
+
+.view-switcher__btn--active:hover {
+  color: #FFFFFF;
+}
+

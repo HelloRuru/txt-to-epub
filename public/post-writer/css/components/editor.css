@@ -1,0 +1,58 @@
+/* Post Writer - Editor Layout */
+/* ─── 10. Editor Layout ──────────────────────────────── */
+
+.editor-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.editor-pane {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: var(--shadow);
+
+}
+
+.editor-pane:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+.preview-pane {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: var(--shadow);
+
+}
+
+.preview-pane:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+.pane__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.pane__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pane__title svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--icon-stroke);
+}
+

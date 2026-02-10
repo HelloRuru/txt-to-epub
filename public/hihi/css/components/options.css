@@ -1,0 +1,54 @@
+    .option-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .option-label {
+      font-size: var(--text-body);
+      color: var(--color-muted);
+      min-width: fit-content;
+      font-weight: var(--weight-medium);
+    }
+
+    /* ─── Pill Buttons (font, size) ─── */
+    .pill-btn {
+      padding: 8px 16px;
+      border: 2px solid var(--color-mist);
+      border-radius: var(--radius-lg);
+      background: var(--color-card);
+      font-family: var(--font-body);
+      font-size: var(--text-small);
+      font-weight: var(--weight-medium);
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--color-ink);
+      min-height: 44px;
+    }
+    .pill-btn:hover { border-color: var(--color-rose); }
+    .pill-btn.active { background: var(--color-rose); border-color: var(--color-rose); color: #FFF; }
+    .pill-btn.lavender:hover { border-color: var(--color-lavender); }
+    .pill-btn.lavender.active { background: var(--color-lavender); border-color: var(--color-lavender); color: #FFF; }
+
+    /* ─── Font Button Preview ─── */
+    .font-btn[data-font="gensenrounded"] { font-family: 'GenSenRounded', sans-serif; }
+    .font-btn[data-font="wenkai"] { font-family: 'LXGW WenKai TC', serif; }
+    .font-btn[data-font="nanifont"] { font-family: 'NaniFont', sans-serif; }
+    .font-btn[data-font="notoserif"] { font-family: 'Noto Serif TC', serif; }
+    .font-btn[data-font="notosans"] { font-family: 'Noto Sans TC', sans-serif; }
+    .font-btn[data-font="huninn"] { font-family: 'jf-openhuninn', sans-serif; }
+    .font-btn[data-font="zenmaru"] { font-family: 'Zen Maru Gothic', sans-serif; }
+
+    /* ─── Color Dots ─── */
+    .color-dot {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-full);
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .color-dot:hover { transform: scale(1.1); }
+    .color-dot.active { border-color: var(--color-ink); transform: scale(1.1); }
+
+    /* ─── Color Cycle Button (致/來自) ─── */

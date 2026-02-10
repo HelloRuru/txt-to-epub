@@ -1,0 +1,11 @@
+    .color-cycle {
+      width: 32px; height: 32px;
+      border-radius: var(--radius-full);
+      border: 2px solid var(--color-mist);
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .color-cycle:hover { transform: scale(1.15); }
+
+    /* ─── Position Grid ─── */

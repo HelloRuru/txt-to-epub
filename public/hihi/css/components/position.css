@@ -1,0 +1,19 @@
+    .pos-wrap { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
+    .pos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+    .pos-btn {
+      width: 52px; height: 40px;
+      border: 2px solid var(--color-mist);
+      border-radius: var(--radius-sm);
+      background: var(--color-card);
+      font-family: var(--font-body);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-medium);
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--color-ink);
+      padding: 0;
+    }
+    .pos-btn:hover { border-color: var(--color-rose); }
+    .pos-btn.active { background: var(--color-rose); border-color: var(--color-rose); color: #FFF; }
+
+    /* ─── Sticker Grid ─── */

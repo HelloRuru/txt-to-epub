@@ -1,0 +1,84 @@
+    .sticker-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .sticker-thumb {
+      width: 64px; height: 64px;
+      border: 2px solid var(--color-mist);
+      border-radius: calc(var(--radius-lg) - 8px);
+      background: var(--color-card);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+    }
+    .sticker-thumb:hover { border-color: var(--color-rose); transform: scale(1.05); }
+    .sticker-thumb.active { border-color: var(--color-rose); background: #FFF5F5; }
+    .sticker-thumb img { width: 100%; height: 100%; object-fit: contain; }
+    .sticker-name {
+      font-family: var(--font-caption);
+      font-size: var(--text-caption);
+      color: var(--color-muted);
+      text-align: center;
+      margin-top: 2px;
+    }
+
+    /* ─── Sticker Controls ─── */
+    .sticker-controls {
+      margin-top: 12px;
+      padding: 16px;
+      background: var(--color-card);
+      border: 2px solid var(--color-mist);
+      border-radius: var(--radius-lg);
+      display: none;
+    }
+    .sticker-controls.show { display: block; }
+    .sticker-controls-title {
+      font-size: var(--text-small);
+      color: var(--color-rose);
+      font-weight: var(--weight-bold);
+      margin-bottom: 10px;
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .slider-row:last-child { margin-bottom: 0; }
+    .slider-label {
+      font-size: var(--text-small);
+      color: var(--color-muted);
+      min-width: 36px;
+    }
+    .slider-row input[type="range"] {
+      flex: 1;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--color-mist);
+      border-radius: 3px;
+      outline: none;
+    }
+    .slider-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 28px; height: 28px;
+      border-radius: var(--radius-full);
+      background: var(--color-rose);
+      cursor: pointer;
+      border: 2px solid var(--color-card);
+      box-shadow: var(--shadow-soft);
+    }
+    .slider-row input[type="range"]::-moz-range-thumb {
+      width: 28px; height: 28px;
+      border-radius: var(--radius-full);
+      background: var(--color-rose);
+      cursor: pointer;
+      border: 2px solid var(--color-card);
+    }
+
+    /* ─── Canvas Preview ─── */

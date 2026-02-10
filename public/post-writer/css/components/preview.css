@@ -1,0 +1,230 @@
+/* Post Writer - Preview */
+/* ─── 16. Preview ────────────────────────────────────── */
+
+.preview-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1.5px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.preview-tabs__btn {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  cursor: pointer;
+  position: relative;
+
+}
+
+.preview-tabs__btn:hover {
+  color: var(--text-primary);
+}
+
+.preview-tabs__btn--active {
+  color: var(--accent-primary);
+}
+
+.preview-tabs__btn--active::after {
+  content: '';
+  position: absolute;
+  bottom: -1.5px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-primary);
+  border-radius: 1px;
+}
+
+.device-switcher {
+  display: inline-flex;
+  background: var(--bg-secondary);
+  border-radius: 9999px;
+  padding: 3px;
+  gap: 2px;
+  margin-bottom: 16px;
+}
+
+.device-switcher__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+  cursor: pointer;
+
+}
+
+.device-switcher__btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.device-switcher__btn:hover {
+  color: var(--text-primary);
+}
+
+.device-switcher__btn--active {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Simulated Post Cards */
+
+.fb-preview,
+.ig-preview,
+.threads-preview {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.6;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+.post-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.post-card__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  flex-shrink: 0;
+}
+
+.post-card__meta {
+  flex: 1;
+}
+
+.post-card__username {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.post-card__timestamp {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.post-card__content {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 12px;
+}
+
+.post-card__show-more {
+  display: inline;
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.post-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.post-card__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.post-card__action svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Result preview (converted text) */
+
+.result-preview {
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-height: 360px;
+  overflow-y: auto;
+  max-width: 100%;
+}
+
+/* Thread splits preview */
+
+.thread-splits {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.thread-split {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  position: relative;
+}
+
+.thread-split__index {
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  padding: 0 8px;
+  background: var(--accent-primary);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 8px;
+}
+
+.thread-split__content {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+

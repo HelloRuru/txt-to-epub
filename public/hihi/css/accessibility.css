@@ -1,0 +1,15 @@
+    @media (hover: none) and (pointer: coarse) {
+      .greeting-btn:hover, .wisdom-btn:hover, .pill-btn:hover,
+      .pos-btn:hover, .sticker-thumb:hover, .color-dot:hover,
+      .color-cycle:hover, .upload-area:hover, .btn-primary:hover {
+        transform: none;
+        box-shadow: inherit;
+      }
+      .greeting-btn:active, .wisdom-btn:active, .pill-btn:active,
+      .pos-btn:active, .sticker-thumb:active {
+        transform: scale(0.96);
+      }
+      .btn-primary:active:not(:disabled) {
+        transform: scale(0.98);
+      }
+    }

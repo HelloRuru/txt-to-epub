@@ -1,0 +1,32 @@
+/* Post Writer - Separator Bar */
+/* ─── 13. Separator Bar ──────────────────────────────── */
+
+.separator-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.separator-bar__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  cursor: pointer;
+
+}
+
+.separator-bar__btn:hover {
+  background: var(--accent-primary);
+  color: #FFFFFF;
+}
+
+

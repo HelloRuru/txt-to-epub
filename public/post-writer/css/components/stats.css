@@ -1,0 +1,83 @@
+/* Post Writer - Stats Bar */
+/* ─── 15. Stats Bar ──────────────────────────────────── */
+
+.stats-bar {
+  margin-top: 14px;
+  margin-bottom: 14px;
+}
+
+.stats-progress {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-secondary);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.stats-progress__fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+
+}
+
+.stats-progress__fill--warning {
+  background: linear-gradient(90deg, #FFB74D, #FF9800);
+}
+
+.stats-progress__fill--danger {
+  background: linear-gradient(90deg, #EF5350, #E53935);
+}
+
+.stats-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.stats-label__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stats-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.stats-badge--warning {
+  background: #FFF8E1;
+  color: #8D6E00;
+}
+
+body.dark .stats-badge--warning {
+  background: rgba(255, 224, 130, 0.1);
+  color: #FFD54F;
+}
+
+.stats-badge--danger {
+  background: #FFEBEE;
+  color: #C62828;
+}
+
+body.dark .stats-badge--danger {
+  background: rgba(239, 83, 80, 0.1);
+  color: #EF5350;
+}
+
+.stats-badge--info {
+  background: rgba(184, 169, 201, 0.12);
+  color: var(--mauve);
+}
+

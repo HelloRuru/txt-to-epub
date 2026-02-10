@@ -1,0 +1,27 @@
+/* === Custom Input === */
+.custom-input-section {
+  margin-bottom: 24px;
+}
+
+.custom-input {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-text);
+  background: var(--color-surface);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.custom-input::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+.custom-input:focus {
+  border-color: var(--color-primary);
+}
+

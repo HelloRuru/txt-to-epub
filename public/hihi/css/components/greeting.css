@@ -1,0 +1,46 @@
+    .greeting-section { margin-bottom: 16px; }
+    .greeting-sub-label {
+      font-family: var(--font-caption);
+      font-size: var(--text-small);
+      color: var(--color-muted);
+      margin-bottom: 8px;
+    }
+    .greeting-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .greeting-btn, .wisdom-btn {
+      padding: 10px 18px;
+      border: 2px solid var(--color-mist);
+      border-radius: var(--radius-lg);
+      background: var(--color-card);
+      font-family: var(--font-body);
+      font-weight: var(--weight-medium);
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--color-ink);
+      min-height: 44px;
+    }
+    .greeting-btn { font-size: var(--text-body); }
+    .wisdom-btn { font-size: var(--text-small); }
+    .greeting-btn:hover { border-color: var(--color-rose); }
+    .greeting-btn.active { background: var(--color-rose); border-color: var(--color-rose); color: #FFF; }
+    .wisdom-btn:hover { border-color: var(--color-lavender); }
+    .wisdom-btn.active { background: var(--color-lavender); border-color: var(--color-lavender); color: #FFF; }
+
+    /* Random surprise button — unique gradient style */
+    .wisdom-btn.random-btn {
+      border: 2px solid var(--color-nadeshiko);
+      background: var(--gradient-pink-purple);
+      color: #FFF;
+      font-weight: var(--weight-bold);
+    }
+    .wisdom-btn.random-btn:hover {
+      border-color: var(--color-bellflower);
+      box-shadow: 0 2px 12px rgba(143,119,181,0.25);
+    }
+    .wisdom-btn.random-btn.active {
+      background: var(--gradient-main);
+      border-color: var(--color-grey-rose);
+      box-shadow: 0 4px 16px rgba(212,165,165,0.3);
+    }
+
+    /* ─── Textarea ─── */

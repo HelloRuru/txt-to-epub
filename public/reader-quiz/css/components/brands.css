@@ -1,0 +1,8 @@
+/* Brands link */
+.brands-link {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+.brands-link .btn { display: inline-flex; align-items: center; gap: var(--space-sm); }
+.brands-link .btn svg { width: 18px; height: 18px; }
+

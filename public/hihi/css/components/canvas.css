@@ -1,0 +1,14 @@
+    .preview-wrap {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      background: var(--color-card);
+    }
+    #canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: var(--radius-lg);
+    }
+
+    /* ─── Download Button ─── */

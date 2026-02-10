@@ -1,0 +1,18 @@
+    .name-input {
+      flex: 1;
+      min-width: 0;
+      padding: 10px 14px;
+      border: 2px solid var(--color-mist);
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: var(--text-body);
+      font-weight: var(--weight-medium);
+      color: var(--color-ink);
+      background: var(--color-card);
+      transition: border-color 0.2s;
+      min-height: 44px;
+    }
+    .name-input::placeholder { color: var(--color-light); }
+    .name-input:focus { outline: none; border-color: var(--color-rose); }
+
+    /* ─── Option Rows ─── */

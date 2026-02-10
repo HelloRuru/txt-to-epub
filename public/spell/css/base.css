@@ -1,0 +1,68 @@
+/* ========================================
+   SD 咒語產生器 - Design System v1.6
+   Hello Ruru / tools.helloruru.com
+   Font: GenSenRounded (源泉圓體)
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400&display=swap');
+
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --color-primary: #D4A5A5;
+  --color-secondary: #B8A9C9;
+  --color-primary-light: #E8B4B8;    /* 撫子粉 */
+  --color-primary-dark: #C9929A;
+  --color-secondary-light: #C4B7D7;
+  --color-secondary-dark: #9B7E93;
+  --color-bg: #FAFAFA;
+  --color-surface: #FFFFFF;
+  --color-text: #333333;
+  --color-text-light: #4A4A4A;
+  --color-text-muted: #888888;
+  --color-text-placeholder: #AAAAAA;
+  --color-border: #E8E4E1;
+  --color-success: #A8B5A0;
+  --radius-lg: 24px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --font-heading: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+  --font-body: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+  --font-small: 'Noto Sans TC', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --shadow-sm: 0 2px 8px rgba(212,165,165,0.1);
+  --shadow-md: 0 4px 16px rgba(212,165,165,0.15);
+  --shadow-lg: 0 8px 32px rgba(212,165,165,0.2);
+  --transition: 250ms ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  font-weight: 500;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.8;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+

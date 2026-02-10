@@ -1,0 +1,23 @@
+/* 響應式 - Design System v1.4: Mobile <768px */
+@media (max-width: 640px) {
+  :root {
+    --radius-lg: 16px;
+    --radius: 16px;
+    --radius-md: 8px;
+    --radius-sm: 6px;
+  }
+  html { font-size: 15px; }
+  h1 { font-size: 1.875rem; }  /* 手機 30px */
+  h2 { font-size: 1.5rem; }    /* 手機 24px */
+  h3 { font-size: 1.125rem; }  /* 手機 18px */
+  .header { padding: var(--space-xl) var(--space-md); }
+  .header__title { font-size: 1.5rem; }
+  .quiz, .result { padding: var(--space-lg) var(--space-md); }
+  .option { padding: var(--space-md); }
+  .option__icon { width: 40px; height: 40px; min-width: 40px; }
+  .option__icon svg { width: 20px; height: 20px; }
+  .specs { grid-template-columns: 1fr; }
+  .btn { padding: var(--space-md); font-size: 0.9375rem; }
+  .ranking-card__body { padding: var(--space-lg); }
+  .ranking-card__header { padding: var(--space-sm) var(--space-lg); }
+}

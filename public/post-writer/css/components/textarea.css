@@ -1,0 +1,33 @@
+/* Post Writer - Textarea */
+/* ─── 12. Textarea ───────────────────────────────────── */
+
+.post-textarea {
+  width: 100%;
+  min-height: 240px;
+  padding: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg-secondary);
+  font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.8;
+  color: var(--text-primary);
+  resize: vertical;
+  outline: none;
+
+}
+
+.post-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.post-textarea:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.15);
+}
+
+body.dark .post-textarea:focus {
+  box-shadow: 0 0 0 3px rgba(232, 180, 184, 0.12);
+}
+

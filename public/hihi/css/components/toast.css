@@ -1,0 +1,11 @@
+    .toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--color-charcoal); color: #FFF;
+      font-size: var(--text-body); font-weight: var(--weight-medium);
+      padding: 12px 24px; border-radius: var(--radius-lg);
+      opacity: 0; transition: all 0.3s; z-index: 10; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ─── Save Overlay (for LINE / in-app browsers) ─── */

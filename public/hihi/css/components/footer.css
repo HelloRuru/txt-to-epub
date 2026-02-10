@@ -1,0 +1,9 @@
+    .footer {
+      text-align: center; padding: 32px 0 0;
+      font-family: var(--font-caption);
+      font-size: var(--text-small);
+      color: var(--color-muted);
+    }
+    .footer a { color: var(--color-rose); text-decoration: none; }
+
+    /* ─── Tablet (768–1023px) ─── */

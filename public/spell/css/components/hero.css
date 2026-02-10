@@ -1,0 +1,24 @@
+/* === Hero === */
+.hero {
+  text-align: center;
+  padding: 48px 24px 32px;
+}
+
+.hero__title {
+  font-family: var(--font-heading);
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.3;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.hero__subtitle {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+

@@ -1,0 +1,24 @@
+/* === Section Titles === */
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title svg {
+  width: 20px;
+  height: 20px;
+}
+
+.section-subtitle {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-light);
+  margin-bottom: 10px;
+}
+
