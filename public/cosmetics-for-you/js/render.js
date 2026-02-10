@@ -16,7 +16,9 @@ export function renderApp(state) {
     <div aria-live="polite" id="search-live" class="sr-only"></div>
     ${renderSearchBox(state)}
     ${renderFilters(state)}
+    ${renderCategoryFilters(state)}
     ${state.results.length > 0 ? renderResults(state.results) : renderEmptyState(state)}
+    ${renderExchangeCalc(state)}
   `
 }
 
@@ -31,7 +33,7 @@ function renderSearchBox(state) {
           type="text"
           class="search-box__input"
           id="search-input"
-          placeholder="輸入品牌 + 色號，如 Dior 075"
+          placeholder="輸入品牌 + 色號，如 Dior 075 或 爛番茄色"
           value="${escapeAttr(state.query)}"
           maxlength="100"
           autocomplete="off"
@@ -47,7 +49,7 @@ function renderSearchBox(state) {
   `
 }
 
-/* ─── 篩選器 ─────────────────────────────── */
+/* ─── 地區篩選 ────────────────────────────── */
 
 function renderFilters(state) {
   const filters = [
@@ -66,6 +68,32 @@ function renderFilters(state) {
           role="radio"
           aria-checked="${state.regionFilter === f.key}"
         >${f.label}</button>
+      `).join('')}
+    </div>
+  `
+}
+
+/* ─── 品類篩選 ────────────────────────────── */
+
+function renderCategoryFilters(state) {
+  const categories = [
+    { key: 'all', label: '全部品類' },
+    { key: 'lipstick', label: '口紅' },
+    { key: 'eyeshadow', label: '眼影' },
+    { key: 'blush', label: '腮紅' },
+    { key: 'foundation', label: '粉底' },
+  ]
+
+  return `
+    <div class="category-filters" role="radiogroup" aria-label="品類篩選">
+      ${categories.map(c => `
+        <button
+          class="category-pill${state.categoryFilter === c.key ? ' category-pill--active' : ''}"
+          data-action="category"
+          data-category="${c.key}"
+          role="radio"
+          aria-checked="${state.categoryFilter === c.key}"
+        >${c.label}</button>
       `).join('')}
     </div>
   `
@@ -198,6 +226,54 @@ function renderEmptyState(state) {
   `
 }
 
+/* ─── 匯率計算機 ─────────────────────────── */
+
+function renderExchangeCalc(state) {
+  const rate = state.exchangeRate
+  const rateDisplay = rate ? rate.toFixed(4) : '—'
+  const rateTime = state.exchangeRateTime || ''
+
+  return `
+    <section class="exchange-calc">
+      <button class="exchange-calc__toggle" data-action="toggle-exchange" aria-expanded="${state.showExchangeCalc ? 'true' : 'false'}">
+        ${icons.calculator} 日本免稅匯率計算機
+        <span class="exchange-calc__chevron ${state.showExchangeCalc ? 'exchange-calc__chevron--open' : ''}">${icons.chevronRight}</span>
+      </button>
+      ${state.showExchangeCalc ? `
+        <div class="exchange-calc__body">
+          <div class="exchange-calc__rate-info">
+            <span class="exchange-calc__rate-label">目前匯率</span>
+            <span class="exchange-calc__rate-value">1 JPY = ${rateDisplay} TWD</span>
+            ${rateTime ? `<span class="exchange-calc__rate-time">${escapeHTML(rateTime)}</span>` : ''}
+          </div>
+          <div class="exchange-calc__inputs">
+            <div class="exchange-calc__field">
+              <label class="exchange-calc__label" for="jpy-input">日圓 ¥</label>
+              <input
+                type="number"
+                id="jpy-input"
+                class="exchange-calc__input"
+                placeholder="例：3500"
+                value="${escapeAttr(String(state.jpyAmount || ''))}"
+                min="0"
+                inputmode="numeric"
+              >
+            </div>
+            <div class="exchange-calc__arrow-icon">${icons.chevronRight}</div>
+            <div class="exchange-calc__field">
+              <label class="exchange-calc__label" for="twd-output">約新台幣 NT$</label>
+              <div class="exchange-calc__output" id="twd-output">
+                ${state.jpyAmount && rate ? `NT$ ${Math.round(state.jpyAmount * rate).toLocaleString()}` : '—'}
+              </div>
+            </div>
+          </div>
+          <p class="exchange-calc__note">匯率每日更新，實際匯率以購買當下為準。日本免稅店價格通常約台灣專櫃 7\u20138 折</p>
+        </div>
+      ` : ''}
+    </section>
+  `
+}
+
 /* ─── 工具函數 ────────────────────────────── */
 
 function escapeHTML(str) {
@@ -207,5 +283,5 @@ function escapeHTML(str) {
 
 function escapeAttr(str) {
   if (!str) return ''
-  return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }

@@ -8,6 +8,7 @@
 import { renderApp } from './render.js'
 import { parseBrandAndColor, generateSearchUrls, getSuggestions } from './search.js'
 import { brands } from './brands.js'
+import { searchNicknames } from './nicknames.js'
 
 /* ─── State ───────────────────────────────── */
 
@@ -16,11 +17,17 @@ const state = {
   brand: null,
   colorCode: '',
   regionFilter: 'tw',
+  categoryFilter: 'all',
   results: [],
-  suggestions: [],
+  suggestions: [],   // unified: [{ type, data }]
   showSuggestions: false,
   hasSearched: false,
   suggestionIndex: -1,
+  // 匯率計算機
+  exchangeRate: null,
+  exchangeRateTime: '',
+  showExchangeCalc: false,
+  jpyAmount: '',
 }
 
 /* ─── Rendering ───────────────────────────── */
@@ -69,6 +76,7 @@ function bindEvents() {
   // 委派 input/keydown/focus — 只綁一次在 #app
   app.addEventListener('input', (e) => {
     if (e.target.id === 'search-input') handleInput(e)
+    if (e.target.id === 'jpy-input') handleJpyInput(e)
   })
 
   app.addEventListener('keydown', (e) => {
@@ -100,6 +108,12 @@ function handleClick(e) {
       else render()
       break
 
+    case 'category':
+      state.categoryFilter = actionEl.dataset.category
+      if (state.hasSearched) executeSearch()
+      else render()
+      break
+
     case 'select-brand': {
       const brandId = actionEl.dataset.brandId
       const brand = brands.find(b => b.id === brandId)
@@ -114,27 +128,52 @@ function handleClick(e) {
     }
 
     case 'select-suggestion': {
-      const brandId = actionEl.dataset.brandId
-      const brand = brands.find(b => b.id === brandId)
-      if (brand) {
-        const parsed = parseBrandAndColor(state.query)
-        state.query = brand.name_en + (parsed.colorCode ? ' ' + parsed.colorCode : ' ')
-        state.showSuggestions = false
-        state.suggestionIndex = -1
-        _focusTarget = 'search'
-        render()
+      const sugType = actionEl.dataset.sugType
+      if (sugType === 'nickname') {
+        const nickname = actionEl.dataset.nickname
+        const brandId = actionEl.dataset.brandId
+        const color = actionEl.dataset.color || ''
+        if (brandId) {
+          const brand = brands.find(b => b.id === brandId)
+          state.query = brand ? (brand.name_en + (color ? ' ' + color : ' ')) : nickname + ' '
+        } else {
+          state.query = nickname + ' '
+        }
+      } else {
+        // brand suggestion
+        const brandId = actionEl.dataset.brandId
+        const brand = brands.find(b => b.id === brandId)
+        if (brand) {
+          const parsed = parseBrandAndColor(state.query)
+          state.query = brand.name_en + (parsed.colorCode ? ' ' + parsed.colorCode : ' ')
+        }
       }
+      state.showSuggestions = false
+      state.suggestionIndex = -1
+      _focusTarget = 'search'
+      render()
       break
     }
+
+    case 'toggle-exchange':
+      state.showExchangeCalc = !state.showExchangeCalc
+      if (state.showExchangeCalc && !state.exchangeRate) {
+        fetchExchangeRate()
+      }
+      render()
+      break
   }
 }
 
 function handleInput(e) {
   state.query = e.target.value
   const parsed = parseBrandAndColor(state.query)
+  const inputText = (parsed.rawBrand || state.query).trim()
 
-  if (parsed.rawBrand && parsed.rawBrand.length >= 1) {
-    state.suggestions = getSuggestions(parsed.rawBrand)
+  if (inputText.length >= 1) {
+    const brandSugs = getSuggestions(inputText).map(b => ({ type: 'brand', data: b }))
+    const nickSugs = searchNicknames(inputText).map(n => ({ type: 'nickname', data: n }))
+    state.suggestions = [...brandSugs, ...nickSugs].slice(0, 8)
     state.showSuggestions = state.suggestions.length > 0
   } else {
     state.suggestions = []
@@ -148,15 +187,9 @@ function handleInput(e) {
 function handleKeydown(e) {
   if (e.key === 'Enter') {
     e.preventDefault()
-    // 如果有選中的建議項，選擇該品牌
+    // 如果有選中的建議項，選擇該品牌/暱稱
     if (state.showSuggestions && state.suggestionIndex >= 0 && state.suggestionIndex < state.suggestions.length) {
-      const brand = state.suggestions[state.suggestionIndex]
-      const parsed = parseBrandAndColor(state.query)
-      state.query = brand.name_en + (parsed.colorCode ? ' ' + parsed.colorCode : ' ')
-      state.showSuggestions = false
-      state.suggestionIndex = -1
-      _focusTarget = 'search'
-      render()
+      selectSuggestion(state.suggestions[state.suggestionIndex])
     } else {
       state.showSuggestions = false
       state.suggestionIndex = -1
@@ -191,6 +224,26 @@ function handleKeydown(e) {
   }
 }
 
+function selectSuggestion(suggestion) {
+  if (suggestion.type === 'nickname') {
+    const n = suggestion.data
+    if (n.brandId) {
+      const brand = brands.find(b => b.id === n.brandId)
+      state.query = brand ? (brand.name_en + (n.color ? ' ' + n.color : ' ')) : n.nickname + ' '
+    } else {
+      state.query = n.nickname + ' '
+    }
+  } else {
+    const brand = suggestion.data
+    const parsed = parseBrandAndColor(state.query)
+    state.query = brand.name_en + (parsed.colorCode ? ' ' + parsed.colorCode : ' ')
+  }
+  state.showSuggestions = false
+  state.suggestionIndex = -1
+  _focusTarget = 'search'
+  render()
+}
+
 function handleInputFocus() {
   if (state.suggestions.length > 0 && state.query.length >= 1) {
     state.showSuggestions = true
@@ -203,6 +256,61 @@ function handleOutsideClick(e) {
     state.showSuggestions = false
     state.suggestionIndex = -1
     updateSuggestions()
+  }
+}
+
+/* ─── JPY 計算機輸入 ─────────────────────── */
+
+function handleJpyInput(e) {
+  state.jpyAmount = e.target.value
+  const output = document.getElementById('twd-output')
+  if (output && state.exchangeRate) {
+    const val = parseFloat(state.jpyAmount)
+    output.textContent = val > 0
+      ? `NT$ ${Math.round(val * state.exchangeRate).toLocaleString()}`
+      : '\u2014'
+  }
+}
+
+/* ─── 匯率 API ───────────────────────────── */
+
+async function fetchExchangeRate() {
+  // 先從 sessionStorage 讀快取（1 小時有效）
+  try {
+    const cached = sessionStorage.getItem('cosmetics-exchange-rate')
+    if (cached) {
+      const parsed = JSON.parse(cached)
+      if (Date.now() - parsed.timestamp < 3600000) {
+        state.exchangeRate = parsed.rate
+        state.exchangeRateTime = parsed.time
+        render()
+        return
+      }
+    }
+  } catch { /* ignore */ }
+
+  try {
+    const res = await fetch('https://open.er-api.com/v6/latest/JPY')
+    const data = await res.json()
+    if (data.result === 'success' && data.rates && data.rates.TWD) {
+      state.exchangeRate = data.rates.TWD
+      const now = new Date()
+      state.exchangeRateTime = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')} 更新`
+
+      // 快取到 sessionStorage
+      try {
+        sessionStorage.setItem('cosmetics-exchange-rate', JSON.stringify({
+          rate: state.exchangeRate,
+          time: state.exchangeRateTime,
+          timestamp: Date.now(),
+        }))
+      } catch { /* ignore */ }
+
+      render()
+    }
+  } catch {
+    state.exchangeRateTime = '匯率載入失敗'
+    render()
   }
 }
 
@@ -233,29 +341,54 @@ function updateSuggestions() {
   ul.id = 'search-listbox'
 
   for (let i = 0; i < state.suggestions.length; i++) {
-    const b = state.suggestions[i]
+    const sug = state.suggestions[i]
     const li = document.createElement('li')
     li.className = 'search-suggestions__item'
     li.id = `suggestion-${i}`
     li.setAttribute('role', 'option')
     li.setAttribute('aria-selected', i === state.suggestionIndex ? 'true' : 'false')
     li.dataset.action = 'select-suggestion'
-    li.dataset.brandId = b.id
 
     if (i === state.suggestionIndex) {
       li.classList.add('search-suggestions__item--active')
     }
 
-    const nameSpan = document.createElement('span')
-    nameSpan.className = 'search-suggestions__name'
-    nameSpan.textContent = b.name_en
+    if (sug.type === 'brand') {
+      const b = sug.data
+      li.dataset.sugType = 'brand'
+      li.dataset.brandId = b.id
 
-    const subSpan = document.createElement('span')
-    subSpan.className = 'search-suggestions__sub'
-    subSpan.textContent = b.name_zh + (b.name_ja !== b.name_en ? ' / ' + b.name_ja : '')
+      const nameSpan = document.createElement('span')
+      nameSpan.className = 'search-suggestions__name'
+      nameSpan.textContent = b.name_en
 
-    li.appendChild(nameSpan)
-    li.appendChild(subSpan)
+      const subSpan = document.createElement('span')
+      subSpan.className = 'search-suggestions__sub'
+      subSpan.textContent = b.name_zh + (b.name_ja !== b.name_en ? ' / ' + b.name_ja : '')
+
+      li.appendChild(nameSpan)
+      li.appendChild(subSpan)
+    } else {
+      // nickname
+      const n = sug.data
+      li.dataset.sugType = 'nickname'
+      li.dataset.nickname = n.nickname
+      if (n.brandId) li.dataset.brandId = n.brandId
+      if (n.color) li.dataset.color = n.color
+      li.classList.add('search-suggestions__item--nickname')
+
+      const nameSpan = document.createElement('span')
+      nameSpan.className = 'search-suggestions__name'
+      nameSpan.textContent = n.nickname
+
+      const descSpan = document.createElement('span')
+      descSpan.className = 'search-suggestions__sub'
+      descSpan.textContent = n.desc
+
+      li.appendChild(nameSpan)
+      li.appendChild(descSpan)
+    }
+
     ul.appendChild(li)
   }
 
@@ -274,14 +407,14 @@ function updateSuggestions() {
 function executeSearch() {
   if (!state.query.trim()) return
 
-  const { brand, colorCode, rawBrand } = parseBrandAndColor(state.query)
+  const { brand, colorCode, rawBrand, extraKeywords } = parseBrandAndColor(state.query)
 
   state.brand = brand
   state.colorCode = colorCode
   state.hasSearched = true
   state.showSuggestions = false
   state.suggestionIndex = -1
-  state.results = generateSearchUrls(brand, colorCode, rawBrand, state.regionFilter)
+  state.results = generateSearchUrls(brand, colorCode, rawBrand, state.regionFilter, state.categoryFilter, extraKeywords)
 
   _focusTarget = 'search'
   render()
@@ -292,10 +425,10 @@ function executeSearch() {
 const STORAGE_KEY = 'cosmetics-theme'
 
 function getPreferredTheme() {
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (stored) {
-    return stored
-  }
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) return stored
+  } catch { /* ignore */ }
 
   // 檢測系統偏好
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
@@ -303,7 +436,9 @@ function getPreferredTheme() {
 
 function setTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme)
-  localStorage.setItem(STORAGE_KEY, theme)
+  try {
+    localStorage.setItem(STORAGE_KEY, theme)
+  } catch { /* ignore */ }
 
   // 更新按鈕 aria-label
   const toggleBtn = document.getElementById('theme-toggle')
@@ -326,7 +461,11 @@ function initTheme() {
 
   // 監聽系統主題變化
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    if (!localStorage.getItem(STORAGE_KEY)) {
+    try {
+      if (!localStorage.getItem(STORAGE_KEY)) {
+        setTheme(e.matches ? 'dark' : 'light')
+      }
+    } catch {
       setTheme(e.matches ? 'dark' : 'light')
     }
   })

@@ -214,7 +214,6 @@ hello-ruru-header {
 }
 
 .theme-toggle:focus {
-  outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.2);
 }
@@ -614,7 +613,7 @@ hello-ruru-header {
 .result-card__domain {
   font-size: 12px;
   font-weight: 400;
-  color: var(--color-text-placeholder);
+  color: var(--color-text-muted);
   margin-bottom: 4px;
   font-family: var(--font-small);
 }
@@ -864,5 +863,305 @@ hello-ruru-header {
   .tier-group__list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ─── Category Filters ────────────────────── */
+
+.category-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.category-pill {
+  padding: 6px 18px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.category-pill:hover {
+  border-color: var(--color-secondary-light);
+  color: var(--color-text-body);
+  background: rgba(184, 169, 201, 0.06);
+}
+
+.category-pill:active {
+  transform: scale(0.97);
+}
+
+.category-pill--active {
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(184, 169, 201, 0.3);
+}
+
+.category-pill--active:hover {
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+}
+
+/* ─── Exchange Rate Calculator ────────────── */
+
+.exchange-calc {
+  margin-top: 32px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.exchange-calc__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--color-surface);
+  border: none;
+  font-family: var(--font-main);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.exchange-calc__toggle:hover {
+  background: rgba(212, 165, 165, 0.06);
+}
+
+.exchange-calc__toggle:active {
+  background: rgba(212, 165, 165, 0.1);
+}
+
+.exchange-calc__toggle svg:first-child {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.exchange-calc__chevron {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  transition: transform var(--transition);
+  display: flex;
+}
+
+.exchange-calc__chevron--open {
+  transform: rotate(90deg);
+}
+
+.exchange-calc__body {
+  padding: 0 20px 20px;
+  background: var(--color-surface);
+}
+
+.exchange-calc__rate-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: rgba(212, 165, 165, 0.06);
+  border-radius: var(--radius-sm);
+}
+
+[data-theme="dark"] .exchange-calc__rate-info {
+  background: rgba(212, 165, 165, 0.08);
+}
+
+.exchange-calc__rate-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.exchange-calc__rate-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.exchange-calc__rate-time {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text-placeholder);
+  font-family: var(--font-small);
+}
+
+.exchange-calc__inputs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.exchange-calc__field {
+  flex: 1;
+}
+
+.exchange-calc__label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.exchange-calc__input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  font-family: var(--font-main);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.exchange-calc__input:focus {
+  border-color: var(--color-primary);
+}
+
+.exchange-calc__input::placeholder {
+  color: var(--color-text-placeholder);
+  font-weight: 400;
+}
+
+.exchange-calc__arrow-icon {
+  flex-shrink: 0;
+  color: var(--color-primary);
+  margin-top: 20px;
+  display: flex;
+}
+
+.exchange-calc__output {
+  padding: 12px 14px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: rgba(212, 165, 165, 0.06);
+  font-family: var(--font-main);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-primary);
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+[data-theme="dark"] .exchange-calc__output {
+  background: rgba(212, 165, 165, 0.08);
+}
+
+.exchange-calc__note {
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* ─── Nickname Suggestion ─────────────────── */
+
+.search-suggestions__item--nickname .search-suggestions__name {
+  color: var(--color-primary);
+}
+
+/* ─── Focus-Visible (WCAG 2.4.7) ─────────── */
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+input:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.theme-toggle:focus:not(:focus-visible) {
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.3);
+}
+
+/* ─── Word Break ──────────────────────────── */
+
+.result-card__name,
+.result-card__desc,
+.image-search-card__query {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* ─── Prefers Reduced Motion ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ─── Responsive: New Elements ────────────── */
+
+@media (max-width: 768px) {
+  .category-filters {
+    gap: 6px;
+  }
+
+  .category-pill {
+    padding: 6px 14px;
+    font-size: 12px;
+    min-height: 32px;
+  }
+
+  .exchange-calc__toggle {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .exchange-calc__body {
+    padding: 0 16px 16px;
+  }
+
+  .exchange-calc__inputs {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .exchange-calc__arrow-icon {
+    margin-top: 0;
+    transform: rotate(90deg);
+  }
+
+  .exchange-calc__field {
+    width: 100%;
   }
 }
