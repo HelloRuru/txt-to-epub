@@ -1,0 +1,26 @@
+/* ========================================
+   Footer Component
+   網站頁尾
+   ======================================== */
+
+.site-footer {
+  text-align: center;
+  padding: 48px 24px 40px;
+  margin-top: 48px;
+  border-top: 1px solid var(--color-border);
+}
+
+.site-footer p {
+  font-family: var(--font-small);
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.site-footer a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
+}

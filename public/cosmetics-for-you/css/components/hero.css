@@ -1,0 +1,148 @@
+/* ========================================
+   Hero Component
+   主視覺區塊、標題、主題切換按鈕
+   ======================================== */
+
+/* ─── Brand Header Spacing ─────────────── */
+
+hello-ruru-header {
+  display: block;
+  margin-bottom: 28px;
+}
+
+/* ─── Hero ─────────────────────────────── */
+
+.hero {
+  padding: 48px 24px 40px;
+  background: linear-gradient(180deg, #FFF5F5 0%, #F5F0FA 50%, var(--color-bg) 100%);
+  position: relative;
+}
+
+[data-theme="dark"] .hero {
+  background: linear-gradient(180deg, #2A1F1F 0%, #2A1F2A 50%, var(--color-bg) 100%);
+}
+
+.hero__header {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.hero__title-group {
+  text-align: center;
+  flex: 1;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(212,165,165,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero__title {
+  font-family: var(--font-main);
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.3;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 12px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.hero__icon {
+  flex-shrink: 0;
+  stroke: var(--color-primary);
+  filter: drop-shadow(0 2px 4px rgba(212, 165, 165, 0.3));
+  animation: float 3s ease-in-out infinite;
+}
+
+.hero__icon:last-child {
+  animation-delay: 1.5s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.hero__subtitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  position: relative;
+}
+
+/* ─── Theme Toggle ─────────────────────── */
+
+.theme-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.theme-toggle:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.2);
+}
+
+.theme-toggle:active {
+  transform: scale(0.96);
+}
+
+.theme-toggle__icon {
+  transition: var(--transition);
+  opacity: 0;
+  position: absolute;
+}
+
+/* Light mode: 顯示太陽圖標 */
+:root .theme-toggle__icon--sun,
+[data-theme="light"] .theme-toggle__icon--sun {
+  opacity: 1;
+}
+
+/* Dark mode: 顯示月亮圖標 */
+[data-theme="dark"] .theme-toggle__icon--moon {
+  opacity: 1;
+}
+
+[data-theme="dark"] .theme-toggle__icon--sun {
+  opacity: 0;
+}

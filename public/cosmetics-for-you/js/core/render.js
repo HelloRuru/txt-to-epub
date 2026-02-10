@@ -17,14 +17,25 @@ export function renderApp(state) {
     ${renderSearchBox(state)}
     ${renderFilters(state)}
     ${renderCategoryFilters(state)}
-    ${state.results.length > 0 ? renderResults(state.results) : renderEmptyState(state)}
-    ${renderExchangeCalc(state)}
+    ${renderShareButton(state)}
+    ${state.results.length > 0 ? `
+      <div class="results-with-calc">
+        ${renderResults(state.results)}
+        ${renderExchangeCalc(state)}
+      </div>
+    ` : renderEmptyState(state)}
   `
 }
 
 /* ─── 搜尋框 ─────────────────────────────── */
 
 function renderSearchBox(state) {
+  // 根據螢幕寬度決定 placeholder
+  const isMobile = window.innerWidth < 768
+  const placeholder = isMobile
+    ? '品牌 + 色號，如 Dior 075'
+    : '輸入品牌 + 色號，如 Dior 075 或爛番茄色'
+
   return `
     <div class="search-box">
       <div class="search-box__input-wrap">
@@ -33,7 +44,7 @@ function renderSearchBox(state) {
           type="text"
           class="search-box__input"
           id="search-input"
-          placeholder="輸入品牌 + 色號，如 Dior 075 或 爛番茄色"
+          placeholder="${placeholder}"
           value="${escapeAttr(state.query)}"
           maxlength="100"
           autocomplete="off"
@@ -154,6 +165,38 @@ function renderImageSearchCard(results) {
       </div>
       <span class="image-search-card__arrow">${icons.externalLink}</span>
     </a>
+  `
+}
+
+function renderShareButton(state) {
+  if (!state.hasSearched || !state.results.length) return ''
+
+  return `
+    <div class="share-container">
+      <button class="share-btn" data-action="toggle-share" aria-label="分享搜尋結果" aria-expanded="${state.showShareMenu}">
+        ${icons.share}
+      </button>
+      ${state.showShareMenu ? `
+        <div class="share-menu" role="menu">
+          <button class="share-menu__item" data-action="share-line" role="menuitem">
+            ${icons.messageCircle}
+            <span>LINE</span>
+          </button>
+          <button class="share-menu__item" data-action="share-messenger" role="menuitem">
+            ${icons.send}
+            <span>Messenger</span>
+          </button>
+          <button class="share-menu__item" data-action="copy-link" role="menuitem">
+            ${icons.link}
+            <span>複製連結</span>
+          </button>
+          <button class="share-menu__item" data-action="copy-text" role="menuitem">
+            ${icons.clipboard}
+            <span>複製文案</span>
+          </button>
+        </div>
+      ` : ''}
+    </div>
   `
 }
 

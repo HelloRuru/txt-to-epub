@@ -1,0 +1,175 @@
+/* ========================================
+   Calculator Component
+   日圓匯率計算機、佈局
+   ======================================== */
+
+/* ─── Results with Calculator Layout ──────── */
+
+.results-with-calc {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ─── Exchange Rate Calculator ────────────── */
+
+.exchange-calc {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.exchange-calc__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--color-surface);
+  border: none;
+  font-family: var(--font-main);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.exchange-calc__toggle:hover {
+  background: rgba(212, 165, 165, 0.06);
+}
+
+.exchange-calc__toggle:active {
+  background: rgba(212, 165, 165, 0.1);
+}
+
+.exchange-calc__toggle svg:first-child {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.exchange-calc__chevron {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  transition: transform var(--transition);
+  display: flex;
+}
+
+.exchange-calc__chevron--open {
+  transform: rotate(90deg);
+}
+
+.exchange-calc__body {
+  padding: 0 20px 20px;
+  background: var(--color-surface);
+}
+
+.exchange-calc__rate-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: rgba(212, 165, 165, 0.06);
+  border-radius: var(--radius-sm);
+}
+
+[data-theme="dark"] .exchange-calc__rate-info {
+  background: rgba(212, 165, 165, 0.08);
+}
+
+.exchange-calc__rate-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.exchange-calc__rate-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.exchange-calc__rate-time {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text-placeholder);
+  font-family: var(--font-small);
+}
+
+.exchange-calc__inputs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.exchange-calc__field {
+  flex: 1;
+  min-width: 0; /* 防止 flex 子元素撐開父容器 */
+}
+
+.exchange-calc__label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.exchange-calc__input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  font-family: var(--font-main);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.exchange-calc__input:focus {
+  border-color: var(--color-primary);
+}
+
+.exchange-calc__input::placeholder {
+  color: var(--color-text-placeholder);
+  font-weight: 400;
+}
+
+.exchange-calc__arrow-icon {
+  flex-shrink: 0;
+  color: var(--color-primary);
+  margin-top: 20px;
+  display: flex;
+}
+
+.exchange-calc__output {
+  padding: 12px 14px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: rgba(212, 165, 165, 0.06);
+  font-family: var(--font-main);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-primary);
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+[data-theme="dark"] .exchange-calc__output {
+  background: rgba(212, 165, 165, 0.08);
+}
+
+.exchange-calc__note {
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  text-align: center;
+}

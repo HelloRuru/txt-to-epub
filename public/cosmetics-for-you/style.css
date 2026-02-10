@@ -177,6 +177,26 @@ hello-ruru-header {
   background-clip: text;
   margin-bottom: 12px;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.hero__icon {
+  flex-shrink: 0;
+  stroke: var(--color-primary);
+  filter: drop-shadow(0 2px 4px rgba(212, 165, 165, 0.3));
+  animation: float 3s ease-in-out infinite;
+}
+
+.hero__icon:last-child {
+  animation-delay: 1.5s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
 }
 
 .hero__subtitle {
@@ -374,12 +394,16 @@ hello-ruru-header {
   font-weight: 700;
   font-size: 15px;
   color: var(--color-text);
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .search-suggestions__sub {
   font-size: 13px;
   font-weight: 400;
   color: var(--color-text-muted);
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* ─── Filter Pills ─────────────────────── */
@@ -793,6 +817,199 @@ hello-ruru-header {
   font-weight: 400;
 }
 
+/* ─── Share Button ────────────────────── */
+
+.share-container {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.share-btn:active {
+  transform: scale(0.96);
+}
+
+.share-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.share-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  z-index: 100;
+  min-width: 180px;
+  animation: shareMenuFadeIn var(--transition);
+}
+
+@keyframes shareMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.share-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  font-family: var(--font-main);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-body);
+  cursor: pointer;
+  transition: background var(--transition);
+  text-align: left;
+  min-height: 44px;
+}
+
+.share-menu__item:hover {
+  background: rgba(212, 165, 165, 0.08);
+}
+
+.share-menu__item:active {
+  background: rgba(212, 165, 165, 0.15);
+}
+
+.share-menu__item:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.share-menu__item svg {
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+
+[data-theme="dark"] .share-menu {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .share-menu__item:hover {
+  background: rgba(232, 180, 184, 0.08);
+}
+
+/* ─── Back to Top Button ──────────────── */
+
+.back-to-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: opacity var(--transition), transform var(--transition), visibility var(--transition);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-to-top--show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.back-to-top:active {
+  transform: scale(0.96);
+}
+
+.back-to-top:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .back-to-top {
+    bottom: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* ─── Toast Notification ──────────────── */
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: rgba(51, 51, 51, 0.95);
+  color: #FFFFFF;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-main);
+  font-size: 15px;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity var(--transition), transform var(--transition);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.toast--show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+[data-theme="dark"] .toast {
+  background: rgba(232, 232, 232, 0.95);
+  color: #1A1A1A;
+}
+
 /* ─── Screen Reader Only ──────────────── */
 
 .sr-only {
@@ -914,13 +1131,44 @@ hello-ruru-header {
   background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
 }
 
+/* ─── Results with Calculator Layout ──────── */
+
+.results-with-calc {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .results-with-calc {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 24px;
+    align-items: start;
+  }
+}
+
+@media (min-width: 1024px) {
+  .results-with-calc {
+    grid-template-columns: 1fr 320px;
+    gap: 32px;
+  }
+}
+
 /* ─── Exchange Rate Calculator ────────────── */
 
 .exchange-calc {
-  margin-top: 32px;
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+@media (min-width: 1024px) {
+  .exchange-calc {
+    position: sticky;
+    top: 24px;
+  }
 }
 
 .exchange-calc__toggle {

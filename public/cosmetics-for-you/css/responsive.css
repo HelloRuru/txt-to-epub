@@ -1,0 +1,159 @@
+/* ========================================
+   Responsive Styles
+   響應式斷點、佈局調整
+   ======================================== */
+
+/* ─── Mobile (< 768px) ─────────────────── */
+
+@media (max-width: 767px) {
+  /* Hero */
+  .hero {
+    padding: 32px 16px 28px;
+  }
+
+  .hero__title {
+    font-size: 30px;
+  }
+
+  .hero__header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .theme-toggle {
+    position: static;
+    margin-top: 20px;
+  }
+
+  /* Layout */
+  .container {
+    padding: 0 16px 48px;
+  }
+
+  /* Search */
+  .search-box {
+    margin-top: -16px;
+  }
+
+  .search-box__btn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  /* Brand Section */
+  .brand-section {
+    padding: 20px 16px;
+    border-radius: var(--radius-md);
+  }
+
+  .brand-grid {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .brand-chip {
+    flex-shrink: 0;
+  }
+
+  /* Results */
+  .result-card {
+    padding: 14px 16px 14px 20px;
+  }
+
+  /* Category Filters */
+  .category-filters {
+    gap: 6px;
+  }
+
+  .category-pill {
+    padding: 8px 14px;
+    font-size: 13px;
+    min-height: 44px;
+  }
+
+  /* Calculator — 改為底部浮動按鈕 */
+  .exchange-calc {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+    max-width: calc(100vw - 48px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .exchange-calc__toggle {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .exchange-calc__body {
+    padding: 0 16px 16px;
+  }
+
+  .exchange-calc__inputs {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .exchange-calc__arrow-icon {
+    margin-top: 0;
+    transform: rotate(90deg);
+  }
+
+  .exchange-calc__field {
+    width: 100%;
+  }
+
+  /* Back to Top — 上移避免和計算機按鈕重疊 */
+  .back-to-top {
+    bottom: 80px; /* 上移到計算機按鈕上方 */
+    right: 20px;
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* ─── Tablet (768px – 1023px) ─────────── */
+
+@media (min-width: 768px) {
+  /* Calculator Layout */
+  .results-with-calc {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 24px;
+    align-items: start;
+  }
+}
+
+/* ─── Desktop (≥ 1024px) ──────────────── */
+
+@media (min-width: 1024px) {
+  /* Hero */
+  .hero {
+    padding: 56px 24px 48px;
+  }
+
+  .hero__title {
+    font-size: 40px;
+  }
+
+  /* Results Grid */
+  .tier-group__list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Calculator Layout */
+  .results-with-calc {
+    grid-template-columns: 1fr 320px;
+    gap: 32px;
+  }
+
+  /* Calculator Sticky */
+  .exchange-calc {
+    position: sticky;
+    top: 24px;
+  }
+}

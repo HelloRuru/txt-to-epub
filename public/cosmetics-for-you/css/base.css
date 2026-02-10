@@ -1,0 +1,119 @@
+/* ========================================
+   Base Styles — Design System v1.7
+   Fonts, Variables, Reset
+   ======================================== */
+
+/* ─── Font Imports ─────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* ─── CSS Variables ────────────────────── */
+
+:root {
+  --color-primary: #D4A5A5;
+  --color-secondary: #B8A9C9;
+  --color-primary-light: #E8B4B8;
+  --color-primary-dark: #C9929A;
+  --color-secondary-light: #C4B7D7;
+  --color-secondary-dark: #9B7E93;
+  --color-success: #A8B5A0;
+  --color-blush: #F5D0C5;
+  --color-sakura: #FEDFE1;
+  --color-fuji: #C4B7D7;
+
+  --color-bg: #FAFAFA;
+  --color-surface: #FFFFFF;
+  --color-text: #333333;
+  --color-text-body: #4A4A4A;
+  --color-text-muted: #888888;
+  --color-text-placeholder: #AAAAAA;
+  --color-border: #E8E4E1;
+  --color-border-disabled: #B5ADA7;
+
+  --radius-lg: 24px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+
+  --font-main: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+  --font-small: 'Noto Sans TC', sans-serif;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+
+  --transition: 250ms ease;
+}
+
+/* ─── Dark Mode Variables ──────────────── */
+
+[data-theme="dark"] {
+  --color-bg: #1A1A1A;
+  --color-surface: #2D2D2D;
+  --color-text: #E8E8E8;
+  --color-text-body: #D0D0D0;
+  --color-text-muted: #A0A0A0;
+  --color-text-placeholder: #808080;
+  --color-border: #404040;
+  --color-border-disabled: #606060;
+
+  /* 品牌色在暗色模式下稍微調亮 */
+  --color-primary: #E8B4B8;
+  --color-secondary: #C4B7D7;
+  --color-primary-light: #F2C9CD;
+  --color-primary-dark: #D4A5A5;
+  --color-secondary-light: #D9CDE8;
+  --color-secondary-dark: #B8A9C9;
+
+  /* 裝飾色調整 */
+  --color-blush: #3D2F2F;
+  --color-sakura: #3A2F3A;
+  --color-fuji: #2F2F3A;
+  --color-success: #4A5A4A;
+
+  /* 陰影調整為更適合暗色背景 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ─── Reset ────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-main);
+  font-weight: 500;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}

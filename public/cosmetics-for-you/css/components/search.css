@@ -1,0 +1,228 @@
+/* ========================================
+   Search Component
+   搜尋框、自動完成、篩選器
+   ======================================== */
+
+/* ─── Search Box ───────────────────────── */
+
+.search-box {
+  position: relative;
+  margin-bottom: 20px;
+  margin-top: -20px;
+}
+
+.search-box__input-wrap {
+  display: flex;
+  align-items: center;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 4px 4px 4px 20px;
+  box-shadow: var(--shadow-md);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.search-box__input-wrap:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 20px rgba(212, 165, 165, 0.2);
+}
+
+.search-box__icon {
+  flex-shrink: 0;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+}
+
+.search-box__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: none;
+  font-family: var(--font-main);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text);
+  padding: 14px 12px;
+  min-width: 0;
+  width: 0; /* 強制尊重 flex-basis */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.search-box__input::placeholder {
+  color: var(--color-text-placeholder);
+  font-weight: 400;
+}
+
+.search-box__btn {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 12px 28px;
+  font-family: var(--font-main);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--transition), transform var(--transition), box-shadow var(--transition);
+  min-height: 44px;
+  box-shadow: 0 2px 8px rgba(212, 165, 165, 0.3);
+}
+
+.search-box__btn:hover {
+  box-shadow: 0 4px 12px rgba(212, 165, 165, 0.4);
+  transform: translateY(-1px);
+}
+
+.search-box__btn:active {
+  transform: scale(0.97);
+  box-shadow: none;
+}
+
+/* ─── Autocomplete Suggestions ─────────── */
+
+.search-suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  list-style: none;
+  z-index: 100;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.search-suggestions__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background var(--transition);
+  min-height: 44px;
+  min-width: 0; /* 防止 flex 子元素撐開父容器 */
+  overflow: hidden; /* 隱藏溢出內容 */
+}
+
+.search-suggestions__item:hover,
+.search-suggestions__item--active {
+  background: var(--color-sakura);
+}
+
+.search-suggestions__name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-text);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.search-suggestions__sub {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Nickname Suggestion */
+.search-suggestions__item--nickname .search-suggestions__name {
+  color: var(--color-primary);
+}
+
+/* ─── Filter Pills ─────────────────────── */
+
+.filter-pills {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  justify-content: center;
+}
+
+.filter-pill {
+  padding: 8px 24px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.filter-pill:hover {
+  border-color: var(--color-primary-light);
+  color: var(--color-text-body);
+  background: rgba(212, 165, 165, 0.06);
+}
+
+.filter-pill--active {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(212, 165, 165, 0.3);
+}
+
+.filter-pill--active:hover {
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+}
+
+/* ─── Category Filters ────────────────────── */
+
+.category-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.category-pill {
+  padding: 8px 18px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.category-pill:hover {
+  border-color: var(--color-secondary-light);
+  color: var(--color-text-body);
+  background: rgba(184, 169, 201, 0.06);
+}
+
+.category-pill:active {
+  transform: scale(0.97);
+}
+
+.category-pill--active {
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(184, 169, 201, 0.3);
+}
+
+.category-pill--active:hover {
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+}

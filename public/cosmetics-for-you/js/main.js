@@ -5,30 +5,21 @@
  * Flow: init → render → bindEvents (once)
  */
 
-import { renderApp } from './render.js'
-import { parseBrandAndColor, generateSearchUrls, getSuggestions } from './search.js'
-import { brands } from './brands.js'
-import { searchNicknames } from './nicknames.js'
+// Core
+import { renderApp } from './core/render.js'
+import { parseBrandAndColor, generateSearchUrls, getSuggestions } from './core/search.js'
 
-/* ─── State ───────────────────────────────── */
+// Data
+import { brands } from './data/brands.js'
+import { searchNicknames } from './data/nicknames.js'
 
-const state = {
-  query: '',
-  brand: null,
-  colorCode: '',
-  regionFilter: 'tw',
-  categoryFilter: 'all',
-  results: [],
-  suggestions: [],   // unified: [{ type, data }]
-  showSuggestions: false,
-  hasSearched: false,
-  suggestionIndex: -1,
-  // 匯率計算機
-  exchangeRate: null,
-  exchangeRateTime: '',
-  showExchangeCalc: false,
-  jpyAmount: '',
-}
+// State
+import { state } from './state.js'
+
+// Features
+import { fetchExchangeRate, handleJpyInput } from './features/exchange.js'
+import { shareTo, copyShareLink, copyShareText } from './features/share.js'
+import { initBackToTop } from './features/back-to-top.js'
 
 /* ─── Rendering ───────────────────────────── */
 
@@ -76,7 +67,7 @@ function bindEvents() {
   // 委派 input/keydown/focus — 只綁一次在 #app
   app.addEventListener('input', (e) => {
     if (e.target.id === 'search-input') handleInput(e)
-    if (e.target.id === 'jpy-input') handleJpyInput(e)
+    if (e.target.id === 'jpy-input') handleJpyInput(e, state)
   })
 
   app.addEventListener('keydown', (e) => {
@@ -158,9 +149,30 @@ function handleClick(e) {
     case 'toggle-exchange':
       state.showExchangeCalc = !state.showExchangeCalc
       if (state.showExchangeCalc && !state.exchangeRate) {
-        fetchExchangeRate()
+        fetchExchangeRate(state, render)
       }
       render()
+      break
+
+    case 'toggle-share':
+      state.showShareMenu = !state.showShareMenu
+      render()
+      break
+
+    case 'share-line':
+      shareTo('line', state, render)
+      break
+
+    case 'share-messenger':
+      shareTo('messenger', state, render)
+      break
+
+    case 'copy-link':
+      copyShareLink(state, render)
+      break
+
+    case 'copy-text':
+      copyShareText(state, render)
       break
   }
 }
@@ -256,61 +268,6 @@ function handleOutsideClick(e) {
     state.showSuggestions = false
     state.suggestionIndex = -1
     updateSuggestions()
-  }
-}
-
-/* ─── JPY 計算機輸入 ─────────────────────── */
-
-function handleJpyInput(e) {
-  state.jpyAmount = e.target.value
-  const output = document.getElementById('twd-output')
-  if (output && state.exchangeRate) {
-    const val = parseFloat(state.jpyAmount)
-    output.textContent = val > 0
-      ? `NT$ ${Math.round(val * state.exchangeRate).toLocaleString()}`
-      : '\u2014'
-  }
-}
-
-/* ─── 匯率 API ───────────────────────────── */
-
-async function fetchExchangeRate() {
-  // 先從 sessionStorage 讀快取（1 小時有效）
-  try {
-    const cached = sessionStorage.getItem('cosmetics-exchange-rate')
-    if (cached) {
-      const parsed = JSON.parse(cached)
-      if (Date.now() - parsed.timestamp < 3600000) {
-        state.exchangeRate = parsed.rate
-        state.exchangeRateTime = parsed.time
-        render()
-        return
-      }
-    }
-  } catch { /* ignore */ }
-
-  try {
-    const res = await fetch('https://open.er-api.com/v6/latest/JPY')
-    const data = await res.json()
-    if (data.result === 'success' && data.rates && data.rates.TWD) {
-      state.exchangeRate = data.rates.TWD
-      const now = new Date()
-      state.exchangeRateTime = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')} 更新`
-
-      // 快取到 sessionStorage
-      try {
-        sessionStorage.setItem('cosmetics-exchange-rate', JSON.stringify({
-          rate: state.exchangeRate,
-          time: state.exchangeRateTime,
-          timestamp: Date.now(),
-        }))
-      } catch { /* ignore */ }
-
-      render()
-    }
-  } catch {
-    state.exchangeRateTime = '匯率載入失敗'
-    render()
   }
 }
 
@@ -416,6 +373,14 @@ function executeSearch() {
   state.suggestionIndex = -1
   state.results = generateSearchUrls(brand, colorCode, rawBrand, state.regionFilter, state.categoryFilter, extraKeywords)
 
+  // 有搜尋結果時，自動打開計算機並載入匯率
+  if (state.results.length > 0) {
+    state.showExchangeCalc = true
+    if (!state.exchangeRate) {
+      fetchExchangeRate(state, render)
+    }
+  }
+
   _focusTarget = 'search'
   render()
 }
@@ -486,6 +451,30 @@ function bindThemeToggle() {
   }
 }
 
+/* ─── URL Parameters ──────────────────────── */
+
+function parseUrlParams() {
+  const params = new URLSearchParams(window.location.search)
+  const query = params.get('q')
+  const region = params.get('region')
+  const category = params.get('category')
+
+  if (region && ['tw', 'jp', 'both'].includes(region)) {
+    state.regionFilter = region
+  }
+
+  if (category && ['all', 'lips', 'eye', 'face', 'nail'].includes(category)) {
+    state.categoryFilter = category
+  }
+
+  if (query) {
+    state.query = decodeURIComponent(query)
+    return true  // 表示需要執行搜尋
+  }
+
+  return false
+}
+
 /* ─── Init ────────────────────────────────── */
 
 function init() {
@@ -493,6 +482,12 @@ function init() {
   render()
   bindEvents()
   bindThemeToggle()
+  initBackToTop()
+
+  // 如果 URL 有參數，自動執行搜尋
+  if (parseUrlParams()) {
+    executeSearch()
+  }
 }
 
 if (document.readyState === 'loading') {

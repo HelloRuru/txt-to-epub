@@ -182,7 +182,8 @@ function buildQuery(source, brand, colorCode, rawBrand, categoryFilter, extraKey
   }
 
   if (source.searchType === 'zh') {
-    const name = brand ? (brand.name_zh || brand.name_en) : rawBrand
+    // 台灣習慣用英文品牌名（YSL, NARS, MAC 等），所以優先使用 name_en
+    const name = brand ? (brand.name_en || brand.name_zh) : rawBrand
     const parts = [name, color, extraKeywords, categoryKw, '試色 心得'].filter(Boolean)
     return parts.join(' ') + siteClause
   }

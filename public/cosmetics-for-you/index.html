@@ -37,7 +37,17 @@
   </script>
 
   <!-- Styles -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components/hero.css">
+  <link rel="stylesheet" href="css/components/search.css">
+  <link rel="stylesheet" href="css/components/results.css">
+  <link rel="stylesheet" href="css/components/calculator.css">
+  <link rel="stylesheet" href="css/components/share.css">
+  <link rel="stylesheet" href="css/components/back-to-top.css">
+  <link rel="stylesheet" href="css/components/footer.css">
+  <link rel="stylesheet" href="css/accessibility.css">
+  <link rel="stylesheet" href="css/responsive.css">
 
   <!-- JSON-LD -->
   <script type="application/ld+json">
@@ -66,7 +76,15 @@
   <header class="hero">
     <div class="hero__header">
       <div class="hero__title-group">
-        <h1 class="hero__title">Cosmetics For You</h1>
+        <h1 class="hero__title">
+          <svg class="hero__icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v6"/><path d="M8 9h8"/><rect x="8" y="9" width="8" height="12" rx="2"/><path d="M8 15h8"/>
+          </svg>
+          Cosmetics For You
+          <svg class="hero__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/>
+          </svg>
+        </h1>
         <p class="hero__subtitle">從日本＆台灣最可靠的美妝來源，幫你找到最真實的試色</p>
       </div>
       <button id="theme-toggle" class="theme-toggle" aria-label="切換深淺模式">
@@ -87,6 +105,13 @@
       <p class="loading">載入中...</p>
     </div>
   </main>
+
+  <!-- Back to Top Button -->
+  <button id="back-to-top" class="back-to-top" aria-label="返回頂部">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+    </svg>
+  </button>
 
   <!-- Footer -->
   <footer class="site-footer">
