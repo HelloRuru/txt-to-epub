@@ -20,6 +20,7 @@ import { state } from './state.js'
 import { fetchExchangeRate, handleJpyInput } from './features/exchange.js'
 import { shareTo, copyShareLink, copyShareText } from './features/share.js'
 import { initBackToTop } from './features/back-to-top.js'
+import { loadInstagramThumbnails } from './features/instagram.js'
 
 /* ─── Utils ────────────────────────────────── */
 
@@ -44,6 +45,11 @@ function render() {
     app.innerHTML = renderApp(state)
     restoreFocus()
     announceResults()
+
+    // 載入 Instagram 精選貼文縮圖（如果有）
+    loadInstagramThumbnails().catch(err => {
+      console.warn('Failed to load Instagram thumbnails:', err)
+    })
   } catch (error) {
     console.error('[render] Error:', error)
     showErrorUI('渲染頁面時發生錯誤')

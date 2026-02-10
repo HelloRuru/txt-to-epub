@@ -6,6 +6,7 @@
 import { icons, tierIcons } from '../utils/icons.js'
 import { tierMeta, sources } from '../data/sources.js'
 import { brands } from '../data/brands.js'
+import { getCuratedPosts, hasCuratedPosts } from '../data/curated-posts.js'
 
 const defaultTierMeta = { label: '其他', color: '#888888' }
 
@@ -27,7 +28,7 @@ export function renderApp(state) {
     ${renderShareButton(state)}
     ${state.results.length > 0 ? `
       <div class="results-with-calc">
-        ${renderResults(state.results)}
+        ${renderResults(state.results, state)}
         ${renderExchangeCalc(state)}
       </div>
     ` : renderEmptyState(state)}
@@ -214,6 +215,78 @@ function renderImageSearchCard(results) {
   `
 }
 
+/**
+ * Instagram 卡片（兩種模式：策展貼文縮圖 or hashtag 跳轉）
+ * 從搜尋結果判斷品牌+色號，檢查是否有人工策展的貼文
+ */
+function renderInstagramCard(results, state) {
+  if (!results.length) return ''
+
+  const first = results[0]
+  const query = first.query.replace(/\s*site:\S+/g, '').replace(/試色\s*心得/g, '').replace(/スウォッチ/g, '').replace(/swatch\s*review/gi, '').trim()
+  if (!query) return ''
+
+  // 從 query 中提取品牌+色號作為 hashtag（去空格）
+  const hashtag = query.replace(/\s+/g, '').replace(/[^\w\u4e00-\u9fff]/g, '')
+  if (!hashtag) return ''
+
+  // 嘗試從 state 取得品牌 ID 和色號
+  const brandId = state.brand?.id || ''
+  const colorCode = state.colorCode || ''
+
+  // 檢查是否有策展貼文
+  if (brandId && colorCode && hasCuratedPosts(brandId, colorCode)) {
+    const posts = getCuratedPosts(brandId, colorCode)
+    return renderInstagramCuratedCard(posts, hashtag)
+  }
+
+  // 沒有策展貼文，返回 hashtag 跳轉卡片
+  const igUrl = `https://www.instagram.com/explore/tags/${encodeURIComponent(hashtag)}/`
+
+  return `
+    <a class="ig-search-card" href="${escapeAttr(igUrl)}" target="_blank" rel="noopener" aria-label="在 Instagram 搜尋 #${escapeAttr(hashtag)} 試色">
+      <div class="ig-search-card__icon">${icons.instagram}</div>
+      <div class="ig-search-card__content">
+        <div class="ig-search-card__title">Instagram 試色照</div>
+        <div class="ig-search-card__hashtag">#${escapeHTML(hashtag)}</div>
+        <div class="ig-search-card__hint">點擊查看真人試色貼文</div>
+      </div>
+      <span class="ig-search-card__arrow">${icons.externalLink}</span>
+    </a>
+  `
+}
+
+/**
+ * Instagram 策展貼文卡片（顯示縮圖）
+ */
+function renderInstagramCuratedCard(posts, hashtag) {
+  if (!posts || posts.length === 0) return ''
+
+  const igUrl = `https://www.instagram.com/explore/tags/${encodeURIComponent(hashtag)}/`
+
+  return `
+    <div class="ig-curated-card">
+      <div class="ig-curated-card__header">
+        <div class="ig-curated-card__icon">${icons.instagram}</div>
+        <div class="ig-curated-card__title">
+          <div class="ig-curated-card__main-title">Instagram 精選試色</div>
+          <a href="${escapeAttr(igUrl)}" target="_blank" rel="noopener" class="ig-curated-card__hashtag">
+            #${escapeHTML(hashtag)}
+            <span class="ig-curated-card__see-more">查看更多 ${icons.externalLink}</span>
+          </a>
+        </div>
+      </div>
+      <div class="ig-curated-card__grid" id="ig-curated-grid" data-posts='${escapeAttr(JSON.stringify(posts))}'>
+        ${posts.map(url => `
+          <a href="${escapeAttr(url)}" target="_blank" rel="noopener" class="ig-curated-card__post" data-url="${escapeAttr(url)}">
+            <div class="ig-curated-card__placeholder">載入中...</div>
+          </a>
+        `).join('')}
+      </div>
+    </div>
+  `
+}
+
 function renderShareButton(state) {
   if (!state.hasSearched || !state.results.length) return ''
 
@@ -290,7 +363,7 @@ function renderTopRecommendationCard(result) {
   `
 }
 
-function renderResults(results) {
+function renderResults(results, state) {
   // 建立來源優先級映射表（sources 陣列的索引 = 優先級）
   const sourcePriorityMap = new Map()
   sources.forEach((src, index) => {
@@ -319,6 +392,7 @@ function renderResults(results) {
   return `
     <section class="results">
       ${renderTopRecommendations(results)}
+      ${renderInstagramCard(results, state)}
       ${tiers.map(tier => {
         const meta = tierMeta[tier] || defaultTierMeta
         const items = grouped[tier]
