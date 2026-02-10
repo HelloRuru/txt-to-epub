@@ -6,6 +6,12 @@
  * 使用 Instagram oEmbed API 顯示縮圖，保留原作者資訊
  */
 
+/**
+ * 最後更新時間
+ * 格式：YYYY-MM-DD
+ */
+export const lastUpdated = '2026-02-11'
+
 export const curatedPosts = {
   // YSL 416 爛番茄色
   'ysl-416': [

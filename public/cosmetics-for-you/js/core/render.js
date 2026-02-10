@@ -6,7 +6,7 @@
 import { icons, tierIcons } from '../utils/icons.js'
 import { tierMeta, sources } from '../data/sources.js'
 import { brands } from '../data/brands.js'
-import { getCuratedPosts, hasCuratedPosts } from '../data/curated-posts.js'
+import { getCuratedPosts, hasCuratedPosts, lastUpdated } from '../data/curated-posts.js'
 
 const defaultTierMeta = { label: '其他', color: '#888888' }
 
@@ -282,6 +282,9 @@ function renderInstagramCuratedCard(posts, hashtag) {
             <div class="ig-curated-card__placeholder">載入中...</div>
           </a>
         `).join('')}
+      </div>
+      <div class="ig-curated-card__footer">
+        <span class="ig-curated-card__updated">最後更新：${lastUpdated}</span>
       </div>
     </div>
   `
