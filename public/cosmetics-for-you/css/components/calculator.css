@@ -173,3 +173,126 @@
   color: var(--color-text-muted);
   text-align: center;
 }
+
+/* ─── 台灣專櫃參考價比較 ─────────────────────── */
+
+.tw-price-compare {
+  margin-top: 16px;
+  padding: 16px;
+  border-top: 1px solid var(--color-border);
+  background: rgba(184, 169, 201, 0.04);
+  border-radius: var(--radius-md);
+}
+
+[data-theme="dark"] .tw-price-compare {
+  background: rgba(184, 169, 201, 0.06);
+}
+
+.tw-price-compare__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tw-price-compare__icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.tw-price-compare__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.tw-price-compare__price {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tw-price-compare__category {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.tw-price-compare__range {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-secondary);
+}
+
+.tw-price-compare__date {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.tw-price-compare__date--outdated {
+  color: #DD6B20; /* 橘色警告 */
+}
+
+[data-theme="dark"] .tw-price-compare__date--outdated {
+  color: #F6AD55;
+}
+
+/* 省錢提示 */
+.tw-price-compare__savings {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, rgba(168, 181, 160, 0.08), rgba(168, 181, 160, 0.12));
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+}
+
+[data-theme="dark"] .tw-price-compare__savings {
+  background: linear-gradient(135deg, rgba(168, 181, 160, 0.10), rgba(168, 181, 160, 0.14));
+}
+
+.tw-price-compare__savings-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.tw-price-compare__savings-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+/* 警告提示（不划算） */
+.tw-price-compare__warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(221, 107, 32, 0.08);
+  border-left: 3px solid #DD6B20;
+  border-radius: var(--radius-sm);
+}
+
+[data-theme="dark"] .tw-price-compare__warning {
+  background: rgba(246, 173, 85, 0.10);
+  border-left-color: #F6AD55;
+}
+
+.tw-price-compare__warning-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.tw-price-compare__warning-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #DD6B20;
+}
+
+[data-theme="dark"] .tw-price-compare__warning-text {
+  color: #F6AD55;
+}

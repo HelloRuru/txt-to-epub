@@ -7,6 +7,7 @@ import { icons, tierIcons } from '../utils/icons.js'
 import { tierMeta, sources } from '../data/sources.js'
 import { brands } from '../data/brands.js'
 import { getCuratedPosts, hasCuratedPosts, lastUpdated } from '../data/curated-posts.js'
+import { getTaiwanPrice, isPriceOutdated, formatPriceRange } from '../data/taiwan-prices.js'
 
 const defaultTierMeta = { label: '其他', color: '#888888' }
 
@@ -509,6 +510,68 @@ function renderExchangeCalc(state) {
   const rateDisplay = rate ? rate.toFixed(4) : '—'
   const rateTime = state.exchangeRateTime || ''
 
+  // 取得台灣專櫃價格資料
+  let taiwanPriceBlock = ''
+  if (state.brand && state.categoryFilter !== 'all') {
+    const priceData = getTaiwanPrice(state.brand.id, state.categoryFilter)
+    if (priceData) {
+      const { min, max, updatedAt } = priceData
+      const priceRange = formatPriceRange(min, max)
+      const isOutdated = isPriceOutdated(updatedAt)
+      const updateDate = updatedAt.slice(0, 7) // YYYY-MM
+
+      // 品類中文名稱
+      const categoryNames = {
+        lipstick: '唇彩',
+        eyeshadow: '眼影',
+        blush: '腮紅',
+        foundation: '底妝'
+      }
+      const categoryName = categoryNames[state.categoryFilter] || '彩妝'
+
+      // 計算代購可省金額（如果用戶有輸入日圓金額）
+      let savingsBlock = ''
+      if (state.jpyAmount && rate) {
+        const jpyPrice = Math.round(state.jpyAmount * rate)
+        const minSavings = min - jpyPrice
+        const maxSavings = max - jpyPrice
+
+        if (minSavings > 0 && maxSavings > 0) {
+          savingsBlock = `
+            <div class="tw-price-compare__savings">
+              <span class="tw-price-compare__savings-icon">💰</span>
+              <span class="tw-price-compare__savings-text">代購約可省：NT$ ${minSavings.toLocaleString()}-${maxSavings.toLocaleString()}</span>
+            </div>
+          `
+        } else if (maxSavings < 0) {
+          savingsBlock = `
+            <div class="tw-price-compare__warning">
+              <span class="tw-price-compare__warning-icon">⚠️</span>
+              <span class="tw-price-compare__warning-text">此價格高於台灣專櫃，建議在台灣購買</span>
+            </div>
+          `
+        }
+      }
+
+      taiwanPriceBlock = `
+        <div class="tw-price-compare">
+          <div class="tw-price-compare__header">
+            <span class="tw-price-compare__icon">🏬</span>
+            <span class="tw-price-compare__title">台灣專櫃參考價</span>
+          </div>
+          <div class="tw-price-compare__price">
+            <span class="tw-price-compare__category">${escapeHTML(state.brand.name)} ${categoryName}</span>
+            <span class="tw-price-compare__range">${priceRange}</span>
+            <span class="tw-price-compare__date ${isOutdated ? 'tw-price-compare__date--outdated' : ''}">
+              （${updateDate} 更新${isOutdated ? '，價格可能已變動' : ''}）
+            </span>
+          </div>
+          ${savingsBlock}
+        </div>
+      `
+    }
+  }
+
   return `
     <section class="exchange-calc">
       <button class="exchange-calc__toggle" data-action="toggle-exchange" aria-expanded="${state.showExchangeCalc ? 'true' : 'false'}">
@@ -544,6 +607,7 @@ function renderExchangeCalc(state) {
             </div>
           </div>
           <p class="exchange-calc__note">匯率每日更新，實際匯率以購買當下為準。日本免稅店價格通常約台灣專櫃 7\u20138 折</p>
+          ${taiwanPriceBlock}
         </div>
       ` : ''}
     </section>

@@ -8,3 +8,4 @@ dist
 
 # Test files
 test.html
+test-*.html
