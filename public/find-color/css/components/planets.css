@@ -10,18 +10,18 @@
   position: relative;
 }
 
-/* 軌道環線（橢圓軌道）*/
+/* 軌道環線（橢圓軌道）— 時尚粗細版 */
 .color-swatches-planets::before {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 90% 70% at center, transparent 18%, rgba(212, 165, 165, 0.12) 18.3%, transparent 18.8%),
-    radial-gradient(ellipse 90% 70% at center, transparent 34%, rgba(184, 169, 201, 0.10) 34.3%, transparent 34.8%),
-    radial-gradient(ellipse 90% 70% at center, transparent 50%, rgba(212, 165, 165, 0.08) 50.3%, transparent 50.8%),
-    radial-gradient(ellipse 90% 70% at center, transparent 66%, rgba(184, 169, 201, 0.06) 66.3%, transparent 66.8%),
-    radial-gradient(ellipse 90% 70% at center, transparent 82%, rgba(212, 165, 165, 0.05) 82.3%, transparent 82.8%);
+    radial-gradient(ellipse 90% 70% at center, transparent 18%, rgba(212, 165, 165, 0.12) 18.8%, transparent 19.5%),
+    radial-gradient(ellipse 90% 70% at center, transparent 34%, rgba(184, 169, 201, 0.10) 34.8%, transparent 35.5%),
+    radial-gradient(ellipse 90% 70% at center, transparent 50%, rgba(212, 165, 165, 0.08) 50.8%, transparent 51.5%),
+    radial-gradient(ellipse 90% 70% at center, transparent 66%, rgba(184, 169, 201, 0.06) 66.8%, transparent 67.5%),
+    radial-gradient(ellipse 90% 70% at center, transparent 82%, rgba(212, 165, 165, 0.05) 82.8%, transparent 83.5%);
 }
 
 .color-planet {
