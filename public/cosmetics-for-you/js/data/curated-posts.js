@@ -13,25 +13,43 @@
 export const lastUpdated = '2026-02-11'
 
 export const curatedPosts = {
-  // YSL 416 爛番茄色
-  'ysl-416': [
-    'https://www.instagram.com/p/C_abc123/',  // 示例 URL（需替換為真實貼文）
-    'https://www.instagram.com/p/C_def456/',
-    'https://www.instagram.com/p/C_ghi789/'
+  // YSL 2
+  'ysl-2': [
+    'https://www.instagram.com/p/DRG21z7EunS/',
+    'https://www.instagram.com/p/DRVFshQkn2e/'
   ],
 
-  // Dior 999 經典正紅
+  // YSL 3
+  'ysl-3': [
+    'https://www.instagram.com/p/DRG21z7EunS/'
+  ],
+
+  // YSL 1966
+  'ysl-1966': [
+    'https://www.instagram.com/p/DRVFshQkn2e/'
+  ],
+
+  // DIOR 077
+  'dior-077': [
+    'https://www.instagram.com/p/CxB6qShPnrq/'
+  ],
+
+  // DIOR 999
   'dior-999': [
-    'https://www.instagram.com/p/C_jkl012/',
-    'https://www.instagram.com/p/C_mno345/',
-    'https://www.instagram.com/p/C_pqr678/'
+    'https://www.instagram.com/p/Ci3p50hppN-/',
+    'https://www.instagram.com/p/CaSuzNVPy1c/',
+    'https://www.instagram.com/p/CxB6qShPnrq/'
   ],
 
-  // MAC Ruby Woo
+  // MAC ruby woo
   'mac-ruby woo': [
-    'https://www.instagram.com/p/C_stu901/',
-    'https://www.instagram.com/p/C_vwx234/',
-    'https://www.instagram.com/p/C_yza567/'
+    'https://www.instagram.com/p/CqueqAOugDG/'
+  ],
+
+  // CHANEL 197
+  'chanel-197': [
+    'https://www.instagram.com/p/CxnGTIzPodA/',
+    'https://www.instagram.com/p/CnW9awbqspX/'
   ]
 }
 

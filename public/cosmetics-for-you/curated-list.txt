@@ -1,0 +1,42 @@
+# Instagram 精選試色清單 - 2026年2月自動生成
+# 由 Claude 於 2026-02-11 根據熱門度自動整理
+# 已從 Instagram 搜尋到國外試色照
+#
+# 完成後執行：bash auto-update.sh
+
+# YSL 聖羅蘭
+ysl-2
+https://www.instagram.com/p/DRG21z7EunS/
+https://www.instagram.com/p/DRVFshQkn2e/
+
+ysl-3
+https://www.instagram.com/p/DRG21z7EunS/
+
+ysl-1966
+https://www.instagram.com/p/DRVFshQkn2e/
+
+# Dior 迪奧
+dior-077
+https://www.instagram.com/p/CxB6qShPnrq/
+
+dior-999
+https://www.instagram.com/p/Ci3p50hppN-/
+https://www.instagram.com/p/CaSuzNVPy1c/
+https://www.instagram.com/p/CxB6qShPnrq/
+
+# MAC
+mac-ruby woo
+https://www.instagram.com/p/CqueqAOugDG/
+
+# Chanel 香奈兒
+chanel-197
+https://www.instagram.com/p/CxnGTIzPodA/
+https://www.instagram.com/p/CnW9awbqspX/
+
+# 開架熱門（暫無 Instagram URL，需手動補充）
+# 凱婷怪獸級持色唇膏
+# kate-03
+
+# 媚比琳超持久霧感液態唇膏
+# maybelline-175
+# maybelline-118
