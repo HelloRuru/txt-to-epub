@@ -17,14 +17,14 @@
 .region-select {
   padding: 10px 16px;
   font-size: 16px;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--text-primary, #333333);
   background-color: var(--bg-secondary, #FFFFFF);
   border: 2px solid var(--border-color, #E8E4E1);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: 'GenSenRounded TW', 'Noto Sans TC', sans-serif;
+  font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
   min-width: 220px;
 }
 
@@ -36,6 +36,14 @@
   outline: none;
   border-color: var(--accent-color, #D4A5A5);
   box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.1);
+}
+
+/* 選項樣式 — 嫩嫩嫩紫背景 */
+.region-select option:checked,
+.region-select option:hover {
+  background-color: #C4B7D7;  /* 藤紫 — 嫩嫩淺紫 */
+  color: #333333;  /* 深色文字確保可讀 */
+  font-weight: 500;
 }
 
 /* 手機版調整 */
