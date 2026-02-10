@@ -10,7 +10,9 @@
  */
 export async function fetchInstagramOEmbed(postUrl) {
   try {
-    const oembedUrl = `https://api.instagram.com/oembed?url=${encodeURIComponent(postUrl)}`
+    // 使用 CORS proxy 解決瀏覽器端 CORS 限制
+    const igOembedUrl = `https://www.instagram.com/oembed/?url=${encodeURIComponent(postUrl)}`
+    const oembedUrl = `https://corsproxy.io/?${encodeURIComponent(igOembedUrl)}`
     const response = await fetch(oembedUrl)
 
     if (!response.ok) {
