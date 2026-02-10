@@ -4,26 +4,20 @@
 
 .hero {
   text-align: center;
-  padding: 20px 0 12px;
+  padding: 8px 0 4px;
 }
 
-.hero h1 {
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 1.1;
-  margin-bottom: 0;
-  color: #333333;
-  letter-spacing: -0.01em;
-}
-
-.subtitle-en {
-  display: block;
-  font-size: 16px;
+.hero-title-en {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 36px;
   font-weight: 400;
-  margin-top: 4px;
-  color: #888888;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  line-height: 1.1;
+  margin: 0;
+  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, #D4A5A5, #B8A9C9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .subtitle {
@@ -40,7 +34,7 @@
   justify-content: center;
   gap: 20px;
   flex-wrap: wrap;
-  margin-top: 16px;
+  margin-top: 8px;
 }
 
 .feature-item {
@@ -60,15 +54,7 @@
 
 /* Responsive */
 @media (max-width: 767px) {
-  .hero h1 {
-    font-size: 40px;
-  }
-
-  .subtitle-en {
-    font-size: 22px;
-  }
-
-  .subtitle {
-    font-size: 15px;
+  .hero-title-en {
+    font-size: 28px;
   }
 }

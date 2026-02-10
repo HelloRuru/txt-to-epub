@@ -24,7 +24,7 @@
 .palette-card {
   background: #FFFFFF;
   border-radius: 20px;
-  padding: 18px;
+  padding: 16px 18px;
   border: 1px solid rgba(0, 0, 0, 0.04);
   box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
@@ -37,7 +37,7 @@
 
 /* Palette Header */
 .palette-header {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .palette-name {
@@ -57,7 +57,7 @@
 .mode-toggle {
   display: flex;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 4px;
   justify-content: center;
 }
 

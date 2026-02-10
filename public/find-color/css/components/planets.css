@@ -8,13 +8,20 @@
   padding: 32px 16px;
   min-height: 160px;
   position: relative;
+}
+
+/* 軌道環線（橢圓軌道）*/
+.color-swatches-planets::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
   background:
-    radial-gradient(circle, transparent 30%, rgba(212, 165, 165, 0.03) 30%, transparent 30.5%),
-    radial-gradient(circle, transparent 45%, rgba(212, 165, 165, 0.05) 45%, transparent 45.5%),
-    radial-gradient(circle, transparent 60%, rgba(212, 165, 165, 0.04) 60%, transparent 60.5%),
-    radial-gradient(circle, transparent 75%, rgba(212, 165, 165, 0.03) 75%, transparent 75.5%);
-  background-position: center;
-  background-size: 600px 600px;
+    radial-gradient(ellipse 90% 70% at center, transparent 18%, rgba(212, 165, 165, 0.12) 18.3%, transparent 18.8%),
+    radial-gradient(ellipse 90% 70% at center, transparent 34%, rgba(184, 169, 201, 0.10) 34.3%, transparent 34.8%),
+    radial-gradient(ellipse 90% 70% at center, transparent 50%, rgba(212, 165, 165, 0.08) 50.3%, transparent 50.8%),
+    radial-gradient(ellipse 90% 70% at center, transparent 66%, rgba(184, 169, 201, 0.06) 66.3%, transparent 66.8%),
+    radial-gradient(ellipse 90% 70% at center, transparent 82%, rgba(212, 165, 165, 0.05) 82.3%, transparent 82.8%);
 }
 
 .color-planet {
@@ -26,6 +33,7 @@
   transition: transform 0.3s ease;
   position: relative;
   transform: translateY(var(--planet-offset, 0));
+  z-index: 1;
 }
 
 .color-planet:hover {
@@ -44,46 +52,6 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-}
-
-/* 行星重要程度線條（底部橫線）*/
-.color-planet::after {
-  content: '';
-  position: absolute;
-  bottom: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: var(--line-width, 0);
-  height: var(--line-height, 3px);
-  background: #D4A5A5;
-  border-radius: 2px;
-  transition: all 0.3s ease;
-}
-
-/* 不同行星的線條寬度（表示重要程度）*/
-.color-planet[data-planet-key="background"]::after {
-  --line-width: 120px;
-  --line-height: 4px;
-}
-
-.color-planet[data-planet-key="heading"]::after {
-  --line-width: 100px;
-  --line-height: 3.5px;
-}
-
-.color-planet[data-planet-key="button"]::after {
-  --line-width: 80px;
-  --line-height: 3px;
-}
-
-.color-planet[data-planet-key="text"]::after {
-  --line-width: 60px;
-  --line-height: 2.5px;
-}
-
-.color-planet[data-planet-key="accent"]::after {
-  --line-width: 40px;
-  --line-height: 2px;
 }
 
 /* 行星光澤效果 */
@@ -112,14 +80,14 @@
 }
 
 .planet-usage {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-primary, #333333);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .planet-hex {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 400;
   color: var(--text-secondary, #888888);
   font-family: 'JetBrains Mono', monospace;
@@ -134,9 +102,9 @@
 /* 手機版調整 */
 @media (max-width: 767px) {
   .color-swatches-planets {
-    gap: 12px;
-    padding: 40px 10px;
-    min-height: 200px;
+    gap: 10px;
+    padding: 24px 8px;
+    min-height: 140px;
     overflow-x: auto;
     justify-content: flex-start;
   }
@@ -145,7 +113,6 @@
     flex-shrink: 0;
   }
 
-  /* 手機版縮小行星尺寸 */
   .color-planet[data-planet-key="background"] .planet-orb {
     width: 70px;
     height: 70px;
@@ -172,7 +139,7 @@
   }
 
   .planet-usage {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .planet-hex {
@@ -184,10 +151,9 @@
 @media (min-width: 768px) and (max-width: 1023px) {
   .color-swatches-planets {
     gap: 16px;
-    padding: 50px 15px;
+    padding: 28px 15px;
   }
 
-  /* 平板版微縮行星 */
   .color-planet {
     transform: translateY(calc(var(--planet-offset, 0) * 0.7));
   }

@@ -1,126 +1,69 @@
 /* ========================================
-   Preview Section — 預覽區域
+   Preview Bar — 橫式預覽列
    ======================================== */
 
-.color-preview {
+.preview-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  background-color: var(--color-bg);
+  gap: 16px;
+  padding: 10px 20px;
   border-radius: 8px;
-  padding: 8px 12px;
-  margin: 8px auto 0;
-  max-width: 100%;
+  margin-top: 12px;
   transition: background-color 0.3s ease;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 
-/* 標題 */
-.preview-heading {
-  font-size: 11px;
+.preview-bar-heading {
+  font-size: 14px;
   font-weight: 700;
-  margin: 0;
   transition: color 0.3s ease;
 }
 
-/* 預覽內文區 */
-.preview-body {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.preview-body p {
-  margin: 0;
-  font-size: 10px;
-  line-height: 1;
-}
-
-/* 內文開始提示 */
-.preview-intro {
+.preview-bar-text {
+  font-size: 13px;
   font-weight: 400;
   transition: color 0.3s ease;
 }
 
-/* 按鈕區標籤 */
-.preview-label {
-  font-weight: 400;
-  transition: color 0.3s ease;
-}
-
-/* 按鈕區 */
-.preview-buttons {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-
-.preview-btn {
-  padding: 3px 8px;
+.preview-bar-btn {
+  padding: 4px 12px;
   border: none;
-  border-radius: 4px;
-  font-size: 10px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 500;
   font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-height: 22px;
+  cursor: default;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.preview-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.preview-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* 內文 */
-.preview-text {
-  font-size: 12px;
-  line-height: 1.4;
-  margin-bottom: 0;
-  transition: color 0.3s ease;
-}
-
-/* 強調文字 */
-.preview-accent {
+.preview-bar-accent {
+  font-size: 13px;
   font-weight: 700;
   transition: color 0.3s ease;
 }
 
-/* 手機版調整 */
+/* 手機版 */
 @media (max-width: 767px) {
-  .color-preview {
-    padding: 10px 14px;
-    margin-top: 12px;
-    gap: 6px;
+  .preview-bar {
+    gap: 10px;
+    padding: 8px 14px;
   }
 
-  .preview-heading {
+  .preview-bar-heading {
     font-size: 12px;
   }
 
-  .preview-body {
-    gap: 4px;
-  }
-
-  .preview-body p {
+  .preview-bar-text {
     font-size: 11px;
   }
 
-  .preview-buttons {
-    gap: 3px;
+  .preview-bar-btn {
+    padding: 3px 9px;
+    font-size: 11px;
   }
 
-  .preview-btn {
-    padding: 4px 9px;
-    min-height: 26px;
+  .preview-bar-accent {
     font-size: 11px;
   }
 }

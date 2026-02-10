@@ -83,7 +83,7 @@ function renderPaletteCard(groupIndex) {
       </div>
 
       <div class="color-swatches-planets">
-        ${colorEntries.map(([key, hex], index) => {
+        ${colorEntries.map(([key, hex]) => {
           // 行星大小配置（依用途重要性）
           const planetSizes = {
             background: 100,  // 背景色 - 最大（土星大小）
@@ -114,6 +114,14 @@ function renderPaletteCard(groupIndex) {
             </div>
           </div>
         `}).join('')}
+      </div>
+
+      <!-- 橫式預覽列 -->
+      <div class="preview-bar" style="background-color: ${currentPalette.colors.background};">
+        <span class="preview-bar-heading" style="color: ${currentPalette.colors.heading};">標題</span>
+        <span class="preview-bar-text" style="color: ${currentPalette.colors.text};">內文文字示範</span>
+        <button class="preview-bar-btn" style="background-color: ${currentPalette.colors.button}; color: #fff;">按鈕</button>
+        <span class="preview-bar-accent" style="color: ${currentPalette.colors.accent};">強調色</span>
       </div>
 
     </div>
@@ -184,24 +192,17 @@ function switchMode(card, groupIndex, targetMode) {
     }
   });
 
-  // 更新預覽區的顏色
-  const preview = card.querySelector('.color-preview');
-  const previewHeading = card.querySelector('.preview-heading');
-  const previewIntro = card.querySelector('.preview-intro');
-  const previewLabel = card.querySelector('.preview-label');
-  const previewText = card.querySelector('.preview-text');
-  const previewAccent = card.querySelector('.preview-accent');
-  const primaryBtn = card.querySelector('.preview-btn.primary');
-  const secondaryBtn = card.querySelector('.preview-btn.secondary');
-
-  if (preview) preview.style.backgroundColor = palette.colors.background;
-  if (previewHeading) previewHeading.style.color = palette.colors.heading;
-  if (previewIntro) previewIntro.style.color = palette.colors.text;
-  if (previewLabel) previewLabel.style.color = palette.colors.text;
-  if (previewText) previewText.style.color = palette.colors.text;
-  if (previewAccent) previewAccent.style.color = palette.colors.accent;
-  if (primaryBtn) primaryBtn.style.backgroundColor = palette.colors.button;
-  if (secondaryBtn) secondaryBtn.style.backgroundColor = palette.colors.accent;
+  // 更新橫式預覽列
+  const bar = card.querySelector('.preview-bar');
+  const barHeading = card.querySelector('.preview-bar-heading');
+  const barText = card.querySelector('.preview-bar-text');
+  const barBtn = card.querySelector('.preview-bar-btn');
+  const barAccent = card.querySelector('.preview-bar-accent');
+  if (bar) bar.style.backgroundColor = palette.colors.background;
+  if (barHeading) barHeading.style.color = palette.colors.heading;
+  if (barText) barText.style.color = palette.colors.text;
+  if (barBtn) barBtn.style.backgroundColor = palette.colors.button;
+  if (barAccent) barAccent.style.color = palette.colors.accent;
 
   // 立即套用配色到整個網站
   applyPalette(palette);
