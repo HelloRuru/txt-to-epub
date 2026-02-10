@@ -108,6 +108,27 @@ export function renderBrandGrid() {
 
 /* ─── 搜尋結果 ────────────────────────────── */
 
+function renderImageSearchCard(results) {
+  if (!results.length) return ''
+  // 從第一筆結果反推搜尋詞（品牌 + 色號）
+  const first = results[0]
+  const query = first.query.replace(/\s*site:\S+/g, '').trim()
+  if (!query) return ''
+  const imageUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(query)}`
+
+  return `
+    <a class="image-search-card" href="${escapeAttr(imageUrl)}" target="_blank" rel="noopener" aria-label="在 Google 圖片搜尋 ${escapeAttr(query)}">
+      <div class="image-search-card__icon">${icons.image}</div>
+      <div class="image-search-card__content">
+        <div class="image-search-card__title">查看試色圖片</div>
+        <div class="image-search-card__query">${escapeHTML(query)}</div>
+        <div class="image-search-card__source">Google 圖片搜尋</div>
+      </div>
+      <span class="image-search-card__arrow">${icons.externalLink}</span>
+    </a>
+  `
+}
+
 function renderResults(results) {
   // 按 Tier 分組
   const grouped = {}
@@ -121,6 +142,7 @@ function renderResults(results) {
 
   return `
     <section class="results">
+      ${renderImageSearchCard(results)}
       ${tiers.map(tier => {
         const meta = tierMeta[tier] || defaultTierMeta
         const items = grouped[tier]

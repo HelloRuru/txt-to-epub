@@ -638,6 +638,112 @@ hello-ruru-header {
   transform: translateX(2px);
 }
 
+/* ─── Image Search Card ───────────────── */
+
+.image-search-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, rgba(212, 165, 165, 0.08), rgba(184, 169, 201, 0.08));
+  border: 1px solid rgba(212, 165, 165, 0.2);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: inherit;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.image-search-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(212, 165, 165, 0.04), rgba(184, 169, 201, 0.06));
+  opacity: 0;
+  transition: opacity var(--transition);
+  pointer-events: none;
+}
+
+.image-search-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
+.image-search-card:hover::before {
+  opacity: 1;
+}
+
+.image-search-card:active {
+  transform: translateY(0);
+}
+
+.image-search-card__icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  border-radius: var(--radius-md);
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.image-search-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.image-search-card__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 2px;
+}
+
+.image-search-card__query {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-primary);
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.image-search-card__source {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  font-family: var(--font-small);
+}
+
+.image-search-card__arrow {
+  flex-shrink: 0;
+  color: var(--color-text-placeholder);
+  transition: color var(--transition), transform var(--transition);
+}
+
+.image-search-card:hover .image-search-card__arrow {
+  color: var(--color-primary);
+  transform: translateX(2px);
+}
+
+[data-theme="dark"] .image-search-card {
+  background: linear-gradient(135deg, rgba(212, 165, 165, 0.06), rgba(184, 169, 201, 0.06));
+  border-color: rgba(212, 165, 165, 0.15);
+}
+
+[data-theme="dark"] .image-search-card:hover {
+  border-color: var(--color-primary);
+}
+
 /* ─── Empty State ──────────────────────── */
 
 .empty-state {
