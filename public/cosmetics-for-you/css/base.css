@@ -49,9 +49,9 @@
   --color-border: #E8E4E1;
   --color-border-disabled: #B5ADA7;
 
-  --radius-lg: 24px;
-  --radius-md: 12px;
-  --radius-sm: 8px;
+  --radius-lg: 32px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
 
   --font-main: 'GenSenRounded', 'Noto Sans TC', sans-serif;
   --font-small: 'Noto Sans TC', sans-serif;

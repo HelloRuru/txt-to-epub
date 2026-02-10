@@ -21,4 +21,8 @@ export const state = {
   jpyAmount: '',
   // 分享功能
   showShareMenu: false,
+  // 搜尋歷史
+  searchHistory: [],  // 最多 5 筆
+  // 熱門搜尋
+  popularSearches: [],  // Top 5 最多人查
 }

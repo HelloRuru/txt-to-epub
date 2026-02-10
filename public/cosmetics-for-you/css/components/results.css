@@ -112,12 +112,13 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 14px;
-  border-radius: var(--radius-sm);
+  padding: 6px 16px;
+  border-radius: 100px;
   font-size: 12px;
   font-weight: 700;
   color: var(--tier-color);
-  background: color-mix(in srgb, var(--tier-color) 12%, transparent);
+  background: color-mix(in srgb, var(--tier-color) 15%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--tier-color) 25%, transparent);
 }
 
 .tier-badge svg {
@@ -134,7 +135,7 @@
 .tier-group__list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
 }
 
 /* ─── Result Card ──────────────────────── */
@@ -144,14 +145,14 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 20px 16px 24px;
+  padding: 20px 24px;
   background: var(--color-surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   text-decoration: none;
   color: inherit;
   transition: transform var(--transition), box-shadow var(--transition);
-  border-left: 4px solid var(--tier-color, var(--color-border));
+  border: 1px solid rgba(0, 0, 0, 0.04);
   position: relative;
   overflow: hidden;
 }

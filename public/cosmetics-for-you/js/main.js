@@ -21,15 +21,33 @@ import { fetchExchangeRate, handleJpyInput } from './features/exchange.js'
 import { shareTo, copyShareLink, copyShareText } from './features/share.js'
 import { initBackToTop } from './features/back-to-top.js'
 
+/* ─── Utils ────────────────────────────────── */
+
+function debounce(fn, delay) {
+  let timer = null
+  return function (...args) {
+    clearTimeout(timer)
+    timer = setTimeout(() => fn.apply(this, args), delay)
+  }
+}
+
 /* ─── Rendering ───────────────────────────── */
 
 let _focusTarget = null
 
 function render() {
-  const app = document.getElementById('app')
-  app.innerHTML = renderApp(state)
-  restoreFocus()
-  announceResults()
+  try {
+    // 每次渲染前更新熱門搜尋
+    state.popularSearches = getTopPopularSearches(5)
+
+    const app = document.getElementById('app')
+    app.innerHTML = renderApp(state)
+    restoreFocus()
+    announceResults()
+  } catch (error) {
+    console.error('[render] Error:', error)
+    showErrorUI('渲染頁面時發生錯誤')
+  }
 }
 
 function restoreFocus() {
@@ -80,6 +98,9 @@ function bindEvents() {
 
   // 點擊外部關閉自動補全 — 只綁一次在 document
   document.addEventListener('click', handleOutsideClick)
+
+  // 全域快捷鍵 / — 聚焦搜尋框
+  document.addEventListener('keydown', handleGlobalKeydown)
 }
 
 function handleClick(e) {
@@ -174,11 +195,83 @@ function handleClick(e) {
     case 'copy-text':
       copyShareText(state, render)
       break
+
+    case 'select-popular': {
+      const query = actionEl.dataset.query
+      if (query) {
+        state.query = query
+        state.showSuggestions = false
+        state.suggestionIndex = -1
+        executeSearch()
+      }
+      break
+    }
+
+    case 'select-history': {
+      const query = actionEl.dataset.query
+      if (query) {
+        state.query = query
+        state.showSuggestions = false
+        state.suggestionIndex = -1
+        _focusTarget = 'search'
+        executeSearch()
+      }
+      break
+    }
+
+    case 'remove-history': {
+      e.stopPropagation()  // 防止觸發父層的 select-history
+      const query = actionEl.dataset.query
+      if (query) {
+        removeHistoryItem(query)
+      }
+      break
+    }
+
+    case 'clear-history':
+      clearSearchHistory()
+      break
+
+    case 'copy-single-link': {
+      const url = actionEl.dataset.url
+      if (url) {
+        navigator.clipboard.writeText(url).then(() => {
+          showToast('連結已複製！')
+        }).catch(() => {
+          showToast('複製失敗，請手動複製')
+        })
+      }
+      break
+    }
   }
 }
 
-function handleInput(e) {
-  state.query = e.target.value
+function showToast(message) {
+  // 簡單的 toast 提示
+  const toast = document.createElement('div')
+  toast.className = 'toast'
+  toast.textContent = message
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-text);
+    color: #FFFFFF;
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 10000;
+    box-shadow: var(--shadow-lg);
+    animation: fadeInOut 2s ease forwards;
+  `
+  document.body.appendChild(toast)
+  setTimeout(() => toast.remove(), 2000)
+}
+
+// 防抖版本的建議更新（300ms 延遲）
+const updateSuggestionsDebounced = debounce(() => {
   const parsed = parseBrandAndColor(state.query)
   const inputText = (parsed.rawBrand || state.query).trim()
 
@@ -194,6 +287,14 @@ function handleInput(e) {
 
   state.suggestionIndex = -1
   updateSuggestions()
+}, 300)
+
+function handleInput(e) {
+  // 立即更新輸入值
+  state.query = e.target.value
+
+  // 延遲執行建議計算
+  updateSuggestionsDebounced()
 }
 
 function handleKeydown(e) {
@@ -268,6 +369,18 @@ function handleOutsideClick(e) {
     state.showSuggestions = false
     state.suggestionIndex = -1
     updateSuggestions()
+  }
+}
+
+function handleGlobalKeydown(e) {
+  // 按下 / 鍵聚焦搜尋框（排除在輸入框內的情況）
+  if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+    e.preventDefault()
+    const searchInput = document.getElementById('search-input')
+    if (searchInput) {
+      searchInput.focus()
+      searchInput.select()
+    }
   }
 }
 
@@ -362,27 +475,142 @@ function updateSuggestions() {
 /* ─── 搜尋執行 ────────────────────────────── */
 
 function executeSearch() {
-  if (!state.query.trim()) return
+  try {
+    if (!state.query.trim()) return
 
-  const { brand, colorCode, rawBrand, extraKeywords } = parseBrandAndColor(state.query)
+    const { brand, colorCode, rawBrand, extraKeywords } = parseBrandAndColor(state.query)
 
-  state.brand = brand
-  state.colorCode = colorCode
-  state.hasSearched = true
-  state.showSuggestions = false
-  state.suggestionIndex = -1
-  state.results = generateSearchUrls(brand, colorCode, rawBrand, state.regionFilter, state.categoryFilter, extraKeywords)
+    state.brand = brand
+    state.colorCode = colorCode
+    state.hasSearched = true
+    state.showSuggestions = false
+    state.suggestionIndex = -1
+    state.results = generateSearchUrls(brand, colorCode, rawBrand, state.regionFilter, state.categoryFilter, extraKeywords)
 
-  // 有搜尋結果時，自動打開計算機並載入匯率
-  if (state.results.length > 0) {
-    state.showExchangeCalc = true
-    if (!state.exchangeRate) {
-      fetchExchangeRate(state, render)
+    // 存儲搜尋歷史
+    saveSearchHistory(state.query.trim())
+
+    // 有搜尋結果時，自動打開計算機並載入匯率
+    if (state.results.length > 0) {
+      state.showExchangeCalc = true
+      if (!state.exchangeRate) {
+        fetchExchangeRate(state, render)
+      }
     }
+
+    _focusTarget = 'search'
+    render()
+  } catch (error) {
+    console.error('[executeSearch] Error:', error)
+    showErrorUI('搜尋時發生錯誤')
+  }
+}
+
+/* ─── Search History Management ──────────── */
+
+const HISTORY_STORAGE_KEY = 'cosmetics-search-history'
+const MAX_HISTORY = 5
+
+function loadSearchHistory() {
+  try {
+    const stored = localStorage.getItem(HISTORY_STORAGE_KEY)
+    if (stored) {
+      state.searchHistory = JSON.parse(stored)
+    }
+  } catch {
+    state.searchHistory = []
+  }
+}
+
+function saveSearchHistory(query) {
+  if (!query) return
+
+  // 移除重複項目（不區分大小寫）
+  state.searchHistory = state.searchHistory.filter(
+    item => item.toLowerCase() !== query.toLowerCase()
+  )
+
+  // 插入到最前面
+  state.searchHistory.unshift(query)
+
+  // 限制最多 5 筆
+  if (state.searchHistory.length > MAX_HISTORY) {
+    state.searchHistory = state.searchHistory.slice(0, MAX_HISTORY)
   }
 
-  _focusTarget = 'search'
+  // 存儲到 localStorage
+  try {
+    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(state.searchHistory))
+  } catch {
+    // 忽略存儲錯誤
+  }
+
+  // 同時追蹤熱門搜尋統計
+  trackPopularSearch(query)
+}
+
+function clearSearchHistory() {
+  state.searchHistory = []
+  try {
+    localStorage.removeItem(HISTORY_STORAGE_KEY)
+  } catch {
+    // 忽略
+  }
   render()
+}
+
+function removeHistoryItem(query) {
+  state.searchHistory = state.searchHistory.filter(item => item !== query)
+  try {
+    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(state.searchHistory))
+  } catch {
+    // 忽略
+  }
+  render()
+}
+
+/* ─── Popular Searches Tracking ───────────── */
+
+const POPULAR_STORAGE_KEY = 'cosmetics-popular-searches'
+const MAX_POPULAR = 20  // 追蹤最多 20 個，顯示前 5 個
+
+// 載入熱門搜尋統計
+function loadPopularSearches() {
+  try {
+    const stored = localStorage.getItem(POPULAR_STORAGE_KEY)
+    return stored ? JSON.parse(stored) : {}
+  } catch {
+    return {}
+  }
+}
+
+// 更新搜尋次數
+function trackPopularSearch(query) {
+  if (!query) return
+
+  try {
+    const stats = loadPopularSearches()
+    stats[query] = (stats[query] || 0) + 1
+
+    // 只保留前 20 個最熱門的
+    const sorted = Object.entries(stats)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, MAX_POPULAR)
+
+    const trimmed = Object.fromEntries(sorted)
+    localStorage.setItem(POPULAR_STORAGE_KEY, JSON.stringify(trimmed))
+  } catch {
+    // 忽略儲存錯誤
+  }
+}
+
+// 獲取 Top N 熱門搜尋
+function getTopPopularSearches(n = 5) {
+  const stats = loadPopularSearches()
+  return Object.entries(stats)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, n)
+    .map(([query, count]) => ({ query, count }))
 }
 
 /* ─── Theme Management ────────────────────── */
@@ -475,10 +703,65 @@ function parseUrlParams() {
   return false
 }
 
+/* ─── Error Boundary ──────────────────────── */
+
+let _errorCount = 0
+const MAX_ERRORS = 3
+
+function showErrorUI(message, details = '') {
+  const app = document.getElementById('app')
+  if (!app) return
+
+  _errorCount++
+
+  // 如果錯誤次數超過 3 次，顯示完整錯誤畫面
+  if (_errorCount >= MAX_ERRORS) {
+    app.innerHTML = `
+      <div style="max-width: 600px; margin: 80px auto; padding: 40px; text-align: center; font-family: var(--font-main);">
+        <div style="font-size: 48px; margin-bottom: 20px;">😵</div>
+        <h2 style="font-size: 24px; font-weight: 700; color: var(--color-text); margin-bottom: 16px;">網站遇到錯誤</h2>
+        <p style="font-size: 16px; color: var(--color-text-muted); margin-bottom: 32px; line-height: 1.6;">
+          很抱歉，網站出現了一些問題。<br>
+          請重新整理頁面，或稍後再試。
+        </p>
+        <button
+          onclick="location.reload()"
+          style="padding: 12px 32px; background: var(--color-primary); color: #FFFFFF; border: none; border-radius: 100px; font-size: 16px; font-weight: 500; cursor: pointer; min-height: 44px;"
+        >
+          重新整理頁面
+        </button>
+        ${details ? `<pre style="margin-top: 32px; padding: 16px; background: #F5F5F5; border-radius: 12px; font-size: 12px; text-align: left; overflow: auto; color: #666;">${details}</pre>` : ''}
+      </div>
+    `
+    return
+  }
+
+  // 否則顯示 toast 提示
+  showToast(message || '發生錯誤，請重試')
+}
+
+function setupErrorBoundary() {
+  // 捕獲未處理的 JavaScript 錯誤
+  window.addEventListener('error', (event) => {
+    console.error('[Error Boundary] Uncaught error:', event.error)
+    showErrorUI('網站遇到錯誤', event.error?.stack || event.message)
+    event.preventDefault()
+  })
+
+  // 捕獲未處理的 Promise rejection
+  window.addEventListener('unhandledrejection', (event) => {
+    console.error('[Error Boundary] Unhandled promise rejection:', event.reason)
+    showErrorUI('網站遇到錯誤', event.reason?.stack || String(event.reason))
+    event.preventDefault()
+  })
+}
+
 /* ─── Init ────────────────────────────────── */
 
 function init() {
+  setupErrorBoundary()  // 設置全域錯誤處理
   initTheme()
+  loadSearchHistory()  // 載入搜尋歷史
   render()
   bindEvents()
   bindThemeToggle()

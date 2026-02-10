@@ -1,0 +1,171 @@
+/* ========================================
+   Top Recommendations Component
+   推薦前三名視覺化區塊
+   ======================================== */
+
+.top-recommendations {
+  margin-bottom: 32px;
+  background: linear-gradient(135deg, rgba(212, 165, 165, 0.08), rgba(184, 169, 201, 0.08));
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  border: 1.5px solid rgba(212, 165, 165, 0.2);
+}
+
+.top-recommendations__header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.top-recommendations__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.top-recommendations__title svg {
+  color: var(--color-primary);
+  width: 24px;
+  height: 24px;
+}
+
+.top-recommendations__subtitle {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.top-recommendations__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+/* Top Recommendation Card */
+.top-rec-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.top-rec-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.top-rec-card__link {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.2s ease;
+}
+
+.top-rec-card__link:hover {
+  background: rgba(212, 165, 165, 0.04);
+}
+
+.top-rec-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  background: #F5F3F0;
+  padding: 4px;
+  object-fit: contain;
+}
+
+.top-rec-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.top-rec-card__name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.top-rec-card__desc {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.top-rec-card__domain {
+  font-size: 12px;
+  color: var(--color-text-placeholder);
+  font-family: var(--font-small);
+}
+
+.top-rec-card__arrow {
+  flex-shrink: 0;
+  color: var(--color-text-placeholder);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.top-rec-card__link:hover .top-rec-card__arrow {
+  color: var(--color-primary);
+  transform: translateX(2px);
+}
+
+.top-rec-card__copy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: #FFFFFF;
+  border: none;
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.top-rec-card__copy:hover {
+  opacity: 0.9;
+}
+
+.top-rec-card__copy:active {
+  opacity: 0.8;
+}
+
+.top-rec-card__copy svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .top-recommendations {
+    padding: 20px 16px;
+  }
+
+  .top-recommendations__title {
+    font-size: 18px;
+  }
+
+  .top-recommendations__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top-rec-card__icon {
+    width: 40px;
+    height: 40px;
+  }
+}

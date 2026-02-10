@@ -3,9 +3,9 @@
  * Cosmetics For You / tools.helloruru.com/cosmetics-for-you/
  */
 
-import { icons, tierIcons } from './icons.js'
-import { tierMeta } from './sources.js'
-import { brands } from './brands.js'
+import { icons, tierIcons } from '../utils/icons.js'
+import { tierMeta, sources } from '../data/sources.js'
+import { brands } from '../data/brands.js'
 
 const defaultTierMeta = { label: '其他', color: '#888888' }
 
@@ -15,8 +15,15 @@ export function renderApp(state) {
   return `
     <div aria-live="polite" id="search-live" class="sr-only"></div>
     ${renderSearchBox(state)}
-    ${renderFilters(state)}
-    ${renderCategoryFilters(state)}
+    ${renderSearchHistory(state)}
+    <div class="filter-section">
+      <h3 class="filter-section__label">區域：</h3>
+      ${renderFilters(state)}
+    </div>
+    <div class="filter-section">
+      <h3 class="filter-section__label">品項：</h3>
+      ${renderCategoryFilters(state)}
+    </div>
     ${renderShareButton(state)}
     ${state.results.length > 0 ? `
       <div class="results-with-calc">
@@ -24,6 +31,45 @@ export function renderApp(state) {
         ${renderExchangeCalc(state)}
       </div>
     ` : renderEmptyState(state)}
+  `
+}
+
+/* ─── 搜尋歷史 ────────────────────────────── */
+
+function renderSearchHistory(state) {
+  if (!state.searchHistory || state.searchHistory.length === 0) return ''
+  if (state.hasSearched) return ''  // 搜尋後隱藏歷史
+
+  return `
+    <div class="search-history">
+      <div class="search-history__header">
+        <span class="search-history__title">${icons.clock} 最近搜尋</span>
+        <button class="search-history__clear" data-action="clear-history" aria-label="清除全部歷史">
+          ${icons.x} 清除全部
+        </button>
+      </div>
+      <div class="search-history__list">
+        ${state.searchHistory.map(query => `
+          <button
+            class="search-history__item"
+            data-action="select-history"
+            data-query="${escapeAttr(query)}"
+            aria-label="搜尋 ${escapeAttr(query)}"
+          >
+            <span class="search-history__query">${escapeHTML(query)}</span>
+            <button
+              class="search-history__remove"
+              data-action="remove-history"
+              data-query="${escapeAttr(query)}"
+              aria-label="移除 ${escapeAttr(query)}"
+              tabindex="-1"
+            >
+              ${icons.x}
+            </button>
+          </button>
+        `).join('')}
+      </div>
+    </div>
   `
 }
 
@@ -64,9 +110,9 @@ function renderSearchBox(state) {
 
 function renderFilters(state) {
   const filters = [
+    { key: 'all', label: '不限' },
     { key: 'tw', label: '台灣' },
     { key: 'jp', label: '日本' },
-    { key: 'all', label: '全部來源' },
   ]
 
   return `
@@ -88,11 +134,11 @@ function renderFilters(state) {
 
 function renderCategoryFilters(state) {
   const categories = [
-    { key: 'all', label: '全部品類' },
+    { key: 'all', label: '不限' },
     { key: 'lipstick', label: '口紅' },
     { key: 'eyeshadow', label: '眼影' },
     { key: 'blush', label: '腮紅' },
-    { key: 'foundation', label: '粉底' },
+    { key: 'foundation', label: '其他彩妝' },
   ]
 
   return `
@@ -200,7 +246,57 @@ function renderShareButton(state) {
   `
 }
 
+function renderTopRecommendations(results) {
+  // 取 Tier 1 的前三個作為推薦
+  const top3 = results.filter(r => r.source.tier === 1).slice(0, 3)
+  if (top3.length === 0) return ''
+
+  return `
+    <div class="top-recommendations">
+      <div class="top-recommendations__header">
+        <h3 class="top-recommendations__title">
+          ${icons.star}
+          推薦優先觀看
+        </h3>
+        <p class="top-recommendations__subtitle">最可靠的試色來源，幫你快速找到答案</p>
+      </div>
+      <div class="top-recommendations__grid">
+        ${top3.map(r => renderTopRecommendationCard(r)).join('')}
+      </div>
+    </div>
+  `
+}
+
+function renderTopRecommendationCard(result) {
+  const { source, url, query } = result
+  const favicon = `https://www.google.com/s2/favicons?domain=${source.domain}&sz=48`
+
+  return `
+    <div class="top-rec-card">
+      <a href="${escapeAttr(url)}" target="_blank" rel="noopener" class="top-rec-card__link">
+        <img src="${escapeAttr(favicon)}" alt="${escapeAttr(source.name)} icon" class="top-rec-card__icon" loading="lazy">
+        <div class="top-rec-card__content">
+          <div class="top-rec-card__name">${escapeHTML(source.name)}</div>
+          <div class="top-rec-card__desc">${escapeHTML(source.description)}</div>
+          <div class="top-rec-card__domain">${escapeHTML(source.domain)}</div>
+        </div>
+        <span class="top-rec-card__arrow">${icons.externalLink}</span>
+      </a>
+      <button class="top-rec-card__copy" data-action="copy-single-link" data-url="${escapeAttr(url)}" aria-label="複製連結">
+        ${icons.link}
+        <span>複製連結</span>
+      </button>
+    </div>
+  `
+}
+
 function renderResults(results) {
+  // 建立來源優先級映射表（sources 陣列的索引 = 優先級）
+  const sourcePriorityMap = new Map()
+  sources.forEach((src, index) => {
+    sourcePriorityMap.set(src.id, index)
+  })
+
   // 按 Tier 分組
   const grouped = {}
   for (const r of results) {
@@ -209,11 +305,20 @@ function renderResults(results) {
     grouped[tier].push(r)
   }
 
+  // 同一 Tier 內按 sources 陣列順序排序（權威性排序）
+  Object.keys(grouped).forEach(tier => {
+    grouped[tier].sort((a, b) => {
+      const prioA = sourcePriorityMap.get(a.source.id) ?? 999
+      const prioB = sourcePriorityMap.get(b.source.id) ?? 999
+      return prioA - prioB
+    })
+  })
+
   const tiers = Object.keys(grouped).sort((a, b) => a - b)
 
   return `
     <section class="results">
-      ${renderImageSearchCard(results)}
+      ${renderTopRecommendations(results)}
       ${tiers.map(tier => {
         const meta = tierMeta[tier] || defaultTierMeta
         const items = grouped[tier]
@@ -230,6 +335,7 @@ function renderResults(results) {
           </div>
         `
       }).join('')}
+      ${renderImageSearchCard(results)}
     </section>
   `
 }
@@ -252,18 +358,68 @@ function renderResultCard(result) {
 
 /* ─── 空狀態 ──────────────────────────────── */
 
+// 熱門色號推薦清單
+const popularColors = [
+  { brand: 'Dior', color: '999', desc: '經典正紅色唇膏' },
+  { brand: 'MAC', color: 'Ruby Woo', desc: '霧面正紅唇膏' },
+  { brand: 'YSL', color: '01', desc: '奶油玫瑰金唇膏' },
+  { brand: 'CHANEL', color: '43', desc: '玫瑰豆沙色唇膏' },
+  { brand: 'NARS', color: 'Orgasm', desc: '蜜桃珊瑚腮紅' },
+  { brand: 'Tom Ford', color: '16', desc: '煙燻玫瑰棕唇膏' },
+  { brand: 'Bobbi Brown', color: 'Pale Pink', desc: '裸色修容餅' },
+  { brand: 'Estee Lauder', color: '420', desc: '玫瑰豆沙唇膏' },
+]
+
 function renderEmptyState(state) {
   if (state.hasSearched) {
     return `
       <div class="empty-state">
         <p class="empty-state__text">找不到相關結果，請確認品牌名稱與色號。</p>
+        <div class="popular-colors">
+          <h3 class="popular-colors__title">${icons.sparkles} 試試這些熱門色號</h3>
+          <div class="popular-colors__grid">
+            ${popularColors.map(item => `
+              <button
+                class="popular-color-chip"
+                data-action="select-popular"
+                data-query="${escapeAttr(item.brand + ' ' + item.color)}"
+                aria-label="搜尋 ${escapeAttr(item.brand + ' ' + item.color)}"
+              >
+                <span class="popular-color-chip__name">${escapeHTML(item.brand)} ${escapeHTML(item.color)}</span>
+                <span class="popular-color-chip__desc">${escapeHTML(item.desc)}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
       </div>
     `
   }
 
+  // 首頁：顯示熱門搜尋（如果有）+ 品牌快選
+  const hasPopular = state.popularSearches && state.popularSearches.length > 0
+
   return `
     <div class="empty-state">
       <p class="empty-state__text">輸入品牌名稱和色號，我們會從日本＆台灣最可靠的美妝來源幫你找試色。</p>
+      ${hasPopular ? `
+        <div class="trending-searches">
+          <h3 class="trending-searches__title">${icons.trendingUp} 最多人查</h3>
+          <div class="trending-searches__grid">
+            ${state.popularSearches.map((item, index) => `
+              <button
+                class="trending-chip"
+                data-action="select-popular"
+                data-query="${escapeAttr(item.query)}"
+                aria-label="搜尋 ${escapeAttr(item.query)}"
+              >
+                <span class="trending-chip__rank">#${index + 1}</span>
+                <span class="trending-chip__query">${escapeHTML(item.query)}</span>
+                <span class="trending-chip__count">${item.count} 次</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
     </div>
     ${renderBrandGrid()}
   `

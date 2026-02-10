@@ -5,8 +5,9 @@
  * 解析使用者輸入 → 比對品牌 → 產生 Google site: 搜尋連結
  */
 
-import { brands } from './brands.js'
-import { sources } from './sources.js'
+import { brands } from '../data/brands.js'
+import { sources } from '../data/sources.js'
+import { nicknames } from '../data/nicknames.js'
 
 /**
  * 解析使用者輸入，分離品牌名、色號、額外關鍵字
@@ -135,6 +136,33 @@ function getCategoryKeyword(category, searchType) {
 }
 
 /**
+ * 嘗試將暱稱轉換為色號
+ * 例如：「爛番茄」+ YSL → 返回 '416'
+ */
+function resolveNickname(extraKeywords, brand) {
+  if (!extraKeywords || !brand) return { colorCode: '', remainingKeywords: extraKeywords }
+
+  const normalized = extraKeywords.trim().toLowerCase()
+
+  // 查找匹配的暱稱
+  for (const n of nicknames) {
+    // 必須品牌匹配（或暱稱是通用的）
+    if (n.brandId && n.brandId !== brand.id) continue
+
+    // 檢查暱稱是否包含在關鍵字中
+    if (normalized.includes(n.nickname.toLowerCase()) || n.nickname.includes(extraKeywords.trim())) {
+      if (n.color) {
+        // 從關鍵字中移除暱稱，保留其他關鍵字
+        const remaining = extraKeywords.replace(n.nickname, '').trim()
+        return { colorCode: n.color, remainingKeywords: remaining }
+      }
+    }
+  }
+
+  return { colorCode: '', remainingKeywords: extraKeywords }
+}
+
+/**
  * 產生搜尋結果：每個來源一組 Google 搜尋連結
  *
  * @param {Object|null} brand - 比對到的品牌物件
@@ -146,6 +174,17 @@ function getCategoryKeyword(category, searchType) {
  * @returns {Array} 按 Tier 排序的結果
  */
 export function generateSearchUrls(brand, colorCode, rawBrand, regionFilter, categoryFilter, extraKeywords) {
+  // 嘗試從 extraKeywords 中識別暱稱並轉換為色號
+  let finalColorCode = colorCode
+  let finalExtraKeywords = extraKeywords
+
+  if (!colorCode && extraKeywords && brand) {
+    const resolved = resolveNickname(extraKeywords, brand)
+    if (resolved.colorCode) {
+      finalColorCode = resolved.colorCode
+      finalExtraKeywords = resolved.remainingKeywords
+    }
+  }
   const filtered = sources.filter(src => {
     if (regionFilter === 'all') return true
     if (regionFilter === 'jp') return src.region === 'jp'
@@ -154,7 +193,7 @@ export function generateSearchUrls(brand, colorCode, rawBrand, regionFilter, cat
   })
 
   return filtered.map(src => {
-    const query = buildQuery(src, brand, colorCode, rawBrand, categoryFilter, extraKeywords)
+    const query = buildQuery(src, brand, finalColorCode, rawBrand, categoryFilter, finalExtraKeywords)
     const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`
 
     return {
