@@ -5,29 +5,29 @@
 /* Brand Header Spacing */
 hello-ruru-header {
   display: block;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 /* Main Container */
 .container {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 0 var(--spacing-lg);
+  padding: 0 20px;
 }
 
 /* Sections */
 section {
-  margin-bottom: var(--spacing-2xl);
+  margin-bottom: 20px;
 }
 
 section h2 {
   text-align: center;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: 12px;
 }
 
 .section-desc {
   text-align: center;
   color: #888888;
-  font-size: var(--font-size-small);
-  margin-bottom: var(--spacing-xl);
+  font-size: 13px;
+  margin-bottom: 20px;
 }

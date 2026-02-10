@@ -4,43 +4,43 @@
 
 .hero {
   text-align: center;
-  padding: var(--spacing-2xl) 0;
+  padding: 20px 0 12px;
 }
 
 .hero h1 {
-  font-size: 56px;
+  font-size: 32px;
   font-weight: 700;
   line-height: 1.1;
   margin-bottom: 0;
   color: #333333;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .subtitle-en {
   display: block;
-  font-size: 28px;
+  font-size: 16px;
   font-weight: 400;
-  margin-top: 8px;
+  margin-top: 4px;
   color: #888888;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .subtitle {
-  font-size: 16px;
+  font-size: 14px;
   color: #888888;
-  margin-top: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
+  margin-top: 12px;
+  margin-bottom: 16px;
   font-weight: 400;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .features {
   display: flex;
   justify-content: center;
-  gap: var(--spacing-xl);
+  gap: 20px;
   flex-wrap: wrap;
-  margin-top: var(--spacing-2xl);
+  margin-top: 16px;
 }
 
 .feature-item {

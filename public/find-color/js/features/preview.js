@@ -6,19 +6,13 @@ let currentPalette = null;
 export function applyPalette(palette) {
   currentPalette = palette;
 
-  // 更新 CSS 變數
+  // 更新 CSS 變數（整個網站立即變色）
   const root = document.documentElement;
   root.style.setProperty('--color-bg', palette.colors.background);
   root.style.setProperty('--color-heading', palette.colors.heading);
   root.style.setProperty('--color-text', palette.colors.text);
   root.style.setProperty('--color-button', palette.colors.button);
   root.style.setProperty('--color-accent', palette.colors.accent);
-
-  // 顯示預覽區域（不捲動，配色變化本身就足夠明顯）
-  const previewSection = document.getElementById('preview-section');
-  if (previewSection) {
-    previewSection.style.display = 'block';
-  }
 
   // Toast 提示
   showToast(`已套用「${palette.name}」配色`);

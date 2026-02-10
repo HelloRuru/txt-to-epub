@@ -79,11 +79,13 @@
   <link rel="stylesheet" href="./css/layout.css">
   <link rel="stylesheet" href="./css/accessibility.css">
   <link rel="stylesheet" href="./css/components/hero.css">
+  <link rel="stylesheet" href="./css/components/region-filter.css">
   <link rel="stylesheet" href="./css/components/palette.css">
+  <link rel="stylesheet" href="./css/components/planets.css">
   <link rel="stylesheet" href="./css/components/preview.css">
   <link rel="stylesheet" href="./css/components/toast.css">
   <link rel="stylesheet" href="./css/components/footer.css">
-  <link rel="stylesheet" href="./css/responsive.css">
+  <link rel="stylesheet" href="./css/components/responsive.css">
 
   <!-- Brand Header Component -->
   <script src="https://lab.helloruru.com/shared/brand-header.js"></script>
@@ -125,28 +127,28 @@
     <!-- Palettes Section -->
     <section class="palettes-section">
       <h2>配色方案</h2>
-      <p class="section-desc">點擊色塊複製 HEX 碼，點擊「套用預覽」查看整體效果</p>
-      <div id="palettes-container" class="palettes-grid">
-        <!-- Palettes will be rendered by JS -->
+
+      <!-- Region Filter -->
+      <div class="region-filter">
+        <label for="region-select">設計美學圈：</label>
+        <select id="region-select" class="region-select">
+          <option value="0">Global — 全球通用</option>
+          <option value="1">Western — 歐美時尚</option>
+          <option value="2">Japanese — 和風侘寂</option>
+          <option value="3">Taiwan — 台灣文化</option>
+          <option value="4">Korean — 韓系莫蘭迪</option>
+          <option value="5">Nordic — 北歐極簡</option>
+          <option value="6">Mediterranean — 地中海暖調</option>
+          <option value="7">Middle East — 中東奢華</option>
+        </select>
+      </div>
+
+      <!-- Single Palette Card Container -->
+      <div id="palette-display" class="palette-display">
+        <!-- Selected palette card will be rendered by JS -->
       </div>
     </section>
 
-    <!-- Preview Section -->
-    <section id="preview-section" class="preview-section" style="display: none;">
-      <h2>預覽效果</h2>
-      <p class="section-desc">以下是套用選中配色後的網站效果示範</p>
-
-      <div class="preview-demo">
-        <div class="preview-card">
-          <h3 class="preview-heading">這是標題文字</h3>
-          <p class="preview-text">這是內文段落範例。Lorem ipsum dolor sit amet, consectetur adipiscing elit. 文字顏色會根據選擇的配色方案自動調整。</p>
-          <button class="preview-button">這是按鈕</button>
-          <div class="preview-accent">這是提示或強調文字</div>
-        </div>
-      </div>
-
-      <button id="reset-preview" class="reset-button">返回原配色</button>
-    </section>
   </div>
 
   <!-- Toast Notification -->

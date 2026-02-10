@@ -3,22 +3,29 @@
    ======================================== */
 
 .palettes-section {
-  margin-bottom: var(--spacing-2xl);
+  margin-bottom: 24px;
+}
+
+.palettes-section h2 {
+  font-size: 24px;
+  margin-bottom: 16px;
+  text-align: center;
 }
 
 .palettes-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--spacing-xl);
-  max-width: 800px;
+  gap: 24px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 /* Palette Card */
 .palette-card {
   background: #FFFFFF;
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+  border-radius: 20px;
+  padding: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
   box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
 }
@@ -30,18 +37,18 @@
 
 /* Palette Header */
 .palette-header {
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 12px;
 }
 
 .palette-name {
-  font-size: var(--font-size-h3);
+  font-size: 18px;
   font-weight: 700;
   color: var(--color-heading);
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: 6px;
 }
 
 .palette-description {
-  font-size: var(--font-size-small);
+  font-size: 13px;
   color: #888888;
   margin-bottom: 0;
 }
@@ -49,8 +56,8 @@
 /* Mode Toggle (Light/Dark) */
 .mode-toggle {
   display: flex;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-lg);
+  gap: 10px;
+  margin-bottom: 12px;
   justify-content: center;
 }
 
@@ -58,11 +65,11 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
+  padding: 10px 20px;
   background: #F5F3F0;
   color: #888888;
-  border: 1px solid #E8E4E1;
-  border-radius: var(--radius-md);
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 100px;
   font-size: var(--font-size-small);
   font-weight: 500;
   transition: all 0.2s ease;
@@ -173,22 +180,22 @@
 /* Text Demo Area */
 .text-demo {
   background: rgba(0, 0, 0, 0.02);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 0;
 }
 
 .demo-line-1 {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 400;
-  line-height: 1.6;
-  margin-bottom: var(--spacing-sm);
+  line-height: 1.5;
+  margin-bottom: 8px;
 }
 
 .demo-line-2 {
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 500;
-  line-height: 1.5;
+  line-height: 1.4;
   margin-bottom: 0;
 }
 
@@ -203,16 +210,16 @@
 }
 
 .apply-button {
-  padding: var(--spacing-sm) var(--spacing-xl);
+  padding: 12px 32px;
   background: var(--color-button);
   color: #FFFFFF;
   border: none;
-  border-radius: var(--radius-lg);
+  border-radius: 100px;
   font-weight: 500;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
   min-height: 44px;
-  min-width: 120px;
+  min-width: 140px;
 }
 
 .apply-button:hover {
