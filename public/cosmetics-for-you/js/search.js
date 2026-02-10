@@ -114,22 +114,24 @@ export function generateSearchUrls(brand, colorCode, rawBrand, regionFilter) {
  */
 function buildQuery(source, brand, colorCode, rawBrand) {
   const color = colorCode || ''
-  const siteClause = `site:${source.domain}`
+  // YouTube / IG / 小紅書用 site: 幾乎搜不到，改為不限站
+  const useSite = !source.noSiteRestrict
+  const siteClause = useSite ? ` site:${source.domain}` : ''
 
   if (source.searchType === 'ja') {
     const name = brand ? brand.name_ja : rawBrand
     const keyword = color ? `${name} ${color} スウォッチ` : `${name} スウォッチ`
-    return `${keyword} ${siteClause}`
+    return `${keyword}${siteClause}`
   }
 
   if (source.searchType === 'zh') {
     const name = brand ? (brand.name_zh || brand.name_en) : rawBrand
-    const keyword = color ? `${name} ${color} 試色` : `${name} 試色`
-    return `${keyword} ${siteClause}`
+    const keyword = color ? `${name} ${color} 試色 心得` : `${name} 試色 心得`
+    return `${keyword}${siteClause}`
   }
 
   // searchType === 'en' 或其他
   const name = brand ? brand.name_en : rawBrand
   const keyword = color ? `${name} ${color} swatch review` : `${name} swatch review`
-  return `${keyword} ${siteClause}`
+  return `${keyword}${siteClause}`
 }

@@ -51,9 +51,9 @@ function renderSearchBox(state) {
 
 function renderFilters(state) {
   const filters = [
-    { key: 'all', label: '全部' },
-    { key: 'jp', label: '日本' },
     { key: 'tw', label: '台灣' },
+    { key: 'jp', label: '日本' },
+    { key: 'all', label: '全部來源' },
   ]
 
   return `
@@ -150,9 +150,8 @@ function renderResults(results) {
           <div class="tier-group">
             <div class="tier-group__header">
               <span class="tier-badge" style="--tier-color: ${meta.color}">
-                ${tierIcons[tier] || ''} Tier ${escapeHTML(String(tier))}
+                ${tierIcons[tier] || ''} ${escapeHTML(meta.label)}
               </span>
-              <span class="tier-group__label">${escapeHTML(meta.label)}</span>
             </div>
             <div class="tier-group__list">
               ${items.map(r => renderResultCard(r)).join('')}

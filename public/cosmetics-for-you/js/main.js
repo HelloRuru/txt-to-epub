@@ -15,7 +15,7 @@ const state = {
   query: '',
   brand: null,
   colorCode: '',
-  regionFilter: 'all',
+  regionFilter: 'tw',
   results: [],
   suggestions: [],
   showSuggestions: false,

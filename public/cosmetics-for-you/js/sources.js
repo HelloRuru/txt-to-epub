@@ -4,10 +4,10 @@
  */
 
 export const tierMeta = {
-  1: { label: '官方＆專業媒體', color: '#c48e8e' },
-  2: { label: '高品質評測平台', color: '#9b8bb5' },
-  3: { label: '台灣社群', color: '#7ba8be' },
-  4: { label: '參考用來源', color: '#b0a898' },
+  1: { label: '優先觀看', color: '#c48e8e' },
+  2: { label: '第二選項', color: '#9b8bb5' },
+  3: { label: '第三輪推薦', color: '#7ba8be' },
+  4: { label: '延伸參考', color: '#b0a898' },
 }
 
 /**
@@ -167,15 +167,17 @@ export const sources = [
     tier: 4,
     searchType: 'zh',
     description: '大量試色但需自行判斷',
+    noSiteRestrict: true,
   },
   {
     id: 'youtube',
-    name: 'YouTube',
+    name: 'YouTube 試色',
     domain: 'youtube.com',
     region: 'global',
     tier: 4,
-    searchType: 'en',
-    description: '影片試色',
+    searchType: 'zh',
+    description: '影片試色開箱',
+    noSiteRestrict: true,
   },
   {
     id: 'instagram',
@@ -183,7 +185,8 @@ export const sources = [
     domain: 'instagram.com',
     region: 'global',
     tier: 4,
-    searchType: 'en',
-    description: 'KOL 試色',
+    searchType: 'zh',
+    description: '美妝 KOL 試色',
+    noSiteRestrict: true,
   },
 ]
