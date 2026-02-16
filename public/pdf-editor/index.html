@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF 編輯工具｜電子簽名・文字填寫・字型偵測 | Hello Ruru Tools</title>
+<link rel="canonical" href="https://tools.helloruru.com/pdf-editor/">
+<meta name="description" content="免費線上 PDF 編輯工具：電子簽名、文字填寫、字型偵測。所有操作在本機完成，不上傳任何檔案。">
+<meta name="theme-color" content="#D4A5A5">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- Font Preloading -->
+<link rel="preconnect" href="https://lab.helloruru.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link as="font" crossorigin href="https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2" rel="preload" type="font/woff2">
+<link as="font" crossorigin href="https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2" rel="preload" type="font/woff2">
+<link as="font" crossorigin href="https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2" rel="preload" type="font/woff2">
+<link as="font" crossorigin href="https://cdn.jsdelivr.net/gh/max32002/nanifont@1.036/webfont/NaniFont-SemiBold.woff2" rel="preload" type="font/woff2">
+<!-- Google Fonts for text overlay -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;700&family=LXGW+WenKai+TC:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+/* ========== FONTS ========== */
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'NaniFont';
+  src: url('https://cdn.jsdelivr.net/gh/max32002/nanifont@1.036/webfont/NaniFont-SemiBold.woff2') format('woff2');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+
+/* ========== RESET & VARIABLES ========== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --brand: #D4A5A5;
+  --brand-light: #E8C8C8;
+  --brand-dark: #B88A8A;
+  --lavender: #B8A9C9;
+  --gradient: linear-gradient(135deg, #D4A5A5 0%, #B8A9C9 100%);
+  --charcoal-900: #2A2A2A;
+  --charcoal-800: #3A3A3A;
+  --charcoal-700: #4A4A4A;
+  --text: #2A2A2A;
+  --text-secondary: #6B6B6B;
+  --text-muted: #9A9A9A;
+  --bg: #F9F0F2;
+  --bg-alt: #FCF8F9;
+  --surface: #FFFFFF;
+  --border: rgba(212, 165, 165, 0.25);
+  --border-strong: rgba(212, 165, 165, 0.4);
+  --success: #10B981;
+  --success-bg: #ECFDF5;
+  --danger: #EF4444;
+  --danger-bg: #FEF2F2;
+  --info-bg: rgba(212, 165, 165, 0.1);
+  --shadow-soft: 0 2px 12px rgba(212, 165, 165, 0.1), 0 1px 3px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 16px rgba(212, 165, 165, 0.15);
+  --shadow-lg: 0 8px 24px rgba(212, 165, 165, 0.2);
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+  --font-body: 'GenSenRounded', sans-serif;
+  --font-heading: 'NaniFont', 'GenSenRounded', sans-serif;
+  --font-hand: 'LXGW WenKai TC', cursive;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* ========== BRAND HEADER SPACING ========== */
+hello-ruru-header {
+  display: block;
+  margin-bottom: 28px;
+}
+
+/* ========== LAYOUT ========== */
+.app-container {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+/* ========== PAGE HEADER ========== */
+.page-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.page-header h1 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1.75rem;
+  color: var(--charcoal-900);
+  margin-bottom: 8px;
+}
+
+.page-header p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.page-header .badge {
+  display: inline-block;
+  background: var(--info-bg);
+  color: var(--brand-dark);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  margin-top: 8px;
+  border: 1px solid var(--border);
+}
+
+/* ========== STEP INDICATOR ========== */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 32px;
+  flex-wrap: nowrap;
+}
+
+.step-dot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: default;
+}
+
+.step-num {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.step-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  transition: color 0.3s;
+  white-space: nowrap;
+}
+
+.step-dot.active .step-num {
+  background: var(--gradient);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 16px rgba(212, 165, 165, 0.3);
+}
+
+.step-dot.active .step-label {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.step-dot.done .step-num {
+  background: var(--success);
+  color: #fff;
+  border-color: transparent;
+}
+
+.step-dot.done .step-label {
+  color: var(--success);
+}
+
+.step-line {
+  width: 40px;
+  height: 2px;
+  background: var(--border);
+  margin: 0 8px;
+  flex-shrink: 0;
+  transition: background 0.3s;
+}
+
+.step-line.done {
+  background: var(--success);
+}
+
+/* ========== STEP PANELS ========== */
+.step-panel {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.step-panel.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  padding: 32px;
+}
+
+.panel-card h2 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+  color: var(--charcoal-900);
+}
+
+.panel-card .subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+/* ========== BUTTONS ========== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: var(--font-body);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1.4;
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--charcoal-900);
+  color: var(--bg-alt);
+  box-shadow: 0 4px 12px rgba(42, 42, 42, 0.15);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1A1A1A;
+  box-shadow: 0 6px 20px rgba(42, 42, 42, 0.2);
+  transform: translateY(-1px);
+}
+
+.btn-accent {
+  background: var(--gradient);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(212, 165, 165, 0.3);
+}
+
+.btn-accent:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(212, 165, 165, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--bg-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg);
+  border-color: var(--border-strong);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #DC2626;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--brand-dark);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--info-bg);
+}
+
+.btn-large {
+  padding: 14px 40px;
+  font-size: 1.05rem;
+}
+
+/* ========== DROP ZONE ========== */
+.drop-zone {
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 48px 24px;
+  text-align: center;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: var(--brand);
+  background: var(--info-bg);
+}
+
+.drop-zone .icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.drop-zone p {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+
+.drop-zone .hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.file-info {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-alt);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  margin-top: 16px;
+}
+
+.file-info.show { display: flex; }
+.file-info .file-icon { font-size: 1.5rem; }
+.file-info .file-details { flex: 1; }
+.file-info .file-name { font-weight: 500; font-size: 0.9rem; word-break: break-all; }
+.file-info .file-size { font-size: 0.8rem; color: var(--text-secondary); }
+
+/* ========== SIGNATURE TABS ========== */
+.sig-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+
+.sig-tab {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sig-tab.active {
+  background: var(--surface);
+  color: var(--charcoal-900);
+  box-shadow: var(--shadow-soft);
+}
+
+.sig-tab-content { display: none; }
+.sig-tab-content.active { display: block; }
+
+/* ========== SIGNATURE CANVAS ========== */
+.canvas-wrapper {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #fff;
+  margin-bottom: 12px;
+}
+
+.canvas-wrapper canvas {
+  display: block;
+  width: 100%;
+  height: 200px;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.sig-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.sig-controls label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.sig-controls input[type="range"] {
+  width: 80px;
+  accent-color: var(--brand);
+}
+
+.sig-controls input[type="color"] {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px;
+  cursor: pointer;
+}
+
+/* ========== TEXT SIGNATURE ========== */
+.text-sig-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  margin-bottom: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+  background: var(--surface);
+}
+
+.text-sig-input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.15);
+}
+
+.text-sig-preview {
+  font-family: var(--font-hand);
+  font-size: 48px;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  color: #1a1a1a;
+  word-break: break-all;
+}
+
+/* ========== IMAGE UPLOAD ========== */
+.sig-img-drop {
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sig-img-drop:hover { border-color: var(--brand); }
+
+.sig-img-preview-area { display: none; text-align: center; margin-top: 16px; }
+.sig-img-preview-area.show { display: block; }
+.sig-img-preview-area img {
+  max-width: 300px;
+  max-height: 150px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: repeating-conic-gradient(#f0f0f0 0% 25%, #fff 0% 50%) 50% / 16px 16px;
+}
+
+.sig-img-preview-area label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+/* ========== SIGNATURE PREVIEW ========== */
+.sig-final-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.sig-final-section h3 {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.sig-final-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: repeating-conic-gradient(#fafafa 0% 25%, #fff 0% 50%) 50% / 16px 16px;
+}
+
+.sig-final-box img { max-height: 80px; max-width: 100%; }
+.sig-final-box .empty { color: var(--text-muted); font-size: 0.85rem; }
+
+/* ========== PDF VIEWER ========== */
+.pdf-viewer-area {
+  position: relative;
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  overflow: auto;
+  max-height: 70vh;
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+}
+
+.pdf-canvas-wrapper {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  box-shadow: var(--shadow-lg);
+}
+
+.pdf-canvas-wrapper canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  background: #fff;
+}
+
+.page-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.page-nav span {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.instruction-bar {
+  background: var(--info-bg);
+  color: var(--brand-dark);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+/* ========== SIGNATURE OVERLAY ========== */
+.sig-overlay {
+  position: absolute;
+  cursor: move;
+  border: 2px solid transparent;
+  z-index: 10;
+  user-select: none;
+  touch-action: none;
+}
+
+.sig-overlay:hover,
+.sig-overlay.selected {
+  border-color: var(--brand);
+}
+
+.sig-overlay img {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  display: block;
+}
+
+.sig-overlay .resize-handle {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 14px;
+  height: 14px;
+  background: var(--brand);
+  border: 2px solid #fff;
+  border-radius: 2px;
+  cursor: nwse-resize;
+  display: none;
+  touch-action: none;
+}
+
+.sig-overlay:hover .resize-handle,
+.sig-overlay.selected .resize-handle {
+  display: block;
+}
+
+.sig-overlay .delete-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 22px;
+  height: 22px;
+  background: var(--danger);
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.sig-overlay:hover .delete-btn,
+.sig-overlay.selected .delete-btn {
+  display: flex;
+}
+
+/* ========== TEXT OVERLAY ========== */
+.text-overlay {
+  position: absolute;
+  cursor: move;
+  border: 2px solid transparent;
+  z-index: 10;
+  user-select: none;
+  touch-action: none;
+  white-space: nowrap;
+  line-height: 1.3;
+  padding: 2px 4px;
+}
+
+.text-overlay:hover,
+.text-overlay.selected {
+  border-color: var(--lavender);
+  background: rgba(184, 169, 201, 0.08);
+}
+
+.text-overlay .delete-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 22px;
+  height: 22px;
+  background: var(--danger);
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-overlay .edit-btn {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  width: 22px;
+  height: 22px;
+  background: var(--lavender);
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-overlay:hover .delete-btn,
+.text-overlay.selected .delete-btn,
+.text-overlay:hover .edit-btn,
+.text-overlay.selected .edit-btn {
+  display: flex;
+}
+
+/* ========== TEXT MODAL ========== */
+.text-modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(42, 42, 42, 0.3);
+  z-index: 9000;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-modal-backdrop.show { display: flex; }
+
+.text-modal {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 28px;
+  width: 90%;
+  max-width: 440px;
+  animation: fadeIn 0.2s ease;
+  border: 1px solid var(--border);
+}
+
+.text-modal h3 {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+}
+
+.text-modal .field { margin-bottom: 14px; }
+
+.text-modal .field label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.text-modal .field input[type="text"],
+.text-modal .field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+  background: var(--surface);
+}
+
+.text-modal .field input:focus,
+.text-modal .field textarea:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.15);
+}
+
+.text-modal .field select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  background: var(--surface);
+  outline: none;
+  cursor: pointer;
+}
+
+.text-modal .field-row {
+  display: flex;
+  gap: 12px;
+}
+
+.text-modal .field-row .field { flex: 1; }
+
+.text-modal .text-preview-box {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  min-height: 48px;
+  text-align: center;
+  margin-bottom: 16px;
+  word-break: break-all;
+}
+
+.text-modal .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ========== PLACED LIST ========== */
+.placed-list { margin-bottom: 16px; }
+
+.placed-list h3 {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.placed-list ul { list-style: none; }
+
+.placed-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-alt);
+  border-radius: 8px;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+}
+
+/* ========== STEP NAV ========== */
+.step-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.step-nav-right {
+  display: flex;
+  gap: 8px;
+}
+
+/* ========== DOWNLOAD ========== */
+.download-section {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.download-section .success-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.download-section h2 { margin-bottom: 8px; }
+.download-section p { color: var(--text-secondary); margin-bottom: 24px; }
+
+/* ========== FONT DETECTION ========== */
+.font-detect-panel {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.font-detect-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.font-detect-table th {
+  text-align: left;
+  padding: 8px 10px;
+  background: var(--bg-alt);
+  color: var(--text-secondary);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+}
+
+.font-detect-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.font-detect-table tr:last-child td { border-bottom: none; }
+
+.font-match-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.font-match-tag.matched { background: var(--success-bg); color: #065F46; }
+.font-match-tag.guessed { background: #FEF3C7; color: #92400E; }
+.font-match-tag.none { background: var(--bg-alt); color: var(--text-muted); }
+
+.detecting-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+/* ========== TOAST ========== */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.3s ease;
+  max-width: 360px;
+}
+
+.toast.success { background: var(--success-bg); color: #065F46; border-left: 4px solid var(--success); }
+.toast.error { background: var(--danger-bg); color: #991B1B; border-left: 4px solid var(--danger); }
+.toast.info { background: var(--info-bg); color: var(--brand-dark); border-left: 4px solid var(--brand); }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ========== LOADING ========== */
+.loading-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(249, 240, 242, 0.9);
+  z-index: 9998;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loading-overlay.show { display: flex; }
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-overlay p { color: var(--text-secondary); font-size: 0.9rem; }
+
+/* ========== FOOTER ========== */
+.site-footer {
+  text-align: center;
+  padding: 24px 20px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+
+.site-footer a {
+  color: #D4A5A5;
+  text-decoration: none;
+}
+
+.site-footer a:hover { text-decoration: underline; }
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .app-container { padding: 16px 12px 40px; }
+  .panel-card { padding: 20px 16px; }
+  .step-label { display: none; }
+  .step-line { width: 24px; margin: 0 4px; }
+  .step-nav { flex-wrap: wrap; }
+  .step-nav-right { flex-wrap: wrap; }
+  .sig-controls { gap: 10px; }
+  .pdf-viewer-area { padding: 8px; max-height: 60vh; }
+  .toast-container { right: 12px; left: 12px; }
+  .toast { max-width: 100%; }
+  .page-header h1 { font-size: 1.35rem; }
+}
+
+/* ========== UTILITY ========== */
+.hidden { display: none !important; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+</style>
+</head>
+
+<body>
+<!-- 品牌頁首 Web Component -->
+<script src="https://lab.helloruru.com/shared/brand-header.js"></script>
+<hello-ruru-header title="PDF 編輯工具"></hello-ruru-header>
+
+<div class="app-container">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>PDF 編輯工具</h1>
+    <p>電子簽名・文字填寫・字型偵測</p>
+    <span class="badge">所有操作皆在本機完成，不上傳任何檔案</span>
+  </div>
+
+  <!-- Step Indicator -->
+  <div class="step-indicator" id="stepIndicator">
+    <div class="step-dot active" data-step="1"><span class="step-num">1</span><span class="step-label">上傳 PDF</span></div>
+    <div class="step-line" data-line="1"></div>
+    <div class="step-dot" data-step="2"><span class="step-num">2</span><span class="step-label">建立簽名</span></div>
+    <div class="step-line" data-line="2"></div>
+    <div class="step-dot" data-step="3"><span class="step-num">3</span><span class="step-label">編輯 PDF</span></div>
+    <div class="step-line" data-line="3"></div>
+    <div class="step-dot" data-step="4"><span class="step-num">4</span><span class="step-label">下載</span></div>
+  </div>
+
+  <!-- ====== STEP 1: Upload PDF ====== -->
+  <div class="step-panel active" id="step1">
+    <div class="panel-card">
+      <h2>上傳 PDF 檔案</h2>
+      <p class="subtitle">拖曳檔案到下方區域，或點擊選擇檔案</p>
+
+      <div class="drop-zone" id="pdfDropZone">
+        <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brand)"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg></span>
+        <p>拖曳 PDF 到此處</p>
+        <button class="btn btn-primary" type="button" id="btnChoosePdf">選擇檔案</button>
+        <input type="file" id="pdfFileInput" accept=".pdf,application/pdf" hidden>
+        <p class="hint mt-12">支援 .pdf 格式，最大 50 MB</p>
+      </div>
+
+      <div class="file-info" id="fileInfo">
+        <span class="file-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brand)"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg></span>
+        <div class="file-details">
+          <div class="file-name" id="fileName"></div>
+          <div class="file-size" id="fileSize"></div>
+        </div>
+        <button class="btn btn-ghost" id="btnRemoveFile" type="button">移除</button>
+      </div>
+
+      <!-- Font Detection -->
+      <div class="font-detect-panel" id="fontDetectPanel" style="display:none;">
+        <h3 style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:8px;">偵測到的字型</h3>
+        <div id="fontDetectLoading" style="font-size:0.85rem;color:var(--text-muted);padding:8px 0;">
+          <span class="detecting-spinner"></span> 正在偵測字型...
+        </div>
+        <div id="fontDetectResults"></div>
+      </div>
+
+      <div class="step-nav">
+        <div></div>
+        <div class="step-nav-right">
+          <button class="btn btn-accent" id="btnSkipToEdit" disabled>直接編輯文字 →</button>
+          <button class="btn btn-primary" id="btnToStep2" disabled>建立簽名 →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== STEP 2: Create Signature ====== -->
+  <div class="step-panel" id="step2">
+    <div class="panel-card">
+      <h2>建立你的簽名</h2>
+      <p class="subtitle">選擇一種方式建立簽名</p>
+
+      <div class="sig-tabs">
+        <button class="sig-tab active" data-tab="draw" type="button">手寫簽名</button>
+        <button class="sig-tab" data-tab="type" type="button">輸入文字</button>
+        <button class="sig-tab" data-tab="upload" type="button">上傳圖片</button>
+      </div>
+
+      <!-- Tab: Draw -->
+      <div class="sig-tab-content active" id="tabDraw">
+        <div class="canvas-wrapper">
+          <canvas id="sigCanvas"></canvas>
+        </div>
+        <div class="sig-controls">
+          <label>粗細 <input type="range" id="penSize" min="1" max="8" value="3"></label>
+          <label>顏色 <input type="color" id="penColor" value="#1a1a1a"></label>
+          <button class="btn btn-secondary" id="btnClearCanvas" type="button">清除</button>
+        </div>
+      </div>
+
+      <!-- Tab: Type -->
+      <div class="sig-tab-content" id="tabType">
+        <input type="text" class="text-sig-input" id="sigTextInput" placeholder="請輸入你的姓名" maxlength="30">
+        <div class="text-sig-preview" id="sigTextPreview">
+          <span style="color:var(--text-muted);font-family:var(--font-body);font-size:0.9rem;">輸入文字後顯示預覽</span>
+        </div>
+        <div class="sig-controls">
+          <label>字型大小 <input type="range" id="fontSize" min="28" max="72" value="48"></label>
+          <label>顏色 <input type="color" id="textColor" value="#1a1a1a"></label>
+        </div>
+      </div>
+
+      <!-- Tab: Upload -->
+      <div class="sig-tab-content" id="tabUpload">
+        <div class="sig-img-drop" id="sigImgDrop">
+          <p>拖曳簽名圖片到此處，或</p>
+          <button class="btn btn-primary" type="button" id="btnChooseSigImg">選擇圖片</button>
+          <input type="file" id="sigImgInput" accept="image/png,image/jpeg,image/webp" hidden>
+          <p class="hint mt-12">支援 PNG（透明背景最佳）、JPG</p>
+        </div>
+        <div class="sig-img-preview-area" id="sigImgPreviewArea">
+          <img id="sigImgPreview" alt="簽名預覽">
+          <label><input type="checkbox" id="removeBg"> 自動去除白色背景</label>
+        </div>
+      </div>
+
+      <!-- Final Preview -->
+      <div class="sig-final-section">
+        <h3>簽名預覽</h3>
+        <div class="sig-final-box" id="sigFinalBox">
+          <span class="empty">尚未建立簽名</span>
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn btn-secondary" id="btnBackStep1" type="button">← 上一步</button>
+        <div class="step-nav-right">
+          <button class="btn btn-ghost" id="btnSkipToStep3" type="button">跳過，只加文字 →</button>
+          <button class="btn btn-primary" id="btnToStep3" disabled>放置簽名 →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== STEP 3: Edit PDF ====== -->
+  <div class="step-panel" id="step3">
+    <div class="panel-card">
+      <h2>編輯 PDF</h2>
+      <div class="instruction-bar">點擊下方按鈕，在 PDF 上點擊要放置的位置。可拖曳移動，簽名可拖曳右下角調整大小。</div>
+
+      <div class="pdf-viewer-area" id="pdfViewerArea">
+        <div class="pdf-canvas-wrapper" id="pdfCanvasWrapper">
+          <canvas id="pdfCanvas"></canvas>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <button class="btn btn-secondary" id="btnPrevPage" type="button" disabled>&#9664; 上一頁</button>
+        <span>第 <strong id="currentPage">1</strong> / <strong id="totalPages">1</strong> 頁</span>
+        <button class="btn btn-secondary" id="btnNextPage" type="button">下一頁 &#9654;</button>
+      </div>
+
+      <div class="placed-list" id="placedList">
+        <h3>已放置的項目（<span id="sigCount">0</span> 個）</h3>
+        <ul id="sigListUl"></ul>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn btn-secondary" id="btnBackStep2" type="button">← 上一步</button>
+        <div class="step-nav-right">
+          <button class="btn btn-accent" id="btnAddSig" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg> 新增簽名</button>
+          <button class="btn btn-primary" id="btnAddText" type="button" style="background:var(--lavender);">T 新增文字</button>
+          <button class="btn btn-primary" id="btnToStep4" disabled>產生 PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== STEP 4: Download ====== -->
+  <div class="step-panel" id="step4">
+    <div class="panel-card download-section">
+      <span class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--success)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg></span>
+      <h2>編輯完成！</h2>
+      <p>PDF 已加入簽名與文字，點擊下方按鈕下載</p>
+      <button class="btn btn-accent btn-large" id="btnDownload" type="button">下載已編輯的 PDF</button>
+      <div class="step-nav" style="justify-content:center;">
+        <button class="btn btn-secondary" id="btnBackStep3" type="button">← 返回調整</button>
+        <button class="btn btn-ghost" id="btnStartOver" type="button">重新開始</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <p>&copy; <span id="footer-year"></span> Kaoru Tsai. All Rights Reserved. | Contact: <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
+  <p style="margin-top:4px;">所有操作皆在本機完成，不上傳任何檔案</p>
+</footer>
+<script>
+  const startYear = 2026;
+  const currentYear = new Date().getFullYear();
+  document.getElementById('footer-year').textContent =
+    currentYear > startYear ? `${startYear}\u2013${currentYear}` : `${startYear}`;
+</script>
+
+<!-- Text Input Modal -->
+<div class="text-modal-backdrop" id="textModalBackdrop">
+  <div class="text-modal">
+    <h3 id="textModalTitle">新增文字</h3>
+    <div class="field">
+      <label for="textModalInput">文字內容</label>
+      <input type="text" id="textModalInput" placeholder="輸入要放置的文字" maxlength="100">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="textModalFont">字型</label>
+        <select id="textModalFont">
+          <option value="Noto Sans TC">Noto Sans TC（黑體）</option>
+          <option value="Noto Serif TC">Noto Serif TC（明體）</option>
+          <option value="LXGW WenKai TC">LXGW WenKai TC（楷體）</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="textModalSize">大小</label>
+        <input type="range" id="textModalSize" min="8" max="48" value="14" style="width:100%;accent-color:var(--brand);">
+        <span id="textModalSizeLabel" style="font-size:0.8rem;color:var(--text-muted);">14 pt</span>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="textModalColor">顏色</label>
+        <input type="color" id="textModalColor" value="#1a1a1a" style="width:48px;height:36px;border:1px solid var(--border);border-radius:6px;padding:2px;cursor:pointer;">
+      </div>
+      <div class="field" style="flex:2;">
+        <label>預覽</label>
+        <div class="text-preview-box" id="textModalPreview">
+          <span style="color:var(--text-muted);font-size:0.85rem;">輸入文字後預覽</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="textModalCancel" type="button">取消</button>
+      <button class="btn btn-accent" id="textModalConfirm" type="button">確定放置</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p id="loadingText">處理中...</p>
+</div>
+
+<!-- ====== SCRIPTS ====== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<script>
+/* ========================================================================
+   PDF 編輯工具 — Main Script (V1.8 Online Edition)
+   ======================================================================== */
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ─── State ───
+const state = {
+  pdfFile: null, pdfDoc: null, pdfFileName: '', currentPage: 1, totalPages: 0,
+  renderScale: 1.5, currentViewport: null,
+  signatureDataURL: null, signatureMode: 'draw', detectedFonts: [],
+  placedSignatures: [], placedTexts: [], nextSigId: 1, nextTextId: 1,
+  currentStep: 1, isPlacingMode: false, isTextPlacingMode: false,
+  pendingText: null, signedPdfBytes: null, loadedGoogleFonts: new Set(),
+};
+
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+// ========== TOAST ==========
+function showToast(msg, type = 'info') {
+  const c = $('#toastContainer'), t = document.createElement('div');
+  t.className = `toast ${type}`; t.textContent = msg; c.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ========== LOADING ==========
+function showLoading(text = '處理中...') { $('#loadingText').textContent = text; $('#loadingOverlay').classList.add('show'); }
+function hideLoading() { $('#loadingOverlay').classList.remove('show'); }
+
+// ========== STEP NAVIGATION ==========
+function goToStep(n) {
+  state.currentStep = n;
+  $$('.step-panel').forEach(p => p.classList.remove('active'));
+  $(`#step${n}`).classList.add('active');
+  $$('.step-dot').forEach(dot => {
+    const s = parseInt(dot.dataset.step);
+    dot.classList.remove('active', 'done');
+    if (s === n) dot.classList.add('active');
+    else if (s < n) dot.classList.add('done');
+  });
+  $$('.step-line').forEach(line => {
+    line.classList.toggle('done', parseInt(line.dataset.line) < n);
+  });
+  if (n === 3) renderPdfPage(state.currentPage);
+}
+
+// ========== UTILITY ==========
+function formatBytes(b) { if (b < 1024) return b + ' B'; if (b < 1048576) return (b / 1024).toFixed(1) + ' KB'; return (b / 1048576).toFixed(1) + ' MB'; }
+function generateId() { return 'sig-' + (state.nextSigId++); }
+
+// ========== FONT DETECTION ==========
+const FONT_MAP = {
+  'mingliu': { google: 'Noto Serif TC', category: '明體' }, 'pmingliu': { google: 'Noto Serif TC', category: '明體' },
+  'simsun': { google: 'Noto Serif SC', category: '宋體' }, 'nsimsun': { google: 'Noto Serif SC', category: '宋體' },
+  'songti': { google: 'Noto Serif TC', category: '宋體' }, 'stsung': { google: 'Noto Serif TC', category: '宋體' },
+  'stsong': { google: 'Noto Serif SC', category: '宋體' },
+  'microsoftjhenghei': { google: 'Noto Sans TC', category: '黑體' },
+  'microsoftyahei': { google: 'Noto Sans SC', category: '黑體' },
+  'simhei': { google: 'Noto Sans SC', category: '黑體' },
+  'heiti': { google: 'Noto Sans TC', category: '黑體' }, 'stheiti': { google: 'Noto Sans TC', category: '黑體' },
+  'pingfang': { google: 'Noto Sans TC', category: '黑體' },
+  'notosanstc': { google: 'Noto Sans TC', category: '黑體' }, 'notosanssc': { google: 'Noto Sans SC', category: '黑體' },
+  'notosanscjktc': { google: 'Noto Sans TC', category: '黑體' }, 'sourcehansans': { google: 'Noto Sans TC', category: '黑體' },
+  'kaiti': { google: 'LXGW WenKai TC', category: '楷體' }, 'stkaiti': { google: 'LXGW WenKai TC', category: '楷體' },
+  'dfkaisb': { google: 'LXGW WenKai TC', category: '楷體' },
+  'times': { google: 'Noto Serif', category: 'Serif' }, 'timesnewroman': { google: 'Noto Serif', category: 'Serif' },
+  'georgia': { google: 'Noto Serif', category: 'Serif' }, 'cambria': { google: 'Noto Serif', category: 'Serif' },
+  'arial': { google: 'Noto Sans', category: 'Sans-serif' }, 'helvetica': { google: 'Noto Sans', category: 'Sans-serif' },
+  'calibri': { google: 'Noto Sans', category: 'Sans-serif' }, 'verdana': { google: 'Noto Sans', category: 'Sans-serif' },
+  'roboto': { google: 'Roboto', category: 'Sans-serif' },
+  'courier': { google: 'Noto Sans Mono', category: 'Monospace' }, 'couriernew': { google: 'Noto Sans Mono', category: 'Monospace' },
+};
+
+function normalizeFontName(raw) {
+  let n = raw.replace(/^[A-Z]{6}\+/, '');
+  n = n.replace(/[-,](Bold|Italic|Regular|Light|Medium|Thin|Black|SemiBold|ExtraBold|Oblique|Condensed|Narrow)\b/gi, '');
+  return n.toLowerCase().replace(/[\s\-_]/g, '');
+}
+
+function matchFont(raw) {
+  const n = normalizeFontName(raw);
+  if (FONT_MAP[n]) return { ...FONT_MAP[n], matched: true };
+  for (const [k, v] of Object.entries(FONT_MAP)) { if (n.includes(k) || k.includes(n)) return { ...v, matched: true }; }
+  if (/serif/i.test(raw) && !/sans/i.test(raw)) return { google: 'Noto Serif TC', category: 'Serif（推測）', matched: false };
+  if (/sans|gothic|hei/i.test(raw)) return { google: 'Noto Sans TC', category: 'Sans-serif（推測）', matched: false };
+  if (/kai|cursive/i.test(raw)) return { google: 'LXGW WenKai TC', category: '楷體（推測）', matched: false };
+  if (/mono|courier/i.test(raw)) return { google: 'Noto Sans Mono', category: 'Monospace（推測）', matched: false };
+  return { google: null, category: '未知', matched: false };
+}
+
+async function detectPdfFonts(doc) {
+  const fontSet = new Map();
+  for (let p = 1; p <= doc.numPages; p++) {
+    const page = await doc.getPage(p);
+    const tc = await page.getTextContent();
+    for (const item of tc.items) {
+      if (!item.str || !item.str.trim()) continue;
+      const fn = item.fontName || 'unknown';
+      const fs = item.transform ? Math.round(Math.abs(item.transform[3]) * 10) / 10 : 0;
+      if (!fontSet.has(fn)) fontSet.set(fn, { sizes: new Set(), pages: new Set(), match: matchFont(fn) });
+      const info = fontSet.get(fn);
+      if (fs > 0) info.sizes.add(fs);
+      info.pages.add(p);
+    }
+  }
+  return Array.from(fontSet.entries())
+    .map(([name, info]) => ({ rawName: name, sizes: [...info.sizes].sort((a,b) => a-b), pages: [...info.pages].sort((a,b) => a-b), googleFont: info.match.google, category: info.match.category, matched: info.match.matched }))
+    .sort((a, b) => b.pages.length - a.pages.length);
+}
+
+// ========== STEP 1: PDF UPLOAD ==========
+function initUpload() {
+  const dropZone = $('#pdfDropZone'), fileInput = $('#pdfFileInput');
+  $('#btnChoosePdf').addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('click', (e) => { if (e.target.id !== 'btnChoosePdf') fileInput.click(); });
+  fileInput.addEventListener('change', (e) => { if (e.target.files[0]) handlePdfFile(e.target.files[0]); });
+  ['dragenter', 'dragover'].forEach(evt => { dropZone.addEventListener(evt, (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); }); });
+  ['dragleave', 'drop'].forEach(evt => { dropZone.addEventListener(evt, (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); }); });
+  dropZone.addEventListener('drop', (e) => { const f = e.dataTransfer.files[0]; if (f && f.type === 'application/pdf') handlePdfFile(f); else showToast('請上傳 PDF 檔案', 'error'); });
+  $('#btnRemoveFile').addEventListener('click', removePdfFile);
+  $('#btnToStep2').addEventListener('click', () => goToStep(2));
+  $('#btnSkipToEdit').addEventListener('click', () => goToStep(3));
+}
+
+async function handlePdfFile(file) {
+  if (file.size > 50 * 1024 * 1024) { showToast('檔案大小不可超過 50 MB', 'error'); return; }
+  showLoading('載入 PDF...');
+  try {
+    const ab = await file.arrayBuffer();
+    const doc = await pdfjsLib.getDocument({ data: ab }).promise;
+    state.pdfFile = ab; state.pdfDoc = doc; state.pdfFileName = file.name; state.totalPages = doc.numPages; state.currentPage = 1;
+    $('#fileName').textContent = file.name; $('#fileSize').textContent = formatBytes(file.size);
+    $('#fileInfo').classList.add('show'); $('#pdfDropZone').classList.add('hidden');
+    $('#btnToStep2').disabled = false; $('#btnSkipToEdit').disabled = false;
+    showToast(`已載入：${file.name}（${doc.numPages} 頁）`, 'success');
+    runFontDetection(doc);
+  } catch (err) {
+    console.error(err);
+    showToast(err.name === 'PasswordException' ? '此 PDF 有密碼保護，無法開啟' : '無法載入此 PDF 檔案', 'error');
+  } finally { hideLoading(); }
+}
+
+async function runFontDetection(doc) {
+  const panel = $('#fontDetectPanel'), loading = $('#fontDetectLoading'), results = $('#fontDetectResults');
+  panel.style.display = ''; loading.style.display = ''; results.innerHTML = '';
+  try {
+    const fonts = await detectPdfFonts(doc);
+    loading.style.display = 'none';
+    if (fonts.length === 0) { results.innerHTML = '<p style="font-size:0.85rem;color:var(--text-muted);">未偵測到文字字型（可能為掃描檔或圖片型 PDF）</p>'; return; }
+    state.detectedFonts = fonts;
+    let html = `<table class="font-detect-table"><thead><tr><th>PDF 字型名稱</th><th>類別</th><th>大小</th><th>Google Font 配對</th></tr></thead><tbody>`;
+    for (const f of fonts) {
+      const sizeStr = f.sizes.length > 0 ? f.sizes.join(', ') + ' pt' : '—';
+      const pageStr = f.pages.length > 3 ? `第 ${f.pages.slice(0,3).join(', ')}... 頁（共 ${f.pages.length} 頁）` : `第 ${f.pages.join(', ')} 頁`;
+      let matchHtml = f.googleFont && f.matched ? `<span class="font-match-tag matched">✓ ${f.googleFont}</span>` : f.googleFont ? `<span class="font-match-tag guessed">≈ ${f.googleFont}</span>` : `<span class="font-match-tag none">無配對</span>`;
+      html += `<tr><td title="${f.rawName}"><code style="font-size:0.8rem;background:var(--bg-alt);padding:2px 6px;border-radius:3px;">${f.rawName}</code><br><span style="font-size:0.75rem;color:var(--text-muted);">${pageStr}</span></td><td>${f.category}</td><td>${sizeStr}</td><td>${matchHtml}</td></tr>`;
+    }
+    html += '</tbody></table>';
+    const mc = fonts.filter(f => f.googleFont && f.matched).length, gc = fonts.filter(f => f.googleFont && !f.matched).length, nc = fonts.filter(f => !f.googleFont).length;
+    let sp = []; if (mc) sp.push(`<span style="color:#065F46;">${mc} 個精確配對</span>`); if (gc) sp.push(`<span style="color:#92400E;">${gc} 個近似配對</span>`); if (nc) sp.push(`<span style="color:var(--text-muted);">${nc} 個無配對</span>`);
+    results.innerHTML = `<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:10px;">共偵測到 ${fonts.length} 個字型：${sp.join('、')}</p>` + html;
+  } catch (err) { console.error(err); loading.style.display = 'none'; results.innerHTML = '<p style="font-size:0.85rem;color:var(--text-muted);">字型偵測失敗</p>'; }
+}
+
+function removePdfFile() {
+  state.pdfFile = null; state.pdfDoc = null; state.pdfFileName = ''; state.totalPages = 0;
+  $('#fileInfo').classList.remove('show'); $('#pdfDropZone').classList.remove('hidden');
+  $('#btnToStep2').disabled = true; $('#btnSkipToEdit').disabled = true; $('#pdfFileInput').value = '';
+  $('#fontDetectPanel').style.display = 'none'; $('#fontDetectResults').innerHTML = ''; state.detectedFonts = [];
+}
+
+// ========== STEP 2: SIGNATURE ==========
+function initSigTabs() {
+  $$('.sig-tab').forEach(tab => { tab.addEventListener('click', () => {
+    $$('.sig-tab').forEach(t => t.classList.remove('active')); $$('.sig-tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active'); const id = tab.dataset.tab; $(`#tab${id.charAt(0).toUpperCase()+id.slice(1)}`).classList.add('active');
+    state.signatureMode = id; updateFinalPreview();
+  }); });
+}
+
+let isDrawing = false, sigCtx = null;
+
+function initSignaturePad() {
+  const canvas = $('#sigCanvas'), dpr = window.devicePixelRatio || 1, rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr; canvas.height = 200 * dpr;
+  sigCtx = canvas.getContext('2d'); sigCtx.scale(dpr, dpr); sigCtx.lineCap = 'round'; sigCtx.lineJoin = 'round';
+  canvas.addEventListener('pointerdown', (e) => { isDrawing = true; canvas.setPointerCapture(e.pointerId); sigCtx.beginPath(); const p = getCanvasPos(canvas, e); sigCtx.moveTo(p.x, p.y); });
+  canvas.addEventListener('pointermove', (e) => { if (!isDrawing) return; sigCtx.lineWidth = parseInt($('#penSize').value); sigCtx.strokeStyle = $('#penColor').value; const p = getCanvasPos(canvas, e); sigCtx.lineTo(p.x, p.y); sigCtx.stroke(); sigCtx.beginPath(); sigCtx.moveTo(p.x, p.y); });
+  canvas.addEventListener('pointerup', () => { isDrawing = false; updateFinalPreview(); });
+  canvas.addEventListener('pointercancel', () => { isDrawing = false; });
+  $('#btnClearCanvas').addEventListener('click', () => { sigCtx.clearRect(0, 0, canvas.width, canvas.height); updateFinalPreview(); });
+}
+
+function getCanvasPos(canvas, e) { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+
+function getDrawnSignatureDataURL() {
+  const canvas = $('#sigCanvas'), dpr = window.devicePixelRatio || 1, w = canvas.width, h = canvas.height;
+  const data = canvas.getContext('2d').getImageData(0, 0, w, h).data;
+  let minX = w, minY = h, maxX = 0, maxY = 0, has = false;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { if (data[(y*w+x)*4+3] > 10) { has = true; if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; } }
+  if (!has) return null;
+  const pad = 10 * dpr; minX = Math.max(0, minX-pad); minY = Math.max(0, minY-pad); maxX = Math.min(w, maxX+pad); maxY = Math.min(h, maxY+pad);
+  const tw = maxX-minX, th = maxY-minY, tmp = document.createElement('canvas'); tmp.width = tw; tmp.height = th;
+  tmp.getContext('2d').drawImage(canvas, minX, minY, tw, th, 0, 0, tw, th);
+  return tmp.toDataURL('image/png');
+}
+
+function initTextSignature() {
+  const input = $('#sigTextInput'), preview = $('#sigTextPreview');
+  const update = () => { const t = input.value.trim(); if (!t) { preview.innerHTML = '<span style="color:var(--text-muted);font-family:var(--font-body);font-size:0.9rem;">輸入文字後顯示預覽</span>'; } else { preview.textContent = t; preview.style.fontSize = $('#fontSize').value + 'px'; preview.style.color = $('#textColor').value; } updateFinalPreview(); };
+  input.addEventListener('input', update); $('#fontSize').addEventListener('input', update); $('#textColor').addEventListener('input', update);
+}
+
+function getTextSignatureDataURL() {
+  const t = $('#sigTextInput').value.trim(); if (!t) return null;
+  const fs = parseInt($('#fontSize').value), c = $('#textColor').value, tmp = document.createElement('canvas'), ctx = tmp.getContext('2d');
+  const fontStr = `${fs}px 'LXGW WenKai TC', cursive`; ctx.font = fontStr;
+  const m = ctx.measureText(t), pad = 16, tw = Math.ceil(m.width)+pad*2, th = Math.ceil(fs*1.4)+pad*2;
+  tmp.width = tw; tmp.height = th; const c2 = tmp.getContext('2d'); c2.font = fontStr; c2.fillStyle = c; c2.textBaseline = 'middle'; c2.fillText(t, pad, th/2);
+  return tmp.toDataURL('image/png');
+}
+
+let uploadedSigDataURL = null;
+
+function initImageUpload() {
+  const drop = $('#sigImgDrop'), input = $('#sigImgInput');
+  $('#btnChooseSigImg').addEventListener('click', () => input.click());
+  drop.addEventListener('click', (e) => { if (e.target.id !== 'btnChooseSigImg') input.click(); });
+  input.addEventListener('change', (e) => { if (e.target.files[0]) handleSigImage(e.target.files[0]); });
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, (e) => e.preventDefault()));
+  drop.addEventListener('drop', (e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('image/')) handleSigImage(f); else showToast('請上傳圖片檔案', 'error'); });
+  $('#removeBg').addEventListener('change', () => updateFinalPreview());
+}
+
+function handleSigImage(file) {
+  const r = new FileReader(); r.onload = (e) => { uploadedSigDataURL = e.target.result; $('#sigImgPreview').src = uploadedSigDataURL; $('#sigImgPreviewArea').classList.add('show'); $('#sigImgDrop').classList.add('hidden'); updateFinalPreview(); }; r.readAsDataURL(file);
+}
+
+function removeWhiteBackground(dataURL) {
+  return new Promise(resolve => { const img = new Image(); img.onload = () => { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0); const d = ctx.getImageData(0, 0, c.width, c.height).data; for (let i = 0; i < d.length; i += 4) { if (d[i] > 235 && d[i+1] > 235 && d[i+2] > 235) d[i+3] = 0; } ctx.putImageData(new ImageData(d, c.width, c.height), 0, 0); resolve(c.toDataURL('image/png')); }; img.src = dataURL; });
+}
+
+async function getImageSignatureDataURL() { if (!uploadedSigDataURL) return null; return $('#removeBg').checked ? await removeWhiteBackground(uploadedSigDataURL) : uploadedSigDataURL; }
+
+async function updateFinalPreview() {
+  const box = $('#sigFinalBox'); let d = null;
+  if (state.signatureMode === 'draw') d = getDrawnSignatureDataURL();
+  else if (state.signatureMode === 'type') d = getTextSignatureDataURL();
+  else if (state.signatureMode === 'upload') d = await getImageSignatureDataURL();
+  state.signatureDataURL = d;
+  if (d) { box.innerHTML = `<img src="${d}" alt="簽名">`; $('#btnToStep3').disabled = false; }
+  else { box.innerHTML = '<span class="empty">尚未建立簽名</span>'; $('#btnToStep3').disabled = true; }
+}
+
+function initStep2Nav() {
+  $('#btnBackStep1').addEventListener('click', () => goToStep(1));
+  $('#btnToStep3').addEventListener('click', () => { if (!state.signatureDataURL) { showToast('請先建立簽名', 'error'); return; } goToStep(3); });
+  $('#btnSkipToStep3').addEventListener('click', () => goToStep(3));
+}
+
+// ========== STEP 3: EDIT PDF ==========
+async function renderPdfPage(pageNum) {
+  if (!state.pdfDoc) return;
+  const page = await state.pdfDoc.getPage(pageNum), vp = page.getViewport({ scale: state.renderScale });
+  state.currentViewport = vp;
+  const canvas = $('#pdfCanvas'), dpr = window.devicePixelRatio || 1;
+  canvas.width = vp.width * dpr; canvas.height = vp.height * dpr; canvas.style.width = vp.width + 'px'; canvas.style.height = vp.height + 'px';
+  const ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  $('#currentPage').textContent = pageNum; $('#totalPages').textContent = state.totalPages;
+  $('#btnPrevPage').disabled = pageNum <= 1; $('#btnNextPage').disabled = pageNum >= state.totalPages;
+  updateOverlaysVisibility();
+}
+
+function updateOverlaysVisibility() {
+  const w = $('#pdfCanvasWrapper');
+  w.querySelectorAll('.sig-overlay').forEach(el => { const s = state.placedSignatures.find(x => x.id === el.dataset.id); el.style.display = (s && s.pageNum === state.currentPage) ? 'block' : 'none'; });
+  w.querySelectorAll('.text-overlay').forEach(el => { const t = state.placedTexts.find(x => x.id === el.dataset.id); el.style.display = (t && t.pageNum === state.currentPage) ? 'block' : 'none'; });
+}
+
+function initPageNav() {
+  $('#btnPrevPage').addEventListener('click', () => { if (state.currentPage > 1) { state.currentPage--; renderPdfPage(state.currentPage); } });
+  $('#btnNextPage').addEventListener('click', () => { if (state.currentPage < state.totalPages) { state.currentPage++; renderPdfPage(state.currentPage); } });
+}
+
+function initPlacement() {
+  const wrapper = $('#pdfCanvasWrapper');
+  $('#btnAddSig').addEventListener('click', () => { if (!state.signatureDataURL) { showToast('請先回 Step 2 建立簽名', 'error'); return; } state.isPlacingMode = true; wrapper.style.cursor = 'crosshair'; showToast('點擊 PDF 上要放置簽名的位置', 'info'); });
+  wrapper.addEventListener('click', (e) => {
+    if (e.target.closest('.sig-overlay') || e.target.closest('.text-overlay')) return;
+    const r = wrapper.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    if (state.isPlacingMode) { addSignatureOverlay(x, y); state.isPlacingMode = false; wrapper.style.cursor = ''; }
+    else if (state.isTextPlacingMode && state.pendingText) { addTextOverlay(x, y, state.pendingText); state.isTextPlacingMode = false; state.pendingText = null; wrapper.style.cursor = ''; }
+  });
+}
+
+function addSignatureOverlay(cx, cy) {
+  const id = generateId(), wrapper = $('#pdfCanvasWrapper'), w = 150, h = 60;
+  const x = Math.max(0, Math.min(cx - w/2, wrapper.clientWidth - w)), y = Math.max(0, Math.min(cy - h/2, wrapper.clientHeight - h));
+  const ov = document.createElement('div'); ov.className = 'sig-overlay selected'; ov.dataset.id = id;
+  ov.style.left = x + 'px'; ov.style.top = y + 'px'; ov.style.width = w + 'px'; ov.style.height = h + 'px';
+  ov.innerHTML = `<img src="${state.signatureDataURL}" draggable="false" alt="簽名"><div class="resize-handle"></div><button class="delete-btn" type="button" title="刪除">&#10005;</button>`;
+  wrapper.appendChild(ov);
+  state.placedSignatures.push({ id, pageNum: state.currentPage, dataURL: state.signatureDataURL, overlayEl: ov });
+  initOverlayDrag(ov); initOverlayResize(ov);
+  ov.querySelector('.delete-btn').addEventListener('click', (e) => { e.stopPropagation(); removeSignatureOverlay(id); });
+  ov.addEventListener('click', (e) => { e.stopPropagation(); $$('.sig-overlay,.text-overlay').forEach(o => o.classList.remove('selected')); ov.classList.add('selected'); });
+  updateSigList(); $('#btnToStep4').disabled = false; showToast('簽名已放置', 'success');
+}
+
+function removeSignatureOverlay(id) {
+  const idx = state.placedSignatures.findIndex(s => s.id === id);
+  if (idx >= 0) { state.placedSignatures[idx].overlayEl.remove(); state.placedSignatures.splice(idx, 1); }
+  updateSigList(); if (state.placedSignatures.length === 0 && state.placedTexts.length === 0) $('#btnToStep4').disabled = true;
+}
+
+function removeTextOverlay(id) {
+  const idx = state.placedTexts.findIndex(t => t.id === id);
+  if (idx >= 0) { state.placedTexts[idx].overlayEl.remove(); state.placedTexts.splice(idx, 1); }
+  updateSigList(); if (state.placedSignatures.length === 0 && state.placedTexts.length === 0) $('#btnToStep4').disabled = true;
+}
+
+function updateSigList() {
+  const ul = $('#sigListUl'), total = state.placedSignatures.length + state.placedTexts.length;
+  $('#sigCount').textContent = total; ul.innerHTML = '';
+  state.placedSignatures.forEach(s => { const li = document.createElement('li'); li.innerHTML = `<span>第 ${s.pageNum} 頁 — 簽名</span><button class="btn btn-ghost" style="color:var(--danger);padding:4px 8px;" type="button">刪除</button>`; li.querySelector('button').addEventListener('click', () => removeSignatureOverlay(s.id)); ul.appendChild(li); });
+  state.placedTexts.forEach(t => { const li = document.createElement('li'); const p = t.text.length > 15 ? t.text.slice(0,15)+'…' : t.text; li.innerHTML = `<span>第 ${t.pageNum} 頁 — 「${p}」</span><button class="btn btn-ghost" style="color:var(--danger);padding:4px 8px;" type="button">刪除</button>`; li.querySelector('button').addEventListener('click', () => removeTextOverlay(t.id)); ul.appendChild(li); });
+}
+
+function initOverlayDrag(ov) {
+  let sx, sy, ol, ot;
+  ov.addEventListener('pointerdown', (e) => {
+    if (e.target.classList.contains('resize-handle') || e.target.classList.contains('delete-btn') || e.target.classList.contains('edit-btn')) return;
+    e.preventDefault(); ov.setPointerCapture(e.pointerId);
+    const w = $('#pdfCanvasWrapper'), r = ov.getBoundingClientRect(), wr = w.getBoundingClientRect();
+    sx = e.clientX; sy = e.clientY; ol = r.left - wr.left; ot = r.top - wr.top;
+    const onMove = (ev) => { let nl = ol + ev.clientX - sx, nt = ot + ev.clientY - sy; nl = Math.max(0, Math.min(nl, w.clientWidth - ov.offsetWidth)); nt = Math.max(0, Math.min(nt, w.clientHeight - ov.offsetHeight)); ov.style.left = nl + 'px'; ov.style.top = nt + 'px'; };
+    const onUp = () => { ov.removeEventListener('pointermove', onMove); ov.removeEventListener('pointerup', onUp); };
+    ov.addEventListener('pointermove', onMove); ov.addEventListener('pointerup', onUp);
+  });
+}
+
+function initOverlayResize(ov) {
+  const handle = ov.querySelector('.resize-handle'); if (!handle) return;
+  let sx, ow, oh, ar;
+  handle.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); e.stopPropagation(); handle.setPointerCapture(e.pointerId);
+    sx = e.clientX; ow = ov.offsetWidth; oh = ov.offsetHeight; ar = ow / oh;
+    const w = $('#pdfCanvasWrapper');
+    const onMove = (ev) => { let nw = Math.max(40, ow + ev.clientX - sx), nh = nw / ar; const l = parseFloat(ov.style.left), t = parseFloat(ov.style.top); if (l + nw > w.clientWidth) nw = w.clientWidth - l; nh = nw / ar; if (t + nh > w.clientHeight) { nh = w.clientHeight - t; nw = nh * ar; } ov.style.width = nw + 'px'; ov.style.height = nh + 'px'; };
+    const onUp = () => { handle.removeEventListener('pointermove', onMove); handle.removeEventListener('pointerup', onUp); };
+    handle.addEventListener('pointermove', onMove); handle.addEventListener('pointerup', onUp);
+  });
+}
+
+function initStep3Nav() {
+  $('#btnBackStep2').addEventListener('click', () => goToStep(2));
+  $('#btnToStep4').addEventListener('click', generateAndGoToStep4);
+}
+
+// ========== TEXT OVERLAY SYSTEM ==========
+function loadGoogleFont(fn) {
+  if (state.loadedGoogleFonts.has(fn)) return Promise.resolve();
+  return new Promise(r => { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = `https://fonts.googleapis.com/css2?family=${fn.replace(/ /g, '+')}:wght@400;700&display=swap`; l.onload = () => { state.loadedGoogleFonts.add(fn); r(); }; l.onerror = () => r(); document.head.appendChild(l); });
+}
+
+function populateFontSelect() {
+  const sel = $('#textModalFont');
+  sel.innerHTML = `<option value="Noto Sans TC">Noto Sans TC（黑體）</option><option value="Noto Serif TC">Noto Serif TC（明體）</option><option value="LXGW WenKai TC">LXGW WenKai TC（楷體）</option>`;
+  if (!state.detectedFonts || !state.detectedFonts.length) return;
+  const defaults = new Set(['Noto Sans TC', 'Noto Serif TC', 'LXGW WenKai TC']), added = new Set();
+  const grp = document.createElement('optgroup'); grp.label = '── PDF 偵測到的字型 ──';
+  for (const f of state.detectedFonts) { if (!f.googleFont || defaults.has(f.googleFont) || added.has(f.googleFont)) continue; added.add(f.googleFont); const o = document.createElement('option'); o.value = f.googleFont; o.textContent = `${f.googleFont}（${f.category}）`; grp.appendChild(o); }
+  if (grp.children.length) sel.appendChild(grp);
+  const primary = state.detectedFonts[0];
+  if (primary && primary.googleFont) { sel.value = primary.googleFont; if (primary.sizes.length) { const s = Math.max(8, Math.min(48, Math.round(primary.sizes[Math.floor(primary.sizes.length/2)]))); $('#textModalSize').value = s; $('#textModalSizeLabel').textContent = s + ' pt'; } }
+}
+
+function initTextModal() {
+  const bd = $('#textModalBackdrop'), inp = $('#textModalInput'), fsel = $('#textModalFont'), sr = $('#textModalSize'), sl = $('#textModalSizeLabel'), ci = $('#textModalColor'), pv = $('#textModalPreview');
+  let editId = null;
+  function upd() { const t = inp.value.trim(); if (!t) { pv.innerHTML = '<span style="color:var(--text-muted);font-size:0.85rem;">輸入文字後預覽</span>'; return; } pv.style.fontFamily = `'${fsel.value}', sans-serif`; pv.style.fontSize = sr.value + 'px'; pv.style.color = ci.value; pv.textContent = t; loadGoogleFont(fsel.value); }
+  inp.addEventListener('input', upd); fsel.addEventListener('change', upd); sr.addEventListener('input', () => { sl.textContent = sr.value + ' pt'; upd(); }); ci.addEventListener('input', upd);
+  $('#btnAddText').addEventListener('click', () => { editId = null; $('#textModalTitle').textContent = '新增文字'; inp.value = ''; ci.value = '#1a1a1a'; populateFontSelect(); upd(); bd.classList.add('show'); setTimeout(() => inp.focus(), 100); });
+  $('#textModalCancel').addEventListener('click', () => { bd.classList.remove('show'); editId = null; });
+  bd.addEventListener('click', (e) => { if (e.target === bd) { bd.classList.remove('show'); editId = null; } });
+  $('#textModalConfirm').addEventListener('click', () => {
+    const t = inp.value.trim(); if (!t) { showToast('請輸入文字', 'error'); return; }
+    const td = { text: t, font: fsel.value, size: parseInt(sr.value), color: ci.value };
+    if (editId) { const ex = state.placedTexts.find(x => x.id === editId); if (ex) { Object.assign(ex, td); const el = ex.overlayEl.querySelector('.text-content'); el.textContent = td.text; el.style.fontFamily = `'${td.font}', sans-serif`; el.style.fontSize = td.size + 'px'; el.style.color = td.color; updateSigList(); showToast('文字已更新', 'success'); } editId = null; bd.classList.remove('show');
+    } else { state.pendingText = td; state.isTextPlacingMode = true; $('#pdfCanvasWrapper').style.cursor = 'crosshair'; bd.classList.remove('show'); showToast('點擊 PDF 上要放置文字的位置', 'info'); }
+  });
+  window._openTextModalForEdit = (id) => { const t = state.placedTexts.find(x => x.id === id); if (!t) return; editId = id; $('#textModalTitle').textContent = '編輯文字'; inp.value = t.text; populateFontSelect(); fsel.value = t.font; sr.value = t.size; sl.textContent = t.size + ' pt'; ci.value = t.color; upd(); bd.classList.add('show'); setTimeout(() => inp.focus(), 100); };
+}
+
+function addTextOverlay(cx, cy, td) {
+  const id = 'txt-' + (state.nextTextId++), wrapper = $('#pdfCanvasWrapper');
+  const ov = document.createElement('div'); ov.className = 'text-overlay selected'; ov.dataset.id = id;
+  ov.style.left = cx + 'px'; ov.style.top = cy + 'px'; ov.style.fontFamily = `'${td.font}', sans-serif`; ov.style.fontSize = td.size + 'px'; ov.style.color = td.color;
+  ov.innerHTML = `<span class="text-content">${td.text}</span><button class="edit-btn" type="button" title="編輯">&#9998;</button><button class="delete-btn" type="button" title="刪除">&#10005;</button>`;
+  wrapper.appendChild(ov);
+  let x = Math.max(0, Math.min(cx - ov.offsetWidth/2, wrapper.clientWidth - ov.offsetWidth));
+  let y = Math.max(0, Math.min(cy - ov.offsetHeight/2, wrapper.clientHeight - ov.offsetHeight));
+  ov.style.left = x + 'px'; ov.style.top = y + 'px';
+  loadGoogleFont(td.font);
+  state.placedTexts.push({ id, pageNum: state.currentPage, text: td.text, font: td.font, size: td.size, color: td.color, overlayEl: ov });
+  initOverlayDrag(ov);
+  ov.querySelector('.delete-btn').addEventListener('click', (e) => { e.stopPropagation(); removeTextOverlay(id); });
+  ov.querySelector('.edit-btn').addEventListener('click', (e) => { e.stopPropagation(); window._openTextModalForEdit(id); });
+  ov.addEventListener('click', (e) => { e.stopPropagation(); $$('.sig-overlay,.text-overlay').forEach(o => o.classList.remove('selected')); ov.classList.add('selected'); });
+  updateSigList(); $('#btnToStep4').disabled = false; showToast('文字已放置', 'success');
+}
+
+// ========== STEP 4: GENERATE & DOWNLOAD ==========
+function renderTextToImage(td) {
+  const dpr = 3, tmp = document.createElement('canvas'), ctx = tmp.getContext('2d');
+  const fontStr = `${td.size * dpr}px '${td.font}', sans-serif`; ctx.font = fontStr;
+  const m = ctx.measureText(td.text), pad = 4 * dpr, w = Math.ceil(m.width) + pad*2, h = Math.ceil(td.size * dpr * 1.4) + pad*2;
+  tmp.width = w; tmp.height = h; const c2 = tmp.getContext('2d'); c2.font = fontStr; c2.fillStyle = td.color; c2.textBaseline = 'middle'; c2.fillText(td.text, pad, h/2);
+  return tmp.toDataURL('image/png');
+}
+
+async function generateAndGoToStep4() {
+  if (state.placedSignatures.length + state.placedTexts.length === 0) { showToast('請先放置至少一個項目', 'error'); return; }
+  showLoading('正在產生 PDF...');
+  try {
+    const { PDFDocument } = PDFLib, doc = await PDFDocument.load(state.pdfFile);
+    const canvas = $('#pdfCanvas'), cw = canvas.clientWidth, ch = canvas.clientHeight;
+    function mapPos(ov, pw, ph) { const l = parseFloat(ov.style.left), t = parseFloat(ov.style.top), w = ov.offsetWidth, h = ov.offsetHeight; return { x: (l/cw)*pw, y: ph - (t/ch)*ph - (h/ch)*ph, width: (w/cw)*pw, height: (h/ch)*ph }; }
+    for (const s of state.placedSignatures) { const p = doc.getPage(s.pageNum-1), { width: pw, height: ph } = p.getSize(), pos = mapPos(s.overlayEl, pw, ph); const b = await fetch(s.dataURL).then(r => r.arrayBuffer()); let img; try { img = await doc.embedPng(b); } catch { img = await doc.embedJpg(b); } p.drawImage(img, pos); }
+    for (const t of state.placedTexts) { const p = doc.getPage(t.pageNum-1), { width: pw, height: ph } = p.getSize(), pos = mapPos(t.overlayEl, pw, ph); const b = await fetch(renderTextToImage(t)).then(r => r.arrayBuffer()); p.drawImage(await doc.embedPng(b), pos); }
+    state.signedPdfBytes = await doc.save(); goToStep(4); showToast('PDF 產生完成！', 'success');
+  } catch (err) { console.error(err); showToast('產生 PDF 時發生錯誤：' + err.message, 'error'); } finally { hideLoading(); }
+}
+
+function initDownload() {
+  $('#btnDownload').addEventListener('click', () => { if (!state.signedPdfBytes) return; const b = new Blob([state.signedPdfBytes], { type: 'application/pdf' }), u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = `${state.pdfFileName.replace(/\.pdf$/i, '')}_已編輯.pdf`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u); showToast('下載已開始', 'success'); });
+  $('#btnBackStep3').addEventListener('click', () => goToStep(3));
+  $('#btnStartOver').addEventListener('click', () => {
+    state.pdfFile = null; state.pdfDoc = null; state.pdfFileName = ''; state.totalPages = 0; state.currentPage = 1;
+    state.signatureDataURL = null; state.signedPdfBytes = null; state.isPlacingMode = false; state.isTextPlacingMode = false; state.pendingText = null; state.detectedFonts = [];
+    state.placedSignatures.forEach(s => s.overlayEl.remove()); state.placedSignatures = []; state.nextSigId = 1;
+    state.placedTexts.forEach(t => t.overlayEl.remove()); state.placedTexts = []; state.nextTextId = 1;
+    $('#fileInfo').classList.remove('show'); $('#pdfDropZone').classList.remove('hidden');
+    $('#btnToStep2').disabled = true; $('#btnSkipToEdit').disabled = true; $('#btnToStep3').disabled = true; $('#btnToStep4').disabled = true;
+    $('#pdfFileInput').value = ''; $('#fontDetectPanel').style.display = 'none'; $('#fontDetectResults').innerHTML = ''; updateSigList();
+    const sc = $('#sigCanvas'); if (sc) sc.getContext('2d').clearRect(0, 0, sc.width, sc.height);
+    $('#sigTextInput').value = ''; uploadedSigDataURL = null; $('#sigImgPreviewArea').classList.remove('show'); $('#sigImgDrop').classList.remove('hidden'); updateFinalPreview();
+    goToStep(1); showToast('已重置', 'info');
+  });
+}
+
+// ========== INIT ==========
+function init() {
+  initUpload(); initSigTabs(); initSignaturePad(); initTextSignature(); initImageUpload(); initStep2Nav(); initPageNav(); initPlacement(); initStep3Nav(); initTextModal(); initDownload();
+  document.addEventListener('click', (e) => { if (!e.target.closest('.sig-overlay') && !e.target.closest('.text-overlay')) $$('.sig-overlay,.text-overlay').forEach(o => o.classList.remove('selected')); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Delete' || e.key === 'Backspace') { if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return; const s = document.querySelector('.sig-overlay.selected'); if (s) { removeSignatureOverlay(s.dataset.id); return; } const t = document.querySelector('.text-overlay.selected'); if (t) removeTextOverlay(t.dataset.id); } });
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (state.currentStep === 3 && state.pdfDoc) renderPdfPage(state.currentPage); }, 300); });
+}
+
+document.fonts.ready.then(init);
+</script>
+</body>
+</html>
