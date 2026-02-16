@@ -20,8 +20,8 @@ export const routes = [
     title: '首頁',
     seo: {
       title: 'Ruru 工具箱 — 免費線上工具，全程本機處理｜HelloRuru',
-      description: '免費線上工具箱：TXT 轉 EPUB 電子書、EPUB 簡轉繁、AI 批次去背、社群貼文排版。全程瀏覽器本機處理，不上傳任何資料，保護個人隱私。',
-      keywords: '線上工具,免費工具,TXT轉EPUB,EPUB簡轉繁,AI去背,社群貼文排版,本機處理,隱私保護,HelloRuru',
+      description: '免費線上工具箱：TXT 轉 EPUB 電子書、EPUB 簡轉繁、AI 批次去背、社群貼文排版、PDF 編輯簽名。全程瀏覽器本機處理，不上傳任何資料，保護個人隱私。',
+      keywords: '線上工具,免費工具,TXT轉EPUB,EPUB簡轉繁,AI去背,社群貼文排版,PDF編輯,PDF簽名,本機處理,隱私保護,HelloRuru',
       canonical: `${BASE}/`,
       jsonLd: [
         {
@@ -69,6 +69,13 @@ export const routes = [
               name: '社群貼文排版',
               description: '解決 Facebook、Instagram、Threads 貼文換行消失問題，即時預覽、雜誌感設計排版、Broetry 文體模式。',
               url: `${BASE}/post-writer`,
+            },
+            {
+              '@type': 'ListItem',
+              position: 5,
+              name: 'PDF 編輯工具',
+              description: '免費線上 PDF 編輯工具：手寫簽名、打字簽名、圖片簽名、文字覆蓋。支援多頁 PDF 瀏覽與編輯，全程瀏覽器本機處理，不上傳任何檔案。',
+              url: `${BASE}/pdf-editor/`,
             },
           ],
         },

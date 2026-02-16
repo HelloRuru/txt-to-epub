@@ -35,6 +35,15 @@ const tools = [
     ready: true,
     color: 'sage',
   },
+  {
+    id: 'pdf-editor',
+    name: 'PDF 編輯工具',
+    description: '線上 PDF 編輯：手寫簽名、打字簽名、圖片簽名、文字覆蓋。全程本機處理，不上傳任何檔案。',
+    path: '/pdf-editor/',
+    ready: true,
+    color: 'rose',
+    external: true,
+  },
 ]
 
 // SVG Icons
@@ -124,12 +133,22 @@ const PostWriterIcon = () => (
   </svg>
 )
 
+const PdfEditIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <path d="M12 18v-6"/>
+    <path d="M9 15l3 3 3-3"/>
+  </svg>
+)
+
 const getIcon = (id) => {
   switch (id) {
     case 'epub': return <BookIcon />
     case 'epub-convert': return <ConvertIcon />
     case 'bg-removal': return <ScissorsIcon />
     case 'post-writer': return <PostWriterIcon />
+    case 'pdf-editor': return <PdfEditIcon />
     default: return <BookIcon />
   }
 }
@@ -212,11 +231,14 @@ export default function Home() {
 
         {/* Tools Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {tools.map((tool, index) => (
+          {tools.map((tool, index) => {
+            const CardTag = tool.external ? 'a' : Link
+            const cardProps = tool.external ? { href: tool.path } : { to: tool.path }
+            return (
             tool.ready ? (
-              <Link
+              <CardTag
                 key={tool.id}
-                to={tool.path}
+                {...cardProps}
                 className="group relative flex flex-col p-8 rounded-3xl transition-all duration-500 overflow-hidden animate-fadeInUp"
                 style={{ 
                   background: 'var(--bg-card)',
@@ -265,16 +287,16 @@ export default function Home() {
                 </p>
                 
                 {/* Arrow */}
-                <div 
+                <div
                   className="absolute bottom-7 right-7 w-10 h-10 rounded-full flex items-center justify-center opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0"
-                  style={{ 
+                  style={{
                     background: 'var(--bg-secondary)',
                     color: 'var(--accent-primary)'
                   }}
                 >
                   <ArrowIcon />
                 </div>
-              </Link>
+              </CardTag>
             ) : (
               <div
                 key={tool.id}
@@ -305,7 +327,7 @@ export default function Home() {
                 </p>
                 
                 {/* Coming soon badge */}
-                <span 
+                <span
                   className="inline-flex items-center gap-1.5 mt-4 text-xs"
                   style={{ color: 'var(--text-muted)' }}
                 >
@@ -314,7 +336,8 @@ export default function Home() {
                 </span>
               </div>
             )
-          ))}
+          )})}
+
         </div>
 
         {/* Footer */}
