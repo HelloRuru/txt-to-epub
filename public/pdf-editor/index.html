@@ -10,13 +10,11 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <!-- Font Preloading -->
 <link rel="preconnect" href="https://lab.helloruru.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link as="font" crossorigin href="https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2" rel="preload" type="font/woff2">
 <link as="font" crossorigin href="https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2" rel="preload" type="font/woff2">
 <link as="font" crossorigin href="https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2" rel="preload" type="font/woff2">
-<link as="font" crossorigin href="https://cdn.jsdelivr.net/gh/max32002/nanifont@1.036/webfont/NaniFont-SemiBold.woff2" rel="preload" type="font/woff2">
 <!-- Google Fonts for text overlay -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;700&family=LXGW+WenKai+TC:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
@@ -35,11 +33,6 @@
   font-family: 'GenSenRounded';
   src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2');
   font-weight: 700; font-style: normal; font-display: swap;
-}
-@font-face {
-  font-family: 'NaniFont';
-  src: url('https://cdn.jsdelivr.net/gh/max32002/nanifont@1.036/webfont/NaniFont-SemiBold.woff2') format('woff2');
-  font-weight: 600; font-style: normal; font-display: swap;
 }
 
 /* ========== RESET & VARIABLES ========== */
@@ -75,7 +68,7 @@
   --radius-lg: 24px;
   --radius-full: 9999px;
   --font-body: 'GenSenRounded', sans-serif;
-  --font-heading: 'NaniFont', 'GenSenRounded', sans-serif;
+  --font-heading: 'GenSenRounded', sans-serif;
   --font-hand: 'LXGW WenKai TC', cursive;
 }
 
@@ -108,7 +101,7 @@ hello-ruru-header {
 
 .page-header h1 {
   font-family: var(--font-heading);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1.75rem;
   color: var(--charcoal-900);
   margin-bottom: 8px;
@@ -231,7 +224,7 @@ hello-ruru-header {
 
 .panel-card h2 {
   font-family: var(--font-heading);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1.25rem;
   margin-bottom: 8px;
   color: var(--charcoal-900);
