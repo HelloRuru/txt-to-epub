@@ -562,6 +562,106 @@ hello-ruru-header {
   cursor: pointer;
 }
 
+/* ========== SAVED SIGNATURES ========== */
+.saved-sigs-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.saved-sigs-section h3 {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.saved-sigs-section h3 .count {
+  font-size: 0.75rem;
+  background: var(--info-bg);
+  color: var(--brand-dark);
+  padding: 1px 8px;
+  border-radius: var(--radius-full);
+}
+
+.saved-sigs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.saved-sig-card {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  background: repeating-conic-gradient(#fafafa 0% 25%, #fff 0% 50%) 50% / 12px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.saved-sig-card:hover {
+  border-color: var(--brand);
+  box-shadow: var(--shadow-soft);
+}
+
+.saved-sig-card.active {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px rgba(212, 165, 165, 0.3);
+}
+
+.saved-sig-card img {
+  max-width: 100%;
+  max-height: 50px;
+  display: block;
+  margin: 0 auto 6px;
+}
+
+.saved-sig-card .sig-name {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.saved-sig-card .sig-delete {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  background: var(--danger);
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.saved-sig-card:hover .sig-delete { display: flex; }
+
+.saved-sigs-empty {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 16px;
+}
+
+.save-sig-btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 /* ========== SIGNATURE PREVIEW ========== */
 .sig-final-section {
   margin-top: 20px;
@@ -1047,13 +1147,47 @@ hello-ruru-header {
   .panel-card { padding: 20px 16px; }
   .step-label { display: none; }
   .step-line { width: 24px; margin: 0 4px; }
-  .step-nav { flex-wrap: wrap; }
-  .step-nav-right { flex-wrap: wrap; }
+  .step-nav { flex-wrap: wrap; gap: 8px; }
+  .step-nav-right { flex-wrap: wrap; width: 100%; }
+  .step-nav-right .btn { flex: 1; min-width: 0; text-align: center; }
   .sig-controls { gap: 10px; }
   .pdf-viewer-area { padding: 8px; max-height: 60vh; }
   .toast-container { right: 12px; left: 12px; }
   .toast { max-width: 100%; }
   .page-header h1 { font-size: 1.35rem; }
+
+  /* Signature canvas taller on mobile */
+  .canvas-wrapper canvas { height: 250px; }
+
+  /* Bigger tap targets */
+  .btn { padding: 12px 20px; font-size: 0.95rem; min-height: 44px; }
+  .sig-tab { padding: 12px 10px; font-size: 0.9rem; min-height: 44px; }
+
+  /* Modal full width */
+  .text-modal { width: 95%; max-width: none; padding: 20px; }
+  .text-modal .field-row { flex-direction: column; gap: 10px; }
+
+  /* Saved signatures grid smaller */
+  .saved-sigs-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+  .saved-sig-card .sig-delete { display: flex; }
+
+  /* Page nav better touch */
+  .page-nav { gap: 10px; }
+  .page-nav .btn { padding: 10px 16px; }
+
+  /* Drop zone smaller padding */
+  .drop-zone { padding: 32px 16px; }
+
+  /* Sig image preview smaller */
+  .sig-img-preview-area img { max-width: 200px; max-height: 100px; }
+}
+
+@media (max-width: 380px) {
+  .app-container { padding: 12px 8px 32px; }
+  .panel-card { padding: 16px 12px; }
+  .btn { padding: 10px 14px; font-size: 0.85rem; }
+  .page-header h1 { font-size: 1.2rem; }
+  .text-sig-preview { font-size: 36px; }
 }
 
 /* ========== UTILITY ========== */
@@ -1180,11 +1314,21 @@ hello-ruru-header {
         </div>
       </div>
 
+      <!-- Saved Signatures -->
+      <div class="saved-sigs-section" id="savedSigsSection">
+        <h3><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> 已儲存的簽名 <span class="count" id="savedSigCount">0</span></h3>
+        <div class="saved-sigs-grid" id="savedSigsGrid"></div>
+        <div class="saved-sigs-empty" id="savedSigsEmpty">還沒有儲存的簽名</div>
+      </div>
+
       <!-- Final Preview -->
       <div class="sig-final-section">
         <h3>簽名預覽</h3>
         <div class="sig-final-box" id="sigFinalBox">
           <span class="empty">尚未建立簽名</span>
+        </div>
+        <div class="save-sig-btn-row">
+          <button class="btn btn-secondary" id="btnSaveSig" type="button" disabled><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> 儲存這個簽名</button>
         </div>
       </div>
 
@@ -1567,8 +1711,8 @@ async function updateFinalPreview() {
   else if (state.signatureMode === 'type') d = getTextSignatureDataURL();
   else if (state.signatureMode === 'upload') d = await getImageSignatureDataURL();
   state.signatureDataURL = d;
-  if (d) { box.innerHTML = `<img src="${d}" alt="簽名">`; $('#btnToStep3').disabled = false; }
-  else { box.innerHTML = '<span class="empty">尚未建立簽名</span>'; $('#btnToStep3').disabled = true; }
+  if (d) { box.innerHTML = `<img src="${d}" alt="簽名">`; $('#btnToStep3').disabled = false; $('#btnSaveSig').disabled = false; $$('.saved-sig-card').forEach(c => c.classList.remove('active')); }
+  else { box.innerHTML = '<span class="empty">尚未建立簽名</span>'; $('#btnToStep3').disabled = true; $('#btnSaveSig').disabled = true; }
 }
 
 function initStep2Nav() {
@@ -1769,12 +1913,76 @@ function initDownload() {
   });
 }
 
+// ========== SAVED SIGNATURES (localStorage) ==========
+const STORAGE_KEY = 'helloruru-pdf-signatures';
+
+function loadSavedSignatures() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function saveSavedSignatures(sigs) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(sigs)); }
+  catch (e) { if (e.name === 'QuotaExceededError') showToast('儲存空間已滿，請刪除部分簽名', 'error'); }
+}
+
+function renderSavedSignatures() {
+  const sigs = loadSavedSignatures(), grid = $('#savedSigsGrid'), empty = $('#savedSigsEmpty'), count = $('#savedSigCount');
+  count.textContent = sigs.length;
+  grid.innerHTML = '';
+  if (sigs.length === 0) { empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  sigs.forEach((sig, i) => {
+    const card = document.createElement('div');
+    card.className = 'saved-sig-card';
+    card.innerHTML = `<img src="${sig.dataURL}" alt="${sig.name}" draggable="false"><div class="sig-name">${sig.name}</div><button class="sig-delete" type="button" title="刪除">&#10005;</button>`;
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.sig-delete')) return;
+      state.signatureDataURL = sig.dataURL;
+      const box = $('#sigFinalBox');
+      box.innerHTML = `<img src="${sig.dataURL}" alt="簽名">`;
+      $('#btnToStep3').disabled = false;
+      $('#btnSaveSig').disabled = true;
+      $$('.saved-sig-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      showToast(`已載入簽名「${sig.name}」`, 'success');
+    });
+    card.querySelector('.sig-delete').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const all = loadSavedSignatures();
+      all.splice(i, 1);
+      saveSavedSignatures(all);
+      renderSavedSignatures();
+      showToast('已刪除簽名', 'info');
+    });
+    grid.appendChild(card);
+  });
+}
+
+function initSavedSignatures() {
+  renderSavedSignatures();
+  $('#btnSaveSig').addEventListener('click', () => {
+    if (!state.signatureDataURL) { showToast('請先建立簽名', 'error'); return; }
+    const sigs = loadSavedSignatures();
+    if (sigs.length >= 10) { showToast('最多儲存 10 個簽名，請先刪除部分', 'error'); return; }
+    const name = prompt('為這個簽名取個名字：', `簽名 ${sigs.length + 1}`);
+    if (name === null) return;
+    sigs.push({ name: name.trim() || `簽名 ${sigs.length + 1}`, dataURL: state.signatureDataURL, createdAt: Date.now() });
+    saveSavedSignatures(sigs);
+    renderSavedSignatures();
+    showToast('簽名已儲存', 'success');
+  });
+}
+
 // ========== INIT ==========
 function init() {
-  initUpload(); initSigTabs(); initSignaturePad(); initTextSignature(); initImageUpload(); initStep2Nav(); initPageNav(); initPlacement(); initStep3Nav(); initTextModal(); initDownload();
+  initUpload(); initSigTabs(); initSignaturePad(); initTextSignature(); initImageUpload(); initStep2Nav(); initPageNav(); initPlacement(); initStep3Nav(); initTextModal(); initDownload(); initSavedSignatures();
   document.addEventListener('click', (e) => { if (!e.target.closest('.sig-overlay') && !e.target.closest('.text-overlay')) $$('.sig-overlay,.text-overlay').forEach(o => o.classList.remove('selected')); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Delete' || e.key === 'Backspace') { if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return; const s = document.querySelector('.sig-overlay.selected'); if (s) { removeSignatureOverlay(s.dataset.id); return; } const t = document.querySelector('.text-overlay.selected'); if (t) removeTextOverlay(t.dataset.id); } });
-  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (state.currentStep === 3 && state.pdfDoc) renderPdfPage(state.currentPage); }, 300); });
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (state.currentStep === 2) initSignaturePad(); if (state.currentStep === 3 && state.pdfDoc) renderPdfPage(state.currentPage); }, 300); });
+  // Prevent page scroll while touching signature canvas or PDF overlays
+  document.querySelector('.canvas-wrapper').addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+  $('#pdfCanvasWrapper').addEventListener('touchmove', (e) => { if (e.target.closest('.sig-overlay') || e.target.closest('.text-overlay')) e.preventDefault(); }, { passive: false });
 }
 
 document.fonts.ready.then(init);
