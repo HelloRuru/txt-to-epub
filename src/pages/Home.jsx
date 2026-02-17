@@ -2,169 +2,111 @@ import { Link } from 'react-router-dom'
 import ThemeToggle from '../components/ThemeToggle'
 import { useTheme } from '../contexts/ThemeContext'
 
+// ── Categories ─────────────────────────────────────
+
+const categories = [
+  { id: 'text', label: '文字 & 轉檔', desc: '小說轉檔 · 社群排版 · AI 提示詞' },
+  { id: 'media', label: '圖片 & 設計', desc: '去背 · PDF · 問安圖 · 色票' },
+  { id: 'discover', label: '查詢 & 測驗', desc: '閱讀器推薦 · 美妝色號' },
+]
+
+// ── Tools ──────────────────────────────────────────
+
 const tools = [
   {
-    id: 'epub',
-    name: 'TXT 轉 EPUB',
+    id: 'epub', name: 'TXT 轉 EPUB', category: 'text',
     description: '上傳 TXT 小說檔案，自動偵測章節結構、支援簡轉繁，一鍵生成標準 EPUB 電子書格式。',
-    path: '/epub',
-    ready: true,
-    color: 'rose',
+    path: '/epub', color: 'rose',
   },
   {
-    id: 'epub-convert',
-    name: 'EPUB 簡轉繁',
+    id: 'epub-convert', name: 'EPUB 簡轉繁', category: 'text',
     description: '將簡體中文 EPUB 電子書轉換為繁體中文，保留原有格式與排版。',
-    path: '/epub-convert',
-    ready: true,
-    color: 'lavender',
+    path: '/epub-convert', color: 'lavender',
   },
   {
-    id: 'bg-removal',
-    name: '批次去背',
-    description: '上傳多張圖片，AI 自動去除背景。全程本機處理，不限解析度，完全免費。',
-    path: '/bg-remove',
-    ready: true,
-    color: 'lavender',
-  },
-  {
-    id: 'post-writer',
-    name: '社群貼文排版',
+    id: 'post-writer', name: '社群貼文排版', category: 'text',
     description: '解決 FB、IG、Threads 換行消失問題。即時預覽、多平台支援、雜誌感設計與 Broetry 排版模式。',
-    path: '/post-writer',
-    ready: true,
-    color: 'sage',
+    path: '/post-writer', color: 'sage',
   },
   {
-    id: 'pdf-editor',
-    name: 'PDF 編輯工具',
-    description: '線上 PDF 編輯：手寫簽名、打字簽名、圖片簽名、文字覆蓋。全程本機處理，不上傳任何檔案。',
-    path: '/pdf-editor/',
-    ready: true,
-    color: 'rose',
-    external: true,
-  },
-  {
-    id: 'hihi',
-    name: '問安圖產生器',
-    description: '早安圖、午安圖、晚安圖線上製作。7 種字體、配件貼紙，3 步驟免費下載。',
-    path: '/hihi/',
-    ready: true,
-    color: 'sage',
-    external: true,
-  },
-  {
-    id: 'find-color',
-    name: '2026 數位色票庫',
-    description: '收錄 Pantone 2026 與 8 大設計美學圈流行色，設計師必備色彩靈感工具。',
-    path: '/find-color/',
-    ready: true,
-    color: 'lavender',
-    external: true,
-  },
-  {
-    id: 'reader-quiz',
-    name: '電子書閱讀器測驗',
-    description: '8 題精準推薦最適合你的電子書閱讀器，涵蓋 34 款機型比較。',
-    path: '/reader-quiz/',
-    ready: true,
-    color: 'rose',
-    external: true,
-  },
-  {
-    id: 'cosmetics',
-    name: '色號試色搜尋',
-    description: '美妝色號搜尋引擎，快速找到試色文章與真人試色照片。',
-    path: '/cosmetics-for-you/',
-    ready: true,
-    color: 'rose',
-    external: true,
-  },
-  {
-    id: 'spell',
-    name: 'SD 咒語產生器',
+    id: 'spell', name: 'SD 咒語產生器', category: 'text',
     description: 'Stable Diffusion 提示詞快速組合，中英對照，一鍵複製。',
-    path: '/spell/',
-    ready: true,
-    color: 'lavender',
-    external: true,
+    path: '/spell/', color: 'lavender', external: true,
+  },
+  {
+    id: 'bg-removal', name: '批次去背', category: 'media',
+    description: '上傳多張圖片，AI 自動去除背景。全程本機處理，不限解析度，完全免費。',
+    path: '/bg-remove', color: 'lavender',
+  },
+  {
+    id: 'pdf-editor', name: 'PDF 編輯工具', category: 'media',
+    description: '線上 PDF 編輯：手寫簽名、打字簽名、圖片簽名、文字覆蓋。全程本機處理，不上傳任何檔案。',
+    path: '/pdf-editor/', color: 'rose', external: true,
+  },
+  {
+    id: 'hihi', name: '問安圖產生器', category: 'media',
+    description: '早安圖、午安圖、晚安圖線上製作。7 種字體、配件貼紙，3 步驟免費下載。',
+    path: '/hihi/', color: 'sage', external: true,
+  },
+  {
+    id: 'find-color', name: '2026 數位色票庫', category: 'media',
+    description: '收錄 Pantone 2026 與 8 大設計美學圈流行色，設計師必備色彩靈感工具。',
+    path: '/find-color/', color: 'lavender', external: true,
+  },
+  {
+    id: 'reader-quiz', name: '電子書閱讀器測驗', category: 'discover',
+    description: '8 題精準推薦最適合你的電子書閱讀器，涵蓋 34 款機型比較。',
+    path: '/reader-quiz/', color: 'rose', external: true,
+  },
+  {
+    id: 'cosmetics', name: '色號試色搜尋', category: 'discover',
+    description: '美妝色號搜尋引擎，快速找到試色文章與真人試色照片。',
+    path: '/cosmetics-for-you/', color: 'rose', external: true,
   },
 ]
 
-// SVG Icons
+// ── Color Helpers ──────────────────────────────────
+
+const accentGradients = {
+  rose: 'linear-gradient(90deg, #D4A5A5, #F5D0C5)',
+  lavender: 'linear-gradient(90deg, #B8A9C9, #C9C1DC)',
+  sage: 'linear-gradient(90deg, #A8B5A0, #C5D4BD)',
+}
+
+const iconColors = {
+  rose: 'var(--rose)',
+  lavender: 'var(--lavender)',
+  sage: 'var(--sage)',
+}
+
+const iconBgs = {
+  rose: 'linear-gradient(135deg, rgba(212, 165, 165, 0.22), rgba(245, 208, 197, 0.15))',
+  lavender: 'linear-gradient(135deg, rgba(184, 169, 201, 0.22), rgba(201, 193, 220, 0.15))',
+  sage: 'linear-gradient(135deg, rgba(168, 181, 160, 0.22), rgba(184, 201, 176, 0.15))',
+}
+
+// ── SVG Icons ──────────────────────────────────────
+
 const BookIcon = () => (
   <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-    <path d="M8 7h8"/>
-    <path d="M8 11h6"/>
+    <path d="M8 7h8"/><path d="M8 11h6"/>
   </svg>
 )
 
 const ConvertIcon = () => (
   <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <path d="M12 3v18"/>
-    <path d="M5 8l7-5 7 5"/>
-    <path d="M8 14l4 4 4-4"/>
-    <circle cx="5" cy="12" r="2"/>
-    <circle cx="19" cy="12" r="2"/>
+    <path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M8 14l4 4 4-4"/>
+    <circle cx="5" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
   </svg>
 )
 
 const ScissorsIcon = () => (
   <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <circle cx="6" cy="6" r="3"/>
-    <circle cx="6" cy="18" r="3"/>
-    <line x1="20" y1="4" x2="8.12" y2="15.88"/>
-    <line x1="14.47" y1="14.48" x2="20" y2="20"/>
+    <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+    <line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/>
     <line x1="8.12" y1="8.12" x2="12" y2="12"/>
-  </svg>
-)
-
-const WrenchIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-8 h-8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="white">
-    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-  </svg>
-)
-
-const ShieldIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-  </svg>
-)
-
-const ArrowIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <path d="M5 12h14M12 5l7 7-7 7"/>
-  </svg>
-)
-
-const ClockIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <circle cx="12" cy="12" r="10"/>
-    <polyline points="12 6 12 12 16 14"/>
-  </svg>
-)
-
-const LabIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <path d="M9 3h6v5l4 9a2 2 0 0 1-1.8 2.9H6.8A2 2 0 0 1 5 17l4-9V3z"/>
-    <path d="M9 3h6"/>
-    <path d="M7 15h10"/>
-  </svg>
-)
-
-const GlobeIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <circle cx="12" cy="12" r="10"/>
-    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
-    <path d="M2 12h20"/>
-  </svg>
-)
-
-const GitHubIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
-    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
   </svg>
 )
 
@@ -172,9 +114,7 @@ const PostWriterIcon = () => (
   <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
     <polyline points="14 2 14 8 20 8"/>
-    <line x1="8" y1="13" x2="16" y2="13"/>
-    <line x1="8" y1="17" x2="12" y2="17"/>
-    <path d="M10 9H8"/>
+    <line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/><path d="M10 9H8"/>
   </svg>
 )
 
@@ -182,8 +122,7 @@ const PdfEditIcon = () => (
   <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
     <polyline points="14 2 14 8 20 8"/>
-    <path d="M12 18v-6"/>
-    <path d="M9 15l3 3 3-3"/>
+    <path d="M12 18v-6"/><path d="M9 15l3 3 3-3"/>
   </svg>
 )
 
@@ -219,6 +158,58 @@ const BookOpenIcon = () => (
   </svg>
 )
 
+const WrenchIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-8 h-8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="white">
+    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+  </svg>
+)
+
+const ShieldIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  </svg>
+)
+
+const ArrowIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-5 h-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <path d="M5 12h14M12 5l7 7-7 7"/>
+  </svg>
+)
+
+const LabIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <path d="M9 3h6v5l4 9a2 2 0 0 1-1.8 2.9H6.8A2 2 0 0 1 5 17l4-9V3z"/><path d="M9 3h6"/><path d="M7 15h10"/>
+  </svg>
+)
+
+const GlobeIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>
+  </svg>
+)
+
+const GitHubIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  </svg>
+)
+
+// Brand five-petal flower
+const BrandFlower = ({ size = 36 }) => (
+  <svg viewBox="0 0 100 120" width={size} height={size * 1.2} className="animate-float">
+    <g transform="translate(50,50)">
+      <ellipse cx="0" cy="-22" rx="12" ry="19" fill="#E6B8C3" opacity="0.85"/>
+      <ellipse cx="0" cy="-22" rx="12" ry="19" fill="#D4A5A5" opacity="0.85" transform="rotate(72)"/>
+      <ellipse cx="0" cy="-22" rx="12" ry="19" fill="#C9C1DC" opacity="0.85" transform="rotate(144)"/>
+      <ellipse cx="0" cy="-22" rx="12" ry="19" fill="#E6B8C3" opacity="0.85" transform="rotate(216)"/>
+      <ellipse cx="0" cy="-22" rx="12" ry="19" fill="#B8A9C9" opacity="0.85" transform="rotate(288)"/>
+      <circle cx="0" cy="0" r="8" fill="#D4A5A5"/>
+    </g>
+    <line x1="50" y1="58" x2="50" y2="85" stroke="#8FA88C" strokeWidth="3" strokeLinecap="round"/>
+    <ellipse cx="42" cy="72" rx="8" ry="4" fill="#8FA88C" opacity="0.6" transform="rotate(-30, 42, 72)"/>
+  </svg>
+)
+
 const getIcon = (id) => {
   switch (id) {
     case 'epub': return <BookIcon />
@@ -235,38 +226,89 @@ const getIcon = (id) => {
   }
 }
 
+// ── Tool Card ──────────────────────────────────────
+
+function ToolCard({ tool, index }) {
+  const CardTag = tool.external ? 'a' : Link
+  const cardProps = tool.external ? { href: tool.path } : { to: tool.path }
+
+  return (
+    <CardTag
+      {...cardProps}
+      className="tool-card group relative flex flex-col p-7 rounded-3xl overflow-hidden animate-fadeInUp"
+      style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
+        boxShadow: 'var(--shadow)',
+        animationDelay: `${index * 0.08}s`,
+        textDecoration: 'none',
+        color: 'inherit',
+      }}
+    >
+      {/* Top accent bar — always visible */}
+      <div
+        className="top-bar absolute top-0 left-0 right-0 h-[3px] rounded-t-3xl transition-opacity duration-300"
+        style={{ background: accentGradients[tool.color], opacity: 0.5 }}
+      />
+
+      {/* Icon */}
+      <div
+        className="tool-icon w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-transform duration-500"
+        style={{ background: iconBgs[tool.color], color: iconColors[tool.color] }}
+      >
+        {getIcon(tool.id)}
+      </div>
+
+      {/* Content */}
+      <h3 className="font-serif text-lg font-semibold mb-2 tracking-wide">{tool.name}</h3>
+      <p
+        className="font-serif text-sm leading-relaxed flex-1"
+        style={{ color: 'var(--text-secondary)' }}
+      >
+        {tool.description}
+      </p>
+
+      {/* Arrow */}
+      <div
+        className="card-arrow absolute bottom-6 right-6 w-9 h-9 rounded-full flex items-center justify-center"
+        style={{ background: 'var(--bg-secondary)', color: 'var(--accent-primary)' }}
+      >
+        <ArrowIcon />
+      </div>
+    </CardTag>
+  )
+}
+
+// ── Home Page ──────────────────────────────────────
+
 export default function Home() {
   const { isDark } = useTheme()
-  
-  // 年份自動計算
+
   const startYear = 2026
   const currentYear = new Date().getFullYear()
   const yearDisplay = currentYear > startYear ? `${startYear}–${currentYear}` : `${startYear}`
 
   return (
-    <div 
+    <div
       className="min-h-screen py-12 px-6 transition-colors duration-500 relative"
-      style={{ 
-        background: 'var(--bg-primary)',
-        color: 'var(--text-primary)'
-      }}
+      style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
     >
       <div className="max-w-5xl mx-auto relative z-10">
         {/* Header */}
         <header className="flex justify-between items-center mb-16">
           <a href="https://lab.helloruru.com" className="flex items-center gap-4 group">
-            <div 
+            <div
               className="w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:rotate-[-15deg] group-hover:scale-110"
-              style={{ 
+              style={{
                 background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
-                boxShadow: '0 4px 20px rgba(212, 165, 165, 0.3)'
+                boxShadow: '0 4px 20px rgba(212, 165, 165, 0.3)',
               }}
             >
               <WrenchIcon />
             </div>
             <div>
               <div className="font-serif text-3xl font-semibold tracking-wide">Tools</div>
-              <div 
+              <div
                 className="text-xs font-medium tracking-widest uppercase mt-0.5"
                 style={{ color: 'var(--accent-primary)' }}
               >
@@ -278,168 +320,100 @@ export default function Home() {
         </header>
 
         {/* Hero */}
-        <section className="text-center mb-14">
+        <section className="text-center mb-16">
+          <div className="flex justify-center mb-4">
+            <BrandFlower size={40} />
+          </div>
           <h1 className="font-serif text-5xl md:text-6xl font-semibold tracking-wide mb-5">
-            <span 
-              className="text-gradient"
-              style={{ 
+            <span
+              style={{
                 background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 50%, var(--accent-tertiary) 100%)',
                 WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
+                WebkitTextFillColor: 'transparent',
               }}
             >
               Tools
             </span>
           </h1>
-          <p 
+          <p
             className="font-serif text-base leading-relaxed tracking-wide mb-5"
             style={{ color: 'var(--text-secondary)' }}
           >
-            簡單好用的線上小工具。<br/>全程本機處理，保護你的隱私。
+            簡單好用的線上小工具。<br />全程本機處理，保護你的隱私。
           </p>
-          <span 
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm"
-            style={{ 
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border)',
-              color: 'var(--text-muted)',
-              boxShadow: 'var(--shadow)'
-            }}
-          >
-            <ShieldIcon style={{ color: 'var(--accent-primary)' }} />
-            檔案不會上傳到任何伺服器
-          </span>
+          <div className="flex flex-wrap justify-center gap-3">
+            <span
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm"
+              style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border)',
+                color: 'var(--text-muted)',
+                boxShadow: 'var(--shadow)',
+              }}
+            >
+              <ShieldIcon style={{ color: 'var(--accent-primary)' }} />
+              檔案不會上傳到任何伺服器
+            </span>
+            <span
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium"
+              style={{
+                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                color: 'white',
+                boxShadow: '0 4px 16px rgba(212, 165, 165, 0.25)',
+              }}
+            >
+              {tools.length} 款免費工具
+            </span>
+          </div>
         </section>
 
-        {/* Tools Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {tools.map((tool, index) => {
-            const CardTag = tool.external ? 'a' : Link
-            const cardProps = tool.external ? { href: tool.path } : { to: tool.path }
-            return (
-            tool.ready ? (
-              <CardTag
-                key={tool.id}
-                {...cardProps}
-                className="group relative flex flex-col p-8 rounded-3xl transition-all duration-500 overflow-hidden animate-fadeInUp"
-                style={{ 
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border)',
-                  boxShadow: 'var(--shadow)',
-                  animationDelay: `${index * 0.1}s`
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-8px)'
-                  e.currentTarget.style.boxShadow = 'var(--shadow-hover)'
-                  e.currentTarget.querySelector('.top-bar').style.opacity = '1'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = 'var(--shadow)'
-                  e.currentTarget.querySelector('.top-bar').style.opacity = '0'
-                }}
-              >
-                {/* Top gradient bar */}
-                <div 
-                  className="top-bar absolute top-0 left-0 right-0 h-1 rounded-t-3xl transition-opacity duration-300"
-                  style={{ 
-                    background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-secondary))',
-                    opacity: 0
-                  }}
-                />
-                
-                {/* Icon */}
-                <div 
-                  className={`w-16 h-16 rounded-full flex items-center justify-center mb-5 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-[-5deg] icon-container ${tool.color}`}
-                  style={{ 
-                    color: tool.color === 'rose' ? 'var(--rose)' : 
-                           tool.color === 'lavender' ? 'var(--lavender)' : 'var(--sage)'
-                  }}
+        {/* Categorized Tool Grid */}
+        {categories.map((cat) => {
+          const catTools = tools.filter((t) => t.category === cat.id)
+          return (
+            <section key={cat.id} className="mb-12">
+              {/* Section Header */}
+              <div className="flex items-center gap-4 mb-6">
+                <h2
+                  className="font-serif text-lg font-semibold whitespace-nowrap"
+                  style={{ color: 'var(--accent-primary)' }}
                 >
-                  {getIcon(tool.id)}
-                </div>
-                
-                {/* Content */}
-                <h3 className="font-serif text-xl font-semibold mb-3 tracking-wide">{tool.name}</h3>
-                <p 
-                  className="font-serif text-sm leading-relaxed flex-1"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
-                  {tool.description}
-                </p>
-                
-                {/* Arrow */}
-                <div
-                  className="absolute bottom-7 right-7 w-10 h-10 rounded-full flex items-center justify-center opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0"
-                  style={{
-                    background: 'var(--bg-secondary)',
-                    color: 'var(--accent-primary)'
-                  }}
-                >
-                  <ArrowIcon />
-                </div>
-              </CardTag>
-            ) : (
-              <div
-                key={tool.id}
-                className="relative flex flex-col p-8 rounded-3xl opacity-60 animate-fadeInUp"
-                style={{ 
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border)',
-                  animationDelay: `${index * 0.1}s`
-                }}
-              >
-                {/* Icon */}
-                <div 
-                  className={`w-16 h-16 rounded-full flex items-center justify-center mb-5 icon-container ${tool.color}`}
-                  style={{ 
-                    color: tool.color === 'sage' ? 'var(--sage)' : 'var(--accent-primary)'
-                  }}
-                >
-                  {getIcon(tool.id)}
-                </div>
-                
-                {/* Content */}
-                <h3 className="font-serif text-xl font-semibold mb-3 tracking-wide">{tool.name}</h3>
-                <p 
-                  className="font-serif text-sm leading-relaxed flex-1"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
-                  {tool.description}
-                </p>
-                
-                {/* Coming soon badge */}
+                  {cat.label}
+                </h2>
+                <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
                 <span
-                  className="inline-flex items-center gap-1.5 mt-4 text-xs"
+                  className="hidden sm:inline text-xs whitespace-nowrap"
                   style={{ color: 'var(--text-muted)' }}
                 >
-                  <ClockIcon />
-                  即將推出
+                  {cat.desc}
                 </span>
               </div>
-            )
-          )})}
 
-        </div>
+              {/* Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {catTools.map((tool, i) => (
+                  <ToolCard key={tool.id} tool={tool} index={i} />
+                ))}
+              </div>
+            </section>
+          )
+        })}
 
         {/* Footer */}
-        <footer 
+        <footer
           className="mt-10 pt-12 text-center"
           style={{ borderTop: '1px solid var(--border)' }}
         >
-          <p 
+          <p
             className="font-serif text-sm flex items-center justify-center gap-2 mb-4"
             style={{ color: 'var(--text-secondary)' }}
           >
             <ShieldIcon style={{ color: 'var(--accent-primary)' }} />
             所有檔案處理皆在瀏覽器本機完成
           </p>
-          <p 
-            className="font-serif text-sm"
-            style={{ color: 'var(--text-muted)' }}
-          >
-            © {yearDisplay} Kaoru Tsai. All Rights Reserved. |{' '}
-            <a 
+          <p className="font-serif text-sm" style={{ color: 'var(--text-muted)' }}>
+            &copy; {yearDisplay} Kaoru Tsai. All Rights Reserved. |{' '}
+            <a
               href="mailto:hello@helloruru.com"
               className="transition-colors hover:opacity-80"
               style={{ color: 'var(--accent-primary)' }}
@@ -448,29 +422,26 @@ export default function Home() {
             </a>
           </p>
           <div className="flex justify-center gap-8 mt-5">
-            <a 
-              href="https://lab.helloruru.com" 
+            <a
+              href="https://lab.helloruru.com"
               className="flex items-center gap-1.5 text-sm transition-colors hover:opacity-80"
               style={{ color: 'var(--text-secondary)' }}
             >
-              <LabIcon />
-              Lab
+              <LabIcon /> Lab
             </a>
-            <a 
-              href="https://helloruru.com" 
+            <a
+              href="https://helloruru.com"
               className="flex items-center gap-1.5 text-sm transition-colors hover:opacity-80"
               style={{ color: 'var(--text-secondary)' }}
             >
-              <GlobeIcon />
-              HelloRuru
+              <GlobeIcon /> HelloRuru
             </a>
-            <a 
-              href="https://github.com/HelloRuru" 
+            <a
+              href="https://github.com/HelloRuru"
               className="flex items-center gap-1.5 text-sm transition-colors hover:opacity-80"
               style={{ color: 'var(--text-secondary)' }}
             >
-              <GitHubIcon />
-              GitHub
+              <GitHubIcon /> GitHub
             </a>
           </div>
         </footer>
