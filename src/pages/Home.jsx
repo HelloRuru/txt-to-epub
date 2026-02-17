@@ -44,6 +44,51 @@ const tools = [
     color: 'rose',
     external: true,
   },
+  {
+    id: 'hihi',
+    name: '問安圖產生器',
+    description: '早安圖、午安圖、晚安圖線上製作。7 種字體、配件貼紙，3 步驟免費下載。',
+    path: '/hihi/',
+    ready: true,
+    color: 'sage',
+    external: true,
+  },
+  {
+    id: 'find-color',
+    name: '2026 數位色票庫',
+    description: '收錄 Pantone 2026 與 8 大設計美學圈流行色，設計師必備色彩靈感工具。',
+    path: '/find-color/',
+    ready: true,
+    color: 'lavender',
+    external: true,
+  },
+  {
+    id: 'reader-quiz',
+    name: '電子書閱讀器測驗',
+    description: '8 題精準推薦最適合你的電子書閱讀器，涵蓋 34 款機型比較。',
+    path: '/reader-quiz/',
+    ready: true,
+    color: 'rose',
+    external: true,
+  },
+  {
+    id: 'cosmetics',
+    name: '色號試色搜尋',
+    description: '美妝色號搜尋引擎，快速找到試色文章與真人試色照片。',
+    path: '/cosmetics-for-you/',
+    ready: true,
+    color: 'rose',
+    external: true,
+  },
+  {
+    id: 'spell',
+    name: 'SD 咒語產生器',
+    description: 'Stable Diffusion 提示詞快速組合，中英對照，一鍵複製。',
+    path: '/spell/',
+    ready: true,
+    color: 'lavender',
+    external: true,
+  },
 ]
 
 // SVG Icons
@@ -142,6 +187,38 @@ const PdfEditIcon = () => (
   </svg>
 )
 
+const SunIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <circle cx="12" cy="12" r="5"/>
+    <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+    <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+)
+
+const PaletteIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <circle cx="13.5" cy="6.5" r="0.5" fill="currentColor"/><circle cx="17.5" cy="10.5" r="0.5" fill="currentColor"/>
+    <circle cx="8.5" cy="7.5" r="0.5" fill="currentColor"/><circle cx="6.5" cy="12" r="0.5" fill="currentColor"/>
+    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+  </svg>
+)
+
+const SparklesIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z"/>
+    <path d="M18 14l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z"/>
+  </svg>
+)
+
+const BookOpenIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+  </svg>
+)
+
 const getIcon = (id) => {
   switch (id) {
     case 'epub': return <BookIcon />
@@ -149,6 +226,11 @@ const getIcon = (id) => {
     case 'bg-removal': return <ScissorsIcon />
     case 'post-writer': return <PostWriterIcon />
     case 'pdf-editor': return <PdfEditIcon />
+    case 'hihi': return <SunIcon />
+    case 'find-color': return <PaletteIcon />
+    case 'reader-quiz': return <BookOpenIcon />
+    case 'cosmetics': return <PaletteIcon />
+    case 'spell': return <SparklesIcon />
     default: return <BookIcon />
   }
 }
