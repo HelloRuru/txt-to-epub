@@ -1,4 +1,4 @@
-/* HelloRuru Design System v1.6 */
+/* HelloRuru Design System v1.8 */
 
 @tailwind base;
 @tailwind components;
@@ -106,7 +106,7 @@ body::before {
 
 /* Typography */
 .font-serif {
-  font-family: 'GenWanMin', serif;
+  font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
 }
 
 .text-gradient {

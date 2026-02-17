@@ -1,8 +1,9 @@
-# HelloRuru Design System v1.0
+# HelloRuru Design System v1.8
 
 ## 概述
 
 此為 HelloRuru 品牌的統一設計規範，適用於所有子網站與工具頁面。
+完整規範見 `d:\RURU-ALL\HelloRuru-Website\DESIGN-SYSTEM-v1.8.md`。
 
 ---
 
@@ -58,56 +59,45 @@
 
 ## 字體系統
 
-### 字體家族
+### 字體家族（v1.8 統一）
 
-| 用途 | 字體 | 備援 |
-|------|------|------|
-| 標題 | GenWanMin（源雲明體） | serif |
-| 內文 | GenWanMin（源雲明體） | serif |
-| UI/標籤 | Noto Sans TC | sans-serif |
+| 用途 | 字體 | 字重 | 備援 |
+|------|------|------|------|
+| 全站 | GenSenRounded（源泉圓體） | 400/500/700 | Noto Sans TC, sans-serif |
 
 ### 字體引入
 
 ```css
-/* 源雲明體 Web Font */
+/* 源泉圓體 GenSenRounded TW（OFL 商用免費） */
 @font-face {
-    font-family: 'GenWanMin';
-    src: url('https://cdn.jsdelivr.net/gh/nickhsine/genwan-font@master/webfont/GenWanMin2-L.woff2') format('woff2');
-    font-weight: 300;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'GenWanMin';
-    src: url('https://cdn.jsdelivr.net/gh/nickhsine/genwan-font@master/webfont/GenWanMin2-R.woff2') format('woff2');
+    font-family: 'GenSenRounded';
+    src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2');
     font-weight: 400;
     font-display: swap;
 }
-
 @font-face {
-    font-family: 'GenWanMin';
-    src: url('https://cdn.jsdelivr.net/gh/nickhsine/genwan-font@master/webfont/GenWanMin2-M.woff2') format('woff2');
+    font-family: 'GenSenRounded';
+    src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2');
     font-weight: 500;
     font-display: swap;
 }
-
 @font-face {
-    font-family: 'GenWanMin';
-    src: url('https://cdn.jsdelivr.net/gh/nickhsine/genwan-font@master/webfont/GenWanMin2-SB.woff2') format('woff2');
-    font-weight: 600;
+    font-family: 'GenSenRounded';
+    src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2');
+    font-weight: 700;
     font-display: swap;
 }
 ```
 
 ### 字級規範
 
-| 層級 | 字體 | 字重 | 大小 | 行高 |
-|------|------|------|------|------|
-| H1 | GenWanMin | 600 | clamp(48px, 10vw, 88px) | 1.1 |
-| H2 | GenWanMin | 600 | 22-26px | 1.3 |
-| H3 | GenWanMin | 500 | 18-20px | 1.4 |
-| 內文 | GenWanMin | 400 | 14-16px | 1.9 |
-| 標籤/UI | Noto Sans TC | 500 | 11-14px | 1.5 |
+| 層級 | 字重 | 大小 | 行高 |
+|------|------|------|------|
+| H1 | 700 | clamp(48px, 10vw, 88px) | 1.1 |
+| H2 | 700 | 22-26px | 1.3 |
+| H3 | 500 | 18-20px | 1.4 |
+| 內文 | 500 | 14-16px | 1.9 |
+| 標籤/UI | 400 | 11-14px | 1.5 |
 
 ---
 
@@ -331,11 +321,10 @@ transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 複製以下指令讓任何 AI 遵循此設計系統：
 
 ```
-請依照 HelloRuru Design System 設計：
+請依照 HelloRuru Design System v1.8 設計：
 - 色系：乾燥玫瑰 #D4A5A5 + 薰衣草 #B8A9C9 漸層
-- 字體：標題用源雲明體（GenWanMin）SemiBold，內文用 Regular
-- UI文字：Noto Sans TC
-- Icon：SVG 線條風格，禁止 Emoji
+- 字體：全站使用源泉圓體（GenSenRounded），400/500/700 三種字重
+- Icon：SVG 線條風格（Lucide），禁止 Emoji
 - 卡片：圓角 24px，hover 上移 8px + 頂部漸層邊條
 - 支援深淺模式切換
 - 圓形元素為主（Icon 容器、按鈕膠囊形）
@@ -356,3 +345,4 @@ transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 |------|------|------|
 | 1.0 | 2026-01-29 | 初版建立 |
 | 1.1 | 2026-01-30 | 同步 Google Doc 完整內容 |
+| 1.8 | 2026-02-17 | 字體統一為 GenSenRounded，移除 GenWanMin/Huninn |

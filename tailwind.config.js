@@ -29,9 +29,7 @@ export default {
         }
       },
       fontFamily: {
-        // jf 粉圓為主字體
-        sans: ['Huninn', 'jf-openhuninn', '"Noto Sans TC"', 'sans-serif'],
-        display: ['Huninn', 'jf-openhuninn', 'sans-serif'],
+        sans: ['GenSenRounded', '"Noto Sans TC"', 'sans-serif'],
       },
       borderRadius: {
         'xl': '1rem',
