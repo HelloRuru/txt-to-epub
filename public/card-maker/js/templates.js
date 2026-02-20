@@ -14,9 +14,9 @@ const TEMPLATES = {
   'tool-intro': {
     name: '工具介紹',
     fields: [
-      { id: 'pill',     label: '類別標籤',   placeholder: 'AI 生財工具 #1',              maxLength: 24 },
-      { id: 'title',    label: '工具名稱',   placeholder: 'Typeless',                    maxLength: 30 },
-      { id: 'subtitle', label: '一句話說明',  placeholder: '語音轉文字，支援所有 App',     maxLength: 60 },
+      { id: 'pill',     label: '類別標籤',   placeholder: '例：好用工具推薦',             maxLength: 24 },
+      { id: 'title',    label: '工具名稱',   placeholder: '輸入工具名稱',                 maxLength: 30 },
+      { id: 'subtitle', label: '一句話說明',  placeholder: '用一句話介紹這個工具',          maxLength: 60 },
     ],
     hasImage: true,
     render(data, theme, size, imageUrl, texture) {
@@ -40,7 +40,7 @@ const TEMPLATES = {
     name: '金句卡',
     fields: [
       { id: 'quote',  label: '金句',   placeholder: '最好的時間就是現在',  type: 'textarea', maxLength: 120 },
-      { id: 'author', label: '出處',   placeholder: '— 一行禪師',         maxLength: 40 },
+      { id: 'author', label: '出處',   placeholder: '— 出處或作者名',      maxLength: 40 },
     ],
     hasImage: false,
     render(data, theme, size, imageUrl, texture) {
