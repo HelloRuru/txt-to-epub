@@ -101,7 +101,7 @@
 
     fieldsContainer.innerHTML = tmpl.fields.map(f => {
       const tag = f.type === 'textarea'
-        ? `<textarea id="field-${f.id}" placeholder="${f.placeholder || ''}" maxlength="${f.maxLength || 200}" rows="3"></textarea>`
+        ? `<textarea id="field-${f.id}" placeholder="${f.placeholder || ''}" maxlength="${f.maxLength || 200}" rows="2"></textarea>`
         : `<input type="text" id="field-${f.id}" placeholder="${f.placeholder || ''}" maxlength="${f.maxLength || 100}">`;
 
       return `<div class="field-group">
