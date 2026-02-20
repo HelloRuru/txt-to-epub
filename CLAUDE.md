@@ -1,8 +1,8 @@
-# CLAUDE.md — HelloRuru 全域專案指引
+# CLAUDE.md — tools.helloruru.com
 
-> Claude Code / Happy Coder 進入任何 HelloRuru repo 時自動讀取此檔案。
-> 部署位置：`~/CLAUDE.md`（所有 repo 的共同上層）
-> 最後更新：2026-02-07
+@AGENTS.md
+
+> 最後更新：2026-02-20
 
 ---
 
