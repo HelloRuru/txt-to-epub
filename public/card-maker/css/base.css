@@ -1,0 +1,90 @@
+/* ─── Card Maker — DS v1.8 Base ─── */
+
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+
+:root {
+  /* DS v1.8 Colors */
+  --color-rose: #D4A5A5;
+  --color-lavender: #B8A9C9;
+  --color-blush: #F5D0C5;
+  --color-grey-rose: #C9929A;
+  --color-nadeshiko: #E8B4B8;
+  --color-sakura: #FEDFE1;
+  --color-wisteria: #C4B7D7;
+  --color-bellflower: #8F77B5;
+  --color-sage: #A8B5A0;
+  --color-mist: #E8E4E1;
+  --color-warm-grey: #B5ADA7;
+  --color-charcoal: #5C5856;
+  --color-ink: #333333;
+  --color-body: #4A4A4A;
+  --color-muted: #888888;
+  --color-light: #AAAAAA;
+  --color-bg: #FAFAFA;
+  --color-card: #FFFFFF;
+
+  /* Fonts */
+  --font-main: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+
+  /* Sizes */
+  --text-h1: 2.5rem;
+  --text-h2: 1.75rem;
+  --text-h3: 1.25rem;
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+  --text-caption: 0.75rem;
+
+  /* Weights */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 24px;
+  --radius-full: 50%;
+
+  /* Shadows */
+  --shadow-soft: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+
+  /* Gradients */
+  --gradient-main: linear-gradient(135deg, #D4A5A5, #B8A9C9);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --text-h1: 1.875rem;
+    --text-h2: 1.5rem;
+    --text-h3: 1.125rem;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-main);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  background: var(--color-bg);
+  color: var(--color-body);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}

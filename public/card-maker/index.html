@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+  <title>Card Maker 卡片製造機｜紙紋理社群貼文圖片產生器，和紙、水彩紙、牛皮紙質感一鍵下載 | Hello Ruru Tools</title>
+  <meta name="description" content="免費社群貼文圖片產生器，4 款質感模板 + 6 種紙紋理背景（和紙、水彩紙、牛皮紙、亞麻紙、撕紙效果）+ IG/FB 多尺寸切換，填文字、選配色、貼截圖，一鍵下載 PNG。">
+  <meta name="keywords" content="社群圖片產生器,IG貼文模板,紙紋理,和紙背景,社群卡片製作,貼文圖片工具,免費設計工具,社群素材,card maker">
+  <link rel="canonical" href="https://tools.helloruru.com/card-maker/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Card Maker 卡片製造機｜紙紋理社群貼文圖片產生器">
+  <meta property="og:description" content="4 款模板 + 6 種紙紋理（和紙、水彩紙、牛皮紙）+ IG/FB 多尺寸，一鍵下載 PNG。">
+  <meta property="og:url" content="https://tools.helloruru.com/card-maker/">
+  <meta property="og:site_name" content="Hello Ruru Tools">
+  <meta property="og:locale" content="zh_TW">
+  <meta property="og:image" content="https://tools.helloruru.com/card-maker/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Card Maker 卡片製造機 — 社群貼文圖片產生器">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Card Maker 卡片製造機｜紙紋理社群貼文圖片產生器">
+  <meta name="twitter:description" content="4 款模板 + 6 種紙紋理（和紙、水彩紙、牛皮紙）+ IG/FB 多尺寸，一鍵下載 PNG。">
+  <meta name="twitter:image" content="https://tools.helloruru.com/card-maker/og-image.png">
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Card Maker 卡片製造機",
+    "alternateName": ["社群卡片產生器", "貼文圖片製作工具"],
+    "description": "免費社群貼文圖片產生器，4 款質感模板 + 6 種紙紋理背景（和紙、水彩紙、牛皮紙、亞麻紙、撕紙），支援 IG 貼文、IG 限動、FB 貼文等多種尺寸，一鍵下載 PNG。",
+    "url": "https://tools.helloruru.com/card-maker/",
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" },
+    "featureList": [
+      "4 款質感社群卡片模板",
+      "6 種紙紋理背景（和紙、水彩紙、牛皮紙、亞麻紙、撕紙效果）",
+      "IG 貼文 1080x1080、IG 限動 1080x1920、FB 貼文 1200x630",
+      "即時預覽 + 文字即時更新",
+      "5 組品牌配色主題",
+      "圖片上傳（拖放或點選）",
+      "一鍵下載 PNG 圖片"
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "Kaoru Tsai",
+      "url": "https://lab.helloruru.com"
+    }
+  }
+  </script>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://lab.helloruru.com" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2" crossorigin>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+</head>
+<body>
+  <!-- Brand Header -->
+  <script src="https://lab.helloruru.com/shared/brand-header.js"></script>
+  <hello-ruru-header title="Card Maker"></hello-ruru-header>
+
+  <main class="app">
+    <div class="app-layout">
+
+      <!-- Left Panel: Controls -->
+      <aside class="controls-panel">
+        <h2 class="panel-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          卡片設定
+        </h2>
+
+        <!-- Template Selector -->
+        <section class="control-section">
+          <label class="control-label">模板</label>
+          <div class="template-grid" id="templateGrid">
+            <button class="template-btn active" data-template="tool-intro">
+              <span class="template-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              </span>
+              <span>工具介紹</span>
+            </button>
+            <button class="template-btn" data-template="quote">
+              <span class="template-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3z"/></svg>
+              </span>
+              <span>金句卡</span>
+            </button>
+            <button class="template-btn" data-template="list">
+              <span class="template-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </span>
+              <span>重點清單</span>
+            </button>
+            <button class="template-btn" data-template="text">
+              <span class="template-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+              </span>
+              <span>文字卡</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Size Selector -->
+        <section class="control-section">
+          <label class="control-label">尺寸</label>
+          <div class="size-pills" id="sizePills">
+            <button class="size-pill active" data-size="square">正方形 1:1</button>
+            <button class="size-pill" data-size="story">直式 9:16</button>
+            <button class="size-pill" data-size="wide">橫式 16:9</button>
+          </div>
+          <span class="size-hint" id="sizeHint">1080 x 1080 px</span>
+        </section>
+
+        <!-- Theme Selector -->
+        <section class="control-section">
+          <label class="control-label">配色</label>
+          <div class="theme-grid" id="themeGrid">
+            <button class="theme-dot active" data-theme="rose" title="乾燥玫瑰" style="background: linear-gradient(135deg, #D4A5A5, #E8B4B8)"></button>
+            <button class="theme-dot" data-theme="lavender" title="薰衣草紫" style="background: linear-gradient(135deg, #B8A9C9, #C4B7D7)"></button>
+            <button class="theme-dot" data-theme="sage" title="鼠尾草綠" style="background: linear-gradient(135deg, #A8B5A0, #C5D1BC)"></button>
+            <button class="theme-dot" data-theme="warm" title="暖杏色" style="background: linear-gradient(135deg, #F5D0C5, #E8D5C4)"></button>
+            <button class="theme-dot" data-theme="cool" title="淡藍灰" style="background: linear-gradient(135deg, #B8C5D6, #C8D0DC)"></button>
+          </div>
+        </section>
+
+        <!-- Texture Selector -->
+        <section class="control-section">
+          <label class="control-label">紙質</label>
+          <div class="texture-grid" id="textureGrid">
+            <button class="texture-btn active" data-texture="none" title="無紋理">
+              <span class="texture-preview texture-preview--none"></span>
+              <span>無紋理</span>
+            </button>
+            <button class="texture-btn" data-texture="washi" title="和紙">
+              <span class="texture-preview texture-preview--washi"></span>
+              <span>和紙</span>
+            </button>
+            <button class="texture-btn" data-texture="watercolor" title="水彩紙">
+              <span class="texture-preview texture-preview--watercolor"></span>
+              <span>水彩紙</span>
+            </button>
+            <button class="texture-btn" data-texture="kraft" title="牛皮紙">
+              <span class="texture-preview texture-preview--kraft"></span>
+              <span>牛皮紙</span>
+            </button>
+            <button class="texture-btn" data-texture="linen" title="亞麻紙">
+              <span class="texture-preview texture-preview--linen"></span>
+              <span>亞麻紙</span>
+            </button>
+            <button class="texture-btn" data-texture="torn" title="撕紙">
+              <span class="texture-preview texture-preview--torn"></span>
+              <span>撕紙</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Dynamic Fields (changes per template) -->
+        <section class="control-section" id="fieldsContainer">
+          <!-- Fields injected by JS based on template -->
+        </section>
+
+        <!-- Image Upload (for tool-intro template) -->
+        <section class="control-section" id="imageUploadSection">
+          <label class="control-label">截圖上傳</label>
+          <div class="upload-area" id="uploadArea">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            <p>拖放圖片或點選上傳</p>
+            <input type="file" id="imageInput" accept="image/*" hidden>
+          </div>
+          <button class="btn-clear-image" id="clearImageBtn" style="display:none">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            移除圖片
+          </button>
+        </section>
+
+        <!-- Watermark Toggle -->
+        <section class="control-section">
+          <label class="control-label toggle-label">
+            <span>品牌浮水印</span>
+            <input type="checkbox" id="watermarkToggle" checked>
+            <span class="toggle-switch"></span>
+          </label>
+        </section>
+      </aside>
+
+      <!-- Right Panel: Preview + Export -->
+      <div class="preview-panel">
+        <div class="preview-wrapper" id="previewWrapper">
+          <div class="preview-canvas" id="previewCanvas">
+            <!-- Template content rendered here -->
+          </div>
+        </div>
+
+        <div class="export-bar">
+          <button class="btn-export" id="exportBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            下載 PNG
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Kaoru Tsai. All Rights Reserved. | Contact: <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- App Scripts -->
+  <script src="js/templates.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

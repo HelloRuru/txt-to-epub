@@ -6,7 +6,7 @@ import { useTheme } from '../contexts/ThemeContext'
 
 const categories = [
   { id: 'text', label: '文字 & 轉檔', desc: '小說轉檔 · 社群排版 · AI 提示詞' },
-  { id: 'media', label: '圖片 & 設計', desc: '去背 · PDF · 問安圖 · 色票' },
+  { id: 'media', label: '圖片 & 設計', desc: '去背 · PDF · 卡片製造機 · 問安圖 · 色票' },
   { id: 'discover', label: '查詢 & 測驗', desc: '閱讀器推薦 · 美妝色號' },
 ]
 
@@ -47,6 +47,11 @@ const tools = [
     id: 'hihi', name: '問安圖產生器', category: 'media',
     description: '早安圖、午安圖、晚安圖線上製作。7 種字體、配件貼紙，3 步驟免費下載。',
     path: '/hihi/', color: 'sage', external: true,
+  },
+  {
+    id: 'card-maker', name: 'Card Maker 卡片製造機', category: 'media',
+    description: '社群貼文圖片產生器，4 款質感模板 + IG/FB 多尺寸切換，填文字選配色一鍵下載 PNG。',
+    path: '/card-maker/', color: 'rose', external: true,
   },
   {
     id: 'find-color', name: '2026 數位色票庫', category: 'media',
@@ -144,6 +149,13 @@ const PaletteIcon = () => (
   </svg>
 )
 
+const CardMakerIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <rect x="3" y="3" width="18" height="18" rx="2"/>
+    <path d="M3 9h18"/><path d="M9 21V9"/>
+  </svg>
+)
+
 const SparklesIcon = () => (
   <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
     <path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z"/>
@@ -221,6 +233,7 @@ const getIcon = (id) => {
     case 'find-color': return <PaletteIcon />
     case 'reader-quiz': return <BookOpenIcon />
     case 'cosmetics': return <PaletteIcon />
+    case 'card-maker': return <CardMakerIcon />
     case 'spell': return <SparklesIcon />
     default: return <BookIcon />
   }

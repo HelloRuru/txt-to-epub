@@ -73,6 +73,13 @@ export const routes = [
             {
               '@type': 'ListItem',
               position: 5,
+              name: 'Card Maker 卡片製造機',
+              description: '免費社群貼文圖片產生器，4 款質感模板，支援 IG 貼文、IG 限動、FB 貼文等多種尺寸，一鍵下載 PNG。',
+              url: `${BASE}/card-maker/`,
+            },
+            {
+              '@type': 'ListItem',
+              position: 6,
               name: 'PDF 編輯工具',
               description: '免費線上 PDF 編輯工具：手寫簽名、打字簽名、圖片簽名、文字覆蓋。支援多頁 PDF 瀏覽與編輯，全程瀏覽器本機處理，不上傳任何檔案。',
               url: `${BASE}/pdf-editor/`,
