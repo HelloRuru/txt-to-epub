@@ -20,6 +20,12 @@
 - 「真人手寫」→「HelloRuru 撰寫」
 - 「SEO」→「SGE」（Search Generative Experience）
 
+## Git 規則
+
+- **一律在 main 分支工作**，不要建立 claude/ 開頭的分支
+- commit 訊息用繁體中文，格式：`feat:` / `fix:` / `refactor:` / `docs:` + 說明
+- 完成後直接 push 到 main
+
 ## Design System v1.9
 
 ### 色彩
