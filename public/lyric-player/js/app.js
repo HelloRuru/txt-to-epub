@@ -591,32 +591,40 @@
    * 用 Whisper 辨識的時間戳 + 參考歌詞修正文字
    * Whisper 負責人聲時間偵測，參考歌詞負責修正錯字
    */
+  /** 兩字串的字元重疊比例（土法煉鋼 Ctrl+F 式比對） */
+  function charSimilarity(a, b) {
+    if (!a || !b) return 0;
+    var setA = new Set(a.replace(/\s/g, ''));
+    var setB = new Set(b.replace(/\s/g, ''));
+    if (!setA.size || !setB.size) return 0;
+    var overlap = 0;
+    setA.forEach(function (ch) { if (setB.has(ch)) overlap++; });
+    return overlap / Math.max(setA.size, setB.size);
+  }
+
   function replaceTextWithRef(lyrics, refLines) {
-    var N = lyrics.length;  /* Whisper 辨識出的行數 */
-    var M = refLines.length; /* 使用者提供的歌詞行數 */
+    /* 土法煉鋼：逐行找最像的參考歌詞替換，時間戳完全不動 */
+    var used = {};
 
-    if (M === N) {
-      /* 行數相同，直接 1-to-1 替換文字 */
-      return lyrics.map(function (line, i) {
-        return { time: line.time, text: refLines[i].trim() };
-      });
-    }
+    return lyrics.map(function (line) {
+      var bestIdx = -1;
+      var bestScore = 0;
 
-    /* 不論 M > N 或 M < N，永遠保留 N 個原始時間戳
-       把 M 行歌詞分配進 N 個桶，文字換行合併 */
-    var buckets = lyrics.map(function () { return []; });
+      for (var j = 0; j < refLines.length; j++) {
+        if (used[j]) continue;
+        var score = charSimilarity(line.text, refLines[j]);
+        if (score > bestScore) {
+          bestScore = score;
+          bestIdx = j;
+        }
+      }
 
-    for (var i = 0; i < M; i++) {
-      var idx = Math.round(i * (N - 1) / (M - 1 || 1));
-      idx = Math.min(idx, N - 1);
-      buckets[idx].push(refLines[i].trim());
-    }
-
-    return lyrics.map(function (line, i) {
-      var text = buckets[i].length > 0
-        ? buckets[i].join('\n')
-        : line.text; /* 沒分配到歌詞的保留原文 */
-      return { time: line.time, text: text };
+      /* 相似度 > 30% 才替換，否則保留原文 */
+      if (bestIdx >= 0 && bestScore > 0.3) {
+        used[bestIdx] = true;
+        return { time: line.time, text: refLines[bestIdx].trim() };
+      }
+      return { time: line.time, text: line.text };
     });
   }
 
