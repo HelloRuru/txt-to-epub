@@ -340,13 +340,15 @@
       fill.style.width = '50%';
 
       var lang = $('langSelect').value;
-      var result = await transcriber(audioData, {
+      var opts = {
         return_timestamps: true,
         chunk_length_s: 30,
         stride_length_s: 5,
-        language: lang,
         task: 'transcribe',
-      });
+      };
+      /* auto = 不指定語言，讓 Whisper 自己偵測 */
+      if (lang !== 'auto') { opts.language = lang; }
+      var result = await transcriber(audioData, opts);
 
       /* 4. Build lyrics — 保留 endTime 以便分配 */
       var chunks = [];
