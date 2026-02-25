@@ -6,7 +6,7 @@ import { useTheme } from '../contexts/ThemeContext'
 
 const categories = [
   { id: 'text', label: '文字 & 轉檔', desc: '小說轉檔 · 社群排版 · AI 提示詞' },
-  { id: 'media', label: '圖片 & 設計', desc: '去背 · PDF · 卡片製造機 · 問安圖 · 色票' },
+  { id: 'media', label: '圖片 & 多媒體', desc: '去背 · PDF · 卡片 · 問安圖 · 色票 · 歌詞播放器' },
   { id: 'discover', label: '查詢 & 測驗', desc: '閱讀器推薦 · 美妝色號' },
 ]
 
@@ -67,6 +67,11 @@ const tools = [
     id: 'cosmetics', name: '色號試色搜尋', category: 'discover',
     description: '美妝色號搜尋引擎，快速找到試色文章與真人試色照片。',
     path: '/cosmetics-for-you/', color: 'rose', external: true,
+  },
+  {
+    id: 'lyric-player', name: 'Lyric Player 歌詞播放器', category: 'media',
+    description: '上傳 MP3 即可 AI 辨識歌詞並同步播放。支援 LRC 上傳、歌詞編輯、時間微調、匯出下載，中英日韓多語言。',
+    path: '/lyric-player/', color: 'lavender', external: true,
   },
 ]
 
@@ -156,6 +161,13 @@ const CardMakerIcon = () => (
   </svg>
 )
 
+const MusicIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
+    <path d="M9 18V5l12-2v13"/>
+    <circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+  </svg>
+)
+
 const SparklesIcon = () => (
   <svg viewBox="0 0 24 24" className="w-7 h-7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor">
     <path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z"/>
@@ -235,6 +247,7 @@ const getIcon = (id) => {
     case 'cosmetics': return <PaletteIcon />
     case 'card-maker': return <CardMakerIcon />
     case 'spell': return <SparklesIcon />
+    case 'lyric-player': return <MusicIcon />
     default: return <BookIcon />
   }
 }

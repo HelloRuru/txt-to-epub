@@ -84,6 +84,13 @@ export const routes = [
               description: '免費線上 PDF 編輯工具：手寫簽名、打字簽名、圖片簽名、文字覆蓋。支援多頁 PDF 瀏覽與編輯，全程瀏覽器本機處理，不上傳任何檔案。',
               url: `${BASE}/pdf-editor/`,
             },
+            {
+              '@type': 'ListItem',
+              position: 7,
+              name: 'Lyric Player 歌詞播放器',
+              description: '免費線上歌詞播放器，上傳 MP3 即可 AI 自動辨識歌詞並同步播放。支援 LRC 上傳、歌詞編輯、時間微調、匯出下載，中英日韓多語言辨識。',
+              url: `${BASE}/lyric-player/`,
+            },
           ],
         },
       ],
