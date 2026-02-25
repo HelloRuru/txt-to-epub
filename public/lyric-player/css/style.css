@@ -2,8 +2,8 @@
 
 /* ── Score Theme Variables ── */
 :root {
-  --score-paper: #FAF8F5;
-  --score-paper-warm: #F5F2ED;
+  --score-paper: #F9F8F8;
+  --score-paper-warm: #F4F2F3;
   --score-card: #FFFFFF;
   --score-ink: #231F1E;
   --score-body: #4A4442;
@@ -13,7 +13,7 @@
   --score-staff-bold: rgba(100, 85, 78, 0.18);
   --score-accent: #7A3B4E;
   --score-rose: #9E5A6C;
-  --score-gold: #B08D57;
+  --score-gold: #B8A9C9;
   --score-border: rgba(100, 85, 78, 0.14);
   --score-shadow: 0 2px 12px rgba(40, 30, 35, 0.06);
   --score-shadow-md: 0 4px 20px rgba(40, 30, 35, 0.08);
@@ -30,7 +30,7 @@ html.dark {
   --score-staff-bold: rgba(200, 180, 175, 0.13);
   --score-accent: #C46B7C;
   --score-rose: #D48A98;
-  --score-gold: #D4AA6A;
+  --score-gold: #C8B9DB;
   --score-border: rgba(200, 180, 175, 0.10);
   --score-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
   --score-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.25);
