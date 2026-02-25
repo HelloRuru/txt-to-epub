@@ -280,15 +280,6 @@
      ══════════════════════════════════ */
   async function startRecognition() {
     if (state.isRecognizing || !state.audioFile) return;
-
-    /* 語言未選擇時提醒 */
-    var langVal = $('langSelect').value;
-    if (!langVal) {
-      showToast('請先選擇歌曲語言再辨識', 'error');
-      $('langSelect').focus();
-      return;
-    }
-
     state.isRecognizing = true;
 
     const prog = $('aiProgress');

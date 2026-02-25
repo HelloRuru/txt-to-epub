@@ -68,8 +68,8 @@
   <link rel="preload" as="font" type="font/woff2" href="https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2" crossorigin>
 
   <!-- Styles -->
-  <link rel="stylesheet" href="css/base.css?v=20260225r">
-  <link rel="stylesheet" href="css/style.css?v=20260225r">
+  <link rel="stylesheet" href="css/base.css?v=20260225s">
+  <link rel="stylesheet" href="css/style.css?v=20260225s">
 </head>
 <body>
   <!-- Brand Header -->
@@ -147,14 +147,13 @@
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
               AI 辨識歌詞
             </button>
-            <label class="lang-label" for="langSelect">* 請選語言</label>
-            <select class="lang-select" id="langSelect" title="選擇歌曲的主要語言（影響辨識準確度）">
-              <option value="" disabled selected>-- 請選擇 --</option>
-              <option value="chinese">中文</option>
+            <label class="lang-label" for="langSelect">請先選語言，避免選「自動」</label>
+            <select class="lang-select" id="langSelect" title="請優先選擇主要語言，自動偵測可能不準確">
+              <option value="chinese" selected>中文</option>
               <option value="english">英文</option>
               <option value="japanese">日文</option>
               <option value="korean">韓文</option>
-              <option value="auto">自動偵測（可能不準）</option>
+              <option value="auto">自動偵測（不建議）</option>
             </select>
           </div>
           <div class="action-bar">
@@ -279,6 +278,6 @@
   <button class="theme-toggle" id="themeToggle" title="切換深色模式"></button>
 
   <!-- App Script -->
-  <script src="js/app.js?v=20260225r"></script>
+  <script src="js/app.js?v=20260225s"></script>
 </body>
 </html>
