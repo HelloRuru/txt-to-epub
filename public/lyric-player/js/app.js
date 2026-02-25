@@ -351,6 +351,8 @@
       var chunks = [];
       var position = 0;
       var chunkIdx = 0;
+      var internalNearZero = 0;  /* Whisper 段內時間戳 < 1 秒的次數 */
+      var internalTotal = 0;
 
       while (position < audioData.length) {
         chunkIdx++;
@@ -368,6 +370,8 @@
         if (result && result.chunks && result.chunks.length) {
           result.chunks.forEach(function (c) {
             if (c.text && c.text.trim()) {
+              internalTotal++;
+              if ((c.timestamp[0] || 0) < 1.0) internalNearZero++;
               chunks.push({
                 time: +(((c.timestamp[0] || 0) + offsetSec).toFixed(2)),
                 endTime: +(((c.timestamp[1] || 0) + offsetSec).toFixed(2)),
@@ -389,43 +393,63 @@
       /* 4. 去除重疊區域產生的重複文字 */
       chunks = deduplicateOverlap(chunks);
 
-      /* 5. 時間戳品質檢查 — 仍可能有問題時自動修正 */
-      var tsReliable = checkTimestampQuality(chunks, audioDur);
-      if (!tsReliable && chunks.length > 1) {
-        chunks = redistributeChunks(chunks, audioDur);
-      }
+      /* 5. 時間戳品質檢查 — 含切塊內部品質 */
+      var internalReliable = internalTotal === 0 || (internalNearZero / internalTotal < 0.4);
+      var tsReliable = checkTimestampQuality(chunks, audioDur) && internalReliable;
 
-      /* 6. 清理重複 + 繁化姬轉正體 */
-      chunks = chunks.map(function (c) {
-        return { time: c.time, endTime: c.endTime, text: cleanRepeats(c.text) };
-      });
-
-      status.textContent = '轉換為正體中文...';
-      fill.style.width = '90%';
-
-      var allText = chunks.map(function (c) { return c.text; }).join('\n');
-      var tradText = await toTraditional(allText);
-      var tradLines = tradText.split('\n');
-
-      state.lyrics = chunks.map(function (c, i) {
-        return { time: c.time, text: tradLines[i] !== undefined ? tradLines[i] : c.text };
-      });
-
-      /* 7. 有參考歌詞：用 Whisper 時間戳 + 參考歌詞修正文字 */
-      if (refLines.length > 0 && state.lyrics.length > 0) {
-        state.lyrics = replaceTextWithRef(state.lyrics, refLines);
+      /* 5a. 時間戳不靠 + 有結構歌詞 → 段落感知分配（比 Whisper 準） */
+      if (!tsReliable && rawLines.length > 0 && hasStructureMarkers(rawLines)) {
+        status.textContent = '依歌詞段落結構分配時間...';
+        fill.style.width = '90%';
+        state.lyrics = structuredDistribute(rawLines, audioDur);
+        /* 繁化姬轉正體 */
+        var structText = state.lyrics.map(function (l) { return l.text; }).join('\n');
+        var structTrad = await toTraditional(structText);
+        var structTradLines = structTrad.split('\n');
+        state.lyrics = state.lyrics.map(function (l, i) {
+          return { time: l.time, text: structTradLines[i] !== undefined ? structTradLines[i] : l.text };
+        });
         fill.style.width = '100%';
-        status.textContent = '完成！AI 辨識 ' + state.lyrics.length + ' 段，已用參考歌詞修正文字';
-        showToast('AI 辨識人聲時間 + 參考歌詞修正文字');
-      } else if (refLines.length > 0 && state.lyrics.length === 0) {
-        state.lyrics = mapReferenceToTimestamps(refLines, chunks);
-        fill.style.width = '100%';
-        status.textContent = '未偵測到人聲，改用均勻分配，共 ' + state.lyrics.length + ' 行';
-        showToast('未偵測到人聲，已均勻分配歌詞');
+        status.textContent = '完成！依歌曲段落分配 ' + state.lyrics.length + ' 行歌詞';
+        showToast('已根據歌詞段落結構分配時間標記');
       } else {
-        fill.style.width = '100%';
-        status.textContent = '辨識完成！共 ' + state.lyrics.length + ' 行歌詞（已轉正體中文）';
-        showToast('歌詞辨識完成！已自動轉為正體中文');
+        /* 正常流程 */
+        if (!tsReliable && chunks.length > 1) {
+          chunks = redistributeChunks(chunks, audioDur);
+        }
+
+        /* 6. 清理重複 + 繁化姬轉正體 */
+        chunks = chunks.map(function (c) {
+          return { time: c.time, endTime: c.endTime, text: cleanRepeats(c.text) };
+        });
+
+        status.textContent = '轉換為正體中文...';
+        fill.style.width = '90%';
+
+        var allText = chunks.map(function (c) { return c.text; }).join('\n');
+        var tradText = await toTraditional(allText);
+        var tradLines = tradText.split('\n');
+
+        state.lyrics = chunks.map(function (c, i) {
+          return { time: c.time, text: tradLines[i] !== undefined ? tradLines[i] : c.text };
+        });
+
+        /* 7. 有參考歌詞：用 Whisper 時間戳 + 參考歌詞修正文字 */
+        if (refLines.length > 0 && state.lyrics.length > 0) {
+          state.lyrics = replaceTextWithRef(state.lyrics, refLines);
+          fill.style.width = '100%';
+          status.textContent = '完成！AI 辨識 ' + state.lyrics.length + ' 段，已用參考歌詞修正文字';
+          showToast('AI 辨識人聲時間 + 參考歌詞修正文字');
+        } else if (refLines.length > 0 && state.lyrics.length === 0) {
+          state.lyrics = mapReferenceToTimestamps(refLines, chunks);
+          fill.style.width = '100%';
+          status.textContent = '未偵測到人聲，改用均勻分配，共 ' + state.lyrics.length + ' 行';
+          showToast('未偵測到人聲，已均勻分配歌詞');
+        } else {
+          fill.style.width = '100%';
+          status.textContent = '辨識完成！共 ' + state.lyrics.length + ' 行歌詞（已轉正體中文）';
+          showToast('歌詞辨識完成！已自動轉為正體中文');
+        }
       }
 
       renderLyricsView();
@@ -666,6 +690,113 @@
       if (/^\(.+\)$/.test(t)) return false;
       return true;
     });
+  }
+
+  /* ══════════════════════════════════
+     Song Structure — 段落感知時間分配
+     ══════════════════════════════════ */
+
+  /** 檢查歌詞是否包含段落標記（至少 2 個才算有結構） */
+  function hasStructureMarkers(rawLines) {
+    var count = 0;
+    for (var i = 0; i < rawLines.length; i++) {
+      if (/^\[.+\]$/.test(rawLines[i].trim())) count++;
+    }
+    return count >= 2;
+  }
+
+  /** 解析歌詞段落結構 → [{ type, lines }] */
+  function parseSongStructure(rawLines) {
+    var sections = [];
+    var current = { type: 'verse', lines: [] };
+
+    for (var i = 0; i < rawLines.length; i++) {
+      var t = rawLines[i].trim();
+      if (!t) continue;
+
+      /* 段落標記 [Intro], [Verse 1] 等 */
+      if (/^\[.+\]$/.test(t)) {
+        if (current.lines.length > 0 || sections.length > 0) {
+          sections.push(current);
+        }
+        var tag = t.slice(1, -1).toLowerCase();
+        var type = 'verse';
+        if (/intro/.test(tag)) type = 'intro';
+        else if (/chorus|hook/.test(tag)) type = 'chorus';
+        else if (/bridge/.test(tag)) type = 'bridge';
+        else if (/outro/.test(tag)) type = 'outro';
+        else if (/instrumental|solo|interlude/.test(tag)) type = 'instrumental';
+        else if (/break/.test(tag)) type = 'break';
+        else if (/fade/.test(tag)) type = 'fade';
+        current = { type: type, lines: [] };
+        continue;
+      }
+
+      /* 演奏描述 (xxx) → 跳過 */
+      if (/^\(.+\)$/.test(t)) continue;
+
+      current.lines.push(t);
+    }
+    if (current.lines.length > 0 || sections.length > 0) {
+      sections.push(current);
+    }
+    return sections;
+  }
+
+  /**
+   * 段落感知時間分配 — 根據歌詞結構 + 音檔長度估算每行時間
+   * [Intro] → 前奏空白、[Break] → 短暫間隔、[Instrumental] → 長間奏
+   * 歌詞行依總行數均分剩餘唱歌時間
+   */
+  function structuredDistribute(rawLines, duration) {
+    var sections = parseSongStructure(rawLines);
+
+    /* 非歌詞段落的預估秒數 */
+    var gapEstimates = {
+      intro: Math.min(duration * 0.06, 12),
+      break: 3,
+      instrumental: Math.min(duration * 0.08, 18),
+      fade: Math.min(duration * 0.03, 5)
+    };
+
+    /* 第一輪：計算總間奏時間 + 歌詞行數 */
+    var totalGap = 0;
+    var totalLines = 0;
+    for (var i = 0; i < sections.length; i++) {
+      var s = sections[i];
+      if (s.lines.length === 0) {
+        totalGap += gapEstimates[s.type] || 3;
+      } else {
+        totalLines += s.lines.length;
+      }
+    }
+
+    /* 可用唱歌時間（至少佔歌曲 50%） */
+    var outroReserve = Math.min(duration * 0.02, 3);
+    var singTime = Math.max(duration - totalGap - outroReserve, duration * 0.5);
+    var timePerLine = totalLines > 0 ? singTime / totalLines : 3;
+
+    /* 第二輪：逐段分配 */
+    var result = [];
+    var currentTime = 0;
+
+    for (var i = 0; i < sections.length; i++) {
+      var s = sections[i];
+      if (s.lines.length === 0) {
+        /* 空段落（前奏/間奏/淡出）→ 跳過時間 */
+        currentTime += gapEstimates[s.type] || 3;
+      } else {
+        for (var j = 0; j < s.lines.length; j++) {
+          result.push({
+            time: +currentTime.toFixed(2),
+            text: s.lines[j]
+          });
+          currentTime += timePerLine;
+        }
+      }
+    }
+
+    return result;
   }
 
   /* ══════════════════════════════════
