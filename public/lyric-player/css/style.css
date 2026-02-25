@@ -2,9 +2,27 @@
 
 /* ── Layout ── */
 .app {
-  max-width: 720px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 24px 16px 48px;
+}
+
+/* Two-column grid */
+.player-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.controls-panel {
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.lyrics-panel {
+  min-height: 400px;
 }
 
 .app-title {
@@ -12,11 +30,16 @@
   margin-bottom: 32px;
 }
 .app-title h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   font-size: var(--text-h2);
   font-weight: var(--weight-bold);
   color: var(--color-ink);
   margin-bottom: 4px;
 }
+.title-icon { flex-shrink: 0; }
 .app-title p {
   font-size: var(--text-small);
   color: var(--color-muted);
@@ -343,6 +366,10 @@ html.dark .lang-select {
 html.dark .lyrics-scroll::-webkit-scrollbar-thumb { background: var(--dark-border); }
 
 .lyric-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
   padding: 10px 16px;
   font-size: 1.125rem;
   line-height: 1.8;
@@ -351,6 +378,20 @@ html.dark .lyrics-scroll::-webkit-scrollbar-thumb { background: var(--dark-borde
   cursor: pointer;
   transition: all 0.35s ease;
   border-radius: var(--radius-sm);
+}
+.lyric-time {
+  font-size: var(--text-caption);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-light);
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+.lyric-line:hover .lyric-time { opacity: 1; }
+.lyric-line.active .lyric-time {
+  color: var(--color-rose);
+  opacity: 0.8;
 }
 .lyric-line:hover {
   color: var(--color-body);
@@ -496,6 +537,170 @@ html.dark .toast { background: var(--dark-hover); }
 }
 html.dark .theme-toggle { background: var(--dark-card); }
 
+/* ── Preview Button (edit mode) ── */
+.btn-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-rose);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.btn-preview:hover {
+  background: rgba(212,165,165,0.12);
+  transform: scale(1.15);
+}
+
+/* ── Tap Mode Panel ── */
+.tap-panel {
+  background: var(--color-card);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--shadow-soft);
+}
+.tap-hint {
+  font-size: var(--text-small);
+  color: var(--color-muted);
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+.tap-hint kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: var(--text-caption);
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--color-mist);
+  border-radius: 4px;
+  color: var(--color-body);
+}
+html.dark .tap-hint kbd {
+  background: var(--dark-border);
+  color: var(--dark-body);
+}
+.tap-textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: var(--text-small);
+  font-family: var(--font-main);
+  font-weight: var(--weight-medium);
+  line-height: 1.8;
+  border: 1px solid var(--color-mist);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-body);
+  resize: vertical;
+  outline: none;
+}
+html.dark .tap-textarea {
+  border-color: var(--dark-border);
+  background: var(--dark-base);
+  color: var(--dark-body);
+}
+.tap-textarea:focus { border-color: var(--color-rose); }
+.tap-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.tap-status {
+  text-align: center;
+  margin-top: 12px;
+}
+.tap-status p {
+  font-size: var(--text-small);
+  color: var(--color-muted);
+}
+.tap-status kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: var(--text-caption);
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--color-mist);
+  border-radius: 4px;
+}
+html.dark .tap-status kbd { background: var(--dark-border); }
+.tap-progress {
+  font-size: var(--text-h3);
+  font-weight: var(--weight-bold);
+  color: var(--color-rose);
+  margin-top: 8px;
+}
+
+/* ── Export Preview Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+html.dark .modal-overlay { background: rgba(0,0,0,0.6); }
+.modal-card {
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-mist);
+}
+html.dark .modal-header { border-color: var(--dark-border); }
+.modal-header h3 {
+  font-size: var(--text-h3);
+  font-weight: var(--weight-bold);
+  color: var(--color-ink);
+}
+.btn-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+.btn-modal-close:hover { color: var(--color-rose); }
+.modal-preview {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  font-size: var(--text-small);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  line-height: 1.8;
+  color: var(--color-body);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--color-mist);
+}
+html.dark .modal-footer { border-color: var(--dark-border); }
+
 /* ── Footer ── */
 .site-footer {
   text-align: center;
@@ -509,6 +714,14 @@ html.dark .theme-toggle { background: var(--dark-card); }
 }
 
 /* ── Responsive ── */
+@media (max-width: 900px) {
+  .player-layout {
+    grid-template-columns: 1fr;
+  }
+  .controls-panel {
+    position: static;
+  }
+}
 @media (max-width: 768px) {
   .app { padding: 16px 12px 40px; }
   .player-controls { padding: 16px; }
@@ -521,4 +734,6 @@ html.dark .theme-toggle { background: var(--dark-card); }
   .btn-action { padding: 6px 12px; font-size: var(--text-caption); }
   .edit-row { flex-wrap: wrap; }
   .edit-time { width: 70px; }
+  .app-title h1 { font-size: var(--text-h3); }
+  .title-icon { width: 24px; height: 24px; }
 }

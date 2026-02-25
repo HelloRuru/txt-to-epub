@@ -243,7 +243,10 @@
     placeholder.style.display = 'none';
     scroll.style.display = '';
     scroll.innerHTML = state.lyrics.map((l, i) =>
-      '<div class="lyric-line" data-index="' + i + '">' + escapeHTML(l.text) + '</div>'
+      '<div class="lyric-line" data-index="' + i + '">' +
+        '<span class="lyric-time">' + formatTimeLRC(l.time) + '</span>' +
+        '<span class="lyric-text">' + escapeHTML(l.text) + '</span>' +
+      '</div>'
     ).join('');
 
     /* Click to seek */
@@ -267,7 +270,13 @@
     $('aiBtn').addEventListener('click', startRecognition);
     $('lrcInput').addEventListener('change', handleLrcUpload);
     $('editBtn').addEventListener('click', toggleEdit);
-    $('exportBtn').addEventListener('click', exportLRC);
+    $('exportBtn').addEventListener('click', showExportPreview);
+    $('tapBtn').addEventListener('click', openTapMode);
+    $('tapStartBtn').addEventListener('click', startTapMode);
+    $('tapCancelBtn').addEventListener('click', closeTapMode);
+    $('exportModalClose').addEventListener('click', closeExportModal);
+    $('exportCopyBtn').addEventListener('click', copyLRC);
+    $('exportConfirmBtn').addEventListener('click', downloadLRC);
   }
 
   /* ── AI Recognition ── */
@@ -340,17 +349,17 @@
         task: 'transcribe',
       });
 
-      /* 4. Convert to lyrics array */
+      /* 4. Convert to lyrics array + clean repeats */
       if (result && result.chunks && result.chunks.length) {
         state.lyrics = result.chunks
           .filter((c) => c.text && c.text.trim())
           .map((c) => ({
             time: c.timestamp[0] || 0,
-            text: c.text.trim()
+            text: cleanRepeats(c.text.trim())
           }));
       } else if (result && result.text) {
         /* Fallback: single block without timestamps */
-        state.lyrics = [{ time: 0, text: result.text.trim() }];
+        state.lyrics = [{ time: 0, text: cleanRepeats(result.text.trim()) }];
       }
 
       fill.style.width = '100%';
@@ -424,8 +433,11 @@
     scroll.style.display = 'none';
     edit.classList.add('visible');
 
+    const ICON_PLAY_SM = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5,3 19,12 5,21"/></svg>';
+
     let html = state.lyrics.map((l, i) =>
       '<div class="edit-row" data-index="' + i + '">' +
+        '<button class="btn-preview" title="從這裡播放">' + ICON_PLAY_SM + '</button>' +
         '<input type="text" class="edit-time" value="' + formatTimeLRC(l.time) + '" data-field="time">' +
         '<input type="text" class="edit-text" value="' + escapeAttr(l.text) + '" data-field="text">' +
         '<button class="btn-delete-row" title="刪除這行">' +
@@ -443,6 +455,18 @@
 
     edit.innerHTML = html;
 
+    /* Preview play */
+    edit.querySelectorAll('.btn-preview').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const row = btn.closest('.edit-row');
+        const timeStr = row.querySelector('[data-field="time"]').value.trim();
+        audio.currentTime = parseTimeLRC(timeStr);
+        audio.play();
+        state.isPlaying = true;
+        updatePlayIcon();
+      });
+    });
+
     /* Delete row */
     edit.querySelectorAll('.btn-delete-row').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -456,11 +480,16 @@
       const row = document.createElement('div');
       row.className = 'edit-row';
       row.innerHTML =
+        '<button class="btn-preview" title="從這裡播放">' + ICON_PLAY_SM + '</button>' +
         '<input type="text" class="edit-time" value="' + formatTimeLRC(lastTime) + '" data-field="time">' +
         '<input type="text" class="edit-text" value="" placeholder="輸入歌詞..." data-field="text">' +
         '<button class="btn-delete-row" title="刪除這行">' +
           '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
         '</button>';
+      row.querySelector('.btn-preview').addEventListener('click', () => {
+        audio.currentTime = parseTimeLRC(row.querySelector('[data-field="time"]').value.trim());
+        audio.play(); state.isPlaying = true; updatePlayIcon();
+      });
       row.querySelector('.btn-delete-row').addEventListener('click', () => row.remove());
       edit.querySelector('.edit-actions').insertAdjacentElement('beforebegin', row);
     });
@@ -479,24 +508,142 @@
     state.lyrics = newLyrics.sort((a, b) => a.time - b.time);
   }
 
-  /* ── Export LRC ── */
-  function exportLRC() {
-    if (!state.lyrics.length) return;
-
+  /* ── Export LRC (with preview) ── */
+  function buildLRC() {
     if (state.isEditing) saveEdits();
-
     const trackName = $('trackName').textContent || 'lyrics';
-    const lrcContent = '[ti:' + trackName + ']\n[by:Lyric Player]\n\n' +
+    return '[ti:' + trackName + ']\n[by:Lyric Player]\n\n' +
       state.lyrics.map((l) => '[' + formatTimeLRC(l.time) + ']' + l.text).join('\n');
+  }
 
-    const blob = new Blob([lrcContent], { type: 'text/plain;charset=utf-8' });
+  function showExportPreview() {
+    if (!state.lyrics.length) return;
+    $('exportPreviewText').textContent = buildLRC();
+    $('exportModal').style.display = '';
+  }
+
+  function closeExportModal() {
+    $('exportModal').style.display = 'none';
+  }
+
+  function copyLRC() {
+    navigator.clipboard.writeText(buildLRC()).then(() => showToast('已複製到剪貼簿'));
+  }
+
+  function downloadLRC() {
+    const trackName = $('trackName').textContent || 'lyrics';
+    const blob = new Blob([buildLRC()], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = trackName + '.lrc';
     a.click();
     URL.revokeObjectURL(url);
+    closeExportModal();
     showToast('LRC 已下載');
+  }
+
+  /* ── Tap Mode (inspired by lrc-maker) ── */
+  let tapLines = [];
+  let tapIndex = 0;
+  let tapActive = false;
+  let tapKeyHandler = null;
+
+  function openTapMode() {
+    $('tapPanel').style.display = '';
+    $('tapTextarea').value = '';
+    $('tapTextarea').focus();
+    $('tapStatus').style.display = 'none';
+  }
+
+  function closeTapMode() {
+    $('tapPanel').style.display = 'none';
+    stopTapMode();
+  }
+
+  function startTapMode() {
+    const text = $('tapTextarea').value.trim();
+    if (!text) { showToast('請先貼上歌詞文字', 'error'); return; }
+
+    tapLines = text.split('\n').filter((l) => l.trim());
+    tapIndex = 0;
+    tapActive = true;
+
+    /* Show status, hide textarea */
+    $('tapTextarea').style.display = 'none';
+    $('tapStartBtn').style.display = 'none';
+    $('tapStatus').style.display = '';
+    $('tapProgress').textContent = '0 / ' + tapLines.length;
+
+    /* Show lines in lyrics panel for visual feedback */
+    state.lyrics = tapLines.map((l) => ({ time: 0, text: l }));
+    renderLyricsView();
+
+    /* Start playback */
+    audio.currentTime = 0;
+    audio.play();
+    state.isPlaying = true;
+    updatePlayIcon();
+
+    /* Listen for spacebar */
+    tapKeyHandler = (e) => {
+      if (!tapActive) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (tapIndex < tapLines.length) {
+          state.lyrics[tapIndex].time = audio.currentTime;
+          tapIndex++;
+          $('tapProgress').textContent = tapIndex + ' / ' + tapLines.length;
+
+          /* Highlight current line */
+          const lines = $('lyricsScroll').querySelectorAll('.lyric-line');
+          lines.forEach((el, i) => {
+            el.classList.toggle('active', i === tapIndex);
+            el.classList.toggle('past', i < tapIndex);
+          });
+
+          if (tapIndex >= tapLines.length) {
+            stopTapMode();
+            renderLyricsView();
+            showToast('打標記完成！共 ' + tapLines.length + ' 行');
+          }
+        }
+      }
+      if (e.code === 'Escape') {
+        stopTapMode();
+        renderLyricsView();
+        showToast('打標記已結束，共標記 ' + tapIndex + ' 行');
+      }
+    };
+    document.addEventListener('keydown', tapKeyHandler);
+  }
+
+  function stopTapMode() {
+    tapActive = false;
+    if (tapKeyHandler) {
+      document.removeEventListener('keydown', tapKeyHandler);
+      tapKeyHandler = null;
+    }
+    /* Reset tap panel UI */
+    $('tapTextarea').style.display = '';
+    $('tapStartBtn').style.display = '';
+    $('tapStatus').style.display = 'none';
+    $('tapPanel').style.display = 'none';
+
+    $('editBtn').disabled = !state.lyrics.length;
+    $('exportBtn').disabled = !state.lyrics.length;
+  }
+
+  /* ══════════════════════════════════
+     Clean Repeats (Whisper hallucination fix)
+     ══════════════════════════════════ */
+  /** Clean repeated characters from Whisper output, e.g. 啊啊啊啊啊 → 啊～ */
+  function cleanRepeats(text) {
+    /* Single character repeated 4+ times → char～ */
+    text = text.replace(/(.)\1{3,}/g, '$1～');
+    /* 2-3 char phrase repeated 3+ times → phrase～ */
+    text = text.replace(/(.{2,3})\1{2,}/g, '$1～');
+    return text.trim();
   }
 
   /* ══════════════════════════════════
