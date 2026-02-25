@@ -904,9 +904,10 @@
     var reader = new FileReader();
     reader.onload = function (ev) {
       var text = ev.target.result;
-      state.lyrics = parseLRC(text);
+      state.lyrics = parseLRC(text).filter(function (l) { return !isWhisperJunk(l.text); });
       if (state.lyrics.length) {
         renderLyricsView();
+        updatePostCorrectBtn();
         showToast('已載入 ' + state.lyrics.length + ' 行歌詞');
       } else {
         showToast('LRC 檔案格式無法解析', 'error');
