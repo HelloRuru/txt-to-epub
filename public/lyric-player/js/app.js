@@ -332,45 +332,76 @@
       status.textContent = '處理音檔中...';
       fill.style.width = '0%';
       var audioData = await decodeAudioTo16kMono(state.audioFile);
+      var audioDur = audio.duration || 180;
 
-      /* 3. Transcribe */
-      status.textContent = refLines.length
-        ? '辨識時間標記中...（使用你提供的歌詞文字）'
-        : '辨識歌詞中...（依歌曲長度約 1-5 分鐘）';
-      fill.style.width = '50%';
-
+      /* 3. 手動切塊辨識 — 自己切音檔，每塊獨立跑 Whisper
+       *    時間戳 = 我們的切塊起點 + Whisper 段內偏移
+       *    重疊 3 秒確保不切斷歌詞 */
       var lang = $('langSelect').value;
-      var opts = {
-        return_timestamps: true,
-        chunk_length_s: 30,
-        stride_length_s: 5,
-        task: 'transcribe',
-      };
-      /* auto = 不指定語言，讓 Whisper 自己偵測 */
-      if (lang !== 'auto') { opts.language = lang; }
-      var result = await transcriber(audioData, opts);
+      var whisperOpts = { return_timestamps: true, task: 'transcribe' };
+      if (lang !== 'auto') { whisperOpts.language = lang; }
 
-      /* 4. Build lyrics — 保留 endTime 以便分配 */
+      var CHUNK_SEC = 20;    /* 每塊 20 秒（Whisper 編碼器最大 30 秒，留餘量） */
+      var OVERLAP_SEC = 3;   /* 重疊 3 秒（防止切斷句子） */
+      var SAMPLE_RATE = 16000;
+      var chunkSamples = CHUNK_SEC * SAMPLE_RATE;
+      var stepSamples = (CHUNK_SEC - OVERLAP_SEC) * SAMPLE_RATE;
+      var totalChunks = Math.max(1, Math.ceil(audioData.length / stepSamples));
+
       var chunks = [];
-      if (result && result.chunks && result.chunks.length) {
-        chunks = result.chunks
-          .filter(function (c) { return c.text && c.text.trim(); })
-          .map(function (c) {
-            return {
-              time: c.timestamp[0] || 0,
-              endTime: c.timestamp[1] || 0,
-              text: c.text.trim()
-            };
+      var position = 0;
+      var chunkIdx = 0;
+
+      while (position < audioData.length) {
+        chunkIdx++;
+        var endPos = Math.min(position + chunkSamples, audioData.length);
+        var slice = audioData.slice(position, endPos);
+        var offsetSec = position / SAMPLE_RATE;
+
+        fill.style.width = (50 + Math.round((chunkIdx / totalChunks) * 35)) + '%';
+        status.textContent = refLines.length
+          ? '辨識時間標記 (' + chunkIdx + '/' + totalChunks + ')...'
+          : '辨識歌詞 (' + chunkIdx + '/' + totalChunks + ')...';
+
+        var result = await transcriber(slice, whisperOpts);
+
+        if (result && result.chunks && result.chunks.length) {
+          result.chunks.forEach(function (c) {
+            if (c.text && c.text.trim()) {
+              chunks.push({
+                time: +(((c.timestamp[0] || 0) + offsetSec).toFixed(2)),
+                endTime: +(((c.timestamp[1] || 0) + offsetSec).toFixed(2)),
+                text: c.text.trim()
+              });
+            }
           });
-      } else if (result && result.text) {
-        chunks = [{ time: 0, endTime: audio.duration || 180, text: result.text.trim() }];
+        } else if (result && result.text && result.text.trim()) {
+          chunks.push({
+            time: +offsetSec.toFixed(2),
+            endTime: +(endPos / SAMPLE_RATE).toFixed(2),
+            text: result.text.trim()
+          });
+        }
+
+        position += stepSamples;
       }
 
-      /* 先清理重複 + 繁化姬轉正體（不管有沒有參考歌詞都要做） */
-      chunks = chunks.map(function (c) { return { time: c.time, endTime: c.endTime, text: cleanRepeats(c.text) }; });
+      /* 4. 去除重疊區域產生的重複文字 */
+      chunks = deduplicateOverlap(chunks);
+
+      /* 5. 時間戳品質檢查 — 仍可能有問題時自動修正 */
+      var tsReliable = checkTimestampQuality(chunks, audioDur);
+      if (!tsReliable && chunks.length > 1) {
+        chunks = redistributeChunks(chunks, audioDur);
+      }
+
+      /* 6. 清理重複 + 繁化姬轉正體 */
+      chunks = chunks.map(function (c) {
+        return { time: c.time, endTime: c.endTime, text: cleanRepeats(c.text) };
+      });
 
       status.textContent = '轉換為正體中文...';
-      fill.style.width = '85%';
+      fill.style.width = '90%';
 
       var allText = chunks.map(function (c) { return c.text; }).join('\n');
       var tradText = await toTraditional(allText);
@@ -380,14 +411,13 @@
         return { time: c.time, text: tradLines[i] !== undefined ? tradLines[i] : c.text };
       });
 
-      /* 如果有參考歌詞：用 Whisper 的時間戳 + 參考歌詞修正文字 */
+      /* 7. 有參考歌詞：用 Whisper 時間戳 + 參考歌詞修正文字 */
       if (refLines.length > 0 && state.lyrics.length > 0) {
         state.lyrics = replaceTextWithRef(state.lyrics, refLines);
         fill.style.width = '100%';
-        status.textContent = '完成！AI 辨識 ' + state.lyrics.length + ' 段人聲，已用參考歌詞修正文字';
+        status.textContent = '完成！AI 辨識 ' + state.lyrics.length + ' 段，已用參考歌詞修正文字';
         showToast('AI 辨識人聲時間 + 參考歌詞修正文字');
       } else if (refLines.length > 0 && state.lyrics.length === 0) {
-        /* Whisper 完全沒結果，只好用均勻分配 */
         state.lyrics = mapReferenceToTimestamps(refLines, chunks);
         fill.style.width = '100%';
         status.textContent = '未偵測到人聲，改用均勻分配，共 ' + state.lyrics.length + ' 行';
@@ -419,6 +449,98 @@
     var mono = decoded.getChannelData(0);
     audioCtx.close();
     return mono;
+  }
+
+  /* ══════════════════════════════════
+     Overlap Deduplication
+     ══════════════════════════════════ */
+  /**
+   * 去除重疊區域產生的重複文字
+   * 重疊 3 秒時，兩塊可能辨識出同樣的句子 → 保留前者
+   */
+  function deduplicateOverlap(chunks) {
+    if (chunks.length <= 1) return chunks;
+    /* 先按時間排序 */
+    chunks.sort(function (a, b) { return a.time - b.time; });
+    var result = [chunks[0]];
+    for (var i = 1; i < chunks.length; i++) {
+      var prev = result[result.length - 1];
+      var curr = chunks[i];
+      /* 時間幾乎重疊（差 < 4 秒）且文字完全相同 → 跳過 */
+      if (Math.abs(curr.time - prev.time) < 4 && curr.text === prev.text) continue;
+      /* 時間重疊且文字包含關係（切斷重複辨識）→ 保留較長的 */
+      if (Math.abs(curr.time - prev.time) < 4 && isSubtext(prev.text, curr.text)) {
+        if (curr.text.length > prev.text.length) {
+          result[result.length - 1] = curr;
+        }
+        continue;
+      }
+      result.push(curr);
+    }
+    return result;
+  }
+
+  /**
+   * 判斷兩段文字是否有包含關係（含尾段開頭重疊）
+   */
+  function isSubtext(a, b) {
+    if (a.includes(b) || b.includes(a)) return true;
+    /* 檢查 a 的結尾是否跟 b 的開頭重疊 */
+    var minOverlap = Math.min(4, Math.min(a.length, b.length));
+    for (var len = minOverlap; len <= Math.min(a.length, b.length); len++) {
+      if (a.slice(-len) === b.slice(0, len)) return true;
+    }
+    return false;
+  }
+
+  /* ══════════════════════════════════
+     Timestamp Quality Check
+     ══════════════════════════════════ */
+  /**
+   * 檢查 Whisper 時間戳是否可靠
+   * 如果所有時間戳擠在音檔前 30% → 不可靠（音樂常見問題）
+   */
+  function checkTimestampQuality(chunks, duration) {
+    if (!chunks.length || duration <= 0) return false;
+    if (chunks.length === 1) return true;
+
+    var firstTime = chunks[0].time;
+    var lastTime = chunks[chunks.length - 1].time;
+    var span = lastTime - firstTime;
+
+    /* 時間戳跨度不到歌曲 40% → 判定不可靠 */
+    if (span < duration * 0.4) return false;
+
+    /* 超過一半的 chunks 時間戳都是 0 → 不可靠 */
+    var zeroCount = 0;
+    for (var i = 0; i < chunks.length; i++) {
+      if (chunks[i].time < 0.5) zeroCount++;
+    }
+    if (zeroCount > chunks.length * 0.5) return false;
+
+    return true;
+  }
+
+  /**
+   * 時間戳不可靠時：保留文字，均勻重新分配到歌曲時長
+   * 跳過前 5% 和後 3%（前奏/尾奏）
+   */
+  function redistributeChunks(chunks, duration) {
+    var N = chunks.length;
+    if (N <= 0) return chunks;
+    var start = Math.min(duration * 0.05, 5);   /* 前奏：最多 5 秒 */
+    var end = duration - Math.min(duration * 0.03, 3); /* 尾奏前 */
+    if (end <= start) end = duration;
+    var usable = end - start;
+    var step = usable / N;
+
+    return chunks.map(function (c, i) {
+      return {
+        time: +(start + step * i).toFixed(2),
+        endTime: +(start + step * (i + 1)).toFixed(2),
+        text: c.text
+      };
+    });
   }
 
   /* ══════════════════════════════════

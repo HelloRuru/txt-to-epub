@@ -2,42 +2,43 @@
 
 /* ── Score Theme Variables ── */
 :root {
-  --score-paper: #F8F3EB;
-  --score-paper-warm: #F5EEE3;
-  --score-card: #FFFDF8;
-  --score-ink: #3D3530;
-  --score-body: #5A514B;
-  --score-muted: #9B8E84;
-  --score-light: #C4B8AD;
-  --score-staff: rgba(139, 119, 101, 0.13);
-  --score-staff-bold: rgba(139, 119, 101, 0.25);
-  --score-accent: #B8907A;
-  --score-rose: #C4A0A0;
-  --score-border: rgba(139, 119, 101, 0.2);
-  --score-shadow: 0 2px 12px rgba(80, 60, 40, 0.06);
-  --score-shadow-md: 0 4px 20px rgba(80, 60, 40, 0.08);
+  --score-paper: #FAF8F5;
+  --score-paper-warm: #F5F2ED;
+  --score-card: #FFFFFF;
+  --score-ink: #231F1E;
+  --score-body: #4A4442;
+  --score-muted: #847B76;
+  --score-light: #B5ADA8;
+  --score-staff: rgba(100, 85, 78, 0.08);
+  --score-staff-bold: rgba(100, 85, 78, 0.18);
+  --score-accent: #7A3B4E;
+  --score-rose: #9E5A6C;
+  --score-gold: #B08D57;
+  --score-border: rgba(100, 85, 78, 0.14);
+  --score-shadow: 0 2px 12px rgba(40, 30, 35, 0.06);
+  --score-shadow-md: 0 4px 20px rgba(40, 30, 35, 0.08);
 }
 html.dark {
-  --score-paper: #1A1612;
-  --score-paper-warm: #1E1A15;
-  --score-card: #252019;
-  --score-ink: #E8DFD4;
-  --score-body: #C8BDAE;
-  --score-muted: #8A7E72;
-  --score-light: #5E5448;
-  --score-staff: rgba(200, 180, 160, 0.08);
-  --score-staff-bold: rgba(200, 180, 160, 0.15);
-  --score-accent: #D4A88C;
-  --score-rose: #D4AFA0;
-  --score-border: rgba(200, 180, 160, 0.12);
+  --score-paper: #1A1617;
+  --score-paper-warm: #201C1D;
+  --score-card: #252022;
+  --score-ink: #EBE5DF;
+  --score-body: #C2BAB5;
+  --score-muted: #8A807B;
+  --score-light: #5A524E;
+  --score-staff: rgba(200, 180, 175, 0.06);
+  --score-staff-bold: rgba(200, 180, 175, 0.13);
+  --score-accent: #C46B7C;
+  --score-rose: #D48A98;
+  --score-gold: #D4AA6A;
+  --score-border: rgba(200, 180, 175, 0.10);
   --score-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
   --score-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
 /* ── Global Score Background ── */
 body {
-  background: var(--score-paper) !important;
-  /* 全頁五線譜 */
+  background: var(--score-paper);
   background-image:
     repeating-linear-gradient(
       to bottom,
@@ -45,9 +46,22 @@ body {
       transparent 23px,
       var(--score-staff) 23px,
       var(--score-staff) 24px
-    ) !important;
-  background-size: 100% 120px !important;
-  background-position: 0 60px !important;
+    );
+  background-size: 100% 120px;
+  background-position: 0 60px;
+}
+html.dark body {
+  background: var(--score-paper);
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 23px,
+      var(--score-staff) 23px,
+      var(--score-staff) 24px
+    );
+  background-size: 100% 120px;
+  background-position: 0 60px;
 }
 
 /* ── Layout ── */
@@ -284,11 +298,11 @@ body {
   color: #FFFFFF;
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 2px 8px rgba(180, 140, 120, 0.25);
+  box-shadow: 0 2px 8px rgba(122, 59, 78, 0.25);
 }
 .btn-player:hover {
   transform: scale(1.08);
-  box-shadow: 0 4px 16px rgba(180, 140, 120, 0.35);
+  box-shadow: 0 4px 16px rgba(122, 59, 78, 0.35);
 }
 .btn-player:active { transform: scale(0.95); }
 .btn-player.small {
@@ -508,7 +522,7 @@ body {
 }
 .lyric-line:hover {
   color: var(--score-body);
-  background: rgba(180, 140, 120, 0.06);
+  background: rgba(122, 59, 78, 0.04);
 }
 .lyric-line.active {
   font-size: 1.375rem;
@@ -516,6 +530,8 @@ body {
   color: var(--score-ink);
   transform: scale(1.02);
   font-style: italic;
+  background: rgba(122, 59, 78, 0.06);
+  box-shadow: inset 3px 0 0 var(--score-accent), inset -3px 0 0 var(--score-accent);
 }
 .lyric-line.past { opacity: 0.45; }
 
@@ -575,8 +591,8 @@ body {
   transition: all 0.2s;
 }
 .btn-delete-row:hover {
-  background: rgba(180, 100, 100, 0.1);
-  color: #B06060;
+  background: rgba(122, 59, 78, 0.1);
+  color: #A04858;
 }
 
 /* Nudge time buttons */
@@ -598,7 +614,7 @@ body {
   padding: 0;
 }
 .btn-nudge:hover {
-  background: rgba(180, 140, 120, 0.1);
+  background: rgba(122, 59, 78, 0.08);
   color: var(--score-accent);
 }
 .btn-nudge:active { transform: scale(0.9); }
@@ -619,8 +635,8 @@ body {
   transition: all 0.2s;
 }
 .btn-insert-row:hover {
-  background: rgba(140, 160, 120, 0.12);
-  color: #7A9464;
+  background: rgba(100, 140, 100, 0.1);
+  color: #6E8C5C;
 }
 
 .edit-actions {
@@ -641,7 +657,7 @@ body {
   background: var(--score-ink);
   color: var(--score-paper);
   border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(60, 50, 40, 0.2);
+  box-shadow: 0 4px 20px rgba(40, 30, 35, 0.2);
   opacity: 0;
   pointer-events: none;
   transition: all 0.3s;
@@ -653,7 +669,7 @@ body {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
-.toast.error { background: #A05050; }
+.toast.error { background: #8C3848; }
 
 /* ── Dark Mode Toggle ── */
 .theme-toggle {
@@ -695,7 +711,7 @@ body {
   transition: all 0.2s;
 }
 .btn-preview:hover {
-  background: rgba(180, 140, 120, 0.1);
+  background: rgba(122, 59, 78, 0.08);
   transform: scale(1.15);
 }
 
@@ -771,7 +787,7 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(30, 25, 20, 0.5);
+  background: rgba(26, 22, 23, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -781,7 +797,7 @@ body {
 .modal-card {
   background: var(--score-card);
   border-radius: 12px;
-  box-shadow: 0 8px 40px rgba(60, 50, 40, 0.2);
+  box-shadow: 0 8px 40px rgba(40, 30, 35, 0.2);
   border: 1px solid var(--score-border);
   width: 100%;
   max-width: 560px;
