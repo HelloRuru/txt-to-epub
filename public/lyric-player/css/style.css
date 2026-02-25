@@ -899,15 +899,38 @@ html.dark body {
 }
 .ref-textarea:focus { border-color: var(--score-accent); }
 
-/* 樂譜風格說明卡 */
+/* 撕破紙張風格說明卡 */
 .ref-desc.score-card {
   position: relative;
   margin-bottom: 12px;
-  padding: 16px 16px 16px 18px;
+  padding: 18px 20px 18px 20px;
   background: var(--score-paper-warm);
-  border-radius: 8px;
-  border: 1px solid var(--score-border);
-  overflow: hidden;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  /* 上下撕裂邊緣 */
+  --tear-size: 10px;
+  clip-path: polygon(
+    0% var(--tear-size),
+    3% 0%, 6% var(--tear-size), 10% 2px, 14% var(--tear-size),
+    18% 1px, 22% calc(var(--tear-size) - 2px), 27% 3px, 32% var(--tear-size),
+    37% 1px, 42% calc(var(--tear-size) - 3px), 48% 2px, 53% var(--tear-size),
+    58% 0%, 63% calc(var(--tear-size) - 1px), 68% 3px, 73% var(--tear-size),
+    78% 1px, 83% calc(var(--tear-size) - 2px), 88% 2px, 93% var(--tear-size),
+    97% 1px, 100% calc(var(--tear-size) - 3px),
+    100% calc(100% - var(--tear-size)),
+    97% 100%, 93% calc(100% - var(--tear-size)), 88% calc(100% - 2px),
+    83% calc(100% - var(--tear-size)), 78% calc(100% - 1px),
+    73% calc(100% - var(--tear-size) + 2px), 68% calc(100% - 3px),
+    63% calc(100% - var(--tear-size)), 58% 100%,
+    53% calc(100% - var(--tear-size) + 1px), 48% calc(100% - 2px),
+    42% calc(100% - var(--tear-size)), 37% calc(100% - 1px),
+    32% calc(100% - var(--tear-size) + 3px), 27% calc(100% - 3px),
+    22% calc(100% - var(--tear-size)), 18% calc(100% - 1px),
+    14% calc(100% - var(--tear-size) + 2px), 10% calc(100% - 2px),
+    6% calc(100% - var(--tear-size)), 3% 100%, 0% calc(100% - var(--tear-size))
+  );
+  filter: drop-shadow(0 1px 3px rgba(40, 30, 35, 0.08));
 }
 /* 五線譜背景 */
 .score-lines {
