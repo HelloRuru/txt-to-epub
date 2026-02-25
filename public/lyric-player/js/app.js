@@ -285,9 +285,10 @@
     status.textContent = '載入 AI 模型中（首次約 1-2 分鐘下載）...';
     $('aiBtn').disabled = true;
 
-    /* Check for reference lyrics */
-    const refText = $('refTextarea') ? $('refTextarea').value.trim() : '';
-    const refLines = refText ? refText.split('\n').filter(function (l) { return l.trim(); }) : [];
+    /* Check for reference lyrics — auto-clean non-lyric lines */
+    var refText = $('refTextarea') ? $('refTextarea').value.trim() : '';
+    var rawLines = refText ? refText.split('\n') : [];
+    var refLines = cleanRefLines(rawLines);
 
     try {
       /* 1. Load Transformers.js + Whisper */
@@ -347,14 +348,20 @@
         task: 'transcribe',
       });
 
-      /* 4. Build lyrics */
+      /* 4. Build lyrics — 保留 endTime 以便分配 */
       var chunks = [];
       if (result && result.chunks && result.chunks.length) {
         chunks = result.chunks
           .filter(function (c) { return c.text && c.text.trim(); })
-          .map(function (c) { return { time: c.timestamp[0] || 0, text: c.text.trim() }; });
+          .map(function (c) {
+            return {
+              time: c.timestamp[0] || 0,
+              endTime: c.timestamp[1] || 0,
+              text: c.text.trim()
+            };
+          });
       } else if (result && result.text) {
-        chunks = [{ time: 0, text: result.text.trim() }];
+        chunks = [{ time: 0, endTime: audio.duration || 180, text: result.text.trim() }];
       }
 
       if (refLines.length > 0) {
@@ -411,43 +418,35 @@
      ══════════════════════════════════ */
   /**
    * 用使用者提供的歌詞文字 + Whisper 的時間戳記，產生 LRC
-   * M = 使用者行數, N = Whisper 分段數
+   * 策略：用 Whisper 找出有人聲的起止時間，在該範圍內均勻分配歌詞行
    */
   function mapReferenceToTimestamps(refLines, chunks) {
     var M = refLines.length;
-    var N = chunks.length;
-    var lyrics = [];
+    if (!M) return [];
+    var dur = audio.duration || 180;
 
-    if (N === 0) {
-      /* 沒有時間戳記，平均分配到歌曲長度 */
-      var dur = audio.duration || 180;
+    if (chunks.length === 0) {
+      /* 沒有 chunks，均勻分配到歌曲全長 */
       var step = dur / M;
-      for (var i = 0; i < M; i++) {
-        lyrics.push({ time: i * step, text: refLines[i].trim() });
-      }
-      return lyrics;
+      return refLines.map(function (text, i) {
+        return { time: step * i, text: text.trim() };
+      });
     }
 
-    if (M <= N) {
-      /* 使用者行數 <= Whisper 分段：取前 M 個時間戳記 */
-      for (var i = 0; i < M; i++) {
-        lyrics.push({ time: chunks[i].time, text: refLines[i].trim() });
-      }
-    } else {
-      /* 使用者行數 > Whisper 分段：先用完 Whisper，剩餘內插 */
-      for (var i = 0; i < N; i++) {
-        lyrics.push({ time: chunks[i].time, text: refLines[i].trim() });
-      }
-      var lastTime = chunks[N - 1].time;
-      var dur = audio.duration || lastTime + 60;
-      var remaining = M - N;
-      var step = (dur - lastTime) / (remaining + 1);
-      for (var j = 0; j < remaining; j++) {
-        lyrics.push({ time: lastTime + step * (j + 1), text: refLines[N + j].trim() });
-      }
-    }
+    /* 用 Whisper 結果確定有人聲的起止時間 */
+    var voiceStart = chunks[0].time;
+    var lastChunk = chunks[chunks.length - 1];
+    var voiceEnd = lastChunk.endTime || (lastChunk.time + 15);
+    if (voiceEnd > dur) voiceEnd = dur;
+    if (voiceEnd <= voiceStart) voiceEnd = dur;
 
-    return lyrics;
+    /* 在有人聲的時段內均勻分配歌詞行 */
+    var voiceDuration = voiceEnd - voiceStart;
+    var step = voiceDuration / M;
+
+    return refLines.map(function (text, i) {
+      return { time: Math.max(0, voiceStart + step * i), text: text.trim() };
+    });
   }
 
   /* ══════════════════════════════════
@@ -469,6 +468,28 @@
       /* API 失敗時回傳原文 */
     }
     return text;
+  }
+
+  /* ══════════════════════════════════
+     Clean Reference Lyrics
+     ══════════════════════════════════ */
+  /**
+   * 過濾使用者貼上的歌詞，自動移除非歌詞行：
+   * - [Intro], [Verse 1], [Chorus], [Bridge], [Outro] 等段落標記
+   * - (Vinyl crackle...), (instrumental) 等音效/演奏描述
+   * - [Fade out], [Small Break] 等指示
+   * - 空行
+   */
+  function cleanRefLines(lines) {
+    return lines.filter(function (line) {
+      var t = line.trim();
+      if (!t) return false;
+      /* 整行是 [xxx] 段落標記 */
+      if (/^\[.+\]$/.test(t)) return false;
+      /* 整行是 (xxx) 演奏描述 */
+      if (/^\(.+\)$/.test(t)) return false;
+      return true;
+    });
   }
 
   /* ══════════════════════════════════
@@ -565,7 +586,9 @@
     row.className = 'edit-row';
     row.innerHTML =
       '<button class="btn-preview" title="從這裡播放">' + ICON_PLAY_SM + '</button>' +
+      '<button class="btn-nudge" data-dir="-1" title="往前 0.5 秒">&laquo;</button>' +
       '<input type="text" class="edit-time" value="' + formatTimeLRC(time) + '" data-field="time">' +
+      '<button class="btn-nudge" data-dir="1" title="往後 0.5 秒">&raquo;</button>' +
       '<input type="text" class="edit-text" value="' + escapeAttr(text) + '" placeholder="輸入歌詞..." data-field="text">' +
       '<button class="btn-insert-row" title="在下方插入一行">' + ICON_INSERT + '</button>' +
       '<button class="btn-delete-row" title="刪除這行">' +
@@ -578,6 +601,17 @@
       audio.play();
       state.isPlaying = true;
       updatePlayIcon();
+    });
+
+    /* 單行時間微調 << >> (0.5 秒) */
+    row.querySelectorAll('.btn-nudge').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var timeInput = row.querySelector('[data-field="time"]');
+        var cur = parseTimeLRC(timeInput.value.trim());
+        var dir = parseInt(btn.dataset.dir, 10);
+        var next = Math.max(0, cur + dir * 0.5);
+        timeInput.value = formatTimeLRC(next);
+      });
     });
 
     /* 插入一行（在目前這行的下方） */
