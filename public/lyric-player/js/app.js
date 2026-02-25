@@ -890,7 +890,7 @@
     if (!t) return true;
     if (/CC字幕|字幕[:：]|[Ss]ubtitle|[Cc]aption/i.test(t)) return true;
     if (/製作[:：]|翻[译譯][:：]|校[对對][:：]/i.test(t)) return true;
-    if (/^[\s\W]*$/.test(t)) return true; /* 純符號 */
+    if (/^[\s\p{P}\p{S}]*$/u.test(t)) return true; /* 純標點符號 */
     return false;
   }
 
