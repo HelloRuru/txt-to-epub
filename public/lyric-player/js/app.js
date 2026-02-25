@@ -363,9 +363,7 @@
         var offsetSec = position / SAMPLE_RATE;
 
         fill.style.width = (50 + Math.round((chunkIdx / totalChunks) * 35)) + '%';
-        status.textContent = refLines.length
-          ? '辨識時間標記 (' + chunkIdx + '/' + totalChunks + ')...'
-          : '辨識歌詞 (' + chunkIdx + '/' + totalChunks + ')...';
+        status.textContent = '辨識歌詞 (' + chunkIdx + '/' + totalChunks + ')...';
 
         var result = await transcriber(slice, whisperOpts);
 
