@@ -71,7 +71,7 @@ const tools = [
   {
     id: 'lyric-player', name: 'Lyric Player 歌詞播放器', category: 'media',
     description: '上傳 MP3 即可 AI 辨識歌詞並同步播放。支援 LRC 上傳、歌詞編輯、時間微調、匯出下載，中英日韓多語言。',
-    path: '/lyric-player/', color: 'lavender', external: true,
+    path: '/lyric-player/', color: 'burgundy', external: true,
   },
 ]
 
@@ -81,18 +81,21 @@ const accentGradients = {
   rose: 'linear-gradient(90deg, #D4A5A5, #F5D0C5)',
   lavender: 'linear-gradient(90deg, #B8A9C9, #C9C1DC)',
   sage: 'linear-gradient(90deg, #A8B5A0, #C5D4BD)',
+  burgundy: 'linear-gradient(90deg, #9E5A6C, #7A3B4E)',
 }
 
 const iconColors = {
   rose: 'var(--rose)',
   lavender: 'var(--lavender)',
   sage: 'var(--sage)',
+  burgundy: '#7A3B4E',
 }
 
 const iconBgs = {
   rose: 'linear-gradient(135deg, rgba(212, 165, 165, 0.22), rgba(245, 208, 197, 0.15))',
   lavender: 'linear-gradient(135deg, rgba(184, 169, 201, 0.22), rgba(201, 193, 220, 0.15))',
   sage: 'linear-gradient(135deg, rgba(168, 181, 160, 0.22), rgba(184, 201, 176, 0.15))',
+  burgundy: 'linear-gradient(135deg, rgba(122, 59, 78, 0.22), rgba(158, 90, 108, 0.15))',
 }
 
 // ── SVG Icons ──────────────────────────────────────
