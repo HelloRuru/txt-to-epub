@@ -591,40 +591,15 @@
    * 用 Whisper 辨識的時間戳 + 參考歌詞修正文字
    * Whisper 負責人聲時間偵測，參考歌詞負責修正錯字
    */
-  /** 兩字串的字元重疊比例（土法煉鋼 Ctrl+F 式比對） */
-  function charSimilarity(a, b) {
-    if (!a || !b) return 0;
-    var setA = new Set(a.replace(/\s/g, ''));
-    var setB = new Set(b.replace(/\s/g, ''));
-    if (!setA.size || !setB.size) return 0;
-    var overlap = 0;
-    setA.forEach(function (ch) { if (setB.has(ch)) overlap++; });
-    return overlap / Math.max(setA.size, setB.size);
-  }
-
   function replaceTextWithRef(lyrics, refLines) {
-    /* 土法煉鋼：逐行找最像的參考歌詞替換，時間戳完全不動 */
-    var used = {};
-
-    return lyrics.map(function (line) {
-      var bestIdx = -1;
-      var bestScore = 0;
-
-      for (var j = 0; j < refLines.length; j++) {
-        if (used[j]) continue;
-        var score = charSimilarity(line.text, refLines[j]);
-        if (score > bestScore) {
-          bestScore = score;
-          bestIdx = j;
-        }
-      }
-
-      /* 相似度 > 30% 才替換，否則保留原文 */
-      if (bestIdx >= 0 && bestScore > 0.3) {
-        used[bestIdx] = true;
-        return { time: line.time, text: refLines[bestIdx].trim() };
-      }
-      return { time: line.time, text: line.text };
+    /* 最簡單：按順序 1 對 1 替換文字，時間戳完全不動
+       歌詞行多於 Whisper 段數 → 多的忽略
+       歌詞行少於 Whisper 段數 → 剩的保留原文 */
+    return lyrics.map(function (line, i) {
+      return {
+        time: line.time,
+        text: i < refLines.length ? refLines[i].trim() : line.text
+      };
     });
   }
 
