@@ -28,6 +28,8 @@
   const ICON_PAUSE = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>';
   const ICON_SUN = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
   const ICON_MOON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  const ICON_PLAY_SM = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5,3 19,12 5,21"/></svg>';
+  const ICON_INSERT = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
 
   /* ══════════════════════════════════
      Init
@@ -87,7 +89,6 @@
   }
 
   function loadAudio(file) {
-    /* Clean up previous */
     if (state.audioFile) {
       audio.pause();
       state.isPlaying = false;
@@ -98,14 +99,10 @@
     audio.src = URL.createObjectURL(file);
     audio.volume = $('volumeSlider').value / 100;
 
-    /* Show player, hide upload */
     $('uploadZone').style.display = 'none';
     $('playerSection').classList.add('visible');
-
-    /* Track name */
     $('trackName').textContent = file.name.replace(/\.[^.]+$/, '');
 
-    /* Reset lyrics */
     state.lyrics = [];
     state.currentLine = -1;
     state.isEditing = false;
@@ -125,10 +122,8 @@
      Player
      ══════════════════════════════════ */
   function initPlayer() {
-    /* Play / Pause */
     $('playBtn').addEventListener('click', togglePlay);
 
-    /* Rewind / Forward */
     $('rewindBtn').addEventListener('click', () => {
       audio.currentTime = Math.max(0, audio.currentTime - 10);
     });
@@ -136,19 +131,16 @@
       audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10);
     });
 
-    /* Volume */
     $('volumeSlider').addEventListener('input', (e) => {
       audio.volume = e.target.value / 100;
     });
 
-    /* Progress bar click */
     $('progressBar').addEventListener('click', (e) => {
       const rect = e.currentTarget.getBoundingClientRect();
       const pct = (e.clientX - rect.left) / rect.width;
       audio.currentTime = pct * (audio.duration || 0);
     });
 
-    /* Time update */
     audio.addEventListener('timeupdate', () => {
       if (!audio.duration) return;
       const pct = (audio.currentTime / audio.duration) * 100;
@@ -157,13 +149,11 @@
       updateCurrentLyric();
     });
 
-    /* Ended */
     audio.addEventListener('ended', () => {
       state.isPlaying = false;
       updatePlayIcon();
     });
 
-    /* Change song */
     $('changeBtn').addEventListener('click', () => {
       audio.pause();
       state.isPlaying = false;
@@ -181,11 +171,7 @@
 
   function togglePlay() {
     if (!state.audioFile) return;
-    if (state.isPlaying) {
-      audio.pause();
-    } else {
-      audio.play();
-    }
+    if (state.isPlaying) { audio.pause(); } else { audio.play(); }
     state.isPlaying = !state.isPlaying;
     updatePlayIcon();
   }
@@ -214,12 +200,10 @@
       el.classList.toggle('past', i < idx);
     });
 
-    /* Auto-scroll to center the active line */
     if (idx >= 0 && lines[idx]) {
-      const container = scroll;
       const el = lines[idx];
-      const scrollTarget = el.offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
-      container.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+      const scrollTarget = el.offsetTop - scroll.clientHeight / 2 + el.clientHeight / 2;
+      scroll.scrollTo({ top: scrollTarget, behavior: 'smooth' });
     }
   }
 
@@ -249,7 +233,6 @@
       '</div>'
     ).join('');
 
-    /* Click to seek */
     scroll.querySelectorAll('.lyric-line').forEach((el) => {
       el.addEventListener('click', () => {
         const idx = parseInt(el.dataset.index, 10);
@@ -277,9 +260,19 @@
     $('exportModalClose').addEventListener('click', closeExportModal);
     $('exportCopyBtn').addEventListener('click', copyLRC);
     $('exportConfirmBtn').addEventListener('click', downloadLRC);
+
+    /* Reference lyrics toggle */
+    $('refToggle').addEventListener('click', () => {
+      const content = $('refContent');
+      const isHidden = content.style.display === 'none';
+      content.style.display = isHidden ? '' : 'none';
+      $('refToggle').classList.toggle('open', isHidden);
+    });
   }
 
-  /* ── AI Recognition ── */
+  /* ══════════════════════════════════
+     AI Recognition
+     ══════════════════════════════════ */
   async function startRecognition() {
     if (state.isRecognizing || !state.audioFile) return;
     state.isRecognizing = true;
@@ -292,17 +285,21 @@
     status.textContent = '載入 AI 模型中（首次約 1-2 分鐘下載）...';
     $('aiBtn').disabled = true;
 
+    /* Check for reference lyrics */
+    const refText = $('refTextarea') ? $('refTextarea').value.trim() : '';
+    const refLines = refText ? refText.split('\n').filter(function (l) { return l.trim(); }) : [];
+
     try {
       /* 1. Load Transformers.js + Whisper */
       if (!transcriber) {
-        const { pipeline } = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
+        var transformers = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
+        var createPipeline = transformers.pipeline;
 
-        /* Try WebGPU first, fallback to WASM */
-        let device = 'wasm';
-        let dtype = 'q8';
+        var device = 'wasm';
+        var dtype = 'q8';
         if (navigator.gpu) {
           try {
-            const adapter = await navigator.gpu.requestAdapter();
+            var adapter = await navigator.gpu.requestAdapter();
             if (adapter) { device = 'webgpu'; dtype = 'fp32'; }
           } catch (_) { /* fallback */ }
         }
@@ -311,13 +308,13 @@
           ? '載入 AI 模型（WebGPU 加速）...'
           : '載入 AI 模型（WASM 模式）...';
 
-        transcriber = await pipeline(
+        transcriber = await createPipeline(
           'automatic-speech-recognition',
           'onnx-community/whisper-small',
           {
             dtype: dtype,
             device: device,
-            progress_callback: (info) => {
+            progress_callback: function (info) {
               if (info.status === 'progress' && info.progress) {
                 fill.style.width = Math.round(info.progress) + '%';
                 status.textContent = '下載模型：' + Math.round(info.progress) + '%';
@@ -330,18 +327,19 @@
         );
       }
 
-      /* 2. Process audio → 16kHz mono Float32Array */
+      /* 2. Process audio */
       status.textContent = '處理音檔中...';
       fill.style.width = '0%';
-
-      const audioData = await decodeAudioTo16kMono(state.audioFile);
+      var audioData = await decodeAudioTo16kMono(state.audioFile);
 
       /* 3. Transcribe */
-      status.textContent = '辨識歌詞中...（依歌曲長度約 1-5 分鐘）';
+      status.textContent = refLines.length
+        ? '辨識時間標記中...（使用你提供的歌詞文字）'
+        : '辨識歌詞中...（依歌曲長度約 1-5 分鐘）';
       fill.style.width = '50%';
 
-      const lang = $('langSelect').value;
-      const result = await transcriber(audioData, {
+      var lang = $('langSelect').value;
+      var result = await transcriber(audioData, {
         return_timestamps: true,
         chunk_length_s: 30,
         stride_length_s: 5,
@@ -349,23 +347,43 @@
         task: 'transcribe',
       });
 
-      /* 4. Convert to lyrics array + clean repeats */
+      /* 4. Build lyrics */
+      var chunks = [];
       if (result && result.chunks && result.chunks.length) {
-        state.lyrics = result.chunks
-          .filter((c) => c.text && c.text.trim())
-          .map((c) => ({
-            time: c.timestamp[0] || 0,
-            text: cleanRepeats(c.text.trim())
-          }));
+        chunks = result.chunks
+          .filter(function (c) { return c.text && c.text.trim(); })
+          .map(function (c) { return { time: c.timestamp[0] || 0, text: c.text.trim() }; });
       } else if (result && result.text) {
-        /* Fallback: single block without timestamps */
-        state.lyrics = [{ time: 0, text: cleanRepeats(result.text.trim()) }];
+        chunks = [{ time: 0, text: result.text.trim() }];
       }
 
-      fill.style.width = '100%';
-      status.textContent = '辨識完成！共 ' + state.lyrics.length + ' 行歌詞';
+      if (refLines.length > 0) {
+        /* 歌詞輔助模式：用使用者的歌詞 + Whisper 的時間標記 */
+        state.lyrics = mapReferenceToTimestamps(refLines, chunks);
+        fill.style.width = '100%';
+        status.textContent = '完成！使用你的歌詞 + AI 時間標記，共 ' + state.lyrics.length + ' 行';
+        showToast('已使用你的歌詞文字 + AI 時間標記');
+      } else {
+        /* 純 AI 辨識：清理重複 + 繁化姬轉正體 */
+        chunks = chunks.map(function (c) { return { time: c.time, text: cleanRepeats(c.text) }; });
+
+        status.textContent = '轉換為正體中文...';
+        fill.style.width = '85%';
+
+        var allText = chunks.map(function (c) { return c.text; }).join('\n');
+        var tradText = await toTraditional(allText);
+        var tradLines = tradText.split('\n');
+
+        state.lyrics = chunks.map(function (c, i) {
+          return { time: c.time, text: tradLines[i] !== undefined ? tradLines[i] : c.text };
+        });
+
+        fill.style.width = '100%';
+        status.textContent = '辨識完成！共 ' + state.lyrics.length + ' 行歌詞（已轉正體中文）';
+        showToast('歌詞辨識完成！已自動轉為正體中文');
+      }
+
       renderLyricsView();
-      showToast('歌詞辨識完成！');
 
     } catch (err) {
       console.error('AI Recognition error:', err);
@@ -374,28 +392,106 @@
     } finally {
       state.isRecognizing = false;
       $('aiBtn').disabled = false;
-      setTimeout(() => prog.classList.remove('visible'), 3000);
+      setTimeout(function () { prog.classList.remove('visible'); }, 3000);
     }
   }
 
   /** Decode audio file to 16kHz mono Float32Array for Whisper */
   async function decodeAudioTo16kMono(file) {
-    const arrayBuffer = await file.arrayBuffer();
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
-    const decoded = await audioCtx.decodeAudioData(arrayBuffer);
-    const mono = decoded.getChannelData(0); // first channel
+    var arrayBuffer = await file.arrayBuffer();
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+    var decoded = await audioCtx.decodeAudioData(arrayBuffer);
+    var mono = decoded.getChannelData(0);
     audioCtx.close();
     return mono;
   }
 
-  /* ── LRC Upload ── */
+  /* ══════════════════════════════════
+     Reference Lyrics → Timestamp Mapping
+     ══════════════════════════════════ */
+  /**
+   * 用使用者提供的歌詞文字 + Whisper 的時間戳記，產生 LRC
+   * M = 使用者行數, N = Whisper 分段數
+   */
+  function mapReferenceToTimestamps(refLines, chunks) {
+    var M = refLines.length;
+    var N = chunks.length;
+    var lyrics = [];
+
+    if (N === 0) {
+      /* 沒有時間戳記，平均分配到歌曲長度 */
+      var dur = audio.duration || 180;
+      var step = dur / M;
+      for (var i = 0; i < M; i++) {
+        lyrics.push({ time: i * step, text: refLines[i].trim() });
+      }
+      return lyrics;
+    }
+
+    if (M <= N) {
+      /* 使用者行數 <= Whisper 分段：取前 M 個時間戳記 */
+      for (var i = 0; i < M; i++) {
+        lyrics.push({ time: chunks[i].time, text: refLines[i].trim() });
+      }
+    } else {
+      /* 使用者行數 > Whisper 分段：先用完 Whisper，剩餘內插 */
+      for (var i = 0; i < N; i++) {
+        lyrics.push({ time: chunks[i].time, text: refLines[i].trim() });
+      }
+      var lastTime = chunks[N - 1].time;
+      var dur = audio.duration || lastTime + 60;
+      var remaining = M - N;
+      var step = (dur - lastTime) / (remaining + 1);
+      for (var j = 0; j < remaining; j++) {
+        lyrics.push({ time: lastTime + step * (j + 1), text: refLines[N + j].trim() });
+      }
+    }
+
+    return lyrics;
+  }
+
+  /* ══════════════════════════════════
+     繁化姬 API — 簡轉正體中文（台灣用語）
+     ══════════════════════════════════ */
+  async function toTraditional(text) {
+    if (!text) return text;
+    try {
+      var resp = await fetch('https://api.zhconvert.org/convert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ text: text, converter: 'Taiwan' })
+      });
+      var data = await resp.json();
+      if (data.code === 0 && data.data && data.data.text) {
+        return data.data.text;
+      }
+    } catch (_) {
+      /* API 失敗時回傳原文 */
+    }
+    return text;
+  }
+
+  /* ══════════════════════════════════
+     Clean Repeats (Whisper hallucination fix)
+     ══════════════════════════════════ */
+  function cleanRepeats(text) {
+    /* 單字重複 4+ 次 → 字～ */
+    text = text.replace(/(.)\1{3,}/g, '$1～');
+    /* 2-3 字片語重複 3+ 次 → 片語～ */
+    text = text.replace(/(.{2,3})\1{2,}/g, '$1～');
+    return text.trim();
+  }
+
+  /* ══════════════════════════════════
+     LRC Upload
+     ══════════════════════════════════ */
   function handleLrcUpload(e) {
-    const file = e.target.files[0];
+    var file = e.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const text = ev.target.result;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var text = ev.target.result;
       state.lyrics = parseLRC(text);
       if (state.lyrics.length) {
         renderLyricsView();
@@ -408,15 +504,15 @@
     e.target.value = '';
   }
 
-  /* ── Edit Mode ── */
+  /* ══════════════════════════════════
+     Edit Mode (with insert row)
+     ══════════════════════════════════ */
   function toggleEdit() {
     if (!state.lyrics.length) return;
     state.isEditing = !state.isEditing;
 
     if (state.isEditing) {
       renderEditView();
-      $('editBtn').querySelector('svg + *') || ($('editBtn').childNodes[1].textContent = ' 完成編輯');
-      /* Replace button text */
       $('editBtn').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 完成編輯';
     } else {
       saveEdits();
@@ -427,93 +523,100 @@
   }
 
   function renderEditView() {
-    const scroll = $('lyricsScroll');
-    const edit = $('editContainer');
+    var scroll = $('lyricsScroll');
+    var edit = $('editContainer');
 
     scroll.style.display = 'none';
     edit.classList.add('visible');
+    edit.innerHTML = '';
 
-    const ICON_PLAY_SM = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5,3 19,12 5,21"/></svg>';
+    /* 逐行建立 edit row */
+    state.lyrics.forEach(function (l) {
+      edit.appendChild(createEditRow(l.time, l.text));
+    });
 
-    let html = state.lyrics.map((l, i) =>
-      '<div class="edit-row" data-index="' + i + '">' +
-        '<button class="btn-preview" title="從這裡播放">' + ICON_PLAY_SM + '</button>' +
-        '<input type="text" class="edit-time" value="' + formatTimeLRC(l.time) + '" data-field="time">' +
-        '<input type="text" class="edit-text" value="' + escapeAttr(l.text) + '" data-field="text">' +
-        '<button class="btn-delete-row" title="刪除這行">' +
-          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-        '</button>' +
-      '</div>'
-    ).join('');
-
-    html += '<div class="edit-actions">' +
+    /* 底部「新增一行」按鈕 */
+    var actionsDiv = document.createElement('div');
+    actionsDiv.className = 'edit-actions';
+    actionsDiv.innerHTML =
       '<button class="btn-action" id="addLineBtn">' +
         '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
         ' 新增一行' +
-      '</button>' +
-    '</div>';
+      '</button>';
+    edit.appendChild(actionsDiv);
 
-    edit.innerHTML = html;
+    $('addLineBtn').addEventListener('click', function () {
+      var rows = edit.querySelectorAll('.edit-row');
+      var lastRow = rows[rows.length - 1];
+      var lastTime = lastRow
+        ? parseTimeLRC(lastRow.querySelector('[data-field="time"]').value.trim()) + 5
+        : 0;
+      var newRow = createEditRow(lastTime, '');
+      edit.querySelector('.edit-actions').insertAdjacentElement('beforebegin', newRow);
+      newRow.querySelector('[data-field="text"]').focus();
+    });
+  }
 
-    /* Preview play */
-    edit.querySelectorAll('.btn-preview').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const row = btn.closest('.edit-row');
-        const timeStr = row.querySelector('[data-field="time"]').value.trim();
-        audio.currentTime = parseTimeLRC(timeStr);
-        audio.play();
-        state.isPlaying = true;
-        updatePlayIcon();
-      });
+  /**
+   * 建立單一 edit row（含播放、時間、歌詞、插入、刪除按鈕）
+   */
+  function createEditRow(time, text) {
+    var row = document.createElement('div');
+    row.className = 'edit-row';
+    row.innerHTML =
+      '<button class="btn-preview" title="從這裡播放">' + ICON_PLAY_SM + '</button>' +
+      '<input type="text" class="edit-time" value="' + formatTimeLRC(time) + '" data-field="time">' +
+      '<input type="text" class="edit-text" value="' + escapeAttr(text) + '" placeholder="輸入歌詞..." data-field="text">' +
+      '<button class="btn-insert-row" title="在下方插入一行">' + ICON_INSERT + '</button>' +
+      '<button class="btn-delete-row" title="刪除這行">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+      '</button>';
+
+    /* 播放預覽 */
+    row.querySelector('.btn-preview').addEventListener('click', function () {
+      audio.currentTime = parseTimeLRC(row.querySelector('[data-field="time"]').value.trim());
+      audio.play();
+      state.isPlaying = true;
+      updatePlayIcon();
     });
 
-    /* Delete row */
-    edit.querySelectorAll('.btn-delete-row').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        btn.closest('.edit-row').remove();
-      });
+    /* 插入一行（在目前這行的下方） */
+    row.querySelector('.btn-insert-row').addEventListener('click', function () {
+      var curTime = parseTimeLRC(row.querySelector('[data-field="time"]').value.trim());
+      var newRow = createEditRow(curTime + 2, '');
+      row.insertAdjacentElement('afterend', newRow);
+      newRow.querySelector('[data-field="text"]').focus();
     });
 
-    /* Add line */
-    $('addLineBtn').addEventListener('click', () => {
-      const lastTime = state.lyrics.length ? state.lyrics[state.lyrics.length - 1].time + 5 : 0;
-      const row = document.createElement('div');
-      row.className = 'edit-row';
-      row.innerHTML =
-        '<button class="btn-preview" title="從這裡播放">' + ICON_PLAY_SM + '</button>' +
-        '<input type="text" class="edit-time" value="' + formatTimeLRC(lastTime) + '" data-field="time">' +
-        '<input type="text" class="edit-text" value="" placeholder="輸入歌詞..." data-field="text">' +
-        '<button class="btn-delete-row" title="刪除這行">' +
-          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-        '</button>';
-      row.querySelector('.btn-preview').addEventListener('click', () => {
-        audio.currentTime = parseTimeLRC(row.querySelector('[data-field="time"]').value.trim());
-        audio.play(); state.isPlaying = true; updatePlayIcon();
-      });
-      row.querySelector('.btn-delete-row').addEventListener('click', () => row.remove());
-      edit.querySelector('.edit-actions').insertAdjacentElement('beforebegin', row);
+    /* 刪除這行 */
+    row.querySelector('.btn-delete-row').addEventListener('click', function () {
+      row.remove();
     });
+
+    return row;
   }
 
   function saveEdits() {
-    const rows = $('editContainer').querySelectorAll('.edit-row');
-    const newLyrics = [];
-    rows.forEach((row) => {
-      const timeStr = row.querySelector('[data-field="time"]').value.trim();
-      const text = row.querySelector('[data-field="text"]').value.trim();
+    var rows = $('editContainer').querySelectorAll('.edit-row');
+    var newLyrics = [];
+    rows.forEach(function (row) {
+      var timeStr = row.querySelector('[data-field="time"]').value.trim();
+      var text = row.querySelector('[data-field="text"]').value.trim();
       if (!text) return;
-      const time = parseTimeLRC(timeStr);
-      newLyrics.push({ time, text });
+      var time = parseTimeLRC(timeStr);
+      newLyrics.push({ time: time, text: text });
     });
-    state.lyrics = newLyrics.sort((a, b) => a.time - b.time);
+    state.lyrics = newLyrics.sort(function (a, b) { return a.time - b.time; });
   }
 
-  /* ── Export LRC (with preview) ── */
+  /* ══════════════════════════════════
+     Export LRC (with preview modal)
+     ══════════════════════════════════ */
   function buildLRC() {
     if (state.isEditing) saveEdits();
-    const trackName = $('trackName').textContent || 'lyrics';
+    var trackName = $('trackName').textContent || 'lyrics';
     return '[ti:' + trackName + ']\n[by:Lyric Player]\n\n' +
-      state.lyrics.map((l) => '[' + formatTimeLRC(l.time) + ']' + l.text).join('\n');
+      state.lyrics.map(function (l) { return '[' + formatTimeLRC(l.time) + ']' + l.text; }).join('\n');
   }
 
   function showExportPreview() {
@@ -527,14 +630,14 @@
   }
 
   function copyLRC() {
-    navigator.clipboard.writeText(buildLRC()).then(() => showToast('已複製到剪貼簿'));
+    navigator.clipboard.writeText(buildLRC()).then(function () { showToast('已複製到剪貼簿'); });
   }
 
   function downloadLRC() {
-    const trackName = $('trackName').textContent || 'lyrics';
-    const blob = new Blob([buildLRC()], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    var trackName = $('trackName').textContent || 'lyrics';
+    var blob = new Blob([buildLRC()], { type: 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
     a.href = url;
     a.download = trackName + '.lrc';
     a.click();
@@ -543,11 +646,13 @@
     showToast('LRC 已下載');
   }
 
-  /* ── Tap Mode (inspired by lrc-maker) ── */
-  let tapLines = [];
-  let tapIndex = 0;
-  let tapActive = false;
-  let tapKeyHandler = null;
+  /* ══════════════════════════════════
+     Tap Mode
+     ══════════════════════════════════ */
+  var tapLines = [];
+  var tapIndex = 0;
+  var tapActive = false;
+  var tapKeyHandler = null;
 
   function openTapMode() {
     $('tapPanel').style.display = '';
@@ -562,31 +667,27 @@
   }
 
   function startTapMode() {
-    const text = $('tapTextarea').value.trim();
+    var text = $('tapTextarea').value.trim();
     if (!text) { showToast('請先貼上歌詞文字', 'error'); return; }
 
-    tapLines = text.split('\n').filter((l) => l.trim());
+    tapLines = text.split('\n').filter(function (l) { return l.trim(); });
     tapIndex = 0;
     tapActive = true;
 
-    /* Show status, hide textarea */
     $('tapTextarea').style.display = 'none';
     $('tapStartBtn').style.display = 'none';
     $('tapStatus').style.display = '';
     $('tapProgress').textContent = '0 / ' + tapLines.length;
 
-    /* Show lines in lyrics panel for visual feedback */
-    state.lyrics = tapLines.map((l) => ({ time: 0, text: l }));
+    state.lyrics = tapLines.map(function (l) { return { time: 0, text: l }; });
     renderLyricsView();
 
-    /* Start playback */
     audio.currentTime = 0;
     audio.play();
     state.isPlaying = true;
     updatePlayIcon();
 
-    /* Listen for spacebar */
-    tapKeyHandler = (e) => {
+    tapKeyHandler = function (e) {
       if (!tapActive) return;
       if (e.code === 'Space') {
         e.preventDefault();
@@ -595,9 +696,8 @@
           tapIndex++;
           $('tapProgress').textContent = tapIndex + ' / ' + tapLines.length;
 
-          /* Highlight current line */
-          const lines = $('lyricsScroll').querySelectorAll('.lyric-line');
-          lines.forEach((el, i) => {
+          var lines = $('lyricsScroll').querySelectorAll('.lyric-line');
+          lines.forEach(function (el, i) {
             el.classList.toggle('active', i === tapIndex);
             el.classList.toggle('past', i < tapIndex);
           });
@@ -624,7 +724,6 @@
       document.removeEventListener('keydown', tapKeyHandler);
       tapKeyHandler = null;
     }
-    /* Reset tap panel UI */
     $('tapTextarea').style.display = '';
     $('tapStartBtn').style.display = '';
     $('tapStatus').style.display = 'none';
@@ -635,63 +734,54 @@
   }
 
   /* ══════════════════════════════════
-     Clean Repeats (Whisper hallucination fix)
-     ══════════════════════════════════ */
-  /** Clean repeated characters from Whisper output, e.g. 啊啊啊啊啊 → 啊～ */
-  function cleanRepeats(text) {
-    /* Single character repeated 4+ times → char～ */
-    text = text.replace(/(.)\1{3,}/g, '$1～');
-    /* 2-3 char phrase repeated 3+ times → phrase～ */
-    text = text.replace(/(.{2,3})\1{2,}/g, '$1～');
-    return text.trim();
-  }
-
-  /* ══════════════════════════════════
      LRC Parser / Formatter
      ══════════════════════════════════ */
   function parseLRC(text) {
-    const lines = text.split('\n');
-    const lyrics = [];
-    const timeRe = /\[(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?\]/g;
+    var lines = text.split('\n');
+    var lyrics = [];
+    var timeRe = /\[(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?\]/g;
 
-    for (const line of lines) {
-      const matches = [...line.matchAll(timeRe)];
-      const content = line.replace(timeRe, '').trim();
+    for (var k = 0; k < lines.length; k++) {
+      var line = lines[k];
+      var matches = [];
+      var m;
+      while ((m = timeRe.exec(line)) !== null) { matches.push(m); }
+      timeRe.lastIndex = 0;
+      var content = line.replace(timeRe, '').trim();
+      timeRe.lastIndex = 0;
       if (!content || !matches.length) continue;
 
-      for (const m of matches) {
-        const min = parseInt(m[1], 10);
-        const sec = parseInt(m[2], 10);
-        const ms = m[3] ? parseInt(m[3].padEnd(3, '0'), 10) : 0;
+      for (var j = 0; j < matches.length; j++) {
+        var mm = matches[j];
+        var min = parseInt(mm[1], 10);
+        var sec = parseInt(mm[2], 10);
+        var ms = mm[3] ? parseInt(mm[3].padEnd(3, '0'), 10) : 0;
         lyrics.push({ time: min * 60 + sec + ms / 1000, text: content });
       }
     }
-    return lyrics.sort((a, b) => a.time - b.time);
+    return lyrics.sort(function (a, b) { return a.time - b.time; });
   }
 
-  /** Format seconds → mm:ss.xx (LRC standard) */
   function formatTimeLRC(sec) {
-    const m = Math.floor(sec / 60);
-    const s = Math.floor(sec % 60);
-    const cs = Math.round((sec % 1) * 100);
+    var m = Math.floor(sec / 60);
+    var s = Math.floor(sec % 60);
+    var cs = Math.round((sec % 1) * 100);
     return pad2(m) + ':' + pad2(s) + '.' + pad2(cs);
   }
 
-  /** Parse mm:ss.xx → seconds */
   function parseTimeLRC(str) {
-    const m = str.match(/^(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?$/);
+    var m = str.match(/^(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?$/);
     if (!m) return 0;
-    const min = parseInt(m[1], 10);
-    const sec = parseInt(m[2], 10);
-    const ms = m[3] ? parseInt(m[3].padEnd(3, '0'), 10) : 0;
+    var min = parseInt(m[1], 10);
+    var sec = parseInt(m[2], 10);
+    var ms = m[3] ? parseInt(m[3].padEnd(3, '0'), 10) : 0;
     return min * 60 + sec + ms / 1000;
   }
 
-  /** Format seconds → m:ss for player display */
   function formatTime(sec) {
     if (!sec || isNaN(sec)) return '0:00';
-    const m = Math.floor(sec / 60);
-    const s = Math.floor(sec % 60);
+    var m = Math.floor(sec / 60);
+    var s = Math.floor(sec % 60);
     return m + ':' + pad2(s);
   }
 
@@ -701,7 +791,7 @@
      Utilities
      ══════════════════════════════════ */
   function escapeHTML(str) {
-    const div = document.createElement('div');
+    var div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
   }
@@ -711,11 +801,11 @@
   }
 
   function showToast(msg, type) {
-    const el = $('toast');
+    var el = $('toast');
     el.textContent = msg;
     el.className = 'toast visible' + (type === 'error' ? ' error' : '');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { el.className = 'toast'; }, 3000);
+    toastTimer = setTimeout(function () { el.className = 'toast'; }, 3000);
   }
 
   /* ══════════════════════════════════
