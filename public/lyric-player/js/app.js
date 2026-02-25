@@ -271,6 +271,8 @@
 
     /* 勘誤按鈕 — 事後用參考歌詞修正文字，時間戳不動 */
     $('postCorrectBtn').addEventListener('click', applyPostCorrection);
+    /* 簡轉繁按鈕 */
+    $('s2tBtn').addEventListener('click', convertLyricsS2T);
     /* textarea 輸入時更新按鈕狀態 */
     $('refTextarea').addEventListener('input', updatePostCorrectBtn);
   }
@@ -414,7 +416,7 @@
 
       state.lyrics = chunks.map(function (c, i) {
         return { time: c.time, text: tradLines[i] !== undefined ? tradLines[i] : c.text };
-      });
+      }).filter(function (l) { return !isWhisperJunk(l.text); });
 
       fill.style.width = '100%';
       status.textContent = '辨識完成！共 ' + state.lyrics.length + ' 行歌詞（已轉正體中文）';
@@ -438,13 +440,14 @@
      勘誤 — 事後用參考歌詞修正文字
      ══════════════════════════════════ */
 
-  /** 啟用/停用勘誤按鈕 */
+  /** 啟用/停用勘誤 & 簡轉繁按鈕 */
   function updatePostCorrectBtn() {
-    var btn = $('postCorrectBtn');
-    if (!btn) return;
     var hasLyrics = state.lyrics && state.lyrics.length > 0;
     var hasRef = $('refTextarea') && $('refTextarea').value.trim().length > 0;
-    btn.disabled = !(hasLyrics && hasRef);
+    var btn = $('postCorrectBtn');
+    if (btn) btn.disabled = !(hasLyrics && hasRef);
+    var s2t = $('s2tBtn');
+    if (s2t) s2t.disabled = !hasLyrics;
   }
 
   /** 勘誤：保留 Whisper 時間戳，只替換文字 */
@@ -662,8 +665,48 @@
   }
 
   /* ══════════════════════════════════
-     繁化姬 API — 簡轉正體中文（台灣用語）
+     簡轉繁 — 本地字元對照（不靠外部 API）
      ══════════════════════════════════ */
+  var S2T_MAP = (function () {
+    /* 簡→繁 對照，每兩字一組：簡繁簡繁... 歌詞常用 ~300 組 */
+    var pairs =
+      '爱愛碍礙暗暗罢罷办辦帮幫报報备備笔筆边邊变變标標别別宾賓补補' +
+      '才纔参參层層长長唱唱车車称稱尘塵成成冲衝出出处處传傳窗窗创創' +
+      '词詞从從错錯达達带帶单單当當导導灯燈点點电電东東动動独獨断斷' +
+      '对對夺奪发發烦煩飞飛风風丰豐凤鳳佛佛赶趕岗崗个個给給关關观觀' +
+      '广廣归歸过過还還汉漢号號合合恨恨红紅后後花花画畫坏壞欢歡环環' +
+      '换換黄黃回回会會伙夥获獲鸡雞积積极極几幾济濟记記际際继繼间間' +
+      '简簡见見将將讲講酱醬节節尽盡进進惊驚经經竞競净淨举舉剧劇决決' +
+      '觉覺开開壳殼来來兰蘭拦攔蓝藍览覽劳勞乐樂离離里裡历歷丽麗两兩' +
+      '了了临臨灵靈刘劉龙龍楼樓陆陸虑慮论論罗羅妈媽马馬满滿么麼没沒' +
+      '门門梦夢面面灭滅庙廟民民铭銘难難脑腦闹鬧拟擬念念鸟鳥宁寧农農' +
+      '浓濃女女盘盤旁旁跑跑贫貧评評凭憑破破朴樸齐齊气氣千千签簽钱錢' +
+      '墙牆亲親轻輕穷窮请請庆慶权權却卻让讓热熱认認荣榮软軟伤傷烧燒' +
+      '设設声聲胜勝师師时時实實视視试試寿壽书書属屬术術树樹双雙顺順' +
+      '说說丝絲苏蘇随隨岁歲损損态態谈談叹嘆汤湯逃逃讨討铁鐵听聽头頭' +
+      '图圖团團万萬网網卫衛温溫问問无無雾霧误誤细細虾蝦闲閒显顯线線' +
+      '现現乡鄉响響向向想想项項象象萧蕭写寫谢謝兴興选選学學压壓烟煙' +
+      '严嚴颜顏眼眼样樣药藥业業叶葉页頁义義艺藝阴陰银銀应應营營拥擁' +
+      '佣傭优優忧憂游遊与與语語欲慾渊淵远遠愿願约約运運杂雜脏髒赞贊' +
+      '张張这這阵陣争爭证證只隻知知织織执執种種众眾专專转轉装裝状狀' +
+      '准準资資总總组組钟鐘终終众眾';
+    var map = {};
+    for (var i = 0; i < pairs.length; i += 2) {
+      if (pairs[i] !== pairs[i + 1]) map[pairs[i]] = pairs[i + 1];
+    }
+    return map;
+  })();
+
+  function localS2T(text) {
+    if (!text) return text;
+    var result = '';
+    for (var i = 0; i < text.length; i++) {
+      result += S2T_MAP[text[i]] || text[i];
+    }
+    return result;
+  }
+
+  /** 簡轉繁：先試 API，失敗用本地對照 */
   async function toTraditional(text) {
     if (!text) return text;
     try {
@@ -676,10 +719,29 @@
       if (data.code === 0 && data.data && data.data.text) {
         return data.data.text;
       }
-    } catch (_) {
-      /* API 失敗時回傳原文 */
-    }
-    return text;
+    } catch (_) { /* API 失敗，用本地對照 */ }
+    return localS2T(text);
+  }
+
+  /** 把目前歌詞全部簡轉繁（按鈕用） */
+  function convertLyricsS2T() {
+    if (!state.lyrics.length) return;
+    var scroll = $('lyricsScroll');
+    var savedTop = scroll ? scroll.scrollTop : 0;
+    var savedPage = window.scrollY;
+
+    var lines = scroll.querySelectorAll('.lyric-line');
+    state.lyrics.forEach(function (l, i) {
+      l.text = localS2T(l.text);
+      if (lines[i]) {
+        var textEl = lines[i].querySelector('.lyric-text');
+        if (textEl) textEl.textContent = l.text;
+      }
+    });
+
+    if (scroll) scroll.scrollTop = savedTop;
+    window.scrollTo(0, savedPage);
+    showToast('已轉換為正體中文');
   }
 
   /* ══════════════════════════════════
@@ -820,6 +882,16 @@
     /* 2-3 字片語重複 3+ 次 → 片語～ */
     text = text.replace(/(.{2,3})\1{2,}/g, '$1～');
     return text.trim();
+  }
+
+  /** 過濾 Whisper 幻覺（CC 署名、字幕來源等垃圾行） */
+  function isWhisperJunk(text) {
+    var t = text.trim();
+    if (!t) return true;
+    if (/CC字幕|字幕[:：]|[Ss]ubtitle|[Cc]aption/i.test(t)) return true;
+    if (/製作[:：]|翻[译譯][:：]|校[对對][:：]/i.test(t)) return true;
+    if (/^[\s\W]*$/.test(t)) return true; /* 純符號 */
+    return false;
   }
 
   /* ══════════════════════════════════
