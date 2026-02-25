@@ -280,6 +280,15 @@
      ══════════════════════════════════ */
   async function startRecognition() {
     if (state.isRecognizing || !state.audioFile) return;
+
+    /* 語言未選擇時提醒 */
+    var langVal = $('langSelect').value;
+    if (!langVal) {
+      showToast('請先選擇歌曲語言再辨識', 'error');
+      $('langSelect').focus();
+      return;
+    }
+
     state.isRecognizing = true;
 
     const prog = $('aiProgress');
@@ -459,7 +468,10 @@
       return;
     }
 
+    console.log('[勘誤] 修正前時間戳:', state.lyrics.slice(0, 5).map(function(l) { return l.time.toFixed(2); }));
     state.lyrics = replaceTextWithRef(state.lyrics, refLines);
+    console.log('[勘誤] 修正後時間戳:', state.lyrics.slice(0, 5).map(function(l) { return l.time.toFixed(2); }));
+    console.log('[勘誤] Whisper 行數:', state.lyrics.length, '/ 歌詞行數:', refLines.length);
     renderLyricsView();
     showToast('已修正 ' + state.lyrics.length + ' 行歌詞文字，時間戳不變');
   }
