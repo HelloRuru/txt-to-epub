@@ -286,6 +286,12 @@ html.dark .btn-action.primary {
 .btn-action input[type="file"] { display: none; }
 
 /* Language Select */
+.lang-label {
+  font-size: var(--text-caption);
+  color: var(--color-light);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+}
 .lang-select {
   padding: 8px 12px;
   font-size: var(--text-small);
@@ -798,6 +804,19 @@ html.dark .ref-textarea {
   color: var(--dark-body);
 }
 .ref-textarea:focus { border-color: var(--color-rose); }
+.ref-desc {
+  font-size: var(--text-small);
+  color: var(--color-body);
+  line-height: 1.6;
+  margin-bottom: 10px;
+  padding: 10px 14px;
+  background: rgba(212, 165, 165, 0.08);
+  border-radius: 10px;
+  border-left: 3px solid var(--color-rose);
+}
+html.dark .ref-desc {
+  background: rgba(224, 175, 175, 0.08);
+}
 .ref-hint {
   font-size: var(--text-caption);
   color: var(--color-light);

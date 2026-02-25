@@ -427,22 +427,30 @@
     if (!M) return [];
     var dur = audio.duration || 180;
 
-    if (chunks.length === 0) {
-      /* 沒有 chunks，均勻分配到歌曲全長 */
-      var step = dur / M;
-      return refLines.map(function (text, i) {
-        return { time: step * i, text: text.trim() };
-      });
+    /* 決定歌詞的起止範圍 */
+    var voiceStart, voiceEnd;
+
+    if (chunks.length > 0) {
+      voiceStart = chunks[0].time;
+      var lastChunk = chunks[chunks.length - 1];
+      voiceEnd = lastChunk.endTime || (lastChunk.time + 15);
+      if (voiceEnd > dur) voiceEnd = dur;
+
+      /* 如果 chunks 涵蓋範圍不到歌曲的 30%，代表時間戳不可靠 */
+      var chunkSpan = voiceEnd - voiceStart;
+      if (chunkSpan < dur * 0.3) {
+        /* 時間戳不可靠，改用歌曲全長（跳過前 3 秒可能的前奏） */
+        voiceStart = Math.min(3, dur * 0.05);
+        voiceEnd = dur - 2;
+      }
+    } else {
+      /* 沒有 chunks，跳過前 3 秒 */
+      voiceStart = Math.min(3, dur * 0.05);
+      voiceEnd = dur - 2;
     }
 
-    /* 用 Whisper 結果確定有人聲的起止時間 */
-    var voiceStart = chunks[0].time;
-    var lastChunk = chunks[chunks.length - 1];
-    var voiceEnd = lastChunk.endTime || (lastChunk.time + 15);
-    if (voiceEnd > dur) voiceEnd = dur;
-    if (voiceEnd <= voiceStart) voiceEnd = dur;
+    if (voiceEnd <= voiceStart) voiceEnd = dur - 2;
 
-    /* 在有人聲的時段內均勻分配歌詞行 */
     var voiceDuration = voiceEnd - voiceStart;
     var step = voiceDuration / M;
 

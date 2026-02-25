@@ -68,8 +68,8 @@
   <link rel="preload" as="font" type="font/woff2" href="https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2" crossorigin>
 
   <!-- Styles -->
-  <link rel="stylesheet" href="css/base.css?v=20260225d">
-  <link rel="stylesheet" href="css/style.css?v=20260225d">
+  <link rel="stylesheet" href="css/base.css?v=20260225e">
+  <link rel="stylesheet" href="css/style.css?v=20260225e">
 </head>
 <body>
   <!-- Brand Header -->
@@ -147,12 +147,13 @@
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
               AI 辨識歌詞
             </button>
+            <label class="lang-label" for="langSelect">主要語言</label>
             <select class="lang-select" id="langSelect" title="選擇歌曲的主要語言">
-              <option value="auto">自動偵測語言</option>
-              <option value="chinese">主要中文</option>
-              <option value="english">主要英文</option>
-              <option value="japanese">主要日文</option>
-              <option value="korean">主要韓文</option>
+              <option value="auto">自動偵測</option>
+              <option value="chinese">中文</option>
+              <option value="english">英文</option>
+              <option value="japanese">日文</option>
+              <option value="korean">韓文</option>
             </select>
           </div>
           <div class="action-bar">
@@ -185,8 +186,9 @@
               <svg class="ref-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
             <div class="ref-content" id="refContent" style="display:none">
-              <textarea class="ref-textarea" id="refTextarea" rows="6" placeholder="貼上歌詞文字...&#10;每行一句&#10;AI 會用你的歌詞 + 自動對時間標記"></textarea>
-              <p class="ref-hint">段落標記 [Verse]、演奏描述 (instrumental) 會自動過濾，只保留歌詞</p>
+              <p class="ref-desc">先貼上正確歌詞，AI 就不需要猜文字，只負責對齊時間，辨識會準確很多。特別推薦中文歌曲使用！</p>
+              <textarea class="ref-textarea" id="refTextarea" rows="6" placeholder="貼上歌詞文字...&#10;每行一句，例如：&#10;我還是會帶著你的愛&#10;繼續走下去"></textarea>
+              <p class="ref-hint">段落標記 [Verse]、演奏描述 (instrumental) 會自動過濾，只保留歌詞行</p>
             </div>
           </div>
 
@@ -264,6 +266,6 @@
   <button class="theme-toggle" id="themeToggle" title="切換深色模式"></button>
 
   <!-- App Script -->
-  <script src="js/app.js?v=20260225d"></script>
+  <script src="js/app.js?v=20260225e"></script>
 </body>
 </html>
