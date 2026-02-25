@@ -584,27 +584,21 @@
       });
     }
 
-    if (M <= N) {
-      /* 歌詞比 Whisper 行數少：取 M 個代表性時間點 */
-      return refLines.map(function (text, i) {
-        var ci = Math.round(i * (N - 1) / (M - 1 || 1));
-        ci = Math.min(ci, N - 1);
-        return { time: lyrics[ci].time, text: text.trim() };
-      });
+    /* 不論 M > N 或 M < N，永遠保留 N 個原始時間戳
+       把 M 行歌詞分配進 N 個桶，文字換行合併 */
+    var buckets = lyrics.map(function () { return []; });
+
+    for (var i = 0; i < M; i++) {
+      var idx = Math.round(i * (N - 1) / (M - 1 || 1));
+      idx = Math.min(idx, N - 1);
+      buckets[idx].push(refLines[i].trim());
     }
 
-    /* 歌詞比 Whisper 行數多：在 Whisper 時間戳之間插值 */
-    return refLines.map(function (text, i) {
-      var pos = i * (N - 1) / (M - 1 || 1);
-      var lo = Math.floor(pos);
-      var hi = Math.ceil(pos);
-      if (lo >= N) lo = N - 1;
-      if (hi >= N) hi = N - 1;
-      var frac = pos - lo;
-      var tLo = lyrics[lo].time;
-      var tHi = (lo === hi) ? tLo : lyrics[hi].time;
-      var t = tLo + frac * (tHi - tLo);
-      return { time: Math.max(0, t), text: text.trim() };
+    return lyrics.map(function (line, i) {
+      var text = buckets[i].length > 0
+        ? buckets[i].join('\n')
+        : line.text; /* 沒分配到歌詞的保留原文 */
+      return { time: line.time, text: text };
     });
   }
 
