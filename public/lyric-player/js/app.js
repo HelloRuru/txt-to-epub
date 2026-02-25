@@ -459,16 +459,26 @@
       return;
     }
 
+    /* 記住捲動位置 */
+    var scroll = $('lyricsScroll');
+    var savedTop = scroll ? scroll.scrollTop : 0;
+    var savedPage = window.scrollY;
+
     state.lyrics = replaceTextWithRef(state.lyrics, refLines);
 
-    /* 就地換文字，不重建 DOM（避免捲動跳回頂部） */
-    var lines = $('lyricsScroll').querySelectorAll('.lyric-line');
+    /* 就地換文字，不重建 DOM */
+    var lines = scroll.querySelectorAll('.lyric-line');
     state.lyrics.forEach(function (l, i) {
       if (lines[i]) {
         var textEl = lines[i].querySelector('.lyric-text');
         if (textEl) textEl.textContent = l.text;
       }
     });
+
+    /* 強制還原捲動位置 */
+    if (scroll) scroll.scrollTop = savedTop;
+    window.scrollTo(0, savedPage);
+
     showToast('已修正歌詞文字，時間戳不變');
   }
 
