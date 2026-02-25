@@ -591,15 +591,33 @@
    * 用 Whisper 辨識的時間戳 + 參考歌詞修正文字
    * Whisper 負責人聲時間偵測，參考歌詞負責修正錯字
    */
+  /** 兩字串是否相似（去空白後共同字元 > 40%） */
+  function isSimilar(a, b) {
+    var sa = a.replace(/\s/g, '');
+    var sb = b.replace(/\s/g, '');
+    if (!sa || !sb) return false;
+    var shorter = sa.length < sb.length ? sa : sb;
+    var longer  = sa.length < sb.length ? sb : sa;
+    var hits = 0;
+    for (var i = 0; i < shorter.length; i++) {
+      if (longer.indexOf(shorter[i]) >= 0) hits++;
+    }
+    return hits / shorter.length > 0.4;
+  }
+
   function replaceTextWithRef(lyrics, refLines) {
-    /* 最簡單：按順序 1 對 1 替換文字，時間戳完全不動
-       歌詞行多於 Whisper 段數 → 多的忽略
-       歌詞行少於 Whisper 段數 → 剩的保留原文 */
-    return lyrics.map(function (line, i) {
-      return {
-        time: line.time,
-        text: i < refLines.length ? refLines[i].trim() : line.text
-      };
+    /* 按順序走：Whisper 逐行往前，遇到像的就替換，不像就跳過
+       時間戳完全不動 */
+    var refIdx = 0;
+    return lyrics.map(function (line) {
+      if (refIdx >= refLines.length) return { time: line.time, text: line.text };
+
+      if (isSimilar(line.text, refLines[refIdx])) {
+        /* 相似 → 替換文字，兩邊都往前 */
+        return { time: line.time, text: refLines[refIdx++].trim() };
+      }
+      /* 不像 → 保留原文，只有 Whisper 往前（歌詞指標不動） */
+      return { time: line.time, text: line.text };
     });
   }
 
