@@ -594,32 +594,42 @@
    * 用 Whisper 辨識的時間戳 + 參考歌詞修正文字
    * Whisper 負責人聲時間偵測，參考歌詞負責修正錯字
    */
-  /** 兩字串是否相似（去空白後共同字元 > 40%） */
-  function isSimilar(a, b) {
+  /** 字元重疊分數（去空白，計算共同字元比例） */
+  function charScore(a, b) {
     var sa = a.replace(/\s/g, '');
     var sb = b.replace(/\s/g, '');
-    if (!sa || !sb) return false;
+    if (!sa || !sb) return 0;
     var shorter = sa.length < sb.length ? sa : sb;
     var longer  = sa.length < sb.length ? sb : sa;
     var hits = 0;
     for (var i = 0; i < shorter.length; i++) {
       if (longer.indexOf(shorter[i]) >= 0) hits++;
     }
-    return hits / shorter.length > 0.4;
+    return hits / shorter.length;
   }
 
   function replaceTextWithRef(lyrics, refLines) {
-    /* 按順序走：Whisper 逐行往前，遇到像的就替換，不像就跳過
-       時間戳完全不動 */
+    /* 往前看最多 3 行參考歌詞，挑最像的配對
+       處理 Whisper 合併/拆行造成的錯位 */
     var refIdx = 0;
+    var LOOK = 3; /* 往前看幾行 */
+
     return lyrics.map(function (line) {
       if (refIdx >= refLines.length) return { time: line.time, text: line.text };
 
-      if (isSimilar(line.text, refLines[refIdx])) {
-        /* 相似 → 替換文字，兩邊都往前 */
-        return { time: line.time, text: refLines[refIdx++].trim() };
+      var bestJ = -1;
+      var bestScore = 0;
+      var limit = Math.min(refIdx + LOOK, refLines.length);
+
+      for (var j = refIdx; j < limit; j++) {
+        var s = charScore(line.text, refLines[j]);
+        if (s > bestScore) { bestScore = s; bestJ = j; }
       }
-      /* 不像 → 保留原文，只有 Whisper 往前（歌詞指標不動） */
+
+      if (bestJ >= 0 && bestScore > 0.35) {
+        refIdx = bestJ + 1; /* 跳過中間不匹配的參考行 */
+        return { time: line.time, text: refLines[bestJ].trim() };
+      }
       return { time: line.time, text: line.text };
     });
   }
@@ -689,7 +699,22 @@
       '严嚴颜顏眼眼样樣药藥业業叶葉页頁义義艺藝阴陰银銀应應营營拥擁' +
       '佣傭优優忧憂游遊与與语語欲慾渊淵远遠愿願约約运運杂雜脏髒赞贊' +
       '张張这這阵陣争爭证證只隻知知织織执執种種众眾专專转轉装裝状狀' +
-      '准準资資总總组組钟鐘终終众眾';
+      '准準资資总總组組钟鐘终終众眾' +
+      /* 補漏：歌詞高頻字 */
+      '为為话話机機荧熒静靜脸臉礼禮挤擠复複属屬于於' +
+      '猫貓狗狗鱼魚连連尝嘗灿燦烂爛频頻率率' +
+      '坚堅护護怀懷恋戀份份借借倒倒够夠罚罰' +
+      '凉涼惨慘忆憶抢搶扑撲拼拼挡擋捡撿损損' +
+      '摇搖断斷旧舊松鬆柜櫃档檔桥橋档檔' +
+      '疯瘋痴癡盖蓋睁睜碰碰祸禍秘秘窃竊' +
+      '笼籠糊糊紧緊纪紀纠糾绑綁绝絕绕繞' +
+      '续續缘緣缩縮罢罷翻翻耻恥肤膚胆膽' +
+      '脏髒腊臘舍捨苍蒼范範茫茫荡蕩蒋蔣' +
+      '蛋蛋蜡蠟补補袭襲览覽诉訴詢詢谁誰' +
+      '贝貝贴貼赶趕趋趨踪蹤躲躲输輸辞辭' +
+      '迁遷迟遲适適遗遺邻鄰郁鬱链鏈锁鎖' +
+      '锅鍋镇鎮闷悶阅閱险險隐隱雕雕靠靠' +
+      '韩韓颤顫饭飯饿餓馆館骗騙魂魂鼓鼓';
     var map = {};
     for (var i = 0; i < pairs.length; i += 2) {
       if (pairs[i] !== pairs[i + 1]) map[pairs[i]] = pairs[i + 1];
