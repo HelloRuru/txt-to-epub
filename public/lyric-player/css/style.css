@@ -899,6 +899,21 @@ html.dark body {
 }
 .ref-textarea:focus { border-color: var(--score-accent); }
 
+/* 勘誤按鈕區 */
+.ref-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+.ref-actions .btn-action {
+  font-size: 13px;
+  padding: 6px 14px;
+}
+.ref-actions .btn-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* 撕破紙張風格說明卡 */
 .ref-desc.score-card {
   position: relative;

@@ -268,6 +268,11 @@
       content.style.display = isHidden ? '' : 'none';
       $('refToggle').classList.toggle('open', isHidden);
     });
+
+    /* 勘誤按鈕 — 事後用參考歌詞修正文字，時間戳不動 */
+    $('postCorrectBtn').addEventListener('click', applyPostCorrection);
+    /* textarea 輸入時更新按鈕狀態 */
+    $('refTextarea').addEventListener('input', updatePostCorrectBtn);
   }
 
   /* ══════════════════════════════════
@@ -285,10 +290,7 @@
     status.textContent = '載入 AI 模型中（首次約 1-2 分鐘下載）...';
     $('aiBtn').disabled = true;
 
-    /* Check for reference lyrics — auto-clean non-lyric lines */
-    var refText = $('refTextarea') ? $('refTextarea').value.trim() : '';
-    var rawLines = refText ? refText.split('\n') : [];
-    var refLines = cleanRefLines(rawLines);
+    /* 參考歌詞不再於辨識時處理，改由事後「勘誤」按鈕獨立修正 */
 
     try {
       /* 1. Load Transformers.js + Whisper */
@@ -393,66 +395,35 @@
       /* 4. 去除重疊區域產生的重複文字 */
       chunks = deduplicateOverlap(chunks);
 
-      /* 5. 時間戳品質檢查 — 含切塊內部品質 */
+      /* 5. 時間戳品質檢查 */
       var internalReliable = internalTotal === 0 || (internalNearZero / internalTotal < 0.4);
       var tsReliable = checkTimestampQuality(chunks, audioDur) && internalReliable;
-
-      /* 5a. 時間戳不靠 + 有結構歌詞 → 段落感知分配（比 Whisper 準） */
-      if (!tsReliable && rawLines.length > 0 && hasStructureMarkers(rawLines)) {
-        status.textContent = '依歌詞段落結構分配時間...';
-        fill.style.width = '90%';
-        state.lyrics = structuredDistribute(rawLines, audioDur);
-        /* 繁化姬轉正體 */
-        var structText = state.lyrics.map(function (l) { return l.text; }).join('\n');
-        var structTrad = await toTraditional(structText);
-        var structTradLines = structTrad.split('\n');
-        state.lyrics = state.lyrics.map(function (l, i) {
-          return { time: l.time, text: structTradLines[i] !== undefined ? structTradLines[i] : l.text };
-        });
-        fill.style.width = '100%';
-        status.textContent = '完成！依歌曲段落分配 ' + state.lyrics.length + ' 行歌詞';
-        showToast('已根據歌詞段落結構分配時間標記');
-      } else {
-        /* 正常流程 */
-        if (!tsReliable && chunks.length > 1) {
-          chunks = redistributeChunks(chunks, audioDur);
-        }
-
-        /* 6. 清理重複 + 繁化姬轉正體 */
-        chunks = chunks.map(function (c) {
-          return { time: c.time, endTime: c.endTime, text: cleanRepeats(c.text) };
-        });
-
-        status.textContent = '轉換為正體中文...';
-        fill.style.width = '90%';
-
-        var allText = chunks.map(function (c) { return c.text; }).join('\n');
-        var tradText = await toTraditional(allText);
-        var tradLines = tradText.split('\n');
-
-        state.lyrics = chunks.map(function (c, i) {
-          return { time: c.time, text: tradLines[i] !== undefined ? tradLines[i] : c.text };
-        });
-
-        /* 7. 有參考歌詞：用 Whisper 時間戳 + 參考歌詞修正文字 */
-        if (refLines.length > 0 && state.lyrics.length > 0) {
-          state.lyrics = replaceTextWithRef(state.lyrics, refLines);
-          fill.style.width = '100%';
-          status.textContent = '完成！AI 辨識 ' + state.lyrics.length + ' 段，已用參考歌詞修正文字';
-          showToast('AI 辨識人聲時間 + 參考歌詞修正文字');
-        } else if (refLines.length > 0 && state.lyrics.length === 0) {
-          state.lyrics = mapReferenceToTimestamps(refLines, chunks);
-          fill.style.width = '100%';
-          status.textContent = '未偵測到人聲，改用均勻分配，共 ' + state.lyrics.length + ' 行';
-          showToast('未偵測到人聲，已均勻分配歌詞');
-        } else {
-          fill.style.width = '100%';
-          status.textContent = '辨識完成！共 ' + state.lyrics.length + ' 行歌詞（已轉正體中文）';
-          showToast('歌詞辨識完成！已自動轉為正體中文');
-        }
+      if (!tsReliable && chunks.length > 1) {
+        chunks = redistributeChunks(chunks, audioDur);
       }
 
+      /* 6. 清理重複 + 繁化姬轉正體 */
+      chunks = chunks.map(function (c) {
+        return { time: c.time, endTime: c.endTime, text: cleanRepeats(c.text) };
+      });
+
+      status.textContent = '轉換為正體中文...';
+      fill.style.width = '90%';
+
+      var allText = chunks.map(function (c) { return c.text; }).join('\n');
+      var tradText = await toTraditional(allText);
+      var tradLines = tradText.split('\n');
+
+      state.lyrics = chunks.map(function (c, i) {
+        return { time: c.time, text: tradLines[i] !== undefined ? tradLines[i] : c.text };
+      });
+
+      fill.style.width = '100%';
+      status.textContent = '辨識完成！共 ' + state.lyrics.length + ' 行歌詞（已轉正體中文）';
+      showToast('歌詞辨識完成！可貼歌詞按「勘誤」修正文字');
+
       renderLyricsView();
+      updatePostCorrectBtn();
 
     } catch (err) {
       console.error('AI Recognition error:', err);
@@ -463,6 +434,36 @@
       $('aiBtn').disabled = false;
       setTimeout(function () { prog.classList.remove('visible'); }, 3000);
     }
+  }
+
+  /* ══════════════════════════════════
+     勘誤 — 事後用參考歌詞修正文字
+     ══════════════════════════════════ */
+
+  /** 啟用/停用勘誤按鈕 */
+  function updatePostCorrectBtn() {
+    var btn = $('postCorrectBtn');
+    if (!btn) return;
+    var hasLyrics = state.lyrics && state.lyrics.length > 0;
+    var hasRef = $('refTextarea') && $('refTextarea').value.trim().length > 0;
+    btn.disabled = !(hasLyrics && hasRef);
+  }
+
+  /** 勘誤：保留 Whisper 時間戳，只替換文字 */
+  function applyPostCorrection() {
+    var refText = $('refTextarea') ? $('refTextarea').value.trim() : '';
+    if (!refText || !state.lyrics.length) return;
+
+    var rawLines = refText.split('\n');
+    var refLines = cleanRefLines(rawLines);
+    if (!refLines.length) {
+      showToast('沒有偵測到歌詞行（段落標記已自動過濾）', 'error');
+      return;
+    }
+
+    state.lyrics = replaceTextWithRef(state.lyrics, refLines);
+    renderLyricsView();
+    showToast('已修正 ' + state.lyrics.length + ' 行歌詞文字，時間戳不變');
   }
 
   /** Decode audio file to 16kHz mono Float32Array for Whisper */
