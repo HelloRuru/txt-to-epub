@@ -459,12 +459,17 @@
       return;
     }
 
-    console.log('[勘誤] 修正前時間戳:', state.lyrics.slice(0, 5).map(function(l) { return l.time.toFixed(2); }));
     state.lyrics = replaceTextWithRef(state.lyrics, refLines);
-    console.log('[勘誤] 修正後時間戳:', state.lyrics.slice(0, 5).map(function(l) { return l.time.toFixed(2); }));
-    console.log('[勘誤] Whisper 行數:', state.lyrics.length, '/ 歌詞行數:', refLines.length);
-    renderLyricsView();
-    showToast('已修正 ' + state.lyrics.length + ' 行歌詞文字，時間戳不變');
+
+    /* 就地換文字，不重建 DOM（避免捲動跳回頂部） */
+    var lines = $('lyricsScroll').querySelectorAll('.lyric-line');
+    state.lyrics.forEach(function (l, i) {
+      if (lines[i]) {
+        var textEl = lines[i].querySelector('.lyric-text');
+        if (textEl) textEl.textContent = l.text;
+      }
+    });
+    showToast('已修正歌詞文字，時間戳不變');
   }
 
   /** Decode audio file to 16kHz mono Float32Array for Whisper */
