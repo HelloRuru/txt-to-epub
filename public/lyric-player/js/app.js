@@ -402,13 +402,13 @@
       }
 
       if (refText) {
-        /* ── 有歌詞 → 只用 Whisper 的時間範圍，文字用使用者的 ── */
+        /* ── 有歌詞 → Whisper 時間戳當錨點，文字用使用者的 ── */
         var rawLines = refText.split('\n');
         if (hasStructureMarkers(rawLines)) {
           state.lyrics = structuredDistribute(rawLines, audioDur);
         } else {
           var refLines = cleanRefLines(rawLines);
-          state.lyrics = mapReferenceToTimestamps(refLines, chunks);
+          state.lyrics = alignLyricsToChunks(refLines, chunks);
         }
         fill.style.width = '100%';
         status.textContent = '完成！共 ' + state.lyrics.length + ' 行歌詞已對齊時間軸';
@@ -599,6 +599,140 @@
 
     return refLines.map(function (text, i) {
       return { time: Math.max(0, voiceStart + step * i), text: text.trim() };
+    });
+  }
+
+  /* ══════════════════════════════════
+     字元順序比對 — 計算兩段文字的相似度
+     ══════════════════════════════════ */
+
+  /**
+   * 計算 ref 中有多少比例的字元依序出現在 target 中
+   * 去掉空白和標點後比對，回傳 0~1
+   */
+  function charOverlap(ref, target) {
+    if (!ref || !target) return 0;
+    var a = ref.replace(/[\s\p{P}]/gu, '');
+    var b = target.replace(/[\s\p{P}]/gu, '');
+    if (!a.length || !b.length) return 0;
+
+    var j = 0;
+    var matches = 0;
+    for (var i = 0; i < a.length; i++) {
+      for (var k = j; k < b.length; k++) {
+        if (a[i] === b[k]) {
+          matches++;
+          j = k + 1;
+          break;
+        }
+      }
+    }
+    return matches / a.length;
+  }
+
+  /* ══════════════════════════════════
+     錨點比對 — 用 Whisper 時間戳對齊使用者歌詞
+     ══════════════════════════════════ */
+
+  /**
+   * 把使用者的歌詞逐行比對 Whisper 的辨識結果，
+   * 匹配到的行直接用 Whisper 時間戳，
+   * 沒匹配到的行在鄰近錨點之間內插。
+   * 如果錨點太少（< 3），退回均勻分配。
+   */
+  function alignLyricsToChunks(refLines, chunks) {
+    var M = refLines.length;
+    if (!M) return [];
+    if (chunks.length < 2) {
+      return mapReferenceToTimestamps(refLines, chunks);
+    }
+
+    /* 把 Whisper 文字轉繁體，方便跟使用者歌詞比對 */
+    var normChunks = chunks.map(function (c) {
+      return { time: c.time, endTime: c.endTime, text: localS2T(c.text) };
+    });
+
+    /* 第一輪：為每行歌詞找最佳匹配的 Whisper 段落 */
+    var anchors = [];
+    var chunkPtr = 0;
+
+    for (var i = 0; i < M; i++) {
+      var ref = refLines[i].trim();
+      if (!ref) continue;
+      var bestScore = 0;
+      var bestChunk = -1;
+
+      /* 搜尋窗口：根據目前位置和預期位置，前後各看幾段 */
+      var expectedChunk = Math.round((i / M) * normChunks.length);
+      var windowStart = Math.max(0, Math.min(chunkPtr - 1, expectedChunk - 3));
+      var windowEnd = Math.min(normChunks.length, Math.max(chunkPtr + 6, expectedChunk + 6));
+
+      for (var j = windowStart; j < windowEnd; j++) {
+        var score = charOverlap(ref, normChunks[j].text);
+        if (score > bestScore) {
+          bestScore = score;
+          bestChunk = j;
+        }
+      }
+
+      if (bestScore >= 0.3 && bestChunk >= 0) {
+        anchors.push({ lineIdx: i, chunkIdx: bestChunk });
+        chunkPtr = bestChunk;
+      }
+    }
+
+    /* 錨點太少 → 退回均勻分配 */
+    if (anchors.length < 3) {
+      return mapReferenceToTimestamps(refLines, chunks);
+    }
+
+    /* 第二輪：根據錨點分配時間 */
+    var times = new Array(M);
+
+    /* 錨點行直接用 Whisper 時間 */
+    for (var a = 0; a < anchors.length; a++) {
+      times[anchors[a].lineIdx] = chunks[anchors[a].chunkIdx].time;
+    }
+
+    /* 同 chunk 多行展開：如果連續幾行匹配到同一個 chunk，在 chunk 時間範圍內均分 */
+    for (var a = 0; a < anchors.length; ) {
+      var ci = anchors[a].chunkIdx;
+      var groupStart = a;
+      while (a < anchors.length && anchors[a].chunkIdx === ci) a++;
+      var groupEnd = a;
+      if (groupEnd - groupStart > 1) {
+        var tStart = chunks[ci].time;
+        var tEnd = chunks[ci].endTime || (tStart + 3);
+        var count = groupEnd - groupStart;
+        var step = (tEnd - tStart) / count;
+        for (var g = groupStart; g < groupEnd; g++) {
+          times[anchors[g].lineIdx] = +(tStart + step * (g - groupStart)).toFixed(2);
+        }
+      }
+    }
+
+    /* 非錨點行：在前後錨點之間內插 */
+    var dur = audio.duration || 180;
+    for (var i = 0; i < M; i++) {
+      if (times[i] !== undefined) continue;
+
+      var prevIdx = -1, prevTime = 0;
+      var nextIdx = M, nextTime = dur;
+
+      for (var p = i - 1; p >= 0; p--) {
+        if (times[p] !== undefined) { prevIdx = p; prevTime = times[p]; break; }
+      }
+      for (var n = i + 1; n < M; n++) {
+        if (times[n] !== undefined) { nextIdx = n; nextTime = times[n]; break; }
+      }
+
+      var span = nextTime - prevTime;
+      var steps = nextIdx - prevIdx;
+      times[i] = prevTime + (span / steps) * (i - prevIdx);
+    }
+
+    return refLines.map(function (text, i) {
+      return { time: Math.max(0, +times[i].toFixed(2)), text: text.trim() };
     });
   }
 
@@ -1191,4 +1325,12 @@
      Bootstrap
      ══════════════════════════════════ */
   document.addEventListener('DOMContentLoaded', init);
+
+  /* 測試鉤子 — 讓 Playwright 能呼叫內部函式 */
+  window._lp = {
+    charOverlap: charOverlap,
+    alignLyricsToChunks: alignLyricsToChunks,
+    localS2T: localS2T,
+    mapReferenceToTimestamps: mapReferenceToTimestamps,
+  };
 })();
