@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post Writer</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div id="app">
+    <p style="text-align:center;padding:40px 20px;color:#A09090;">載入中...</p>
+  </div>
+
+  <!-- 錯誤偵測（非模組，確保一定執行） -->
+  <script>
+    window.onerror = function(msg, src, line, col, err) {
+      var app = document.getElementById('app');
+      if (app) {
+        app.innerHTML =
+          '<div style="padding:20px;color:#C97070;font-size:13px;word-break:break-all;">' +
+          '<p style="font-weight:700;margin-bottom:8px;">JS 錯誤</p>' +
+          '<p>' + msg + '</p>' +
+          '<p style="color:#888;font-size:12px;">at ' + src + ':' + line + ':' + col + '</p>' +
+          '</div>';
+      }
+    };
+    window.addEventListener('unhandledrejection', function(e) {
+      var app = document.getElementById('app');
+      if (app && app.textContent.trim() === '載入中...') {
+        app.innerHTML =
+          '<div style="padding:20px;color:#C97070;font-size:13px;word-break:break-all;">' +
+          '<p style="font-weight:700;margin-bottom:8px;">Promise 錯誤</p>' +
+          '<p>' + (e.reason ? (e.reason.message || e.reason) : '未知錯誤') + '</p>' +
+          '</div>';
+      }
+    });
+    // 5 秒後如果還是「載入中」就顯示提示
+    setTimeout(function() {
+      var app = document.getElementById('app');
+      if (app && app.textContent.trim() === '載入中...') {
+        app.innerHTML =
+          '<div style="padding:20px;text-align:center;color:#A09090;font-size:13px;">' +
+          '<p style="margin-bottom:8px;">載入逾時</p>' +
+          '<p>請按 F12 開啟 DevTools 查看 Console 錯誤訊息</p>' +
+          '</div>';
+      }
+    }, 5000);
+  </script>
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

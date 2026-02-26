@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4A5A5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <!-- White rounded background -->
+  <rect x="0.3" y="0.3" width="23.4" height="23.4" rx="4" ry="4" fill="#FFFFFF" stroke="none"/>
+  <!-- Paper outline with folded corner -->
+  <path d="M3.5 2.5 L12 2.5 L15.5 6 L15.5 21 L3.5 21 Z"/>
+  <!-- Fold corner detail -->
+  <path d="M12 2.5 L12 6 L15.5 6"/>
+  <!-- Text lines on paper -->
+  <line x1="6" y1="9.5" x2="13" y2="9.5" stroke-width="1.5"/>
+  <line x1="6" y1="12.5" x2="11.5" y2="12.5" stroke-width="1.5"/>
+  <line x1="6" y1="15.5" x2="12" y2="15.5" stroke-width="1.5"/>
+  <!-- Pencil shaft -->
+  <line x1="15.78" y1="19.78" x2="20.72" y2="14.85" stroke-width="1.5"/>
+  <line x1="17.34" y1="21.34" x2="22.28" y2="16.41" stroke-width="1.5"/>
+  <!-- Pencil top cap -->
+  <line x1="20.72" y1="14.85" x2="22.28" y2="16.41" stroke-width="1.5"/>
+  <!-- Pencil collar -->
+  <line x1="15.78" y1="19.78" x2="17.34" y2="21.34" stroke-width="1.5"/>
+  <!-- Pencil tip -->
+  <path d="M15 21 L15.78 19.78 M15 21 L17.34 21.34" stroke-width="1.5"/>
+</svg>
