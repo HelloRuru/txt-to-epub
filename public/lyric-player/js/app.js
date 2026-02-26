@@ -458,7 +458,7 @@
 
     try {
       /* 1. 載入 CTC 模型 */
-      status.textContent = '載入對齊模型中（首次約 1 分鐘下載 199 MB）...';
+      status.textContent = '載入對齊模型中（首次約 1-2 分鐘下載 ~200 MB）...';
       await loadCTCModel(function (info) {
         if (info.status === 'progress' && info.progress) {
           fill.style.width = Math.round(info.progress * 0.4) + '%';
@@ -509,7 +509,7 @@
       } catch (err2) {
         console.error('Fallback also failed:', err2);
         status.textContent = '辨識失敗';
-        showToast('辨識失敗：' + err.message, 'error');
+        showToast('辨識失敗：' + (err.message || err2.message || String(err)), 'error');
       }
     } finally {
       state.isRecognizing = false;
@@ -862,14 +862,24 @@
 
   var CTC_MODEL_ID = 'onnx-community/wav2vec2-large-xlsr-53-chinese-zh-cn-ONNX';
 
-  /** 載入中文 wav2vec2 CTC 模型（首次約 199 MB） */
+  /** 載入中文 wav2vec2 CTC 模型（首次約 200-250 MB） */
   async function loadCTCModel(onProgress) {
     if (ctcModel) return;
     var transformers = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
 
+    /* WebGPU → q4f16 (199 MB) / WASM → q4 (244 MB) */
+    var device = 'wasm';
+    var dtype = 'q4';
+    if (navigator.gpu) {
+      try {
+        var adapter = await navigator.gpu.requestAdapter();
+        if (adapter) { device = 'webgpu'; dtype = 'q4f16'; }
+      } catch (_) { /* fallback */ }
+    }
+
     ctcModel = await transformers.AutoModelForCTC.from_pretrained(CTC_MODEL_ID, {
-      dtype: 'q4f16',
-      device: 'wasm',
+      dtype: dtype,
+      device: device,
       progress_callback: onProgress,
     });
 
