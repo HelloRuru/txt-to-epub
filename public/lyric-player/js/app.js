@@ -15,7 +15,10 @@
   };
 
   const audio = new Audio();
-  let transcriber = null;
+  let transcriber = null;   /* Whisper（沒歌詞時用） */
+  let ctcModel = null;      /* wav2vec2 CTC（有歌詞時用） */
+  let ctcProcessor = null;
+  let ctcVocab = null;      /* char → token ID */
   let toastTimer = null;
 
   /* ══════════════════════════════════
@@ -278,6 +281,14 @@
      ══════════════════════════════════ */
   async function startRecognition() {
     if (state.isRecognizing || !state.audioFile) return;
+
+    /* 有歌詞 → CTC 強制對齊（不需要 Whisper） */
+    var refText = $('refTextarea') ? $('refTextarea').value.trim() : '';
+    if (refText) {
+      return startCTCAlignment(refText);
+    }
+
+    /* 沒有歌詞 → Whisper 辨識（原有邏輯） */
     state.isRecognizing = true;
 
     const prog = $('aiProgress');
@@ -287,8 +298,6 @@
     fill.style.width = '0%';
     status.textContent = '載入 AI 模型中（首次約 1-2 分鐘下載）...';
     $('aiBtn').disabled = true;
-
-    /* 參考歌詞不再於辨識時處理，改由事後「勘誤」按鈕獨立修正 */
 
     try {
       /* 1. Load Transformers.js + Whisper */
@@ -391,49 +400,32 @@
       /* 4. 去除重疊區域產生的重複文字 */
       chunks = deduplicateOverlap(chunks);
 
-      /* 5. 判斷：使用者有沒有先貼歌詞？ */
-      var refText = $('refTextarea') ? $('refTextarea').value.trim() : '';
-
-      /* 時間戳品質檢查（兩條路線都需要） */
+      /* 5. 時間戳品質檢查 */
       var internalReliable = internalTotal === 0 || (internalNearZero / internalTotal < 0.4);
       var tsReliable = checkTimestampQuality(chunks, audioDur) && internalReliable;
       if (!tsReliable && chunks.length > 1) {
         chunks = redistributeChunks(chunks, audioDur);
       }
 
-      if (refText) {
-        /* ── 有歌詞 → Whisper 時間戳當錨點，文字用使用者的 ── */
-        var rawLines = refText.split('\n');
-        if (hasStructureMarkers(rawLines)) {
-          state.lyrics = structuredDistribute(rawLines, audioDur);
-        } else {
-          var refLines = cleanRefLines(rawLines);
-          state.lyrics = alignLyricsToChunks(refLines, chunks);
-        }
-        fill.style.width = '100%';
-        status.textContent = '完成！共 ' + state.lyrics.length + ' 行歌詞已對齊時間軸';
-        showToast('歌詞已對齊到音檔時間！可用「編輯」微調');
-      } else {
-        /* ── 沒有歌詞 → Whisper 全輸出（文字 + 時間戳） ── */
-        chunks = chunks.map(function (c) {
-          return { time: c.time, endTime: c.endTime, text: cleanRepeats(c.text) };
-        });
+      /* 6. Whisper 全輸出（文字 + 時間戳） */
+      chunks = chunks.map(function (c) {
+        return { time: c.time, endTime: c.endTime, text: cleanRepeats(c.text) };
+      });
 
-        status.textContent = '轉換為正體中文...';
-        fill.style.width = '90%';
+      status.textContent = '轉換為正體中文...';
+      fill.style.width = '90%';
 
-        var allText = chunks.map(function (c) { return c.text; }).join('\n');
-        var tradText = await toTraditional(allText);
-        var tradLines = tradText.split('\n');
+      var allText = chunks.map(function (c) { return c.text; }).join('\n');
+      var tradText = await toTraditional(allText);
+      var tradLines = tradText.split('\n');
 
-        state.lyrics = chunks.map(function (c, i) {
-          return { time: c.time, text: tradLines[i] !== undefined ? tradLines[i] : c.text };
-        }).filter(function (l) { return !isWhisperJunk(l.text); });
+      state.lyrics = chunks.map(function (c, i) {
+        return { time: c.time, text: tradLines[i] !== undefined ? tradLines[i] : c.text };
+      }).filter(function (l) { return !isWhisperJunk(l.text); });
 
-        fill.style.width = '100%';
-        status.textContent = '辨識完成！共 ' + state.lyrics.length + ' 行歌詞（已轉正體中文）';
-        showToast('歌詞辨識完成');
-      }
+      fill.style.width = '100%';
+      status.textContent = '辨識完成！共 ' + state.lyrics.length + ' 行歌詞（已轉正體中文）';
+      showToast('歌詞辨識完成');
 
       renderLyricsView();
       updateActionButtons();
@@ -447,6 +439,134 @@
       $('aiBtn').disabled = false;
       setTimeout(function () { prog.classList.remove('visible'); }, 3000);
     }
+  }
+
+  /* ══════════════════════════════════
+     CTC 強制對齊入口
+     ══════════════════════════════════ */
+
+  /** 有歌詞時的路線：CTC 強制對齊（不需要 Whisper） */
+  async function startCTCAlignment(refText) {
+    state.isRecognizing = true;
+
+    var prog = $('aiProgress');
+    var fill = $('aiProgressFill');
+    var status = $('aiStatus');
+    prog.classList.add('visible');
+    fill.style.width = '0%';
+    $('aiBtn').disabled = true;
+
+    try {
+      /* 1. 載入 CTC 模型 */
+      status.textContent = '載入對齊模型中（首次約 1 分鐘下載 199 MB）...';
+      await loadCTCModel(function (info) {
+        if (info.status === 'progress' && info.progress) {
+          fill.style.width = Math.round(info.progress * 0.4) + '%';
+          status.textContent = '下載對齊模型：' + Math.round(info.progress) + '%';
+        }
+        if (info.status === 'ready') {
+          status.textContent = '模型載入完成！';
+        }
+      });
+
+      /* 2. 處理音檔 */
+      status.textContent = '處理音檔中...';
+      fill.style.width = '45%';
+      var audioData = await decodeAudioTo16kMono(state.audioFile);
+
+      /* 3. 強制對齊 */
+      status.textContent = '對齊歌詞中（CTC Viterbi）...';
+      fill.style.width = '55%';
+
+      var rawLines = refText.split('\n');
+      var refLines = cleanRefLines(rawLines);
+
+      var result = await forcedAlignLyrics(audioData, refLines);
+
+      if (result) {
+        state.lyrics = result;
+        fill.style.width = '100%';
+        status.textContent = '完成！共 ' + state.lyrics.length + ' 行歌詞已精確對齊';
+        showToast('歌詞已精確對齊！可用「編輯」微調');
+      } else {
+        /* CTC 字彙覆蓋率太低 → 退回 Whisper + charOverlap */
+        status.textContent = '字彙覆蓋率不足，改用備選方式...';
+        fill.style.width = '60%';
+        await fallbackWhisperAlign(refText, fill, status);
+      }
+
+      renderLyricsView();
+      updateActionButtons();
+
+    } catch (err) {
+      console.error('CTC alignment error:', err);
+      /* CTC 失敗 → 退回 Whisper + charOverlap */
+      try {
+        status.textContent = '對齊模型載入失敗，改用 Whisper...';
+        await fallbackWhisperAlign(refText, fill, status);
+        renderLyricsView();
+        updateActionButtons();
+      } catch (err2) {
+        console.error('Fallback also failed:', err2);
+        status.textContent = '辨識失敗';
+        showToast('辨識失敗：' + err.message, 'error');
+      }
+    } finally {
+      state.isRecognizing = false;
+      $('aiBtn').disabled = false;
+      setTimeout(function () { prog.classList.remove('visible'); }, 3000);
+    }
+  }
+
+  /** CTC 失敗時的備選：Whisper + charOverlap 錨點比對 */
+  async function fallbackWhisperAlign(refText, fill, status) {
+    /* 載入 Whisper */
+    if (!transcriber) {
+      status.textContent = '載入 Whisper 模型中...';
+      var transformers = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
+      transcriber = await transformers.pipeline(
+        'automatic-speech-recognition',
+        'onnx-community/whisper-small',
+        {
+          dtype: 'q8', device: 'wasm',
+          progress_callback: function (info) {
+            if (info.status === 'progress' && info.progress) {
+              fill.style.width = Math.round(60 + info.progress * 0.2) + '%';
+              status.textContent = '下載 Whisper：' + Math.round(info.progress) + '%';
+            }
+          }
+        }
+      );
+    }
+
+    status.textContent = '處理音檔中...';
+    var audioData = await decodeAudioTo16kMono(state.audioFile);
+    var audioDur = audio.duration || 180;
+    var lang = $('langSelect').value;
+    var whisperOpts = { return_timestamps: true, task: 'transcribe' };
+    if (lang !== 'auto') whisperOpts.language = lang;
+
+    /* 簡化切塊：只跑一次取大略時間戳 */
+    var result = await transcriber(audioData, whisperOpts);
+    var chunks = [];
+    if (result && result.chunks) {
+      result.chunks.forEach(function (c) {
+        if (c.text && c.text.trim()) {
+          chunks.push({
+            time: +((c.timestamp[0] || 0).toFixed(2)),
+            endTime: +((c.timestamp[1] || 0).toFixed(2)),
+            text: c.text.trim()
+          });
+        }
+      });
+    }
+
+    var rawLines = refText.split('\n');
+    var refLines = cleanRefLines(rawLines);
+    state.lyrics = alignLyricsToChunks(refLines, chunks);
+    fill.style.width = '100%';
+    status.textContent = '完成！共 ' + state.lyrics.length + ' 行（備選方式）';
+    showToast('歌詞已對齊（備選方式）');
   }
 
   /* ══════════════════════════════════
@@ -737,6 +857,181 @@
   }
 
   /* ══════════════════════════════════
+     CTC 強制對齊（正宗方法）
+     ══════════════════════════════════ */
+
+  var CTC_MODEL_ID = 'onnx-community/wav2vec2-large-xlsr-53-chinese-zh-cn-ONNX';
+
+  /** 載入中文 wav2vec2 CTC 模型（首次約 199 MB） */
+  async function loadCTCModel(onProgress) {
+    if (ctcModel) return;
+    var transformers = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
+
+    ctcModel = await transformers.AutoModelForCTC.from_pretrained(CTC_MODEL_ID, {
+      dtype: 'q4f16',
+      device: 'wasm',
+      progress_callback: onProgress,
+    });
+
+    ctcProcessor = await transformers.AutoProcessor.from_pretrained(CTC_MODEL_ID);
+
+    /* 載入字彙表（char → token ID） */
+    var resp = await fetch(
+      'https://huggingface.co/' + CTC_MODEL_ID + '/resolve/main/vocab.json'
+    );
+    ctcVocab = await resp.json();
+  }
+
+  /** 對單幀 logits 做 log-softmax，回傳 Float32Array(V) */
+  function logSoftmax(data, offset, V) {
+    var max = -Infinity;
+    for (var i = 0; i < V; i++) {
+      if (data[offset + i] > max) max = data[offset + i];
+    }
+    var sumExp = 0;
+    for (var i = 0; i < V; i++) sumExp += Math.exp(data[offset + i] - max);
+    var logNorm = max + Math.log(sumExp);
+    var out = new Float32Array(V);
+    for (var i = 0; i < V; i++) out[i] = data[offset + i] - logNorm;
+    return out;
+  }
+
+  /**
+   * CTC Viterbi 強制對齊
+   * @param {Float32Array} emissions - 模型 logits，扁平 [T * V]
+   * @param {number} T - 音訊幀數
+   * @param {number} V - 字彙大小
+   * @param {number[]} tokenIds - 歌詞的 token ID 序列（長度 S）
+   * @param {number} blankId - CTC blank token ID
+   * @returns {Array<{frame: number, tokenIdx: number}>}
+   */
+  function ctcViterbi(emissions, T, V, tokenIds, blankId) {
+    var S = tokenIds.length;
+    if (!S || !T) return [];
+
+    /* 滾動兩行省記憶體，完整 backpointer 用於回溯 */
+    var prev = new Float32Array(S + 1).fill(-Infinity);
+    var curr = new Float32Array(S + 1).fill(-Infinity);
+    var bp = new Uint8Array((T + 1) * (S + 1)); /* 0=stay, 1=move */
+
+    prev[0] = 0; /* 起點 */
+
+    for (var t = 0; t < T; t++) {
+      var lp = logSoftmax(emissions, t * V, V);
+      var blankP = lp[blankId];
+      curr.fill(-Infinity);
+
+      for (var s = 0; s <= S; s++) {
+        var idx = (t + 1) * (S + 1) + s;
+        var stayScore = prev[s] + blankP;
+        var moveScore = s > 0
+          ? prev[s - 1] + lp[tokenIds[s - 1]]
+          : -Infinity;
+
+        if (stayScore >= moveScore) {
+          curr[s] = stayScore;
+          bp[idx] = 0;
+        } else {
+          curr[s] = moveScore;
+          bp[idx] = 1;
+        }
+      }
+
+      /* swap */
+      var tmp = prev; prev = curr; curr = tmp;
+    }
+
+    /* 回溯：從 (T, S) 往回走 */
+    var path = [];
+    var s = S;
+    for (var t = T; t > 0; t--) {
+      var idx = t * (S + 1) + s;
+      if (bp[idx] === 1 && s > 0) {
+        path.push({ frame: t - 1, tokenIdx: s - 1 });
+        s--;
+      }
+      if (s <= 0) break;
+    }
+    path.reverse();
+    return path;
+  }
+
+  /**
+   * 完整 CTC 強制對齊流程
+   * @param {Float32Array} audioData - 16kHz mono 音訊
+   * @param {string[]} refLines - 歌詞行（已清理）
+   * @returns {Promise<Array<{time: number, text: string}>>}
+   */
+  async function forcedAlignLyrics(audioData, refLines) {
+    /* 1. wav2vec2 推理 → 每幀字元機率 */
+    var inputs = await ctcProcessor(audioData);
+    var output = await ctcModel(inputs);
+    var logits = output.logits;
+    var T = logits.dims[1];
+    var V = logits.dims[2];
+
+    /* 2. 歌詞拆字 → token ID 序列 */
+    var lineStarts = [];
+    var allChars = '';
+    for (var i = 0; i < refLines.length; i++) {
+      lineStarts.push(allChars.length);
+      allChars += refLines[i].trim();
+    }
+
+    /* 繁→簡（模型字彙是簡體） */
+    var simplified = localT2S(allChars);
+    var unkId = ctcVocab['<unk>'] !== undefined ? ctcVocab['<unk>'] : 3;
+    var blankId = ctcVocab['<pad>'] !== undefined ? ctcVocab['<pad>'] : 0;
+    var tokenIds = [];
+    var unkCount = 0;
+    for (var i = 0; i < simplified.length; i++) {
+      var ch = simplified[i];
+      if (ctcVocab[ch] !== undefined) {
+        tokenIds.push(ctcVocab[ch]);
+      } else {
+        tokenIds.push(unkId);
+        unkCount++;
+      }
+    }
+
+    /* 字彙覆蓋率太低 → 回傳 null，讓呼叫端退回備選方案 */
+    if (simplified.length > 0 && unkCount / simplified.length > 0.5) {
+      console.warn('CTC vocab coverage too low:', unkCount + '/' + simplified.length);
+      return null;
+    }
+
+    /* 3. Viterbi 對齊 */
+    var path = ctcViterbi(logits.data, T, V, tokenIds, blankId);
+
+    /* 釋放大型 tensor */
+    logits = null;
+    output = null;
+
+    /* 4. 幀 → 秒，對應回行 */
+    var FRAME_SEC = 320 / 16000; /* wav2vec2 stride = 0.02 秒/幀 */
+    var result = [];
+
+    for (var i = 0; i < refLines.length; i++) {
+      var lineStart = lineStarts[i];
+      var lineTime = null;
+
+      for (var p = 0; p < path.length; p++) {
+        if (path[p].tokenIdx >= lineStart) {
+          lineTime = path[p].frame * FRAME_SEC;
+          break;
+        }
+      }
+
+      result.push({
+        time: lineTime !== null ? +lineTime.toFixed(2) : 0,
+        text: refLines[i].trim()
+      });
+    }
+
+    return result;
+  }
+
+  /* ══════════════════════════════════
      簡轉繁 — 本地字元對照（不靠外部 API）
      ══════════════════════════════════ */
   var S2T_MAP = (function () {
@@ -789,6 +1084,24 @@
     var result = '';
     for (var i = 0; i < text.length; i++) {
       result += S2T_MAP[text[i]] || text[i];
+    }
+    return result;
+  }
+
+  /** 繁→簡對照（S2T_MAP 的反向，CTC 字彙查表用） */
+  var T2S_MAP = (function () {
+    var map = {};
+    for (var s in S2T_MAP) {
+      if (S2T_MAP[s] !== s) map[S2T_MAP[s]] = s;
+    }
+    return map;
+  })();
+
+  function localT2S(text) {
+    if (!text) return text;
+    var result = '';
+    for (var i = 0; i < text.length; i++) {
+      result += T2S_MAP[text[i]] || text[i];
     }
     return result;
   }
@@ -1331,6 +1644,10 @@
     charOverlap: charOverlap,
     alignLyricsToChunks: alignLyricsToChunks,
     localS2T: localS2T,
+    localT2S: localT2S,
     mapReferenceToTimestamps: mapReferenceToTimestamps,
+    ctcViterbi: ctcViterbi,
+    logSoftmax: logSoftmax,
+    forcedAlignLyrics: forcedAlignLyrics,
   };
 })();
