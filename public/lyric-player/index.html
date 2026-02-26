@@ -141,6 +141,26 @@
             </div>
           </div>
 
+          <!-- 歌詞輸入（先貼歌詞，AI 辨識時自動對齊時間） -->
+          <div class="ref-panel">
+            <button class="ref-toggle" id="refToggle" type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              先貼歌詞（推薦）
+              <svg class="ref-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="ref-content" id="refContent" style="display:none">
+              <div class="ref-desc score-card">
+                <div class="score-lines"></div>
+                <div class="score-body">
+                  <svg class="score-note" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                  <p>先貼上正確歌詞，再按「AI 辨識」，時間會自動對齊。不需要事後修正！</p>
+                </div>
+              </div>
+              <textarea class="ref-textarea" id="refTextarea" rows="6" placeholder="貼上歌詞文字...&#10;每行一句，例如：&#10;我還是會帶著你的愛&#10;繼續走下去"></textarea>
+              <p class="ref-hint">段落標記 [Verse]、演奏描述 (instrumental) 會自動過濾，只保留歌詞行</p>
+            </div>
+          </div>
+
           <!-- Action Buttons -->
           <div class="action-bar">
             <button class="btn-action primary" id="aiBtn">
@@ -182,32 +202,6 @@
             </button>
           </div>
 
-          <!-- 歌詞輔助 (Reference Lyrics) -->
-          <div class="ref-panel">
-            <button class="ref-toggle" id="refToggle" type="button">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              提供歌詞文字（提高準確度）
-              <svg class="ref-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            <div class="ref-content" id="refContent" style="display:none">
-              <div class="ref-desc score-card">
-                <div class="score-lines"></div>
-                <div class="score-body">
-                  <svg class="score-note" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                  <p>先按「AI 辨識歌詞」取得時間戳，再貼上歌詞按「勘誤」修正文字。時間戳不受影響，特別推薦中文歌使用！</p>
-                </div>
-              </div>
-              <textarea class="ref-textarea" id="refTextarea" rows="6" placeholder="貼上歌詞文字...&#10;每行一句，例如：&#10;我還是會帶著你的愛&#10;繼續走下去"></textarea>
-              <div class="ref-actions">
-                <button class="btn-action" id="postCorrectBtn" disabled>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                  勘誤（保留時間戳，修正文字）
-                </button>
-              </div>
-              <p class="ref-hint">段落標記 [Verse]、演奏描述 (instrumental) 會自動過濾，只保留歌詞行</p>
-            </div>
-          </div>
-
           <!-- AI Progress -->
           <div class="ai-progress" id="aiProgress">
             <div class="progress-bar">
@@ -236,7 +230,7 @@
           <div class="lyrics-container" id="lyricsContainer">
             <div class="lyrics-placeholder" id="lyricsPlaceholder">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-              <p>點「AI 辨識歌詞」自動產生<br>或上傳 LRC 歌詞檔<br>或用「打標記」手動對時間</p>
+              <p>先貼歌詞，再按「AI 辨識」自動對齊時間<br>或上傳 LRC 歌詞檔<br>或用「打標記」手動對時間</p>
             </div>
             <div class="lyrics-scroll" id="lyricsScroll" style="display:none"></div>
             <div class="edit-container" id="editContainer"></div>
@@ -282,6 +276,6 @@
   <button class="theme-toggle" id="themeToggle" title="切換深色模式"></button>
 
   <!-- App Script -->
-  <script src="js/app.js?v=20260226b"></script>
+  <script src="js/app.js?v=20260226c"></script>
 </body>
 </html>

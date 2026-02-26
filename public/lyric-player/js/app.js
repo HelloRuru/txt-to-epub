@@ -269,12 +269,8 @@
       $('refToggle').classList.toggle('open', isHidden);
     });
 
-    /* 勘誤按鈕 — 事後用參考歌詞修正文字，時間戳不動 */
-    $('postCorrectBtn').addEventListener('click', applyPostCorrection);
     /* 簡轉繁按鈕 */
     $('s2tBtn').addEventListener('click', convertLyricsS2T);
-    /* textarea 輸入時更新按鈕狀態 */
-    $('refTextarea').addEventListener('input', updatePostCorrectBtn);
   }
 
   /* ══════════════════════════════════
@@ -395,35 +391,51 @@
       /* 4. 去除重疊區域產生的重複文字 */
       chunks = deduplicateOverlap(chunks);
 
-      /* 5. 時間戳品質檢查 */
-      var internalReliable = internalTotal === 0 || (internalNearZero / internalTotal < 0.4);
-      var tsReliable = checkTimestampQuality(chunks, audioDur) && internalReliable;
-      if (!tsReliable && chunks.length > 1) {
-        chunks = redistributeChunks(chunks, audioDur);
+      /* 5. 判斷：使用者有沒有先貼歌詞？ */
+      var refText = $('refTextarea') ? $('refTextarea').value.trim() : '';
+
+      if (refText) {
+        /* ── 有歌詞 → 只用 Whisper 的時間範圍，文字用使用者的 ── */
+        var rawLines = refText.split('\n');
+        if (hasStructureMarkers(rawLines)) {
+          state.lyrics = structuredDistribute(rawLines, audioDur);
+        } else {
+          var refLines = cleanRefLines(rawLines);
+          state.lyrics = mapReferenceToTimestamps(refLines, chunks);
+        }
+        fill.style.width = '100%';
+        status.textContent = '完成！共 ' + state.lyrics.length + ' 行歌詞已對齊時間軸';
+        showToast('歌詞已對齊到音檔時間！可用「編輯」微調');
+      } else {
+        /* ── 沒有歌詞 → Whisper 全輸出（文字 + 時間戳） ── */
+        var internalReliable = internalTotal === 0 || (internalNearZero / internalTotal < 0.4);
+        var tsReliable = checkTimestampQuality(chunks, audioDur) && internalReliable;
+        if (!tsReliable && chunks.length > 1) {
+          chunks = redistributeChunks(chunks, audioDur);
+        }
+
+        chunks = chunks.map(function (c) {
+          return { time: c.time, endTime: c.endTime, text: cleanRepeats(c.text) };
+        });
+
+        status.textContent = '轉換為正體中文...';
+        fill.style.width = '90%';
+
+        var allText = chunks.map(function (c) { return c.text; }).join('\n');
+        var tradText = await toTraditional(allText);
+        var tradLines = tradText.split('\n');
+
+        state.lyrics = chunks.map(function (c, i) {
+          return { time: c.time, text: tradLines[i] !== undefined ? tradLines[i] : c.text };
+        }).filter(function (l) { return !isWhisperJunk(l.text); });
+
+        fill.style.width = '100%';
+        status.textContent = '辨識完成！共 ' + state.lyrics.length + ' 行歌詞（已轉正體中文）';
+        showToast('歌詞辨識完成');
       }
 
-      /* 6. 清理重複 + 繁化姬轉正體 */
-      chunks = chunks.map(function (c) {
-        return { time: c.time, endTime: c.endTime, text: cleanRepeats(c.text) };
-      });
-
-      status.textContent = '轉換為正體中文...';
-      fill.style.width = '90%';
-
-      var allText = chunks.map(function (c) { return c.text; }).join('\n');
-      var tradText = await toTraditional(allText);
-      var tradLines = tradText.split('\n');
-
-      state.lyrics = chunks.map(function (c, i) {
-        return { time: c.time, text: tradLines[i] !== undefined ? tradLines[i] : c.text };
-      }).filter(function (l) { return !isWhisperJunk(l.text); });
-
-      fill.style.width = '100%';
-      status.textContent = '辨識完成！共 ' + state.lyrics.length + ' 行歌詞（已轉正體中文）';
-      showToast('歌詞辨識完成！可貼歌詞按「勘誤」修正文字');
-
       renderLyricsView();
-      updatePostCorrectBtn();
+      updateActionButtons();
 
     } catch (err) {
       console.error('AI Recognition error:', err);
@@ -437,52 +449,14 @@
   }
 
   /* ══════════════════════════════════
-     勘誤 — 事後用參考歌詞修正文字
+     按鈕狀態管理
      ══════════════════════════════════ */
 
-  /** 啟用/停用勘誤 & 簡轉繁按鈕 */
-  function updatePostCorrectBtn() {
+  /** 啟用/停用簡轉繁、編輯、匯出按鈕 */
+  function updateActionButtons() {
     var hasLyrics = state.lyrics && state.lyrics.length > 0;
-    var hasRef = $('refTextarea') && $('refTextarea').value.trim().length > 0;
-    var btn = $('postCorrectBtn');
-    if (btn) btn.disabled = !(hasLyrics && hasRef);
     var s2t = $('s2tBtn');
     if (s2t) s2t.disabled = !hasLyrics;
-  }
-
-  /** 勘誤：保留 Whisper 時間戳，只替換文字 */
-  function applyPostCorrection() {
-    var refText = $('refTextarea') ? $('refTextarea').value.trim() : '';
-    if (!refText || !state.lyrics.length) return;
-
-    var rawLines = refText.split('\n');
-    var refLines = cleanRefLines(rawLines);
-    if (!refLines.length) {
-      showToast('沒有偵測到歌詞行（段落標記已自動過濾）', 'error');
-      return;
-    }
-
-    /* 記住捲動位置 */
-    var scroll = $('lyricsScroll');
-    var savedTop = scroll ? scroll.scrollTop : 0;
-    var savedPage = window.scrollY;
-
-    state.lyrics = replaceTextWithRef(state.lyrics, refLines);
-
-    /* 就地換文字，不重建 DOM */
-    var lines = scroll.querySelectorAll('.lyric-line');
-    state.lyrics.forEach(function (l, i) {
-      if (lines[i]) {
-        var textEl = lines[i].querySelector('.lyric-text');
-        if (textEl) textEl.textContent = l.text;
-      }
-    });
-
-    /* 強制還原捲動位置 */
-    if (scroll) scroll.scrollTop = savedTop;
-    window.scrollTo(0, savedPage);
-
-    showToast('已修正歌詞文字，時間戳不變');
   }
 
   /** Decode audio file to 16kHz mono Float32Array for Whisper */
@@ -588,54 +562,7 @@
   }
 
   /* ══════════════════════════════════
-     Reference Lyrics — 修正文字
-     ══════════════════════════════════ */
-  /**
-   * 用 Whisper 辨識的時間戳 + 參考歌詞修正文字
-   * Whisper 負責人聲時間偵測，參考歌詞負責修正錯字
-   */
-  /** 字元重疊分數（去空白，計算共同字元比例） */
-  function charScore(a, b) {
-    var sa = a.replace(/\s/g, '');
-    var sb = b.replace(/\s/g, '');
-    if (!sa || !sb) return 0;
-    var shorter = sa.length < sb.length ? sa : sb;
-    var longer  = sa.length < sb.length ? sb : sa;
-    var hits = 0;
-    for (var i = 0; i < shorter.length; i++) {
-      if (longer.indexOf(shorter[i]) >= 0) hits++;
-    }
-    return hits / shorter.length;
-  }
-
-  function replaceTextWithRef(lyrics, refLines) {
-    /* 往前看最多 3 行參考歌詞，挑最像的配對
-       處理 Whisper 合併/拆行造成的錯位 */
-    var refIdx = 0;
-    var LOOK = 3; /* 往前看幾行 */
-
-    return lyrics.map(function (line) {
-      if (refIdx >= refLines.length) return { time: line.time, text: line.text };
-
-      var bestJ = -1;
-      var bestScore = 0;
-      var limit = Math.min(refIdx + LOOK, refLines.length);
-
-      for (var j = refIdx; j < limit; j++) {
-        var s = charScore(line.text, refLines[j]);
-        if (s > bestScore) { bestScore = s; bestJ = j; }
-      }
-
-      if (bestJ >= 0 && bestScore > 0.35) {
-        refIdx = bestJ + 1; /* 跳過中間不匹配的參考行 */
-        return { time: line.time, text: refLines[bestJ].trim() };
-      }
-      return { time: line.time, text: line.text };
-    });
-  }
-
-  /* ══════════════════════════════════
-     Fallback：Whisper 無結果時均勻分配
+     用 Whisper 人聲範圍分配歌詞時間
      ══════════════════════════════════ */
   function mapReferenceToTimestamps(refLines, chunks) {
     var M = refLines.length;
@@ -932,7 +859,7 @@
       state.lyrics = parseLRC(text).filter(function (l) { return !isWhisperJunk(l.text); });
       if (state.lyrics.length) {
         renderLyricsView();
-        updatePostCorrectBtn();
+        updateActionButtons();
         showToast('已載入 ' + state.lyrics.length + ' 行歌詞');
       } else {
         showToast('LRC 檔案格式無法解析', 'error');
