@@ -394,6 +394,13 @@
       /* 5. 判斷：使用者有沒有先貼歌詞？ */
       var refText = $('refTextarea') ? $('refTextarea').value.trim() : '';
 
+      /* 時間戳品質檢查（兩條路線都需要） */
+      var internalReliable = internalTotal === 0 || (internalNearZero / internalTotal < 0.4);
+      var tsReliable = checkTimestampQuality(chunks, audioDur) && internalReliable;
+      if (!tsReliable && chunks.length > 1) {
+        chunks = redistributeChunks(chunks, audioDur);
+      }
+
       if (refText) {
         /* ── 有歌詞 → 只用 Whisper 的時間範圍，文字用使用者的 ── */
         var rawLines = refText.split('\n');
@@ -408,12 +415,6 @@
         showToast('歌詞已對齊到音檔時間！可用「編輯」微調');
       } else {
         /* ── 沒有歌詞 → Whisper 全輸出（文字 + 時間戳） ── */
-        var internalReliable = internalTotal === 0 || (internalNearZero / internalTotal < 0.4);
-        var tsReliable = checkTimestampQuality(chunks, audioDur) && internalReliable;
-        if (!tsReliable && chunks.length > 1) {
-          chunks = redistributeChunks(chunks, audioDur);
-        }
-
         chunks = chunks.map(function (c) {
           return { time: c.time, endTime: c.endTime, text: cleanRepeats(c.text) };
         });
