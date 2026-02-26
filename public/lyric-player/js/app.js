@@ -396,6 +396,9 @@
         chunks = redistributeChunks(chunks, audioDur);
       }
 
+      console.log('[Lyric Player] Whisper 切塊結果：', chunks.length, '段',
+        chunks.slice(0, 5).map(function (c) { return c.time + 's: ' + c.text.substring(0, 15); }));
+
       /* 6. 檢查使用者是否已貼歌詞 */
       var refText = $('refTextarea') ? $('refTextarea').value.trim() : '';
 
@@ -587,14 +590,17 @@
       /* 如果 chunks 涵蓋範圍不到歌曲的 30%，代表時間戳不可靠 */
       var chunkSpan = voiceEnd - voiceStart;
       if (chunkSpan < dur * 0.3) {
-        /* 時間戳不可靠，改用歌曲全長（跳過前 3 秒可能的前奏） */
-        voiceStart = Math.min(3, dur * 0.05);
-        voiceEnd = dur - 2;
+        voiceStart = Math.min(8, dur * 0.08);
+        voiceEnd = dur - 3;
+      }
+
+      /* 第一段從 0 秒開始 → Whisper 把前奏也當歌詞了，至少跳幾秒 */
+      if (voiceStart < 2 && dur > 30) {
+        voiceStart = Math.min(8, dur * 0.08);
       }
     } else {
-      /* 沒有 chunks，跳過前 3 秒 */
-      voiceStart = Math.min(3, dur * 0.05);
-      voiceEnd = dur - 2;
+      voiceStart = Math.min(8, dur * 0.08);
+      voiceEnd = dur - 3;
     }
 
     if (voiceEnd <= voiceStart) voiceEnd = dur - 2;
@@ -686,8 +692,12 @@
       }
     }
 
-    /* 錨點太少 → 退回均勻分配 */
-    if (anchors.length < 3) {
+    console.log('[Lyric Player] 錨點比對結果：', anchors.length, '/', M, '行命中',
+      anchors.map(function (a) { return refLines[a.lineIdx].substring(0, 8) + '→' + a.chunkIdx; }));
+
+    /* 完全沒錨點 → 退回均勻分配 */
+    if (anchors.length === 0) {
+      console.log('[Lyric Player] 零錨點，退回均勻分配');
       return mapReferenceToTimestamps(refLines, chunks);
     }
 
