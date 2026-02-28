@@ -1,0 +1,42 @@
+/* Hero */
+
+.hero {
+  text-align: center;
+  padding: 48px 20px 36px;
+}
+
+.hero__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: var(--accent-secondary);
+}
+
+.hero__arrow {
+  color: var(--text-muted);
+}
+
+.hero__title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.hero__subtitle {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.hero__badge {
+  display: inline-block;
+  padding: 6px 18px;
+  border-radius: 20px;
+  background: rgba(184, 169, 201, 0.12);
+  color: var(--accent-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+}

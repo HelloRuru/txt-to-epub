@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+
+  <!-- SEO -->
+  <title>YT→Spotify 歌單轉換 — 把 YouTube Music 歌單搬到 Spotify｜HelloRuru</title>
+  <meta name="description" content="免費線上工具，把 YouTube Music 播放清單轉到 Spotify。貼上歌名清單，自動比對 Spotify 曲庫，一鍵建立歌單。只需免費 Spotify 帳號，全程瀏覽器處理。">
+  <meta name="keywords" content="YouTube Music,Spotify,歌單轉換,播放清單,playlist transfer,YT Music to Spotify,音樂搬家,免費工具">
+  <meta name="author" content="Hello Ruru">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://tools.helloruru.com/spotify-transfer/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="YT→Spotify 歌單轉換 — 把 YouTube Music 歌單搬到 Spotify｜HelloRuru">
+  <meta property="og:description" content="免費線上工具，把 YouTube Music 播放清單轉到 Spotify。貼上歌名清單，自動比對 Spotify 曲庫，一鍵建立歌單。">
+  <meta property="og:url" content="https://tools.helloruru.com/spotify-transfer/">
+  <meta property="og:site_name" content="Hello Ruru Tools">
+  <meta property="og:locale" content="zh_TW">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="YT→Spotify 歌單轉換 — 把 YouTube Music 歌單搬到 Spotify｜HelloRuru">
+  <meta name="twitter:description" content="免費線上工具，把 YouTube Music 播放清單轉到 Spotify。貼上歌名清單，自動比對 Spotify 曲庫，一鍵建立歌單。">
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components/hero.css">
+  <link rel="stylesheet" href="css/components/auth.css">
+  <link rel="stylesheet" href="css/components/input.css">
+  <link rel="stylesheet" href="css/components/results.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- JSON-LD: WebApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "YT→Spotify 歌單轉換",
+    "applicationCategory": "UtilitiesApplication",
+    "url": "https://tools.helloruru.com/spotify-transfer/",
+    "description": "把 YouTube Music 播放清單轉到 Spotify。貼上歌名清單，自動比對 Spotify 曲庫，一鍵建立歌單。",
+    "featureList": [
+      "貼上歌名清單自動比對 Spotify 曲庫",
+      "一鍵建立 Spotify 播放清單",
+      "支援中文、日文、韓文、英文歌曲",
+      "全程瀏覽器處理，不上傳資料",
+      "只需免費 Spotify 帳號"
+    ],
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "TWD"
+    },
+    "creator": {
+      "@type": "Organization",
+      "name": "Hello Ruru",
+      "url": "https://ohruru.com"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- Brand Header -->
+  <script src="https://lab.helloruru.com/shared/brand-header.js"></script>
+  <hello-ruru-header title="YT→Spotify 歌單轉換"></hello-ruru-header>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero__icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M9 8l6 4-6 4V8z"/>
+      </svg>
+      <svg class="hero__arrow" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M8 15c0-2.5 2-4 4-4s4 1.5 4 4" stroke-linecap="round"/>
+        <circle cx="8" cy="9" r="1.5" fill="currentColor"/>
+        <circle cx="16" cy="9" r="1.5" fill="currentColor"/>
+      </svg>
+    </div>
+    <h1 class="hero__title">YT → Spotify 歌單轉換</h1>
+    <p class="hero__subtitle">把 YouTube Music 的歌搬到 Spotify，貼上歌名就搞定</p>
+    <span class="hero__badge">免費 Spotify 帳號即可使用（不需 Premium）</span>
+  </header>
+
+  <!-- Main -->
+  <main class="container">
+
+    <!-- Step 1: Spotify Auth -->
+    <section class="step" id="step-auth">
+      <div class="step__header">
+        <span class="step__number">1</span>
+        <h2 class="step__title">連接 Spotify</h2>
+      </div>
+      <div class="auth-area">
+        <p class="auth-area__desc">點擊下方按鈕登入你的 Spotify 帳號，授權建立歌單。</p>
+        <button class="btn btn--spotify" id="btn-spotify-login">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z"/>
+          </svg>
+          連接 Spotify
+        </button>
+        <div class="auth-area__status" id="auth-status"></div>
+      </div>
+    </section>
+
+    <!-- Step 2: Input Songs -->
+    <section class="step" id="step-input">
+      <div class="step__header">
+        <span class="step__number">2</span>
+        <h2 class="step__title">匯入歌曲</h2>
+      </div>
+      <div class="input-area">
+        <!-- Tabs -->
+        <div class="tab-bar">
+          <button class="tab-btn tab-btn--active" data-tab="url">貼上 YT Music 網址</button>
+          <button class="tab-btn" data-tab="manual">手動輸入歌名</button>
+        </div>
+
+        <!-- Tab: URL -->
+        <div class="tab-panel" id="tab-url">
+          <p class="input-area__desc">貼上 YouTube Music 播放清單網址，自動抓取所有歌名。</p>
+          <div class="input-area__url-row">
+            <input type="url" id="url-input" class="input-area__url" placeholder="https://music.youtube.com/playlist?list=...">
+            <button class="btn btn--primary" id="btn-fetch-url">抓取歌名</button>
+          </div>
+        </div>
+
+        <!-- Tab: Manual -->
+        <div class="tab-panel" id="tab-manual" hidden>
+          <p class="input-area__desc">每行一首，格式不拘，有歌手名更準確。</p>
+          <div class="input-area__examples">
+            <strong>範例：</strong>
+            <code>周杰倫 - 晴天</code>&ensp;
+            <code>YOASOBI - 夜に駆ける</code>&ensp;
+            <code>Adele - Someone Like You</code>
+          </div>
+        </div>
+
+        <!-- Shared textarea + actions (always visible) -->
+        <textarea id="song-input" class="input-area__textarea" rows="10" placeholder="歌名會出現在這裡（貼網址自動填入，或手動輸入）&#10;&#10;周杰倫 - 晴天&#10;五月天 - 倔強&#10;YOASOBI - 夜に駆ける"></textarea>
+        <div class="input-area__actions">
+          <span class="input-area__count" id="song-count">0 首歌</span>
+          <button class="btn btn--primary" id="btn-search" disabled>搜尋比對</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 3: Results -->
+    <section class="step" id="step-results" hidden>
+      <div class="step__header">
+        <span class="step__number">3</span>
+        <h2 class="step__title">比對結果</h2>
+      </div>
+      <div class="results-area">
+        <div class="results-area__summary" id="results-summary"></div>
+        <div class="results-area__progress" id="search-progress" hidden>
+          <div class="progress-bar">
+            <div class="progress-bar__fill" id="progress-fill"></div>
+          </div>
+          <span class="progress-bar__text" id="progress-text">搜尋中...</span>
+        </div>
+        <div class="results-area__table-wrap">
+          <table class="results-table" id="results-table">
+            <thead>
+              <tr>
+                <th class="results-table__check"><input type="checkbox" id="select-all" checked></th>
+                <th>原始歌名</th>
+                <th>Spotify 比對</th>
+                <th>狀態</th>
+              </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 4: Create Playlist -->
+    <section class="step" id="step-create" hidden>
+      <div class="step__header">
+        <span class="step__number">4</span>
+        <h2 class="step__title">建立歌單</h2>
+      </div>
+      <div class="create-area">
+        <div class="create-area__field">
+          <label for="playlist-name">歌單名稱</label>
+          <input type="text" id="playlist-name" class="create-area__input" value="從 YT Music 轉來的歌單" placeholder="輸入歌單名稱">
+        </div>
+        <div class="create-area__field">
+          <label>
+            <input type="checkbox" id="playlist-public"> 公開歌單
+          </label>
+        </div>
+        <div class="create-area__actions">
+          <span id="selected-count">已選 0 首</span>
+          <button class="btn btn--primary" id="btn-create" disabled>建立 Spotify 歌單</button>
+        </div>
+        <div class="create-area__result" id="create-result" hidden></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p>&copy; <span id="footer-year"></span> Kaoru Tsai. All Rights Reserved. | Contact: <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
+  </footer>
+  <script>
+    const startYear = 2026;
+    const currentYear = new Date().getFullYear();
+    document.getElementById('footer-year').textContent =
+      currentYear > startYear ? `${startYear}\u2013${currentYear}` : `${startYear}`;
+  </script>
+
+  <!-- App -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

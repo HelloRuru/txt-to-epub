@@ -1,0 +1,188 @@
+/* Spotify Transfer - Base Styles */
+
+/* ─── Font Imports ──────────────────────────────── */
+
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── CSS Variables ─────────────────────────────── */
+
+:root {
+  --rose: #D4A5A5;
+  --blush: #F5D0C5;
+  --lavender: #B8A9C9;
+  --cream: #FDF6F0;
+  --sage: #A8B5A0;
+
+  --bg-primary: #FFFCFA;
+  --bg-secondary: #FDF6F0;
+  --bg-card: #FFFFFF;
+  --text-primary: #3D3535;
+  --text-secondary: #6B5B5B;
+  --text-muted: #A09090;
+  --accent-primary: #D4A5A5;
+  --accent-secondary: #B8A9C9;
+  --border: rgba(212, 165, 165, 0.15);
+  --shadow: 0 4px 24px rgba(212, 165, 165, 0.12);
+  --shadow-hover: 0 12px 48px rgba(212, 165, 165, 0.2);
+  --radius: 24px;
+  --radius-sm: 12px;
+
+  --spotify-green: #1DB954;
+  --spotify-dark: #191414;
+}
+
+/* ─── Reset & Base ──────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent-secondary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ─── Buttons ───────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--accent-primary);
+  color: #fff;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: #c89494;
+  box-shadow: var(--shadow);
+}
+
+.btn--spotify {
+  background: var(--spotify-green);
+  color: #fff;
+}
+
+.btn--spotify:hover:not(:disabled) {
+  background: #1aa34a;
+  box-shadow: 0 4px 16px rgba(29, 185, 84, 0.3);
+}
+
+.btn--connected {
+  background: var(--sage);
+}
+
+.btn--sm {
+  padding: 8px 20px;
+  font-size: 0.85rem;
+}
+
+/* ─── Badge ─────────────────────────────────────── */
+
+.badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.badge--ok {
+  background: rgba(29, 185, 84, 0.1);
+  color: #1aa34a;
+}
+
+.badge--warn {
+  background: rgba(212, 165, 165, 0.15);
+  color: #c07070;
+}
+
+/* ─── Toast ─────────────────────────────────────── */
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #fff;
+  background: var(--text-primary);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.toast--show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast--success {
+  background: var(--spotify-green);
+}
+
+.toast--error {
+  background: #c07070;
+}
+
+/* ─── Text Utilities ────────────────────────────── */
+
+.text-muted {
+  color: var(--text-muted);
+}
