@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+
+  <!-- SEO -->
+  <title>Spotify Goods — 歌單搬家工具 | HelloRuru Tools</title>
+  <meta name="description" content="免費線上工具，把 YouTube Music 歌單搬到 Spotify。貼上網址自動抓歌或手動輸入歌名，一鍵建立 Spotify 歌單。支援封面上傳。">
+  <meta name="keywords" content="YouTube Music,Spotify,歌單轉換,播放清單,playlist transfer,音樂搬家,免費工具">
+  <link rel="canonical" href="https://tools.helloruru.com/spotify-goods/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Spotify Goods — 歌單搬家工具 | HelloRuru Tools">
+  <meta property="og:description" content="免費線上工具，把 YouTube Music 歌單搬到 Spotify。貼上網址自動抓歌，一鍵建立 Spotify 歌單。">
+  <meta property="og:url" content="https://tools.helloruru.com/spotify-goods/">
+  <meta property="og:site_name" content="Hello Ruru Tools">
+  <meta property="og:locale" content="zh_TW">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Spotify Goods — 歌單搬家工具 | HelloRuru Tools">
+  <meta name="twitter:description" content="免費線上工具，把 YouTube Music 歌單搬到 Spotify。貼上網址自動抓歌，一鍵建立 Spotify 歌單。">
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+
+  <!-- Brand Header -->
+  <script src="https://lab.helloruru.com/shared/brand-header.js"></script>
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Spotify Goods — 歌單搬家工具",
+    "applicationCategory": "UtilitiesApplication",
+    "url": "https://tools.helloruru.com/spotify-goods/",
+    "description": "把 YouTube Music 歌單搬到 Spotify。貼上網址自動抓歌或手動輸入歌名，一鍵建立 Spotify 歌單。",
+    "featureList": [
+      "貼上 YT Music 網址自動抓歌",
+      "手動輸入歌名清單",
+      "一鍵建立 Spotify 播放清單",
+      "支援歌單封面上傳",
+      "全程瀏覽器處理，不上傳資料"
+    ],
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" },
+    "creator": { "@type": "Organization", "name": "Hello Ruru", "url": "https://ohruru.com" }
+  }
+  </script>
+
+  <style>
+    @font-face {
+      font-family: 'GenSenRounded';
+      src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2');
+      font-weight: 400; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'GenSenRounded';
+      src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2');
+      font-weight: 700; font-style: normal; font-display: swap;
+    }
+
+    :root {
+      --c-rose: #D4A5A5;
+      --c-lavender: #B8A9C9;
+      --c-ink: #3D3535;
+      --c-bg: #FFFCFA;
+      --c-card: #FFFFFF;
+      --c-border: rgba(212,165,165,0.15);
+      --c-success: #1DB954;
+      --c-error: #C07070;
+      --c-muted: #A09090;
+      --radius: 24px;
+      --radius-sm: 12px;
+      --shadow: 0 4px 24px rgba(212,165,165,0.12);
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+      background: var(--c-bg); color: var(--c-ink);
+      line-height: 1.7; -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--c-lavender); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .hidden { display: none !important; }
+
+    /* Layout */
+    .container { max-width: 720px; margin: 0 auto; padding: 0 20px 60px; }
+    .hero { text-align: center; padding: 40px 20px 28px; }
+    .hero h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 6px; }
+    .hero p { font-size: 1rem; color: #6B5B5B; }
+
+    /* Steps */
+    .step {
+      background: var(--c-card); border-radius: var(--radius);
+      padding: 28px; margin-bottom: 24px; box-shadow: var(--shadow);
+    }
+    .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .step-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--c-rose), var(--c-lavender));
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.95rem; flex-shrink: 0;
+    }
+    .step-title { font-size: 1.15rem; font-weight: 700; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px 28px; border: none; border-radius: var(--radius-sm);
+      font-family: inherit; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; width: 100%;
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--c-rose); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: #c89494; box-shadow: var(--shadow); }
+    .btn-spotify { background: var(--c-success); color: #fff; }
+    .btn-spotify:hover:not(:disabled) {
+      background: #1aa34a; box-shadow: 0 4px 16px rgba(29,185,84,0.3);
+    }
+    .btn-small { padding: 10px 18px; width: auto; font-size: 0.88rem; white-space: nowrap; }
+
+    /* User info */
+    .user-info {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; background: var(--c-bg); border-radius: var(--radius-sm);
+    }
+    .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--c-lavender); }
+    .user-name { font-weight: 600; font-size: 0.9rem; }
+    .user-logout {
+      margin-left: auto; font-size: 0.8rem; color: var(--c-muted);
+      cursor: pointer; text-decoration: underline;
+    }
+
+    /* YT Music section */
+    .ytm-section { margin-bottom: 18px; }
+    .ytm-url-row { display: flex; gap: 8px; }
+    .ytm-url-row input { flex: 1; }
+    .ytm-status {
+      font-size: 0.85rem; padding: 10px 14px; border-radius: 10px;
+      margin-top: 10px; line-height: 1.5;
+    }
+    .ytm-status.loading { background: #F5F0FF; color: #7B6BA0; }
+    .ytm-status.success { background: rgba(29,185,84,0.08); color: #1aa34a; }
+    .ytm-status.error { background: rgba(192,112,112,0.08); color: var(--c-error); }
+
+    .divider-or {
+      text-align: center; margin: 20px 0; position: relative;
+    }
+    .divider-or span {
+      background: var(--c-card); padding: 0 14px;
+      font-size: 0.82rem; color: var(--c-muted); position: relative; z-index: 1;
+    }
+    .divider-or::before {
+      content: ''; position: absolute; left: 0; right: 0;
+      top: 50%; height: 1px; background: var(--c-border);
+    }
+
+    /* Inputs */
+    input[type="text"], input[type="url"] {
+      width: 100%; border: 2px solid var(--c-border); border-radius: var(--radius-sm);
+      padding: 12px 16px; font-family: inherit; font-size: 0.95rem;
+      background: var(--c-bg); color: var(--c-ink); transition: border-color 0.2s;
+    }
+    input:focus { outline: none; border-color: var(--c-lavender); }
+    input::placeholder { color: var(--c-muted); }
+
+    textarea {
+      width: 100%; min-height: 160px;
+      border: 2px solid var(--c-border); border-radius: var(--radius-sm);
+      padding: 14px 16px; font-family: inherit; font-size: 0.9rem;
+      line-height: 1.6; resize: vertical; transition: border-color 0.2s;
+      background: var(--c-bg); color: var(--c-ink);
+    }
+    textarea:focus { outline: none; border-color: var(--c-lavender); }
+    textarea::placeholder { color: var(--c-muted); }
+
+    .input-row { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; }
+    .input-row label { font-size: 0.9rem; color: #6B5B5B; min-width: 70px; font-weight: 500; }
+    .hint { font-size: 0.8rem; color: var(--c-muted); margin-top: 8px; line-height: 1.5; }
+
+    /* Cover upload */
+    .cover-section { margin-bottom: 18px; }
+    .cover-row { display: flex; align-items: center; gap: 14px; }
+    .cover-preview {
+      width: 72px; height: 72px; border-radius: 10px;
+      background: #F5F0EE; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; color: var(--c-muted); flex-shrink: 0;
+      cursor: pointer;
+    }
+    .cover-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .cover-preview-text { text-align: center; line-height: 1.3; }
+    .cover-info { flex: 1; }
+    .cover-info p { font-size: 0.8rem; color: var(--c-muted); line-height: 1.4; }
+    .cover-remove {
+      font-size: 0.78rem; color: var(--c-error); cursor: pointer;
+      text-decoration: underline; margin-top: 4px; display: inline-block;
+    }
+    #coverFileInput { display: none; }
+
+    /* Results */
+    .results { margin-top: 16px; }
+    .result-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid var(--c-border); font-size: 0.88rem;
+    }
+    .result-item:last-child { border-bottom: none; }
+    .result-status {
+      width: 24px; height: 24px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; flex-shrink: 0;
+    }
+    .result-status.found { background: rgba(29,185,84,0.1); color: var(--c-success); }
+    .result-status.not-found { background: rgba(192,112,112,0.08); color: var(--c-error); }
+    .result-info { flex: 1; min-width: 0; }
+    .result-match { font-weight: 500; }
+    .result-original { color: var(--c-muted); font-size: 0.8rem; }
+    .result-link { color: var(--c-rose); text-decoration: none; font-size: 0.8rem; flex-shrink: 0; }
+
+    .progress-bar {
+      width: 100%; height: 6px; background: #F5F0EE;
+      border-radius: 3px; overflow: hidden; margin: 12px 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--c-rose), var(--c-lavender));
+      border-radius: 3px; transition: width 0.3s; width: 0%;
+    }
+    .progress-text { font-size: 0.82rem; color: var(--c-muted); text-align: center; }
+
+    .summary { display: flex; gap: 14px; margin: 16px 0; }
+    .summary-item {
+      flex: 1; text-align: center; padding: 12px;
+      border-radius: var(--radius-sm); background: var(--c-bg);
+    }
+    .summary-num { font-size: 1.5rem; font-weight: 700; }
+    .summary-label { font-size: 0.78rem; color: var(--c-muted); margin-top: 2px; }
+    .summary-item.found .summary-num { color: var(--c-success); }
+    .summary-item.not-found .summary-num { color: var(--c-error); }
+    .summary-item.total .summary-num { color: var(--c-lavender); }
+
+    .status-msg {
+      text-align: center; padding: 16px; border-radius: var(--radius-sm);
+      margin: 12px 0; font-size: 0.9rem;
+    }
+    .status-msg.success { background: rgba(29,185,84,0.06); color: #1aa34a; }
+    .status-msg.error { background: rgba(192,112,112,0.06); color: var(--c-error); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      padding: 12px 24px; border-radius: var(--radius-sm);
+      font-size: 0.9rem; font-weight: 500; color: #fff;
+      background: var(--c-ink); box-shadow: var(--shadow);
+      opacity: 0; transition: all 0.3s; z-index: 1000; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: var(--c-success); }
+    .toast.error { background: var(--c-error); }
+
+    /* Footer */
+    .footer { text-align: center; margin-top: 40px; font-size: 0.78rem; color: #CCC; }
+    .footer a { color: var(--c-rose); }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .hero { padding: 32px 16px 20px; }
+      .hero h1 { font-size: 1.4rem; }
+      .container { padding: 0 12px 40px; }
+      .step { padding: 20px 16px; border-radius: 18px; }
+      .step-title { font-size: 1.05rem; }
+      .ytm-url-row { flex-direction: column; }
+      .ytm-url-row .btn { width: 100%; justify-content: center; }
+      .btn { padding: 10px 20px; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <hello-ruru-header title="Spotify Goods — 歌單搬家"></hello-ruru-header>
+
+  <header class="hero">
+    <h1>Spotify Goods</h1>
+    <p>把 YouTube Music 的歌搬到 Spotify，貼上歌名就搞定</p>
+  </header>
+
+  <main class="container">
+
+    <!-- Step 1: Login Spotify -->
+    <div class="step" id="step1">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <div class="step-title">連接 Spotify</div>
+      </div>
+      <div id="loginSection">
+        <p style="font-size:0.9rem; color:#6B5B5B; margin-bottom:12px;">登入你的 Spotify 帳號，歌單會建在你的帳號裡。</p>
+        <button class="btn btn-spotify" onclick="loginSpotify()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          連接 Spotify
+        </button>
+      </div>
+      <div class="hidden" id="userSection">
+        <div class="user-info">
+          <img class="user-avatar" id="userAvatar" src="" alt="">
+          <span class="user-name" id="userName"></span>
+          <span class="user-logout" onclick="logoutSpotify()">登出</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Import Songs -->
+    <div class="step hidden" id="step2">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <div class="step-title">匯入歌曲</div>
+      </div>
+
+      <!-- YT Music URL (Piped API) -->
+      <div class="ytm-section">
+        <p style="font-size:0.9rem; color:#6B5B5B; margin-bottom:10px;">貼上 YouTube Music 播放清單網址，自動抓取歌名。</p>
+        <div class="ytm-url-row">
+          <input type="url" id="ytmUrl" placeholder="https://music.youtube.com/playlist?list=..."
+                 onkeydown="if(event.key==='Enter')fetchYTMusic()">
+          <button class="btn btn-primary btn-small" id="btnFetchYTM" onclick="fetchYTMusic()">抓取</button>
+        </div>
+        <div id="ytmStatus" class="ytm-status hidden"></div>
+      </div>
+
+      <div class="divider-or"><span>或手動貼上</span></div>
+
+      <textarea id="songInput" placeholder="每行一首，格式不拘：&#10;&#10;突然的自我 - 伍佰&#10;挪威的森林 - 伍佰&#10;Last Dance - 伍佰&#10;&#10;有歌手名更準確"></textarea>
+      <div class="hint">支援格式：「歌名 - 歌手」「歌名 / 歌手」「歌名, 歌手」或只有歌名</div>
+
+      <div class="input-row" style="margin-top:18px;">
+        <label>歌單名稱</label>
+        <input type="text" id="playlistName" placeholder="例如：My Playlist">
+      </div>
+
+      <!-- Cover image upload -->
+      <div class="cover-section">
+        <div class="cover-row">
+          <div class="cover-preview" id="coverPreview" onclick="document.getElementById('coverFileInput').click()">
+            <div class="cover-preview-text" id="coverPreviewText">點擊上傳<br>封面</div>
+            <img id="coverImg" class="hidden" src="" alt="">
+          </div>
+          <div class="cover-info">
+            <p>選填，正方形 JPEG/PNG，最大 256KB</p>
+            <span class="cover-remove hidden" id="coverRemove" onclick="removeCover()">移除封面</span>
+          </div>
+        </div>
+        <input type="file" id="coverFileInput" accept="image/jpeg,image/png" onchange="handleCoverUpload(event)">
+      </div>
+
+      <button class="btn btn-primary" id="btnSearch" onclick="startSearch()">搜尋 Spotify</button>
+    </div>
+
+    <!-- Step 3: Results + Create -->
+    <div class="step hidden" id="step3">
+      <div class="step-header">
+        <div class="step-num">3</div>
+        <div class="step-title">比對結果</div>
+      </div>
+
+      <div class="progress-bar" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-text" id="progressText">搜尋中...</div>
+
+      <div class="summary hidden" id="summary">
+        <div class="summary-item total">
+          <div class="summary-num" id="totalCount">0</div>
+          <div class="summary-label">總共</div>
+        </div>
+        <div class="summary-item found">
+          <div class="summary-num" id="foundCount">0</div>
+          <div class="summary-label">找到</div>
+        </div>
+        <div class="summary-item not-found">
+          <div class="summary-num" id="notFoundCount">0</div>
+          <div class="summary-label">沒找到</div>
+        </div>
+      </div>
+
+      <div class="results" id="resultsList"></div>
+
+      <div class="hidden" id="createSection" style="margin-top:20px;">
+        <button class="btn btn-spotify" id="btnCreate" onclick="createPlaylist()">建立歌單</button>
+      </div>
+
+      <div class="hidden" id="createStatus"></div>
+    </div>
+
+    <div class="footer">
+      <a href="https://tools.helloruru.com">HelloRuru Tools</a>
+    </div>
+  </main>
+
+  <script>
+    // ===== Config =====
+    const SPOTIFY_CLIENT_ID = '6311e9e594cd4b968047a6b60eed5b52';
+    const REDIRECT_URI = 'https://tools.helloruru.com/spotify-goods/';
+    const SCOPES = 'playlist-modify-public playlist-modify-private ugc-image-upload';
+
+    // Piped API instances (public, CORS-friendly, no API key needed)
+    const PIPED_INSTANCES = [
+      'https://pipedapi.kavin.rocks',
+      'https://pipedapi.adminforge.de',
+      'https://api.piped.projectsegfault.com',
+    ];
+
+    // ===== State =====
+    let accessToken = null;
+    let spotifyUser = null;
+    let matchedTracks = [];
+    let coverBase64 = null;
+
+    // ===== Helpers =====
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    function esc(str) {
+      const d = document.createElement('div');
+      d.textContent = str || '';
+      return d.innerHTML;
+    }
+
+    function showToast(msg, type) {
+      let t = document.getElementById('toast');
+      if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; document.body.appendChild(t); }
+      t.textContent = msg;
+      t.className = `toast ${type || ''} show`;
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ===== PKCE =====
+    function generateRandomString(len) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+      const vals = crypto.getRandomValues(new Uint8Array(len));
+      return Array.from(vals, v => chars[v % chars.length]).join('');
+    }
+
+    async function generateCodeChallenge(verifier) {
+      const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
+      return btoa(String.fromCharCode(...new Uint8Array(digest)))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    // ===== Init =====
+    window.addEventListener('DOMContentLoaded', async () => {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+
+      if (code) {
+        const verifier = sessionStorage.getItem('pkce_verifier');
+        if (verifier) {
+          await exchangeCodeForToken(code, verifier);
+          sessionStorage.removeItem('pkce_verifier');
+          // Restore saved form data
+          const saved = sessionStorage.getItem('sg_form');
+          if (saved) {
+            const form = JSON.parse(saved);
+            if (form.name) document.getElementById('playlistName').value = form.name;
+            if (form.songs) document.getElementById('songInput').value = form.songs;
+            if (form.url) document.getElementById('ytmUrl').value = form.url;
+            sessionStorage.removeItem('sg_form');
+          }
+        }
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+
+      updateUI();
+    });
+
+    async function exchangeCodeForToken(code, verifier) {
+      const res = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: SPOTIFY_CLIENT_ID,
+          grant_type: 'authorization_code',
+          code, redirect_uri: REDIRECT_URI, code_verifier: verifier,
+        }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      accessToken = data.access_token;
+      await fetchSpotifyUser();
+    }
+
+    function updateUI() {
+      const loggedIn = accessToken && spotifyUser;
+      document.getElementById('loginSection').classList.toggle('hidden', !!loggedIn);
+      document.getElementById('userSection').classList.toggle('hidden', !loggedIn);
+      document.getElementById('step2').classList.toggle('hidden', !loggedIn);
+    }
+
+    // ===== Spotify OAuth =====
+    async function loginSpotify() {
+      // Save form data before redirect
+      sessionStorage.setItem('sg_form', JSON.stringify({
+        name: document.getElementById('playlistName')?.value || '',
+        songs: document.getElementById('songInput')?.value || '',
+        url: document.getElementById('ytmUrl')?.value || '',
+      }));
+
+      const verifier = generateRandomString(64);
+      sessionStorage.setItem('pkce_verifier', verifier);
+      const challenge = await generateCodeChallenge(verifier);
+
+      const params = new URLSearchParams({
+        client_id: SPOTIFY_CLIENT_ID, response_type: 'code',
+        redirect_uri: REDIRECT_URI, scope: SCOPES,
+        code_challenge_method: 'S256', code_challenge: challenge,
+      });
+      window.location.href = `https://accounts.spotify.com/authorize?${params}`;
+    }
+
+    async function fetchSpotifyUser() {
+      const res = await fetch('https://api.spotify.com/v1/me', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (!res.ok) { accessToken = null; return; }
+      spotifyUser = await res.json();
+      document.getElementById('userName').textContent = spotifyUser.display_name || spotifyUser.id;
+      const avatar = spotifyUser.images?.[0]?.url;
+      if (avatar) document.getElementById('userAvatar').src = avatar;
+    }
+
+    function logoutSpotify() {
+      accessToken = null; spotifyUser = null;
+      coverBase64 = null; matchedTracks = [];
+      document.getElementById('step3').classList.add('hidden');
+      updateUI();
+    }
+
+    // ===== Cover Upload =====
+    function handleCoverUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 256 * 1024) { showToast('圖片太大，最大 256KB', 'error'); e.target.value = ''; return; }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result;
+        document.getElementById('coverImg').src = dataUrl;
+        document.getElementById('coverImg').classList.remove('hidden');
+        document.getElementById('coverPreviewText').classList.add('hidden');
+        document.getElementById('coverRemove').classList.remove('hidden');
+
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const size = Math.min(img.width, img.height);
+          canvas.width = 300; canvas.height = 300;
+          const ctx = canvas.getContext('2d');
+          const sx = (img.width - size) / 2, sy = (img.height - size) / 2;
+          ctx.drawImage(img, sx, sy, size, size, 0, 0, 300, 300);
+          coverBase64 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+        };
+        img.src = dataUrl;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeCover() {
+      coverBase64 = null;
+      document.getElementById('coverImg').classList.add('hidden');
+      document.getElementById('coverImg').src = '';
+      document.getElementById('coverPreviewText').classList.remove('hidden');
+      document.getElementById('coverRemove').classList.add('hidden');
+      document.getElementById('coverFileInput').value = '';
+    }
+
+    // ===== YT Music Fetch (Piped API) =====
+    async function fetchYTMusic() {
+      const url = document.getElementById('ytmUrl').value.trim();
+      if (!url) return;
+
+      const playlistId = extractPlaylistId(url);
+      if (!playlistId) {
+        showYTMStatus('error', '無法辨識播放清單網址，請確認格式');
+        return;
+      }
+
+      const btn = document.getElementById('btnFetchYTM');
+      btn.disabled = true;
+      showYTMStatus('loading', '抓取中...');
+
+      let lastErr = null;
+      for (const instance of PIPED_INSTANCES) {
+        try {
+          const res = await fetch(`${instance}/playlists/${playlistId}`);
+          if (!res.ok) continue;
+          const data = await res.json();
+          if (!data.relatedStreams?.length) continue;
+
+          const songs = data.relatedStreams.map(s => {
+            const parsed = parseVideoTitle(s.title, s.uploaderName);
+            return `${parsed.artist} - ${parsed.title}`;
+          });
+
+          document.getElementById('songInput').value = songs.join('\n');
+          if (data.name) document.getElementById('playlistName').value = data.name;
+          showYTMStatus('success', `成功抓到 ${songs.length} 首歌！`);
+          btn.disabled = false;
+          return;
+        } catch (err) { lastErr = err; continue; }
+      }
+
+      showYTMStatus('error', '無法抓取歌單，請改用手動貼上歌名');
+      btn.disabled = false;
+    }
+
+    function extractPlaylistId(url) {
+      try {
+        const u = new URL(url);
+        return u.searchParams.get('list');
+      } catch {
+        if (/^[A-Za-z0-9_-]+$/.test(url.trim())) return url.trim();
+        return null;
+      }
+    }
+
+    function parseVideoTitle(videoTitle, uploaderName) {
+      let clean = videoTitle
+        .replace(/\(Official\s*(Music\s*)?Video\)/gi, '')
+        .replace(/\(Official\s*MV\)/gi, '')
+        .replace(/\(MV\)/gi, '')
+        .replace(/\(Lyric\s*Video\)/gi, '')
+        .replace(/\(Audio\)/gi, '')
+        .replace(/\(Visualizer\)/gi, '')
+        .replace(/【[^】]*】/g, '')
+        .replace(/\[[^\]]*\]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const seps = [' - ', ' – ', ' — ', ' | '];
+      for (const sep of seps) {
+        const idx = clean.indexOf(sep);
+        if (idx > 0) {
+          return { artist: clean.substring(0, idx).trim(), title: clean.substring(idx + sep.length).trim() };
+        }
+      }
+
+      const artist = uploaderName?.replace(/\s*-\s*Topic$/, '').replace(/ VEVO$/i, '').trim() || '';
+      return { title: clean, artist };
+    }
+
+    function showYTMStatus(type, msg) {
+      const el = document.getElementById('ytmStatus');
+      el.classList.remove('hidden');
+      el.className = `ytm-status ${type}`;
+      el.textContent = msg;
+    }
+
+    // ===== Parse Songs =====
+    function parseSongs(text) {
+      return text.split('\n')
+        .map(line => line.trim())
+        .filter(line => line && !/^\d+\.\s*$/.test(line))
+        .map(line => {
+          line = line.replace(/^\d+[\.\)]\s*/, '').replace(/^[-•]\s*/, '').trim();
+          const seps = [' - ', ' – ', ' — ', ' | ', ' / ', ', '];
+          for (const sep of seps) {
+            const idx = line.indexOf(sep);
+            if (idx > 0) return { title: line.substring(idx + sep.length).trim(), artist: line.substring(0, idx).trim() };
+          }
+          return { title: line, artist: '' };
+        });
+    }
+
+    // ===== Spotify API with Rate Limit =====
+    async function spotifyFetch(url, options = {}) {
+      const res = await fetch(url, {
+        ...options,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      });
+
+      // Rate limit: wait and retry
+      if (res.status === 429) {
+        const wait = parseInt(res.headers.get('Retry-After') || '3', 10);
+        await sleep(wait * 1000);
+        return spotifyFetch(url, options);
+      }
+
+      return res;
+    }
+
+    async function searchSpotify(title, artist) {
+      const query = artist ? `${title} ${artist}` : title;
+      const params = new URLSearchParams({ q: query, type: 'track', limit: '5', market: 'TW' });
+      const res = await spotifyFetch(`https://api.spotify.com/v1/search?${params}`);
+      if (!res.ok) return null;
+
+      const data = await res.json();
+      const tracks = data.tracks?.items;
+      if (!tracks || !tracks.length) return null;
+
+      const t = tracks[0];
+      return {
+        uri: t.uri,
+        name: t.name,
+        artist: t.artists.map(a => a.name).join(', '),
+        url: t.external_urls.spotify,
+      };
+    }
+
+    // ===== Search Flow =====
+    async function startSearch() {
+      const input = document.getElementById('songInput').value;
+      const songs = parseSongs(input);
+      if (!songs.length) { showToast('請先貼上歌名', 'error'); return; }
+
+      document.getElementById('step3').classList.remove('hidden');
+      document.getElementById('summary').classList.add('hidden');
+      document.getElementById('createSection').classList.add('hidden');
+      document.getElementById('createStatus').classList.add('hidden');
+      document.getElementById('resultsList').innerHTML = '';
+      matchedTracks = [];
+
+      const progressFill = document.getElementById('progressFill');
+      const progressText = document.getElementById('progressText');
+      const btnSearch = document.getElementById('btnSearch');
+      btnSearch.disabled = true;
+      progressFill.style.width = '0%';
+
+      let found = 0, notFound = 0;
+
+      for (let i = 0; i < songs.length; i++) {
+        const song = songs[i];
+        const pct = ((i + 1) / songs.length * 100).toFixed(0);
+        progressFill.style.width = pct + '%';
+        progressText.textContent = `搜尋中... ${i + 1} / ${songs.length}`;
+
+        const result = await searchSpotify(song.title, song.artist);
+        const item = {
+          query: song.artist ? `${song.title} - ${song.artist}` : song.title,
+          spotifyUri: result?.uri || null,
+          spotifyName: result?.name || null,
+          spotifyArtist: result?.artist || null,
+          spotifyUrl: result?.url || null,
+        };
+        matchedTracks.push(item);
+
+        if (result) { found++; appendResult(item, true); }
+        else { notFound++; appendResult(item, false); }
+
+        // Throttle: 200ms between requests
+        if (i < songs.length - 1) await sleep(200);
+      }
+
+      progressText.textContent = '搜尋完成';
+      document.getElementById('summary').classList.remove('hidden');
+      document.getElementById('totalCount').textContent = songs.length;
+      document.getElementById('foundCount').textContent = found;
+      document.getElementById('notFoundCount').textContent = notFound;
+      btnSearch.disabled = false;
+
+      if (found > 0) document.getElementById('createSection').classList.remove('hidden');
+    }
+
+    function appendResult(item, isFound) {
+      const div = document.createElement('div');
+      div.className = 'result-item';
+      if (isFound) {
+        div.innerHTML = `
+          <div class="result-status found">&#10003;</div>
+          <div class="result-info">
+            <div class="result-match">${esc(item.spotifyName)} — ${esc(item.spotifyArtist)}</div>
+            <div class="result-original">${esc(item.query)}</div>
+          </div>
+          <a class="result-link" href="${esc(item.spotifyUrl)}" target="_blank" rel="noopener">開啟</a>`;
+      } else {
+        div.innerHTML = `
+          <div class="result-status not-found">&#10007;</div>
+          <div class="result-info">
+            <div class="result-match" style="color:var(--c-muted)">${esc(item.query)}</div>
+            <div class="result-original">在 Spotify 找不到</div>
+          </div>`;
+      }
+      document.getElementById('resultsList').appendChild(div);
+    }
+
+    // ===== Create Playlist =====
+    async function createPlaylist() {
+      if (!accessToken || !spotifyUser) return;
+
+      const btnCreate = document.getElementById('btnCreate');
+      const statusDiv = document.getElementById('createStatus');
+      btnCreate.disabled = true;
+      statusDiv.classList.remove('hidden');
+      statusDiv.className = 'status-msg';
+      statusDiv.textContent = '建立中...';
+
+      const playlistName = document.getElementById('playlistName').value || 'My Playlist';
+      const uris = matchedTracks.filter(t => t.spotifyUri).map(t => t.spotifyUri);
+
+      if (!uris.length) {
+        statusDiv.className = 'status-msg error';
+        statusDiv.textContent = '沒有可加入的歌曲';
+        btnCreate.disabled = false;
+        return;
+      }
+
+      try {
+        // 1. Create playlist
+        const createRes = await spotifyFetch('https://api.spotify.com/v1/me/playlists', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: playlistName,
+            description: '由 Spotify Goods (HelloRuru Tools) 建立',
+            public: false,
+          }),
+        });
+        if (!createRes.ok) throw new Error('建立歌單失敗');
+        const playlist = await createRes.json();
+
+        // 2. Add tracks (batch 100)
+        for (let i = 0; i < uris.length; i += 100) {
+          const batch = uris.slice(i, i + 100);
+          const addRes = await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlist.id}/tracks`, {
+            method: 'POST',
+            body: JSON.stringify({ uris: batch }),
+          });
+          if (!addRes.ok) throw new Error('加入歌曲失敗');
+        }
+
+        // 3. Upload cover (if provided)
+        if (coverBase64) {
+          await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlist.id}/images`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'image/jpeg' },
+            body: coverBase64,
+          });
+        }
+
+        statusDiv.className = 'status-msg success';
+        statusDiv.innerHTML = `歌單「${esc(playlistName)}」建立成功！共 ${uris.length} 首<br>
+          <a href="${playlist.external_urls.spotify}" target="_blank" rel="noopener"
+             style="color:#1DB954;font-weight:600;">在 Spotify 開啟歌單</a>`;
+        showToast('歌單建立成功！', 'success');
+      } catch (err) {
+        statusDiv.className = 'status-msg error';
+        statusDiv.textContent = err.message;
+        showToast('建立失敗：' + err.message, 'error');
+      }
+
+      btnCreate.disabled = false;
+    }
+  </script>
+</body>
+</html>

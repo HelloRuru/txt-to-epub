@@ -89,6 +89,16 @@
       "ready": true,
       "color": "lavender",
       "external": true
+    },
+    {
+      "id": "spotify-goods",
+      "name": "Spotify Goods 歌單搬家",
+      "description": "把 YouTube Music 歌單搬到 Spotify。貼上網址自動抓歌，支援封面上傳，一鍵建立歌單。",
+      "path": "/spotify-goods/",
+      "icon": "music",
+      "ready": true,
+      "color": "lavender",
+      "external": true
     }
   ]
 }
