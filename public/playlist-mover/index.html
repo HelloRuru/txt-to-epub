@@ -212,7 +212,7 @@
       </div>
       <div class="input-row">
         <label>歌單名稱</label>
-        <input type="text" id="playlistName" value="Midnight Groove" placeholder="輸入 Spotify 歌單名稱">
+        <input type="text" id="playlistName" value="" placeholder="例如：My Playlist">
       </div>
 
       <!-- Cover image upload -->
@@ -230,7 +230,7 @@
         <input type="file" id="coverFileInput" accept="image/jpeg,image/png" onchange="handleCoverUpload(event)">
       </div>
 
-      <textarea id="songInput" placeholder="一行一首，格式：&#10;歌名 - 歌手&#10;歌名 / 歌手&#10;或只貼歌名也行&#10;&#10;範例：&#10;ワンルーム・ステップ - Retro City Pop&#10;恋はメイクアップ - Retro City Pop"></textarea>
+      <textarea id="songInput" placeholder="一行一首，格式：&#10;歌名 - 歌手&#10;歌名 / 歌手&#10;或只貼歌名也行&#10;&#10;範例：&#10;Shape of You - Ed Sheeran&#10;Blinding Lights - The Weeknd&#10;晴天 - 周杰倫"></textarea>
       <div class="hint">支援格式：「歌名 - 歌手」「歌名 / 歌手」「歌名, 歌手」或只有歌名</div>
       <br>
       <button class="btn btn-primary" id="btnSearch" onclick="startSearch()">搜尋 Spotify</button>
