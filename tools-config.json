@@ -89,16 +89,6 @@
       "ready": true,
       "color": "lavender",
       "external": true
-    },
-    {
-      "id": "spotify-transfer",
-      "name": "YT→Spotify 歌單轉換",
-      "description": "把 YouTube Music 播放清單轉到 Spotify。貼上網址自動抓歌，一鍵建立 Spotify 歌單。",
-      "path": "/spotify-transfer/",
-      "icon": "music",
-      "ready": true,
-      "color": "lavender",
-      "external": true
     }
   ]
 }
