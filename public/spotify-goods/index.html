@@ -1208,67 +1208,83 @@
         .replace(/\s+/g, ' ').trim();
     }
 
-    // Check how well a Spotify result matches the original query
-    function matchScore(track, queryTitle, queryArtist) {
+    // Check if two strings have meaningful overlap
+    function hasOverlap(a, b) {
+      if (!a || !b) return false;
+      a = normalize(a); b = normalize(b);
+      if (a === b) return true;
+      if (a.includes(b) || b.includes(a)) return true;
+      // Word-level overlap
+      const aWords = a.split(' ').filter(w => w.length > 1);
+      const bWords = b.split(' ').filter(w => w.length > 1);
+      return aWords.some(w => bWords.includes(w));
+    }
+
+    // Validate a Spotify result against the original query
+    function isGoodMatch(track, queryTitle, queryArtist) {
       const tName = normalize(track.name);
       const tArtists = track.artists.map(a => normalize(a.name));
       const qTitle = normalize(queryTitle);
       const qArtist = normalize(queryArtist);
 
-      let score = 0;
+      // Must have title overlap — no exceptions
+      const titleOK = tName === qTitle
+        || tName.includes(qTitle) || qTitle.includes(tName)
+        || (() => {
+          const tW = tName.split(' ').filter(w => w.length > 1);
+          const qW = qTitle.split(' ').filter(w => w.length > 1);
+          if (!qW.length) return false;
+          const overlap = qW.filter(w => tW.includes(w)).length;
+          return overlap >= Math.max(1, Math.ceil(qW.length * 0.4));
+        })();
 
-      // Title match (most important)
-      if (tName === qTitle) score += 50;
-      else if (tName.includes(qTitle) || qTitle.includes(tName)) score += 35;
-      else {
-        // Word overlap
-        const tWords = tName.split(' ').filter(w => w.length > 1);
-        const qWords = qTitle.split(' ').filter(w => w.length > 1);
-        if (qWords.length > 0) {
-          const overlap = qWords.filter(w => tWords.includes(w)).length;
-          score += (overlap / qWords.length) * 30;
-        }
-      }
+      if (!titleOK) return false;
 
-      // Artist match
+      // If artist was provided, check artist too
       if (qArtist) {
-        const artistMatch = tArtists.some(a => a === qArtist || a.includes(qArtist) || qArtist.includes(a));
-        if (artistMatch) score += 40;
-        else {
-          // Partial word overlap for artist
-          const qAWords = qArtist.split(' ').filter(w => w.length > 1);
-          const anyOverlap = tArtists.some(a => {
-            const aWords = a.split(' ');
-            return qAWords.some(w => aWords.includes(w));
-          });
-          if (anyOverlap) score += 15;
-        }
+        const artistOK = tArtists.some(a =>
+          a === qArtist || a.includes(qArtist) || qArtist.includes(a)
+          || (() => {
+            const aW = a.split(' ');
+            const qW = qArtist.split(' ').filter(w => w.length > 1);
+            return qW.some(w => aW.includes(w));
+          })()
+        );
+        // With artist: both must pass. Without: title alone is enough
+        if (!artistOK) return false;
       }
 
-      return score;
+      return true;
     }
 
     async function searchSpotify(title, artist) {
-      const query = artist ? `${title} ${artist}` : title;
-      const params = new URLSearchParams({ q: query, type: 'track', limit: '5', market: 'TW' });
-      const res = await spotifyFetch(`https://api.spotify.com/v1/search?${params}`);
-      if (!res.ok) return null;
-      const data = await res.json();
-      const tracks = data.tracks?.items;
-      if (!tracks?.length) return null;
-
-      // Score all results and pick the best match above threshold
-      let best = null, bestScore = -1;
-      for (const t of tracks) {
-        const s = matchScore(t, title, artist);
-        if (s > bestScore) { bestScore = s; best = t; }
+      // Strategy 1: field-specific search (most precise)
+      // Strategy 2: general search (fallback)
+      const queries = [];
+      if (artist) {
+        queries.push(`track:${title} artist:${artist}`);
+        queries.push(`${title} ${artist}`);
+      } else {
+        queries.push(title);
       }
 
-      // Require minimum score: with artist 25+, without artist 20+
-      const threshold = artist ? 25 : 20;
-      if (bestScore < threshold) return null;
+      for (const query of queries) {
+        const params = new URLSearchParams({ q: query, type: 'track', limit: '5', market: 'TW' });
+        const res = await spotifyFetch(`https://api.spotify.com/v1/search?${params}`);
+        if (!res.ok) return null;
+        const data = await res.json();
+        const tracks = data.tracks?.items;
+        if (!tracks?.length) continue;
 
-      return { uri: best.uri, name: best.name, artist: best.artists.map(a => a.name).join(', '), url: best.external_urls.spotify };
+        // Pick the first result that passes validation
+        for (const t of tracks) {
+          if (isGoodMatch(t, title, artist)) {
+            return { uri: t.uri, name: t.name, artist: t.artists.map(a => a.name).join(', '), url: t.external_urls.spotify };
+          }
+        }
+      }
+
+      return null;
     }
 
     // ===== Search Flow =====
