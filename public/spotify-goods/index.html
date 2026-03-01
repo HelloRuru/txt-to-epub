@@ -358,9 +358,9 @@
 
         <!-- YT Music URL -->
         <div class="ytm-section">
-          <p style="font-size:0.85rem; color:#6B5B5B; margin-bottom:8px;">貼上 YouTube Music 播放清單或頻道網址</p>
+          <p style="font-size:0.85rem; color:#6B5B5B; margin-bottom:8px;">貼上 YouTube / YT Music 的播放清單、頻道或影片網址</p>
           <div class="ytm-url-row">
-            <input type="url" id="ytmUrl" placeholder="https://music.youtube.com/playlist?list=..." onkeydown="if(event.key==='Enter')fetchYTMusic()">
+            <input type="url" id="ytmUrl" placeholder="播放清單、頻道、影片網址都可以" onkeydown="if(event.key==='Enter')fetchYTMusic()">
             <button class="btn btn-primary btn-small" id="btnFetchYTM" onclick="fetchYTMusic()">抓取</button>
           </div>
           <div id="ytmStatus" class="ytm-status hidden"></div>
@@ -607,51 +607,7 @@
       document.getElementById('coverFileInput').value = '';
     }
 
-    // ===== YT Music Fetch =====
-    async function fetchYTMusic() {
-      const url = document.getElementById('ytmUrl').value.trim();
-      if (!url) return;
-
-      // Check channel URL first
-      const channelId = extractChannelId(url);
-      if (channelId) { await fetchChannel(channelId); return; }
-
-      // Check playlist URL
-      const playlistId = extractPlaylistId(url);
-      if (!playlistId) {
-        showYTMStatus('error', '無法辨識網址，支援播放清單或頻道網址');
-        return;
-      }
-
-      const btn = document.getElementById('btnFetchYTM');
-      btn.disabled = true;
-      document.getElementById('channelResults').classList.add('hidden');
-      showYTMStatus('loading', '抓取播放清單中...');
-
-      for (const instance of PIPED_INSTANCES) {
-        try {
-          const res = await fetch(`${instance}/playlists/${playlistId}`);
-          if (!res.ok) continue;
-          const data = await res.json();
-          if (!data.relatedStreams?.length) continue;
-
-          const songs = data.relatedStreams.map(s => {
-            const parsed = parseVideoTitle(s.title, s.uploaderName);
-            return `${parsed.artist} - ${parsed.title}`;
-          });
-
-          document.getElementById('songInput').value = songs.join('\n');
-          if (data.name) document.getElementById('playlistName').value = data.name;
-          showYTMStatus('success', `成功抓到 ${songs.length} 首歌！`);
-          btn.disabled = false;
-          return;
-        } catch { continue; }
-      }
-
-      showYTMStatus('error', '無法抓取歌單，請改用手動貼上歌名');
-      btn.disabled = false;
-    }
-
+    // ===== URL Parsers =====
     function extractPlaylistId(url) {
       try {
         const u = new URL(url);
@@ -668,6 +624,205 @@
         const match = u.pathname.match(/\/channel\/(UC[A-Za-z0-9_-]+)/);
         return match ? match[1] : null;
       } catch { return null; }
+    }
+
+    function extractVideoId(url) {
+      try {
+        const u = new URL(url);
+        if (u.hostname === 'youtu.be') return u.pathname.slice(1).split('/')[0];
+        if (u.searchParams.has('v')) return u.searchParams.get('v');
+        return null;
+      } catch { return null; }
+    }
+
+    // ===== YT Fetch (playlist / channel / video) =====
+    async function fetchYTMusic() {
+      const url = document.getElementById('ytmUrl').value.trim();
+      if (!url) return;
+
+      const btn = document.getElementById('btnFetchYTM');
+      btn.disabled = true;
+      document.getElementById('channelResults').classList.add('hidden');
+
+      // 1. Channel URL
+      const channelId = extractChannelId(url);
+      if (channelId) { await fetchChannel(channelId); return; }
+
+      const playlistId = extractPlaylistId(url);
+      const videoId = extractVideoId(url);
+
+      // 2. Regular playlist (skip radio RD prefix — try video first)
+      if (playlistId && !playlistId.startsWith('RD')) {
+        showYTMStatus('loading', '抓取播放清單中...');
+        if (await fetchPlaylistSongs(playlistId)) { btn.disabled = false; return; }
+      }
+
+      // 3. Video description → parse songs
+      if (videoId) {
+        showYTMStatus('loading', '從影片描述抓取歌曲...');
+        if (await fetchVideoSongs(videoId)) { btn.disabled = false; return; }
+      }
+
+      // 4. Radio playlist (RD) — try anyway as last resort
+      if (playlistId && playlistId.startsWith('RD')) {
+        showYTMStatus('loading', '嘗試抓取電台清單...');
+        if (await fetchPlaylistSongs(playlistId)) { btn.disabled = false; return; }
+      }
+
+      showYTMStatus('error', '無法辨識網址或抓取內容');
+      btn.disabled = false;
+    }
+
+    // Fetch a playlist by ID, returns true if successful
+    async function fetchPlaylistSongs(playlistId) {
+      for (const instance of PIPED_INSTANCES) {
+        try {
+          const res = await fetch(`${instance}/playlists/${playlistId}`);
+          if (!res.ok) continue;
+          const data = await res.json();
+          if (!data.relatedStreams?.length) continue;
+
+          const songs = data.relatedStreams.map(s => {
+            const parsed = parseVideoTitle(s.title, s.uploaderName);
+            return `${parsed.artist} - ${parsed.title}`;
+          });
+
+          document.getElementById('songInput').value = songs.join('\n');
+          if (data.name) document.getElementById('playlistName').value = data.name;
+          showYTMStatus('success', `成功抓到 ${songs.length} 首歌！`);
+          return true;
+        } catch { continue; }
+      }
+      return false;
+    }
+
+    // Fetch a single video, parse description for song list
+    async function fetchVideoSongs(videoId) {
+      for (const instance of PIPED_INSTANCES) {
+        try {
+          const res = await fetch(`${instance}/streams/${videoId}`);
+          if (!res.ok) continue;
+          const data = await res.json();
+
+          // Phase 1: try description
+          const descSongs = parseSongsFromDescription(data.description || '');
+          if (descSongs.length >= 2) {
+            showYTMStatus('loading', `找到 ${descSongs.length} 首歌，查詢歌手中...`);
+            const enriched = await lookupArtists(descSongs);
+            document.getElementById('songInput').value = enriched.join('\n');
+            if (data.title) document.getElementById('playlistName').value = data.title;
+            showYTMStatus('success', `從影片描述抓到 ${enriched.length} 首歌！`);
+            return true;
+          }
+
+          // Phase 2: fallback to video title itself (single song)
+          const parsed = parseVideoTitle(data.title || '', data.uploaderName || data.uploader || '');
+          if (parsed.title) {
+            const line = parsed.artist ? `${parsed.artist} - ${parsed.title}` : parsed.title;
+            document.getElementById('songInput').value = line;
+            showYTMStatus('success', `辨識為單曲：${line}`);
+            return true;
+          }
+
+          return false;
+        } catch { continue; }
+      }
+      return false;
+    }
+
+    // ===== Description Parser =====
+    // Extracts song entries from YouTube video descriptions
+    // Supports: timestamp lines, numbered lists, artist-title patterns
+    function parseSongsFromDescription(desc) {
+      if (!desc) return [];
+      const lines = desc.split('\n');
+      const hasSep = (s) => [' - ', ' – ', ' — ', ' | '].some(sep => s.includes(sep));
+
+      // Phase 1: timestamp lines (e.g. "0:00 Artist - Song", "00:00 Song", "[1:23:45] Song")
+      const tsRegex = /^[\[\(]?\d{0,2}:?\d{1,2}:\d{2}[\]\)]?\s*[-–—.]?\s*/;
+      const tsLines = [];
+      for (const line of lines) {
+        const t = line.trim();
+        if (tsRegex.test(t)) {
+          const cleaned = t.replace(tsRegex, '').trim();
+          if (cleaned.length >= 2 && !/^https?:\/\//.test(cleaned)) tsLines.push(cleaned);
+        }
+      }
+      if (tsLines.length >= 2) return tsLines;
+
+      // Phase 2: numbered list (e.g. "1. Artist - Song", "2) Song Name")
+      const numLines = [];
+      for (const line of lines) {
+        const t = line.trim();
+        const m = t.match(/^\d+[\.\)]\s+(.+)/);
+        if (m) {
+          const entry = m[1].trim();
+          if (entry.length >= 2 && !/^https?:\/\//.test(entry)) numLines.push(entry);
+        }
+      }
+      if (numLines.length >= 2) return numLines;
+
+      // Phase 3: lines with artist-title separator (bulk consecutive lines)
+      const sepLines = [];
+      for (const line of lines) {
+        const t = line.trim();
+        if (t.length < 4) continue;
+        if (/^https?:\/\//.test(t)) continue;
+        if (/^[#➤►▶♫♪🔔👉↓@]/u.test(t)) continue;
+        if (/^(subscribe|follow|like|share|turn on|copyright|license|provided)/i.test(t)) continue;
+        if (hasSep(t)) sepLines.push(t);
+      }
+      if (sepLines.length >= 2) return sepLines;
+
+      return [];
+    }
+
+    // ===== Artist Lookup =====
+    // For songs without artist info, search the real artist via Spotify or iTunes
+    async function lookupArtists(entries) {
+      const result = [];
+      const hasSep = (s) => [' - ', ' – ', ' — ', ' | '].some(sep => s.includes(sep));
+
+      for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i];
+        if (hasSep(entry)) {
+          result.push(entry);
+          continue;
+        }
+
+        // Look up real artist
+        const artist = await findArtist(entry);
+        result.push(artist ? `${artist} - ${entry}` : entry);
+
+        if (i < entries.length - 1) await sleep(200);
+      }
+      return result;
+    }
+
+    async function findArtist(songTitle) {
+      // Try Spotify first if logged in
+      if (accessToken) {
+        try {
+          const params = new URLSearchParams({ q: songTitle, type: 'track', limit: '1', market: 'TW' });
+          const res = await spotifyFetch(`https://api.spotify.com/v1/search?${params}`);
+          if (res.ok) {
+            const data = await res.json();
+            const track = data.tracks?.items?.[0];
+            if (track) return track.artists.map(a => a.name).join(', ');
+          }
+        } catch {}
+      }
+
+      // Fallback: iTunes Search API (free, no auth, CORS-friendly)
+      try {
+        const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(songTitle)}&entity=song&limit=1&country=TW`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.results?.[0]?.artistName) return data.results[0].artistName;
+        }
+      } catch {}
+
+      return null;
     }
 
     // ===== Channel Fetch (Piped API) =====
