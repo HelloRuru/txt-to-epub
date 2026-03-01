@@ -199,6 +199,15 @@
     }
     input:focus { outline: none; border-color: var(--c-lavender); }
     input::placeholder { color: var(--c-muted); }
+    select {
+      width: 100%; border: 2px solid var(--c-border); border-radius: var(--radius-sm);
+      padding: 10px 14px; font-family: inherit; font-size: 0.9rem;
+      background: var(--c-bg); color: var(--c-ink); cursor: pointer;
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23A09090' stroke-width='2'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+    }
+    select:focus { outline: none; border-color: var(--c-lavender); }
     textarea {
       width: 100%; min-height: 120px;
       border: 2px solid var(--c-border); border-radius: var(--radius-sm);
@@ -277,8 +286,12 @@
     .toast.error { background: var(--c-error); }
 
     /* Footer */
-    .footer { text-align: center; margin-top: 28px; font-size: 0.75rem; color: #CCC; }
-    .footer a { color: var(--c-rose); }
+    .footer {
+      text-align: center; margin-top: 32px; padding: 20px 16px;
+      border-top: 1px solid var(--c-border); font-size: 0.78rem; color: var(--c-muted); line-height: 1.6;
+    }
+    .footer a { color: var(--c-rose); font-weight: 500; }
+    .footer .footer-brand { font-weight: 700; color: var(--c-ink); opacity: 0.5; }
 
     /* Responsive */
     @media (max-width: 768px) {
@@ -378,6 +391,12 @@
         <div class="hint">支援格式：歌名 - 歌手 / 歌名, 歌手 / 只有歌名</div>
 
         <div class="input-row" style="margin-top:14px;">
+          <label>目標歌單</label>
+          <select id="playlistTarget" onchange="togglePlaylistTarget()">
+            <option value="new">建立新歌單</option>
+          </select>
+        </div>
+        <div class="input-row" id="playlistNameRow">
           <label>歌單名稱</label>
           <input type="text" id="playlistName" placeholder="例如：My Playlist">
         </div>
@@ -424,7 +443,9 @@
       <div class="hidden" id="createStatus"></div>
     </div>
 
-    <div class="footer"><a href="https://tools.helloruru.com">HelloRuru Tools</a></div>
+    <footer class="footer">
+      <span class="footer-brand">HelloRuru</span> · <a href="https://tools.helloruru.com">更多工具</a> · <a href="https://ohruru.com">官網</a>
+    </footer>
   </main>
 
   <script>
@@ -560,13 +581,72 @@
       document.getElementById('userBarName').textContent = name;
       const avatar = spotifyUser.images?.[0]?.url;
       if (avatar) document.getElementById('userBarAvatar').src = avatar;
+      fetchUserPlaylists();
     }
 
     function logoutSpotify() {
       accessToken = null; spotifyUser = null;
       coverBase64 = null; matchedTracks = [];
       document.getElementById('step3').classList.add('hidden');
+      const sel = document.getElementById('playlistTarget');
+      while (sel.options.length > 1) sel.remove(1);
+      sel.value = 'new';
+      document.getElementById('playlistNameRow').classList.remove('hidden');
       updateUI();
+    }
+
+    // ===== Auto Thumbnail =====
+    async function autoSetThumbnail(videoId) {
+      if (coverBase64) return;
+      try {
+        const url = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+        const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
+        if (!res.ok) return;
+        const blob = await res.blob();
+        const dataUrl = await new Promise(r => {
+          const rd = new FileReader();
+          rd.onload = () => r(rd.result);
+          rd.readAsDataURL(blob);
+        });
+        document.getElementById('coverImg').src = dataUrl;
+        document.getElementById('coverImg').classList.remove('hidden');
+        document.getElementById('coverPreviewText').classList.add('hidden');
+        document.getElementById('coverRemove').classList.remove('hidden');
+        const img = new Image();
+        img.onload = () => {
+          const c = document.createElement('canvas');
+          c.width = 300; c.height = 300;
+          const ctx = c.getContext('2d');
+          const s = Math.min(img.width, img.height);
+          ctx.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, 300, 300);
+          coverBase64 = c.toDataURL('image/jpeg', 0.9).split(',')[1];
+        };
+        img.src = dataUrl;
+      } catch {}
+    }
+
+    // ===== User Playlists =====
+    async function fetchUserPlaylists() {
+      if (!accessToken) return;
+      try {
+        const res = await spotifyFetch('https://api.spotify.com/v1/me/playlists?limit=50');
+        if (!res.ok) return;
+        const data = await res.json();
+        const sel = document.getElementById('playlistTarget');
+        while (sel.options.length > 1) sel.remove(1);
+        (data.items || []).forEach(pl => {
+          const opt = document.createElement('option');
+          opt.value = pl.id;
+          opt.textContent = `${pl.name} (${pl.tracks.total} 首)`;
+          sel.appendChild(opt);
+        });
+      } catch {}
+    }
+
+    function togglePlaylistTarget() {
+      const isNew = document.getElementById('playlistTarget').value === 'new';
+      document.getElementById('playlistNameRow').classList.toggle('hidden', !isNew);
+      document.getElementById('btnCreate').textContent = isNew ? '建立歌單' : '加入歌單';
     }
 
     // ===== Cover Upload =====
@@ -766,6 +846,7 @@
         document.getElementById('songInput').value = enriched.join('\n');
         if (data.title) document.getElementById('playlistName').value = data.title;
         showYTMStatus('success', `從影片描述抓到 ${enriched.length} 首歌！`);
+        autoSetThumbnail(videoId);
         return true;
       }
 
@@ -775,6 +856,7 @@
         const line = parsed.artist ? `${parsed.artist} - ${parsed.title}` : parsed.title;
         document.getElementById('songInput').value = line;
         showYTMStatus('success', `辨識為單曲：${line}`);
+        autoSetThumbnail(videoId);
         return true;
       }
 
@@ -1189,7 +1271,7 @@
       document.getElementById('resultsList').appendChild(div);
     }
 
-    // ===== Create Playlist =====
+    // ===== Create / Add to Playlist =====
     async function createPlaylist() {
       if (!accessToken || !spotifyUser) return;
 
@@ -1198,9 +1280,8 @@
       btnCreate.disabled = true;
       statusDiv.classList.remove('hidden');
       statusDiv.className = 'status-msg';
-      statusDiv.textContent = '建立中...';
 
-      const playlistName = document.getElementById('playlistName').value || 'My Playlist';
+      const target = document.getElementById('playlistTarget').value;
       const uris = matchedTracks.filter(t => t.spotifyUri).map(t => t.spotifyUri);
 
       if (!uris.length) {
@@ -1211,39 +1292,55 @@
       }
 
       try {
-        const createRes = await spotifyFetch('https://api.spotify.com/v1/me/playlists', {
-          method: 'POST',
-          body: JSON.stringify({ name: playlistName, description: '由 Spotify Goods (HelloRuru Tools) 建立', public: false }),
-        });
-        if (!createRes.ok) throw new Error('建立歌單失敗');
-        const playlist = await createRes.json();
+        let playlistId, playlistUrl, playlistName;
+
+        if (target === 'new') {
+          playlistName = document.getElementById('playlistName').value || 'My Playlist';
+          statusDiv.textContent = '建立歌單中...';
+          const createRes = await spotifyFetch('https://api.spotify.com/v1/me/playlists', {
+            method: 'POST',
+            body: JSON.stringify({ name: playlistName, description: '由 Spotify Goods (HelloRuru Tools) 建立', public: false }),
+          });
+          if (!createRes.ok) throw new Error('建立歌單失敗');
+          const pl = await createRes.json();
+          playlistId = pl.id;
+          playlistUrl = pl.external_urls.spotify;
+        } else {
+          playlistId = target;
+          const sel = document.getElementById('playlistTarget');
+          playlistName = sel.options[sel.selectedIndex].textContent.replace(/ \(\d+ 首\)$/, '');
+          playlistUrl = `https://open.spotify.com/playlist/${playlistId}`;
+          statusDiv.textContent = '加入歌曲中...';
+        }
 
         for (let i = 0; i < uris.length; i += 100) {
           const batch = uris.slice(i, i + 100);
-          const addRes = await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlist.id}/tracks`, {
+          const addRes = await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
             method: 'POST',
             body: JSON.stringify({ uris: batch }),
           });
           if (!addRes.ok) throw new Error('加入歌曲失敗');
         }
 
-        if (coverBase64) {
-          await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlist.id}/images`, {
+        if (coverBase64 && target === 'new') {
+          await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}/images`, {
             method: 'PUT',
             headers: { 'Content-Type': 'image/jpeg' },
             body: coverBase64,
           });
         }
 
+        const verb = target === 'new' ? '建立成功' : '已加入';
         statusDiv.className = 'status-msg success';
-        statusDiv.innerHTML = `歌單「${esc(playlistName)}」建立成功！共 ${uris.length} 首<br>
-          <a href="${playlist.external_urls.spotify}" target="_blank" rel="noopener"
+        statusDiv.innerHTML = `歌單「${esc(playlistName)}」${verb}！共 ${uris.length} 首<br>
+          <a href="${playlistUrl}" target="_blank" rel="noopener"
              style="color:#1DB954;font-weight:600;">在 Spotify 開啟歌單</a>`;
-        showToast('歌單建立成功！', 'success');
+        showToast(`歌單${verb}！`, 'success');
+        fetchUserPlaylists();
       } catch (err) {
         statusDiv.className = 'status-msg error';
         statusDiv.textContent = err.message;
-        showToast('建立失敗：' + err.message, 'error');
+        showToast('失敗：' + err.message, 'error');
       }
 
       btnCreate.disabled = false;
