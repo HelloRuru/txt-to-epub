@@ -697,36 +697,67 @@
     }
 
     // Fetch a single video, parse description for song list
+    // Primary: our own Cloudflare Function (/api/yt-video)
+    // Fallback: Piped API (/streams/)
     async function fetchVideoSongs(videoId) {
-      for (const instance of PIPED_INSTANCES) {
-        try {
-          const res = await fetch(`${instance}/streams/${videoId}`);
-          if (!res.ok) continue;
-          const data = await res.json();
+      let data = null;
 
-          // Phase 1: try description
-          const descSongs = parseSongsFromDescription(data.description || '');
-          if (descSongs.length >= 2) {
-            showYTMStatus('loading', `找到 ${descSongs.length} 首歌，查詢歌手中...`);
-            const enriched = await lookupArtists(descSongs);
-            document.getElementById('songInput').value = enriched.join('\n');
-            if (data.title) document.getElementById('playlistName').value = data.title;
-            showYTMStatus('success', `從影片描述抓到 ${enriched.length} 首歌！`);
-            return true;
-          }
+      // Try our own API first (most reliable, no third-party dependency)
+      try {
+        const res = await fetch(`/api/yt-video?id=${videoId}`);
+        if (res.ok) data = await res.json();
+      } catch {}
 
-          // Phase 2: fallback to video title itself (single song)
-          const parsed = parseVideoTitle(data.title || '', data.uploaderName || data.uploader || '');
-          if (parsed.title) {
-            const line = parsed.artist ? `${parsed.artist} - ${parsed.title}` : parsed.title;
-            document.getElementById('songInput').value = line;
-            showYTMStatus('success', `辨識為單曲：${line}`);
-            return true;
-          }
-
-          return false;
-        } catch { continue; }
+      // Fallback: Piped instances
+      if (!data || data.error) {
+        for (const instance of PIPED_INSTANCES) {
+          try {
+            const res = await fetch(`${instance}/streams/${videoId}`);
+            if (!res.ok) continue;
+            const piped = await res.json();
+            data = {
+              title: piped.title || '',
+              author: piped.uploaderName || piped.uploader || '',
+              description: piped.description || '',
+            };
+            break;
+          } catch { continue; }
+        }
       }
+
+      // Fallback: noembed (title + author only, no description)
+      if (!data || data.error) {
+        try {
+          const res = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`);
+          if (res.ok) {
+            const oembed = await res.json();
+            data = { title: oembed.title || '', author: oembed.author_name || '', description: '' };
+          }
+        } catch {}
+      }
+
+      if (!data || data.error) return false;
+
+      // Phase 1: try description for song list
+      const descSongs = parseSongsFromDescription(data.description || '');
+      if (descSongs.length >= 2) {
+        showYTMStatus('loading', `找到 ${descSongs.length} 首歌，查詢歌手中...`);
+        const enriched = await lookupArtists(descSongs);
+        document.getElementById('songInput').value = enriched.join('\n');
+        if (data.title) document.getElementById('playlistName').value = data.title;
+        showYTMStatus('success', `從影片描述抓到 ${enriched.length} 首歌！`);
+        return true;
+      }
+
+      // Phase 2: fallback to video title itself (single song)
+      const parsed = parseVideoTitle(data.title || '', data.author || '');
+      if (parsed.title) {
+        const line = parsed.artist ? `${parsed.artist} - ${parsed.title}` : parsed.title;
+        document.getElementById('songInput').value = line;
+        showYTMStatus('success', `辨識為單曲：${line}`);
+        return true;
+      }
+
       return false;
     }
 
