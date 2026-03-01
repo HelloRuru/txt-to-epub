@@ -799,7 +799,10 @@
         ];
         for (const proxyFn of proxies) {
           try {
-            const res = await fetch(proxyFn(ytUrl));
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), 15000);
+            const res = await fetch(proxyFn(ytUrl), { signal: ctrl.signal });
+            clearTimeout(timer);
             if (!res.ok) continue;
             const html = await res.text();
             const parsed = parseYTPage(html);
@@ -949,24 +952,28 @@
       return [];
     }
 
-    // ===== Artist Lookup =====
-    // For songs without artist info, search the real artist via Spotify or iTunes
+    // ===== Artist Lookup (parallel batches) =====
     async function lookupArtists(entries) {
-      const result = [];
       const hasSep = (s) => [' - ', ' – ', ' — ', ' | '].some(sep => s.includes(sep));
+      const result = new Array(entries.length);
+      const needLookup = [];
 
-      for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i];
-        if (hasSep(entry)) {
-          result.push(entry);
-          continue;
-        }
+      entries.forEach((entry, i) => {
+        if (hasSep(entry)) { result[i] = entry; }
+        else { needLookup.push(i); }
+      });
 
-        // Look up real artist
-        const artist = await findArtist(entry);
-        result.push(artist ? `${artist} - ${entry}` : entry);
+      if (!needLookup.length) return result;
 
-        if (i < entries.length - 1) await sleep(200);
+      const BATCH = 5;
+      for (let b = 0; b < needLookup.length; b += BATCH) {
+        const batch = needLookup.slice(b, b + BATCH);
+        await Promise.all(batch.map(async i => {
+          const artist = await findArtist(entries[i]);
+          result[i] = artist ? `${artist} - ${entries[i]}` : entries[i];
+        }));
+        const done = Math.min(b + BATCH, needLookup.length);
+        showYTMStatus('loading', `查詢歌手中... ${done} / ${needLookup.length}`);
       }
       return result;
     }
