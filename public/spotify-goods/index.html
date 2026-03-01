@@ -697,19 +697,39 @@
     }
 
     // Fetch a single video, parse description for song list
-    // Primary: our own Cloudflare Function (/api/yt-video)
-    // Fallback: Piped API (/streams/)
+    // Chain: CF Function → CORS proxy (YouTube page) → Piped → noembed
     async function fetchVideoSongs(videoId) {
       let data = null;
 
-      // Try our own API first (most reliable, no third-party dependency)
+      // 1) Try our own CF Function
       try {
         const res = await fetch(`/api/yt-video?id=${videoId}`);
-        if (res.ok) data = await res.json();
+        if (res.ok) {
+          const j = await res.json();
+          if (!j.error) data = j;
+        }
       } catch {}
 
-      // Fallback: Piped instances
-      if (!data || data.error) {
+      // 2) CORS proxy: fetch YouTube page, parse ytInitialPlayerResponse client-side
+      if (!data) {
+        const ytUrl = `https://www.youtube.com/watch?v=${videoId}`;
+        const proxies = [
+          u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+          u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+        ];
+        for (const proxyFn of proxies) {
+          try {
+            const res = await fetch(proxyFn(ytUrl));
+            if (!res.ok) continue;
+            const html = await res.text();
+            const parsed = parseYTPage(html);
+            if (parsed) { data = parsed; break; }
+          } catch { continue; }
+        }
+      }
+
+      // 3) Piped instances
+      if (!data) {
         for (const instance of PIPED_INSTANCES) {
           try {
             const res = await fetch(`${instance}/streams/${videoId}`);
@@ -725,8 +745,8 @@
         }
       }
 
-      // Fallback: noembed (title + author only, no description)
-      if (!data || data.error) {
+      // 4) noembed (title + author only, no description)
+      if (!data) {
         try {
           const res = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`);
           if (res.ok) {
@@ -736,7 +756,7 @@
         } catch {}
       }
 
-      if (!data || data.error) return false;
+      if (!data) return false;
 
       // Phase 1: try description for song list
       const descSongs = parseSongsFromDescription(data.description || '');
@@ -759,6 +779,45 @@
       }
 
       return false;
+    }
+
+    // Parse YouTube page HTML for video details (used by CORS proxy fallback)
+    function parseYTPage(html) {
+      try {
+        const marker = 'var ytInitialPlayerResponse = ';
+        const start = html.indexOf(marker);
+        if (start !== -1) {
+          const jsonStart = start + marker.length;
+          const end1 = html.indexOf(';\nvar ', jsonStart);
+          const end2 = html.indexOf(';</script>', jsonStart);
+          const end = Math.min(
+            end1 !== -1 ? end1 : Infinity,
+            end2 !== -1 ? end2 : Infinity
+          );
+          if (end !== Infinity) {
+            const d = JSON.parse(html.substring(jsonStart, end));
+            const vd = d.videoDetails || {};
+            return {
+              title: vd.title || '',
+              author: vd.author || '',
+              description: vd.shortDescription || '',
+            };
+          }
+        }
+        // Regex fallback
+        const t = html.match(/"title"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+        const a = html.match(/"author"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+        const desc = html.match(/"shortDescription"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+        if (t) {
+          const unescape = s => { try { return JSON.parse(`"${s}"`); } catch { return s; } };
+          return {
+            title: unescape(t[1]),
+            author: a ? unescape(a[1]) : '',
+            description: desc ? unescape(desc[1]) : '',
+          };
+        }
+      } catch {}
+      return null;
     }
 
     // ===== Description Parser =====
