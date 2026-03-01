@@ -256,6 +256,48 @@
     .result-original { color: var(--c-muted); font-size: 0.75rem; }
     .result-link { color: var(--c-rose); text-decoration: none; font-size: 0.78rem; flex-shrink: 0; }
 
+    .preview-btn {
+      width: 32px; height: 32px; border-radius: 50%; border: none;
+      background: var(--c-rose); color: #fff; font-size: 12px;
+      cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .preview-btn:hover { background: var(--c-lavender); transform: scale(1.1); }
+    .preview-btn.playing { background: var(--c-lavender); }
+
+    .mini-player {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(212,165,165,0.2);
+      padding: 8px 16px; display: none; align-items: center; gap: 10px;
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+    }
+    .mini-player.active { display: flex; }
+    .mini-player-info { flex: 1; min-width: 0; }
+    .mini-player-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mini-player-artist { font-size: 11px; color: var(--c-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mini-player-btn {
+      width: 36px; height: 36px; border-radius: 50%; border: none;
+      background: var(--c-rose); color: #fff; font-size: 14px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .mini-player-btn:hover { background: var(--c-lavender); }
+    .mini-player-progress {
+      flex: 1; height: 4px; background: #eee; border-radius: 2px;
+      cursor: pointer; position: relative; min-width: 60px;
+    }
+    .mini-player-progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--c-rose), var(--c-lavender));
+      border-radius: 2px; width: 0%; transition: width 0.1s linear;
+    }
+    .mini-player-time { font-size: 11px; color: var(--c-muted); flex-shrink: 0; min-width: 32px; text-align: right; }
+    .mini-player-close {
+      background: none; border: none; color: var(--c-muted); cursor: pointer;
+      font-size: 18px; padding: 0 4px; flex-shrink: 0;
+    }
+    .mini-player-close:hover { color: var(--c-ink); }
+
     .progress-bar { width: 100%; height: 5px; background: #F5F0EE; border-radius: 3px; overflow: hidden; margin: 10px 0; }
     .progress-fill { height: 100%; background: linear-gradient(90deg, var(--c-rose), var(--c-lavender)); border-radius: 3px; transition: width 0.3s; width: 0%; }
     .progress-text { font-size: 0.78rem; color: var(--c-muted); text-align: center; }
@@ -436,6 +478,13 @@
         <div class="summary-item found"><div class="summary-num" id="foundCount">0</div><div class="summary-label">找到</div></div>
         <div class="summary-item not-found"><div class="summary-num" id="notFoundCount">0</div><div class="summary-label">沒找到</div></div>
       </div>
+      <div class="hidden" id="selectAllRow" style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:13px;color:var(--c-muted);">
+        <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;">
+          <input type="checkbox" id="selectAllBox" checked onchange="toggleSelectAll(this.checked)" style="accent-color:var(--c-rose);width:16px;height:16px;">
+          全選
+        </label>
+        <span id="selectedCount" style="margin-left:auto;"></span>
+      </div>
       <div class="results" id="resultsList"></div>
       <div class="hidden" id="createSection" style="margin-top:16px;">
         <button class="btn btn-spotify" id="btnCreate" onclick="createPlaylist()">建立歌單</button>
@@ -450,6 +499,19 @@
       <span class="footer-brand">HelloRuru</span> · <a href="https://tools.helloruru.com">更多工具</a> · <a href="https://ohruru.com">官網</a>
     </footer>
   </main>
+
+  <div class="mini-player" id="miniPlayer">
+    <button class="mini-player-btn" id="miniPlayBtn" onclick="toggleMiniPlayer()">&#9654;</button>
+    <div class="mini-player-info">
+      <div class="mini-player-title" id="miniTitle"></div>
+      <div class="mini-player-artist" id="miniArtist"></div>
+    </div>
+    <div class="mini-player-progress" id="miniProgressBar" onclick="seekMiniPlayer(event)">
+      <div class="mini-player-progress-fill" id="miniProgressFill"></div>
+    </div>
+    <div class="mini-player-time" id="miniTime">0:00</div>
+    <button class="mini-player-close" onclick="closeMiniPlayer()" title="關閉">&#10005;</button>
+  </div>
 
   <script>
     // ===== Config =====
@@ -1208,49 +1270,26 @@
         .replace(/\s+/g, ' ').trim();
     }
 
-    // Check if two strings have meaningful overlap
-    function hasOverlap(a, b) {
+    // Strict match: a must contain b, or b must contain a (exact or substring)
+    function strictMatch(a, b) {
       if (!a || !b) return false;
       a = normalize(a); b = normalize(b);
-      if (a === b) return true;
-      if (a.includes(b) || b.includes(a)) return true;
-      // Word-level overlap
-      const aWords = a.split(' ').filter(w => w.length > 1);
-      const bWords = b.split(' ').filter(w => w.length > 1);
-      return aWords.some(w => bWords.includes(w));
+      return a === b || a.includes(b) || b.includes(a);
     }
 
-    // Validate a Spotify result against the original query
+    // Validate a Spotify result: song name AND artist must match exactly
     function isGoodMatch(track, queryTitle, queryArtist) {
       const tName = normalize(track.name);
-      const tArtists = track.artists.map(a => normalize(a.name));
       const qTitle = normalize(queryTitle);
       const qArtist = normalize(queryArtist);
 
-      // Must have title overlap — no exceptions
-      const titleOK = tName === qTitle
-        || tName.includes(qTitle) || qTitle.includes(tName)
-        || (() => {
-          const tW = tName.split(' ').filter(w => w.length > 1);
-          const qW = qTitle.split(' ').filter(w => w.length > 1);
-          if (!qW.length) return false;
-          const overlap = qW.filter(w => tW.includes(w)).length;
-          return overlap >= Math.max(1, Math.ceil(qW.length * 0.4));
-        })();
+      // Title must be exact or substring match — no fuzzy
+      if (!strictMatch(tName, qTitle)) return false;
 
-      if (!titleOK) return false;
-
-      // If artist was provided, check artist too
+      // If artist was provided, artist must also match exactly
       if (qArtist) {
-        const artistOK = tArtists.some(a =>
-          a === qArtist || a.includes(qArtist) || qArtist.includes(a)
-          || (() => {
-            const aW = a.split(' ');
-            const qW = qArtist.split(' ').filter(w => w.length > 1);
-            return qW.some(w => aW.includes(w));
-          })()
-        );
-        // With artist: both must pass. Without: title alone is enough
+        const tArtists = track.artists.map(a => normalize(a.name));
+        const artistOK = tArtists.some(a => strictMatch(a, qArtist));
         if (!artistOK) return false;
       }
 
@@ -1279,7 +1318,12 @@
         // Pick the first result that passes validation
         for (const t of tracks) {
           if (isGoodMatch(t, title, artist)) {
-            return { uri: t.uri, name: t.name, artist: t.artists.map(a => a.name).join(', '), url: t.external_urls.spotify };
+            return {
+              uri: t.uri, name: t.name,
+              artist: t.artists.map(a => a.name).join(', '),
+              url: t.external_urls.spotify,
+              preview: t.preview_url || null,
+            };
           }
         }
       }
@@ -1297,8 +1341,10 @@
       document.getElementById('summary').classList.add('hidden');
       document.getElementById('createSection').classList.add('hidden');
       document.getElementById('createStatus').classList.add('hidden');
+      document.getElementById('selectAllRow').classList.add('hidden');
       document.getElementById('resultsList').innerHTML = '';
       matchedTracks = [];
+      closeMiniPlayer();
 
       const progressFill = document.getElementById('progressFill');
       const progressText = document.getElementById('progressText');
@@ -1321,6 +1367,7 @@
           spotifyName: result?.name || null,
           spotifyArtist: result?.artist || null,
           spotifyUrl: result?.url || null,
+          preview: result?.preview || null,
         };
         matchedTracks.push(item);
 
@@ -1337,15 +1384,31 @@
       document.getElementById('notFoundCount').textContent = notFound;
       btnSearch.disabled = false;
       document.getElementById('btnSearchText').textContent = '搜尋 Spotify';
-      if (found > 0) document.getElementById('createSection').classList.remove('hidden');
+      if (found > 0) {
+        document.getElementById('createSection').classList.remove('hidden');
+        document.getElementById('selectAllRow').classList.remove('hidden');
+        document.getElementById('selectAllRow').style.display = 'flex';
+        document.getElementById('selectAllBox').checked = true;
+        updateSelectedCount();
+      }
     }
 
+    let currentAudio = null;
+    let currentPlayBtn = null;
+    let miniAnimFrame = null;
+
     function appendResult(item, isFound) {
+      const idx = matchedTracks.length - 1;
       const div = document.createElement('div');
       div.className = 'result-item';
+      div.dataset.idx = idx;
       if (isFound) {
+        const previewBtn = item.preview
+          ? `<button class="preview-btn" data-url="${esc(item.preview)}" onclick="togglePreview(this)" title="試聽">&#9654;</button>`
+          : '';
         div.innerHTML = `
-          <div class="result-status found">&#10003;</div>
+          <input type="checkbox" class="track-check" data-idx="${idx}" checked onchange="updateSelectedCount()" style="accent-color:var(--c-rose);width:16px;height:16px;flex-shrink:0;cursor:pointer;">
+          ${previewBtn}
           <div class="result-info">
             <div class="result-match">${esc(item.spotifyName)} — ${esc(item.spotifyArtist)}</div>
             <div class="result-original">${esc(item.query)}</div>
@@ -1362,6 +1425,112 @@
       document.getElementById('resultsList').appendChild(div);
     }
 
+    function togglePreview(btn) {
+      const url = btn.dataset.url;
+      const resultItem = btn.closest('.result-item');
+      const nameEl = resultItem?.querySelector('.result-match');
+      const parts = (nameEl?.textContent || '').split(' — ');
+
+      // If clicking same song, toggle pause/play
+      if (currentPlayBtn === btn && currentAudio) {
+        if (currentAudio.paused) {
+          currentAudio.play();
+          btn.innerHTML = '&#9646;&#9646;'; btn.classList.add('playing');
+          document.getElementById('miniPlayBtn').innerHTML = '&#9646;&#9646;';
+        } else {
+          currentAudio.pause();
+          btn.innerHTML = '&#9654;'; btn.classList.remove('playing');
+          document.getElementById('miniPlayBtn').innerHTML = '&#9654;';
+        }
+        return;
+      }
+
+      // Stop current
+      if (currentAudio) {
+        currentAudio.pause();
+        if (currentPlayBtn) { currentPlayBtn.innerHTML = '&#9654;'; currentPlayBtn.classList.remove('playing'); }
+        if (miniAnimFrame) cancelAnimationFrame(miniAnimFrame);
+      }
+
+      // Play new
+      const audio = new Audio(url);
+      audio.volume = 0.5;
+      audio.play();
+      btn.innerHTML = '&#9646;&#9646;'; btn.classList.add('playing');
+      currentAudio = audio;
+      currentPlayBtn = btn;
+
+      // Show mini player
+      const mp = document.getElementById('miniPlayer');
+      mp.classList.add('active');
+      document.getElementById('miniTitle').textContent = parts[0] || '';
+      document.getElementById('miniArtist').textContent = parts[1] || '';
+      document.getElementById('miniPlayBtn').innerHTML = '&#9646;&#9646;';
+      document.getElementById('miniProgressFill').style.width = '0%';
+      document.getElementById('miniTime').textContent = '0:00';
+
+      // Progress update loop
+      function updateProgress() {
+        if (!currentAudio) return;
+        const pct = currentAudio.duration ? (currentAudio.currentTime / currentAudio.duration * 100) : 0;
+        document.getElementById('miniProgressFill').style.width = pct + '%';
+        const s = Math.floor(currentAudio.currentTime);
+        document.getElementById('miniTime').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+        miniAnimFrame = requestAnimationFrame(updateProgress);
+      }
+      miniAnimFrame = requestAnimationFrame(updateProgress);
+
+      audio.onended = () => {
+        btn.innerHTML = '&#9654;'; btn.classList.remove('playing');
+        document.getElementById('miniPlayBtn').innerHTML = '&#9654;';
+        document.getElementById('miniProgressFill').style.width = '100%';
+        if (miniAnimFrame) cancelAnimationFrame(miniAnimFrame);
+        currentAudio = null; currentPlayBtn = null;
+      };
+    }
+
+    function toggleMiniPlayer() {
+      if (!currentAudio) return;
+      if (currentAudio.paused) {
+        currentAudio.play();
+        document.getElementById('miniPlayBtn').innerHTML = '&#9646;&#9646;';
+        if (currentPlayBtn) { currentPlayBtn.innerHTML = '&#9646;&#9646;'; currentPlayBtn.classList.add('playing'); }
+      } else {
+        currentAudio.pause();
+        document.getElementById('miniPlayBtn').innerHTML = '&#9654;';
+        if (currentPlayBtn) { currentPlayBtn.innerHTML = '&#9654;'; currentPlayBtn.classList.remove('playing'); }
+      }
+    }
+
+    function seekMiniPlayer(e) {
+      if (!currentAudio || !currentAudio.duration) return;
+      const bar = document.getElementById('miniProgressBar');
+      const rect = bar.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      currentAudio.currentTime = pct * currentAudio.duration;
+    }
+
+    function closeMiniPlayer() {
+      if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+      if (currentPlayBtn) { currentPlayBtn.innerHTML = '&#9654;'; currentPlayBtn.classList.remove('playing'); currentPlayBtn = null; }
+      if (miniAnimFrame) cancelAnimationFrame(miniAnimFrame);
+      document.getElementById('miniPlayer').classList.remove('active');
+    }
+
+    function toggleSelectAll(checked) {
+      document.querySelectorAll('.track-check').forEach(cb => { cb.checked = checked; });
+      updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+      const total = document.querySelectorAll('.track-check').length;
+      const selected = document.querySelectorAll('.track-check:checked').length;
+      document.getElementById('selectedCount').textContent = `${selected} / ${total} 首`;
+      // Sync select-all checkbox
+      const selectAll = document.getElementById('selectAllBox');
+      if (selectAll) selectAll.checked = selected === total;
+    }
+
     // ===== Create / Add to Playlist =====
     async function createPlaylist() {
       if (!accessToken || !spotifyUser) return;
@@ -1373,7 +1542,12 @@
       statusDiv.className = 'status-msg';
 
       const target = document.getElementById('playlistTarget').value;
-      const uris = matchedTracks.filter(t => t.spotifyUri).map(t => t.spotifyUri);
+      // Only include checked tracks
+      const checkedIdxs = new Set();
+      document.querySelectorAll('.track-check:checked').forEach(cb => checkedIdxs.add(parseInt(cb.dataset.idx)));
+      const uris = matchedTracks
+        .filter((t, i) => t.spotifyUri && checkedIdxs.has(i))
+        .map(t => t.spotifyUri);
 
       if (!uris.length) {
         statusDiv.className = 'status-msg error';
@@ -1444,6 +1618,7 @@
       document.getElementById('continueSection').classList.add('hidden');
       document.getElementById('createSection').classList.add('hidden');
       document.getElementById('createStatus').classList.add('hidden');
+      document.getElementById('selectAllRow').classList.add('hidden');
       document.getElementById('resultsList').innerHTML = '';
       document.getElementById('summary').classList.add('hidden');
       document.getElementById('progressBar').style.display = 'none';
@@ -1457,6 +1632,7 @@
       if (coverPreview) coverPreview.innerHTML = '';
       coverBase64 = null;
       matchedTracks = [];
+      closeMiniPlayer();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   </script>
