@@ -789,7 +789,7 @@
         if (start !== -1) {
           const jsonStart = start + marker.length;
           const end1 = html.indexOf(';\nvar ', jsonStart);
-          const end2 = html.indexOf(';</script>', jsonStart);
+          const end2 = html.indexOf(';</' + 'script>', jsonStart);
           const end = Math.min(
             end1 !== -1 ? end1 : Infinity,
             end2 !== -1 ? end2 : Infinity
