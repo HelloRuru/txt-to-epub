@@ -1277,23 +1277,20 @@
       return a === b || a.includes(b) || b.includes(a);
     }
 
-    // Validate a Spotify result: song name AND artist must match exactly
+    // Validate a Spotify result:
+    // - Has artist → artist MUST match (gatekeeper), title trusts Spotify ranking
+    // - No artist → title must match strictly
     function isGoodMatch(track, queryTitle, queryArtist) {
-      const tName = normalize(track.name);
-      const qTitle = normalize(queryTitle);
       const qArtist = normalize(queryArtist);
+      const tArtists = track.artists.map(a => normalize(a.name));
 
-      // Title must be exact or substring match — no fuzzy
-      if (!strictMatch(tName, qTitle)) return false;
-
-      // If artist was provided, artist must also match exactly
       if (qArtist) {
-        const tArtists = track.artists.map(a => normalize(a.name));
-        const artistOK = tArtists.some(a => strictMatch(a, qArtist));
-        if (!artistOK) return false;
+        // Artist is the gatekeeper — must match strictly
+        return tArtists.some(a => strictMatch(a, qArtist));
       }
 
-      return true;
+      // No artist → title must match
+      return strictMatch(normalize(track.name), normalize(queryTitle));
     }
 
     async function searchSpotify(title, artist) {
