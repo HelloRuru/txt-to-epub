@@ -881,7 +881,7 @@
         }
       }
 
-      // 3) Piped instances
+      // 3) Piped instances (also grab chapters)
       if (!data) {
         for (const instance of PIPED_INSTANCES) {
           try {
@@ -892,6 +892,7 @@
               title: piped.title || '',
               author: piped.uploaderName || piped.uploader || '',
               description: piped.description || '',
+              chapters: piped.chapters || [],
             };
             break;
           } catch { continue; }
@@ -921,6 +922,23 @@
         showYTMStatus('success', `從影片描述抓到 ${enriched.length} 首歌！`);
         autoSetThumbnail(videoId);
         return true;
+      }
+
+      // Phase 1.5: try chapters (Piped API returns chapter titles)
+      const chapters = data.chapters || [];
+      if (chapters.length >= 2) {
+        const chapterSongs = chapters
+          .map(ch => (ch.title || '').trim())
+          .filter(t => t.length >= 2 && !/^(intro|outro|opening|ending|op|ed)$/i.test(t));
+        if (chapterSongs.length >= 2) {
+          showYTMStatus('loading', `從章節找到 ${chapterSongs.length} 首歌，查詢歌手中...`);
+          const enriched = await lookupArtists(chapterSongs);
+          document.getElementById('songInput').value = enriched.join('\n');
+          if (data.title) document.getElementById('playlistName').value = data.title;
+          showYTMStatus('success', `從影片章節抓到 ${enriched.length} 首歌！`);
+          autoSetThumbnail(videoId);
+          return true;
+        }
       }
 
       // Phase 2: fallback to video title itself (single song)
