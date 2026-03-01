@@ -847,20 +847,41 @@
     }
 
     // Fetch a single video, parse description for song list
-    // Chain: CF Function → CORS proxy (YouTube page) → Piped → noembed
+    // Chain: Piped (best: chapters + description) → CF Function → CORS proxy → noembed
     async function fetchVideoSongs(videoId) {
       let data = null;
 
-      // 1) Try our own CF Function
-      try {
-        const res = await fetch(`/api/yt-video?id=${videoId}`);
-        if (res.ok) {
-          const j = await res.json();
-          if (!j.error) data = j;
-        }
-      } catch {}
+      // 1) Piped first — gives chapters + description (most complete)
+      for (const instance of PIPED_INSTANCES) {
+        try {
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 10000);
+          const res = await fetch(`${instance}/streams/${videoId}`, { signal: ctrl.signal });
+          clearTimeout(timer);
+          if (!res.ok) continue;
+          const piped = await res.json();
+          data = {
+            title: piped.title || '',
+            author: piped.uploaderName || piped.uploader || '',
+            description: piped.description || '',
+            chapters: piped.chapters || [],
+          };
+          break;
+        } catch { continue; }
+      }
 
-      // 2) CORS proxy: fetch YouTube page, parse ytInitialPlayerResponse client-side
+      // 2) CF Function fallback
+      if (!data) {
+        try {
+          const res = await fetch(`/api/yt-video?id=${videoId}`);
+          if (res.ok) {
+            const j = await res.json();
+            if (!j.error) data = j;
+          }
+        } catch {}
+      }
+
+      // 3) CORS proxy fallback
       if (!data) {
         const ytUrl = `https://www.youtube.com/watch?v=${videoId}`;
         const proxies = [
@@ -877,24 +898,6 @@
             const html = await res.text();
             const parsed = parseYTPage(html);
             if (parsed) { data = parsed; break; }
-          } catch { continue; }
-        }
-      }
-
-      // 3) Piped instances (also grab chapters)
-      if (!data) {
-        for (const instance of PIPED_INSTANCES) {
-          try {
-            const res = await fetch(`${instance}/streams/${videoId}`);
-            if (!res.ok) continue;
-            const piped = await res.json();
-            data = {
-              title: piped.title || '',
-              author: piped.uploaderName || piped.uploader || '',
-              description: piped.description || '',
-              chapters: piped.chapters || [],
-            };
-            break;
           } catch { continue; }
         }
       }
