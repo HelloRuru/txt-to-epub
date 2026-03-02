@@ -18,10 +18,17 @@
   <meta property="og:site_name" content="Hello Ruru Tools">
   <meta property="og:locale" content="zh_TW">
 
+  <!-- Open Graph Image -->
+  <meta property="og:image" content="https://tools.helloruru.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Spotify Goods — 歌單搬家工具">
+
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Spotify Goods — 歌單搬家工具 | HelloRuru Tools">
   <meta name="twitter:description" content="免費線上工具，把 YouTube Music 歌單搬到 Spotify。貼上網址自動抓歌，一鍵建立 Spotify 歌單。">
+  <meta name="twitter:image" content="https://tools.helloruru.com/og-image.png">
 
   <!-- Favicon -->
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -256,6 +263,7 @@
     .result-original { color: var(--c-muted); font-size: 0.75rem; }
     .result-link { color: var(--c-rose); text-decoration: none; font-size: 0.78rem; flex-shrink: 0; }
 
+    /* Preview button (inline play/pause per track) */
     .preview-btn {
       width: 32px; height: 32px; border-radius: 50%; border: none;
       background: var(--c-rose); color: #fff; font-size: 12px;
@@ -265,6 +273,7 @@
     .preview-btn:hover { background: var(--c-lavender); transform: scale(1.1); }
     .preview-btn.playing { background: var(--c-lavender); }
 
+    /* Mini player (fixed bottom bar for audio preview) */
     .mini-player {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
       background: rgba(255,255,255,0.96); backdrop-filter: blur(12px);
@@ -327,6 +336,20 @@
     .toast.success { background: var(--c-success); }
     .toast.error { background: var(--c-error); }
 
+    /* Inline style replacements */
+    .step-results { margin-top: 16px; }
+    .select-all-row {
+      display: flex; align-items: center; gap: 8px;
+      margin: 8px 0 4px; font-size: 13px; color: var(--c-muted);
+    }
+    .select-all-label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+    .track-checkbox { accent-color: var(--c-rose); width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; }
+    .selected-count { margin-left: auto; }
+    .create-section { margin-top: 16px; }
+    .continue-section { margin-top: 14px; text-align: center; }
+    .continue-section .btn { min-width: 160px; }
+    .input-row-target { margin-top: 14px; }
+
     /* Footer */
     .footer {
       text-align: center; margin-top: 32px; padding: 20px 16px;
@@ -334,6 +357,50 @@
     }
     .footer a { color: var(--c-rose); font-weight: 500; }
     .footer .footer-brand { font-weight: 700; color: var(--c-ink); opacity: 0.5; }
+
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --c-ink: #F0E8E4;
+        --c-bg: #1E1A18;
+        --c-card: #2A2422;
+        --c-border: rgba(212,165,165,0.12);
+        --c-muted: #8A7A74;
+        --c-error: #D08080;
+        --shadow: 0 4px 24px rgba(0,0,0,0.3);
+      }
+      body { -webkit-font-smoothing: antialiased; }
+      input[type="text"], input[type="url"], textarea, select {
+        background: #332D2A; color: var(--c-ink); border-color: rgba(212,165,165,0.15);
+      }
+      input::placeholder, textarea::placeholder { color: #6A5E58; }
+      .hero-icon-box.ytm { background: rgba(255,0,0,0.1); }
+      .hero-icon-box.sp { background: rgba(29,185,84,0.1); }
+      .hero-sub { color: #B0A09A; }
+      .badge { background: rgba(184,169,201,0.15); color: #A090B0; }
+      .step-login .login-desc, .step-login .login-note { color: #B0A09A; }
+      .input-row label { color: #B0A09A; }
+      .mini-player { background: rgba(42,36,34,0.96); border-top-color: rgba(212,165,165,0.1); }
+      .progress-bar { background: #332D2A; }
+      .summary-item { background: #332D2A; }
+      .channel-card { background: #332D2A; }
+      .channel-info { background: #332D2A; }
+      .user-bar { background: var(--c-card); }
+      .status-msg.success { background: rgba(29,185,84,0.12); }
+      .status-msg.error { background: rgba(208,128,128,0.12); }
+      .ytm-status.loading { background: rgba(120,100,160,0.15); }
+      .ytm-status.success { background: rgba(29,185,84,0.12); }
+      .ytm-status.error { background: rgba(208,128,128,0.12); }
+      .toast { background: #3A3230; }
+      .footer { border-top-color: rgba(212,165,165,0.08); }
+      .footer .footer-brand { color: var(--c-ink); }
+      .cover-preview { background: #332D2A; }
+      .divider-or span { background: var(--c-card); }
+      .divider-or::before { background: rgba(212,165,165,0.1); }
+      select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%238A7A74' stroke-width='2'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+      }
+    }
 
     /* Responsive */
     @media (max-width: 768px) {
@@ -432,7 +499,7 @@
         <textarea id="songInput" placeholder="每行一首，格式不拘：&#10;突然的自我 - 伍佰&#10;挪威的森林 - 伍佰&#10;有歌手名更準確"></textarea>
         <div class="hint">支援格式：歌名 - 歌手 / 歌名, 歌手 / 只有歌名</div>
 
-        <div class="input-row" style="margin-top:14px;">
+        <div class="input-row input-row-target">
           <label>目標歌單</label>
           <select id="playlistTarget" onchange="togglePlaylistTarget()">
             <option value="new">建立新歌單</option>
@@ -466,7 +533,7 @@
     </div>
 
     <!-- Step 3: Results + Create -->
-    <div class="step step-results hidden" id="step3" style="margin-top:16px;">
+    <div class="step step-results hidden" id="step3">
       <div class="step-header">
         <div class="step-num">3</div>
         <div class="step-title">比對結果</div>
@@ -478,20 +545,20 @@
         <div class="summary-item found"><div class="summary-num" id="foundCount">0</div><div class="summary-label">找到</div></div>
         <div class="summary-item not-found"><div class="summary-num" id="notFoundCount">0</div><div class="summary-label">沒找到</div></div>
       </div>
-      <div class="hidden" id="selectAllRow" style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:13px;color:var(--c-muted);">
-        <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;">
-          <input type="checkbox" id="selectAllBox" checked onchange="toggleSelectAll(this.checked)" style="accent-color:var(--c-rose);width:16px;height:16px;">
+      <div class="hidden select-all-row" id="selectAllRow">
+        <label class="select-all-label">
+          <input type="checkbox" class="track-checkbox" id="selectAllBox" checked onchange="toggleSelectAll(this.checked)">
           全選
         </label>
-        <span id="selectedCount" style="margin-left:auto;"></span>
+        <span class="selected-count" id="selectedCount"></span>
       </div>
       <div class="results" id="resultsList"></div>
-      <div class="hidden" id="createSection" style="margin-top:16px;">
+      <div class="hidden create-section" id="createSection">
         <button class="btn btn-spotify" id="btnCreate" onclick="createPlaylist()">建立歌單</button>
       </div>
       <div class="hidden" id="createStatus"></div>
-      <div class="hidden" id="continueSection" style="margin-top:14px; text-align:center;">
-        <button class="btn btn-primary" onclick="resetToHome()" style="min-width:160px;">繼續新增</button>
+      <div class="hidden continue-section" id="continueSection">
+        <button class="btn btn-primary" onclick="resetToHome()">繼續新增</button>
       </div>
     </div>
 
@@ -524,6 +591,9 @@
       'https://pipedapi.adminforge.de',
       'https://api.piped.projectsegfault.com',
     ];
+
+    // Fallback: self-hosted Worker (YT Music internal API, no Piped dependency)
+    const WORKER_API = 'https://playlist-mover-api.vmpvmp1017.workers.dev';
 
     // ===== State =====
     let accessToken = null;
@@ -824,10 +894,15 @@
     }
 
     // Fetch a playlist by ID, returns true if successful
+    // Chain: Piped instances → self-hosted Worker (YT Music API)
     async function fetchPlaylistSongs(playlistId) {
+      // 1) Try Piped instances
       for (const instance of PIPED_INSTANCES) {
         try {
-          const res = await fetch(`${instance}/playlists/${playlistId}`);
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 8000);
+          const res = await fetch(`${instance}/playlists/${playlistId}`, { signal: ctrl.signal });
+          clearTimeout(timer);
           if (!res.ok) continue;
           const data = await res.json();
           if (!data.relatedStreams?.length) continue;
@@ -843,6 +918,25 @@
           return true;
         } catch { continue; }
       }
+
+      // 2) Fallback: self-hosted Worker (YT Music internal API)
+      try {
+        showYTMStatus('loading', '切換備用通道抓取中...');
+        const res = await fetch(`${WORKER_API}/playlist?id=${encodeURIComponent(playlistId)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.tracks?.length) {
+            const songs = data.tracks.map(t =>
+              t.artist ? `${t.artist} - ${t.title}` : t.title
+            );
+            document.getElementById('songInput').value = songs.join('\n');
+            if (data.title) document.getElementById('playlistName').value = data.title;
+            showYTMStatus('success', `成功抓到 ${songs.length} 首歌！`);
+            return true;
+          }
+        }
+      } catch {}
+
       return false;
     }
 
@@ -1176,8 +1270,67 @@
         } catch { continue; }
       }
 
+      // Fallback: self-hosted Worker (YT Music internal API)
+      try {
+        showYTMStatus('loading', '切換備用通道抓取頻道...');
+        const res = await fetch(`${WORKER_API}/channel?id=${encodeURIComponent(channelId)}`);
+        if (res.ok) {
+          const data = await res.json();
+          const infoEl = document.getElementById('channelInfo');
+          infoEl.innerHTML = `
+            ${data.thumbnail ? `<img class="channel-avatar" src="${esc(data.thumbnail)}" alt="">` : ''}
+            <div><div class="channel-name">${esc(data.channelName || '未知頻道')}</div></div>`;
+
+          const gridEl = document.getElementById('channelGrid');
+          gridEl.innerHTML = '';
+
+          // Flatten all sections into playlist cards
+          const allItems = (data.sections || []).flatMap(s => s.items || []);
+          if (allItems.length > 0) {
+            allItems.forEach(item => {
+              const card = document.createElement('div');
+              card.className = 'channel-card';
+              card.onclick = () => fetchPlaylistFromWorker(item.playlistId, item.title);
+              card.innerHTML = `
+                <img class="channel-card-thumb" src="${esc(item.thumbnail || '')}" alt="" loading="lazy" onerror="this.style.background='var(--c-border)'">
+                <div class="channel-card-body">
+                  <div class="channel-card-title">${esc(item.title || '未命名')}</div>
+                  <div class="channel-card-count">${esc(item.subtitle || '')}</div>
+                </div>`;
+              gridEl.appendChild(card);
+            });
+            document.getElementById('channelResults').classList.remove('hidden');
+            showYTMStatus('success', `找到 ${allItems.length} 個播放清單，點擊選取`);
+            btn.disabled = false;
+            return;
+          }
+        }
+      } catch {}
+
       showYTMStatus('error', '無法抓取頻道資料');
       btn.disabled = false;
+    }
+
+    // Fetch a single playlist via Worker (used by channel card clicks)
+    async function fetchPlaylistFromWorker(playlistId, name) {
+      if (!playlistId) return;
+      showYTMStatus('loading', `抓取「${name}」中...`);
+      try {
+        const res = await fetch(`${WORKER_API}/playlist?id=${encodeURIComponent(playlistId)}`);
+        if (!res.ok) { showYTMStatus('error', `無法抓取「${name}」`); return; }
+        const data = await res.json();
+        if (!data.tracks?.length) { showYTMStatus('error', `「${name}」沒有歌曲`); return; }
+
+        const songs = data.tracks.map(t => t.artist ? `${t.artist} - ${t.title}` : t.title);
+        const existing = document.getElementById('songInput').value.trim();
+        document.getElementById('songInput').value = existing ? existing + '\n' + songs.join('\n') : songs.join('\n');
+        if (!document.getElementById('playlistName').value && name) {
+          document.getElementById('playlistName').value = name;
+        }
+        showYTMStatus('success', `已加入「${name}」${songs.length} 首歌`);
+      } catch {
+        showYTMStatus('error', `無法抓取「${name}」`);
+      }
     }
 
     async function fetchChannelPlaylist(listId, name, instance) {
@@ -1405,7 +1558,6 @@
       if (found > 0) {
         document.getElementById('createSection').classList.remove('hidden');
         document.getElementById('selectAllRow').classList.remove('hidden');
-        document.getElementById('selectAllRow').style.display = 'flex';
         document.getElementById('selectAllBox').checked = true;
         updateSelectedCount();
       }
@@ -1425,7 +1577,7 @@
           ? `<button class="preview-btn" data-url="${esc(item.preview)}" onclick="togglePreview(this)" title="試聽">&#9654;</button>`
           : '';
         div.innerHTML = `
-          <input type="checkbox" class="track-check" data-idx="${idx}" checked onchange="updateSelectedCount()" style="accent-color:var(--c-rose);width:16px;height:16px;flex-shrink:0;cursor:pointer;">
+          <input type="checkbox" class="track-check track-checkbox" data-idx="${idx}" checked onchange="updateSelectedCount()">
           ${previewBtn}
           <div class="result-info">
             <div class="result-match">${esc(item.spotifyName)} — ${esc(item.spotifyArtist)}</div>
