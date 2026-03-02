@@ -966,7 +966,6 @@
 
     // ===== Auto Thumbnail =====
     async function autoSetThumbnail(videoId) {
-      if (coverBase64) return;
       try {
         const url = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
         const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
@@ -996,7 +995,7 @@
 
     // Auto-set thumbnail from a direct image URL (for playlists)
     async function autoSetThumbnailUrl(imageUrl) {
-      if (coverBase64 || !imageUrl) return;
+      if (!imageUrl) return;
       try {
         const res = await fetch(imageUrl);
         if (!res.ok) return;
@@ -1639,7 +1638,7 @@
         const songs = data.tracks.map(t => t.artist ? `${t.artist} - ${t.title}` : t.title);
         const existing = document.getElementById('songInput').value.trim();
         document.getElementById('songInput').value = existing ? existing + '\n' + songs.join('\n') : songs.join('\n');
-        if (!document.getElementById('playlistName').value && name) {
+        if (name) {
           setPlaylistName(cleanPlaylistName(name));
         }
         showYTMStatus('success', `已加入「${name}」${songs.length} 首歌`);
