@@ -617,37 +617,96 @@ html.dark .quick-action-card:hover {
   margin-top: var(--space-md);
 }
 
-/* Steps */
+/* Storybook (手繪風流程) */
 .guide-intro {
   margin-bottom: var(--space-md);
 }
-.step-list {
+.storybook {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
-}
-.step {
-  display: flex;
-  gap: var(--space-md);
-  align-items: flex-start;
-}
-.step-number {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  background: var(--color-rose);
-  color: #FFFFFF;
-  border-radius: var(--radius-full);
-  font-size: 14px;
-  font-weight: 700;
+  gap: 0;
+  margin: var(--space-lg) 0;
 }
-.step-content p {
+.storybook-page {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: #FFFDF8;
+  border: 2px solid var(--color-fog);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg) var(--space-lg) var(--space-md);
+  text-align: center;
+  box-shadow: 2px 3px 0 var(--color-fog);
+  transform: rotate(-0.5deg);
+}
+.storybook-page:nth-child(4n+3) {
+  transform: rotate(0.5deg);
+}
+.storybook-page:nth-child(4n+5) {
+  transform: rotate(-0.3deg);
+}
+.page-illust {
+  font-size: 36px;
+  line-height: 1;
+  margin-bottom: var(--space-xs);
+}
+.page-label {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--color-rose);
+  margin-bottom: var(--space-sm);
+}
+.page-text {
   font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  text-align: left;
+}
+.page-text strong {
+  color: var(--color-rose);
+}
+.page-why {
+  margin-top: var(--space-sm);
+  font-size: 12px;
+  color: var(--text-hint);
+  font-style: italic;
+}
+.storybook-connector {
+  font-size: 24px;
+  color: var(--color-warm-gray);
+  padding: var(--space-xs) 0;
+  line-height: 1;
+}
+html.dark .storybook-page {
+  background: var(--bg-elevated);
+  border-color: var(--border-color);
+  box-shadow: 2px 3px 0 rgba(0,0,0,0.15);
+}
+
+/* Storybook tips */
+.storybook-tip {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+  padding: var(--space-md);
+  background: rgba(212, 165, 165, 0.08);
+  border-radius: var(--radius-sm);
+  margin-top: var(--space-md);
+  border-left: 3px solid var(--color-rose);
+}
+.tip-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.tip-content {
+  font-size: 13px;
   color: var(--text-muted);
-  margin-top: 2px;
+  line-height: 1.7;
+}
+.tip-content strong {
+  color: var(--text-primary);
 }
 
 .feature-list {
@@ -700,12 +759,23 @@ html.dark .quick-action-card:hover {
 .faq-item summary:hover {
   background: rgba(212, 165, 165, 0.06);
 }
-.faq-item p {
+.faq-item p,
+.faq-detail {
   padding: 0 var(--space-md) var(--space-md);
   margin: 0;
   font-size: 13px;
   color: var(--text-muted);
   line-height: 1.7;
+}
+.faq-detail ul {
+  margin: var(--space-xs) 0 0;
+  padding-left: var(--space-md);
+}
+.faq-detail ul li {
+  margin-bottom: var(--space-xs);
+}
+.faq-detail ul li strong {
+  color: var(--text-primary);
 }
 
 /* ============ AP CHAIN TAB ============ */
@@ -1356,6 +1426,25 @@ html.dark .theme-toggle .icon-moon { display: none; }
 
   .quick-actions {
     grid-template-columns: 1fr;
+  }
+
+  .storybook-page {
+    max-width: 100%;
+    padding: var(--space-md);
+    transform: rotate(0deg) !important;
+  }
+  .page-illust {
+    font-size: 28px;
+  }
+  .page-label {
+    font-size: 15px;
+  }
+  .page-text {
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .storybook-connector {
+    font-size: 18px;
   }
 }
 
