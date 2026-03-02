@@ -1074,6 +1074,27 @@ html.dark .storybook-page::before {
   gap: var(--space-xs);
   flex-shrink: 0;
 }
+.book-annotation {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+.book-annotation svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.book-notes-text {
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 280px;
+}
 
 /* ============ DIRECTORY TAB ============ */
 .directory-toolbar {
@@ -1246,16 +1267,17 @@ html.dark .storybook-page::before {
 /* Export */
 .export-options {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-md);
   margin-bottom: var(--space-md);
 }
 .export-btn {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-xs);
-  padding: var(--space-lg);
+  padding: var(--space-lg) var(--space-md);
   background: var(--bg-page);
   border: 2px solid var(--border-color);
   border-radius: var(--radius-md);
@@ -1274,6 +1296,24 @@ html.dark .storybook-page::before {
 .export-btn i { width: 28px; height: 28px; color: var(--color-rose); }
 .export-btn span { font-weight: 500; font-size: 15px; }
 .export-btn small { font-size: 12px; color: var(--text-muted); }
+/* LINE 按鈕紙膠帶強調 */
+.export-btn-line {
+  background: #FFF8F6;
+  border-color: var(--color-rose);
+}
+.export-btn-line::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 16px;
+  background: var(--color-rose);
+  opacity: 0.55;
+  border-radius: 1px;
+}
+.export-btn-line i { color: #06C755; }
 
 .export-scope {
   display: flex;

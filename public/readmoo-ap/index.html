@@ -561,6 +561,15 @@
         </div>
       </div>
 
+      <div class="form-group">
+        <label for="book-order-number">訂單編號</label>
+        <input type="text" id="book-order-number" class="input-field" placeholder="輸入末三碼即可，如 345">
+      </div>
+      <div class="form-group">
+        <label for="book-notes">備註</label>
+        <textarea id="book-notes" class="input-field textarea" rows="2" placeholder="任何想記的東西..."></textarea>
+      </div>
+
       <input type="hidden" id="book-edit-id">
       <button id="btn-book-save" class="btn-primary">儲存</button>
     </div>
@@ -590,10 +599,15 @@
       <h2 id="export-modal-title">匯出</h2>
 
       <div class="export-options">
+        <button class="export-btn export-btn-line" data-format="line">
+          <i data-lucide="message-circle"></i>
+          <span>LINE 訊息</span>
+          <small>貼到群組分享</small>
+        </button>
         <button class="export-btn" data-format="text">
           <i data-lucide="file-text"></i>
           <span>純文字</span>
-          <small>可直接貼到 LINE</small>
+          <small>完整書單</small>
         </button>
         <button class="export-btn" data-format="excel">
           <i data-lucide="table"></i>

@@ -29,6 +29,8 @@ function initBooks() {
   const bookPubdate = document.getElementById('book-pubdate');
   const bookEditId = document.getElementById('book-edit-id');
   const bookModalTitle = document.getElementById('book-modal-title');
+  const bookOrderNumber = document.getElementById('book-order-number');
+  const bookNotes = document.getElementById('book-notes');
 
   // Batch modal
   const batchModal = document.getElementById('batch-modal');
@@ -67,6 +69,18 @@ function initBooks() {
               <i data-lucide="check-circle"></i>
               已購買${b.purchaseDate ? ' ' + b.purchaseDate : ''}
               ${b.purchaseVia ? ' · 透過 ' + escapeHtml(b.purchaseVia) : ''}
+            </div>
+          ` : ''}
+          ${b.orderNumber ? `
+            <div class="book-annotation">
+              <i data-lucide="receipt"></i>
+              訂單編號 ${escapeHtml(b.orderNumber)}
+            </div>
+          ` : ''}
+          ${b.notes ? `
+            <div class="book-annotation book-notes-text">
+              <i data-lucide="sticky-note"></i>
+              ${escapeHtml(b.notes)}
             </div>
           ` : ''}
         </div>
@@ -150,6 +164,8 @@ function initBooks() {
         bookAuthor.value = book.author || '';
         bookPublisher.value = book.publisher || '';
         bookPubdate.value = book.pubdate || '';
+        bookOrderNumber.value = book.orderNumber || '';
+        bookNotes.value = book.notes || '';
         bookEditId.value = book.id;
         openModal('book-modal');
       });
@@ -185,6 +201,8 @@ function initBooks() {
     bookAuthor.value = '';
     bookPublisher.value = '';
     bookPubdate.value = '';
+    bookOrderNumber.value = '';
+    bookNotes.value = '';
     bookEditId.value = '';
     openModal('book-modal');
   });
@@ -208,6 +226,8 @@ function initBooks() {
         book.author = bookAuthor.value.trim();
         book.publisher = bookPublisher.value.trim();
         book.pubdate = bookPubdate.value.trim();
+        book.orderNumber = bookOrderNumber.value.trim();
+        book.notes = bookNotes.value.trim();
       }
       showToast('已更新');
     } else {
@@ -218,6 +238,8 @@ function initBooks() {
         author: bookAuthor.value.trim(),
         publisher: bookPublisher.value.trim(),
         pubdate: bookPubdate.value.trim(),
+        orderNumber: bookOrderNumber.value.trim(),
+        notes: bookNotes.value.trim(),
         status: 'want',
         createdAt: new Date().toISOString()
       });
