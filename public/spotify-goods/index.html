@@ -458,9 +458,10 @@
 
   <main class="container">
 
-    <div class="how-to" style="font-size:0.82rem; color:var(--c-muted); line-height:1.7; margin-bottom:16px; padding:12px 16px; background:var(--c-card); border-radius:var(--radius-sm);">
-      <b style="color:var(--c-ink); opacity:0.75;">怎麼用？</b>
-      連接 Spotify → 貼上 YouTube 網址或手動輸入歌名 → 自動比對 → 一鍵建立歌單。也可以上傳封面圖片。
+    <div style="display:flex; justify-content:center; gap:24px; flex-wrap:wrap; font-size:0.78rem; color:var(--c-muted); margin-bottom:16px; line-height:1.5;">
+      <span><b style="color:var(--c-rose);">1.</b> 貼上 YouTube 網址</span>
+      <span><b style="color:var(--c-lavender);">2.</b> 連接 Spotify 帳號</span>
+      <span><b style="color:var(--c-success);">3.</b> 一鍵建立歌單</span>
     </div>
 
     <!-- User bar: shown after login, replaces Step 1 -->
@@ -548,8 +549,8 @@
           <input type="file" id="coverFileInput" accept="image/jpeg,image/png" onchange="handleCoverUpload(event)">
         </div>
 
-        <button class="btn btn-primary" id="btnSearch" onclick="startSearch()" disabled>
-          <span id="btnSearchText">請先連接 Spotify</span>
+        <button class="btn btn-primary" id="btnSearch" onclick="startSearch()">
+          <span id="btnSearchText">連接 Spotify 並搜尋</span>
         </button>
       </div>
 
@@ -856,13 +857,11 @@
       if (loggedIn) {
         grid.classList.add('full-width');
         userBar.classList.remove('hidden');
-        btnSearch.disabled = false;
         btnSearchText.textContent = '搜尋 Spotify';
       } else {
         grid.classList.remove('full-width');
         userBar.classList.add('hidden');
-        btnSearch.disabled = true;
-        btnSearchText.textContent = '請先連接 Spotify';
+        btnSearchText.textContent = '連接 Spotify 並搜尋';
       }
     }
 
@@ -1798,6 +1797,12 @@
     }
 
     async function startSearch() {
+      // Not logged in → redirect to Spotify login (will return here after)
+      if (!accessToken) {
+        loginSpotify();
+        return;
+      }
+
       // Use rich YT data if available, otherwise parse from textarea
       let songs;
       if (ytSongQueue) {
