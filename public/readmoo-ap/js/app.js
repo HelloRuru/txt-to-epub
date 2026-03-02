@@ -258,4 +258,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.initChain) initChain();
   if (window.initBooks) initBooks();
   if (window.initChangelog) initChangelog();
+
+  // Quick action: "修改 AP 連結" → switch to directory tab + open edit mode
+  const qaEditLink = document.getElementById('qa-edit-link');
+  if (qaEditLink) {
+    qaEditLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.hash = 'directory';
+      setTimeout(() => {
+        const btnEdit = document.getElementById('btn-edit-directory');
+        if (btnEdit) btnEdit.click();
+      }, 300);
+    });
+  }
 });

@@ -511,6 +511,54 @@ html.dark .welcome-card {
   font-size: 16px;
 }
 
+/* Quick Actions */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+.quick-action-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.quick-action-card:hover {
+  border-color: var(--color-rose);
+  box-shadow: 0 4px 16px rgba(212, 165, 165, 0.15);
+}
+.quick-action-card > i {
+  width: 28px;
+  height: 28px;
+  color: var(--color-rose);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.quick-action-card strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+.quick-action-card p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+html.dark .quick-action-card {
+  background: var(--bg-elevated);
+  border-color: var(--border-color);
+}
+html.dark .quick-action-card:hover {
+  border-color: var(--color-rose);
+}
+
 .guide-section h3 {
   display: flex;
   align-items: center;
@@ -1189,6 +1237,10 @@ html.dark .theme-toggle .icon-moon { display: none; }
   .log-item {
     flex-direction: column;
     gap: var(--space-xs);
+  }
+
+  .quick-actions {
+    grid-template-columns: 1fr;
   }
 }
 
