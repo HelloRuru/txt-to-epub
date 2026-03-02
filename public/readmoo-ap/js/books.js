@@ -148,7 +148,7 @@ function initBooks() {
         bookModalTitle.textContent = '編輯書籍';
         bookTitle.value = book.title;
         bookAuthor.value = book.author || '';
-        bookPublisher.value = book.version || '';
+        bookPublisher.value = book.publisher || '';
         bookPubdate.value = book.pubdate || '';
         bookEditId.value = book.id;
         openModal('book-modal');
@@ -206,7 +206,7 @@ function initBooks() {
       if (book) {
         book.title = title;
         book.author = bookAuthor.value.trim();
-        book.version = bookPublisher.value.trim();
+        book.publisher = bookPublisher.value.trim();
         book.pubdate = bookPubdate.value.trim();
       }
       showToast('已更新');
@@ -216,7 +216,7 @@ function initBooks() {
         id: 'book_' + Date.now(),
         title,
         author: bookAuthor.value.trim(),
-        version: bookPublisher.value.trim(),
+        publisher: bookPublisher.value.trim(),
         pubdate: bookPubdate.value.trim(),
         status: 'want',
         createdAt: new Date().toISOString()
@@ -248,7 +248,7 @@ function initBooks() {
         id: 'book_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
         title,
         author: '',
-        version: '',
+        publisher: '',
         pubdate: '',
         status: 'want',
         createdAt: new Date().toISOString()
