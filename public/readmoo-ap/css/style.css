@@ -815,55 +815,75 @@ html.dark .quick-action-card:hover {
 .chain-queue {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-md);
+}
+.chain-hint {
+  text-align: center;
+  color: var(--text-hint);
+  font-size: 14px;
+  padding: var(--space-md);
+}
+.chain-hint a {
+  color: var(--color-rose);
 }
 
-.queue-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-md);
+.queue-card {
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
+  overflow: hidden;
   transition: all var(--transition-fast);
 }
-.queue-item.done {
-  opacity: 0.5;
+.queue-card.done {
+  opacity: 0.55;
   border-color: var(--status-success);
   background: var(--status-success-bg);
 }
-.queue-item.current {
-  border-color: var(--color-rose);
-  background: var(--status-warning-bg);
-}
-.queue-item .member-name {
-  flex: 1;
-  font-size: 14px;
-  font-weight: 500;
-}
-.queue-item .btn-open-ap {
-  padding: 6px 12px;
-  font-size: 12px;
-  border-radius: var(--radius-sm);
-}
-
-.chain-booklist {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-.chain-book-item {
+.queue-card-header {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
+  background: rgba(212, 165, 165, 0.06);
+  border-bottom: 1px solid var(--border-color);
 }
-.chain-book-item .book-name {
+.queue-card.done .queue-card-header {
+  background: var(--status-success-bg);
+  border-bottom-color: var(--status-success);
+}
+.queue-number {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-hint);
+  min-width: 28px;
+}
+.queue-name {
   flex: 1;
   font-weight: 500;
+  font-size: 14px;
+}
+.queue-card-body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+}
+.queue-card-body .chain-book-select {
+  flex: 1;
+  font-size: 13px;
+  padding: 6px 8px;
+}
+.queue-card-body .btn-open-ap {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+.queue-card-body .chain-copy-btn {
+  padding: 6px;
+}
+.queue-card-body .chain-copy-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .hint-text {
@@ -1313,8 +1333,12 @@ html.dark .theme-toggle .icon-moon { display: none; }
     align-items: flex-start;
   }
 
-  .chain-workspace {
-    grid-template-columns: 1fr;
+  .queue-card-body {
+    flex-wrap: wrap;
+  }
+  .queue-card-body .chain-book-select {
+    flex: 1 1 100%;
+    order: -1;
   }
 
   .form-row {

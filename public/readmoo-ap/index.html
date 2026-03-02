@@ -296,22 +296,12 @@
             <span id="chain-progress-text">0 / 0 完成</span>
           </div>
 
-          <div class="chain-workspace">
-            <div class="chain-left">
-              <h3>接龍順序</h3>
-              <div id="chain-queue" class="chain-queue">
-                <!-- Dynamically populated -->
-              </div>
-            </div>
-            <div class="chain-right">
-              <h3>我的書單</h3>
-              <div id="chain-booklist" class="chain-booklist">
-                <!-- Dynamically populated -->
-              </div>
-              <p class="hint-text" id="chain-no-books" style="display:none;">
-                還沒有書單？先到「我的書單」新增想買的書。
-              </p>
-            </div>
+          <p class="chain-hint" id="chain-no-books" style="display:none;">
+            你的書單是空的。先到「<a href="#books">我的書單</a>」新增想買的書，接龍時才能配對。
+          </p>
+
+          <div id="chain-queue" class="chain-queue">
+            <!-- Dynamically populated -->
           </div>
         </div>
       </div>

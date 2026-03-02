@@ -1,6 +1,6 @@
 /**
  * AP 接龍核心模組
- * 選人 → 配書 → 開連結
+ * 選人 → 每人配一本書 → 複製書名 → 開 AP 連結
  */
 
 function initChain() {
@@ -13,7 +13,6 @@ function initChain() {
   const stepSelect = document.getElementById('chain-step-select');
   const stepActive = document.getElementById('chain-step-active');
   const queueEl = document.getElementById('chain-queue');
-  const booklistEl = document.getElementById('chain-booklist');
   const noBooksEl = document.getElementById('chain-no-books');
   const progressFill = document.getElementById('chain-progress-fill');
   const progressText = document.getElementById('chain-progress-text');
@@ -21,6 +20,8 @@ function initChain() {
   let selectedIds = new Set();
   let chainQueue = [];
   let chainDone = new Set();
+  // Map: memberId → bookId
+  let chainBookMap = {};
 
   // Render member selection grid
   function renderMembers(filter = '') {
@@ -74,6 +75,7 @@ function initChain() {
       AppState.members.find(m => m.id === id)
     ).filter(Boolean);
     chainDone = new Set();
+    chainBookMap = {};
 
     stepSelect.style.display = 'none';
     stepActive.style.display = 'block';
@@ -91,56 +93,89 @@ function initChain() {
 
   // Render active chain
   function renderChainActive() {
-    // Progress
+    const books = getBooks().filter(b => b.status === 'want');
     const total = chainQueue.length;
     const done = chainDone.size;
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
     progressFill.style.width = `${pct}%`;
     progressText.textContent = `${done} / ${total} 完成`;
 
-    // Queue
+    noBooksEl.style.display = books.length === 0 ? 'block' : 'none';
+
     queueEl.innerHTML = chainQueue.map((m, i) => {
       const isDone = chainDone.has(m.id);
-      const isCurrent = !isDone && (i === 0 || chainDone.has(chainQueue[i - 1]?.id));
+      const selectedBookId = chainBookMap[m.id] || '';
+      const selectedBook = books.find(b => b.id === selectedBookId);
+
       return `
-        <div class="queue-item ${isDone ? 'done' : ''} ${isCurrent ? 'current' : ''}">
-          <input type="checkbox" ${isDone ? 'checked' : ''} class="chain-done-cb" data-id="${m.id}"
-                 style="accent-color: var(--color-sage);">
-          <span class="member-name">${isDone ? '&#10003; ' : ''}${escapeHtml(m.name)}</span>
-          <a href="${escapeHtml(m.link)}" target="_blank" rel="noopener"
-             class="btn-secondary btn-sm btn-open-ap"
-             onclick="showToast('已開啟 ${escapeHtml(m.name)} 的 AP 連結')">
-            <i data-lucide="external-link"></i> 開啟 AP
-          </a>
+        <div class="queue-card ${isDone ? 'done' : ''}">
+          <div class="queue-card-header">
+            <input type="checkbox" ${isDone ? 'checked' : ''} class="chain-done-cb" data-id="${m.id}"
+                   style="accent-color: var(--color-sage);">
+            <span class="queue-number">#${i + 1}</span>
+            <span class="queue-name">${escapeHtml(m.name)}</span>
+          </div>
+          <div class="queue-card-body">
+            <select class="input-field chain-book-select" data-member="${m.id}">
+              <option value="">-- 選一本書 --</option>
+              ${books.map(b => `<option value="${b.id}" ${b.id === selectedBookId ? 'selected' : ''}>${escapeHtml(b.title)}</option>`).join('')}
+            </select>
+            <button class="btn-icon chain-copy-btn" data-member="${m.id}" title="複製書名"
+                    ${!selectedBook ? 'disabled' : ''}>
+              <i data-lucide="copy"></i>
+            </button>
+            <a href="${escapeHtml(m.link)}" target="_blank" rel="noopener"
+               class="btn-primary btn-sm btn-open-ap">
+              <i data-lucide="external-link"></i> AP 連結
+            </a>
+          </div>
         </div>
       `;
     }).join('');
 
-    // Done checkboxes
+    // Bind events
     queueEl.querySelectorAll('.chain-done-cb').forEach(cb => {
       cb.addEventListener('change', () => {
-        if (cb.checked) chainDone.add(cb.dataset.id);
-        else chainDone.delete(cb.dataset.id);
+        const memberId = cb.dataset.id;
+        if (cb.checked) {
+          chainDone.add(memberId);
+          // Mark the paired book as bought
+          const bookId = chainBookMap[memberId];
+          if (bookId) {
+            const allBooks = getBooks();
+            const book = allBooks.find(b => b.id === bookId);
+            if (book && book.status === 'want') {
+              const member = chainQueue.find(m => m.id === memberId);
+              book.status = 'bought';
+              book.purchaseDate = new Date().toISOString().split('T')[0];
+              book.purchaseVia = member ? member.name : '';
+              saveBooks(allBooks);
+              showToast(`已標記購買：${book.title}`);
+              document.dispatchEvent(new Event('books-updated'));
+            }
+          }
+        } else {
+          chainDone.delete(memberId);
+        }
         renderChainActive();
       });
     });
 
-    // Books
-    const books = getBooks().filter(b => b.status === 'want');
-    if (books.length === 0) {
-      booklistEl.innerHTML = '';
-      noBooksEl.style.display = 'block';
-    } else {
-      noBooksEl.style.display = 'none';
-      booklistEl.innerHTML = books.map(b => `
-        <div class="chain-book-item">
-          <span class="book-name">${escapeHtml(b.title)}</span>
-          <button class="btn-icon" onclick="copyToClipboard('${escapeHtml(b.title)}')" title="複製書名">
-            <i data-lucide="copy"></i>
-          </button>
-        </div>
-      `).join('');
-    }
+    queueEl.querySelectorAll('.chain-book-select').forEach(sel => {
+      sel.addEventListener('change', () => {
+        chainBookMap[sel.dataset.member] = sel.value;
+        // Re-render to update copy button state
+        renderChainActive();
+      });
+    });
+
+    queueEl.querySelectorAll('.chain-copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const bookId = chainBookMap[btn.dataset.member];
+        const book = books.find(b => b.id === bookId);
+        if (book) copyToClipboard(book.title);
+      });
+    });
 
     if (window.lucide) lucide.createIcons();
   }
