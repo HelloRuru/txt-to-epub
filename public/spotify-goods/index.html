@@ -458,7 +458,7 @@
 
   <main class="container">
 
-    <div class="how-to" style="font-size:0.82rem; color:var(--c-muted); line-height:1.7; margin-bottom:16px; padding:12px 16px; background:var(--c-bg); border-radius:var(--radius-sm);">
+    <div class="how-to" style="font-size:0.82rem; color:var(--c-muted); line-height:1.7; margin-bottom:16px; padding:12px 16px; background:var(--c-card); border-radius:var(--radius-sm);">
       <b style="color:var(--c-ink); opacity:0.75;">怎麼用？</b>
       連接 Spotify → 貼上 YouTube 網址或手動輸入歌名 → 自動比對 → 一鍵建立歌單。也可以上傳封面圖片。
     </div>
@@ -588,13 +588,13 @@
 
     <details class="faq" style="margin: 24px 0 16px; font-size: 0.85rem; line-height: 1.7;">
       <summary style="cursor:pointer; font-weight:700; color:var(--c-ink); opacity:0.7;">常見問題</summary>
-      <div style="margin-top:10px; color:var(--c-muted);">
-        <p><b>這是免費的嗎？</b><br>完全免費，不用註冊，也沒有廣告。</p>
-        <p><b>我的資料安全嗎？</b><br>所有操作都在你的瀏覽器完成，登入資訊不會上傳到任何伺服器。</p>
-        <p><b>支援哪些網址？</b><br>YouTube 影片、YouTube Music 歌單、頻道頁面，或直接手動輸入歌名。</p>
-        <p><b>為什麼有些歌找不到？</b><br>可能是 Spotify 沒有上架，或歌名與 Spotify 上的版本不同。你可以手動修改歌名再搜尋。</p>
-        <p><b>YouTube「播放電台」能用嗎？</b><br>電台是 YouTube 隨機推薦的，每個人不同，無法透過網址抓取。建議改貼一般歌單連結。</p>
-      </div>
+      <ul style="margin:12px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:14px; color:var(--c-muted);">
+        <li><b style="color:var(--c-ink); opacity:0.85;">Q. 這是免費的嗎？</b><br>完全免費，不用註冊，也沒有廣告。</li>
+        <li><b style="color:var(--c-ink); opacity:0.85;">Q. 我的資料安全嗎？</b><br>所有操作都在你的瀏覽器完成，登入資訊不會上傳到任何伺服器。</li>
+        <li><b style="color:var(--c-ink); opacity:0.85;">Q. 支援哪些網址？</b><br>YouTube 影片、YouTube Music 歌單、頻道頁面，或直接手動輸入歌名。</li>
+        <li><b style="color:var(--c-ink); opacity:0.85;">Q. 為什麼有些歌找不到？</b><br>可能是 Spotify 沒有上架，或歌名與 Spotify 上的版本不同。你可以手動修改歌名再搜尋。</li>
+        <li><b style="color:var(--c-ink); opacity:0.85;">Q. YouTube「播放電台」能用嗎？</b><br>電台是 YouTube 隨機推薦的，每個人不同，無法透過網址抓取。建議改貼一般歌單連結。</li>
+      </ul>
     </details>
 
     <footer class="footer">
@@ -1132,7 +1132,7 @@
           document.getElementById('songInput').value = songs.join('\n');
           if (data.name) setPlaylistName(cleanPlaylistName(data.name));
           if (data.thumbnailUrl) autoSetThumbnailUrl(data.thumbnailUrl);
-          showYTMStatus('success', `成功抓到 ${songs.length} 首歌，搜尋 Spotify 中...`);
+          showYTMStatus('success', accessToken ? `成功抓到 ${songs.length} 首歌，搜尋 Spotify 中...` : `成功抓到 ${songs.length} 首歌！請先登入 Spotify 再搜尋。`);
           if (accessToken) startSearch();
           return true;
         } catch { continue; }
@@ -1151,7 +1151,7 @@
             document.getElementById('songInput').value = songs.join('\n');
             if (data.title) setPlaylistName(cleanPlaylistName(data.title));
             if (data.thumbnail) autoSetThumbnailUrl(data.thumbnail);
-            showYTMStatus('success', `成功抓到 ${songs.length} 首歌，搜尋 Spotify 中...`);
+            showYTMStatus('success', accessToken ? `成功抓到 ${songs.length} 首歌，搜尋 Spotify 中...` : `成功抓到 ${songs.length} 首歌！請先登入 Spotify 再搜尋。`);
             if (accessToken) startSearch();
             return true;
           }
@@ -1271,7 +1271,7 @@
           s.artist ? `${s.artist} - ${s.display}` : s.display
         ).join('\n');
         ytSongQueue = richSongs;
-        showYTMStatus('success', `${richSongs.length} 首歌已就緒，搜尋 Spotify 中...`);
+        showYTMStatus('success', accessToken ? `${richSongs.length} 首歌已就緒，搜尋 Spotify 中...` : `${richSongs.length} 首歌已就緒！請先登入 Spotify 再搜尋。`);
         if (accessToken) startSearch();
         return true;
       }
@@ -1299,7 +1299,7 @@
             s.artist ? `${s.artist} - ${s.display}` : s.display
           ).join('\n');
           ytSongQueue = richChapters;
-          showYTMStatus('success', `${richChapters.length} 首歌已就緒，搜尋 Spotify 中...`);
+          showYTMStatus('success', accessToken ? `${richChapters.length} 首歌已就緒，搜尋 Spotify 中...` : `${richChapters.length} 首歌已就緒！請先登入 Spotify 再搜尋。`);
           if (accessToken) startSearch();
           return true;
         }
