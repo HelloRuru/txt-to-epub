@@ -1135,8 +1135,19 @@ html.dark .theme-toggle .icon-moon { display: none; }
   font-size: 14px;
   color: var(--text-muted);
 }
+.site-footer p {
+  margin: 0 0 var(--space-xs) 0;
+}
 .site-footer a {
   color: var(--color-rose);
+}
+.footer-legal {
+  font-size: 12px;
+  color: var(--text-hint);
+  line-height: 1.6;
+}
+.footer-contact {
+  margin-top: var(--space-sm);
 }
 
 /* ============ RESPONSIVE ============ */
