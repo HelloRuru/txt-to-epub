@@ -595,6 +595,37 @@
     // Fallback: self-hosted Worker (YT Music internal API, no Piped dependency)
     const WORKER_API = 'https://playlist-mover-api.vmpvmp1017.workers.dev';
 
+    // ===== Token persistence =====
+    const TOKEN_KEY = 'sg_token';
+    function saveTokens(access, refresh, expiresIn) {
+      localStorage.setItem(TOKEN_KEY, JSON.stringify({
+        access_token: access,
+        refresh_token: refresh,
+        expires_at: Date.now() + expiresIn * 1000,
+      }));
+    }
+    function loadTokens() {
+      try { return JSON.parse(localStorage.getItem(TOKEN_KEY)); } catch { return null; }
+    }
+    function clearTokens() { localStorage.removeItem(TOKEN_KEY); }
+
+    async function refreshAccessToken(refreshToken) {
+      const res = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: SPOTIFY_CLIENT_ID,
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken,
+        }),
+      });
+      if (!res.ok) { clearTokens(); return false; }
+      const data = await res.json();
+      accessToken = data.access_token;
+      saveTokens(data.access_token, data.refresh_token || refreshToken, data.expires_in || 3600);
+      return true;
+    }
+
     // ===== State =====
     let accessToken = null;
     let spotifyUser = null;
@@ -632,6 +663,7 @@
       const code = params.get('code');
 
       if (code) {
+        // OAuth callback — exchange code for tokens
         const verifier = sessionStorage.getItem('pkce_verifier');
         if (verifier) {
           await exchangeCodeForToken(code, verifier);
@@ -646,6 +678,18 @@
           }
         }
         window.history.replaceState({}, '', window.location.pathname);
+      } else {
+        // No OAuth callback — try restoring saved session
+        const saved = loadTokens();
+        if (saved) {
+          if (Date.now() < saved.expires_at - 60000) {
+            accessToken = saved.access_token;
+            await fetchSpotifyUser();
+          } else if (saved.refresh_token) {
+            const ok = await refreshAccessToken(saved.refresh_token);
+            if (ok) await fetchSpotifyUser();
+          }
+        }
       }
 
       updateUI();
@@ -663,6 +707,7 @@
       if (!res.ok) return;
       const data = await res.json();
       accessToken = data.access_token;
+      saveTokens(data.access_token, data.refresh_token, data.expires_in || 3600);
       await fetchSpotifyUser();
     }
 
@@ -710,7 +755,15 @@
       const res = await fetch('https://api.spotify.com/v1/me', {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      if (!res.ok) { accessToken = null; return; }
+      if (res.status === 401) {
+        const saved = loadTokens();
+        if (saved?.refresh_token) {
+          const ok = await refreshAccessToken(saved.refresh_token);
+          if (ok) return fetchSpotifyUser();
+        }
+        clearTokens(); accessToken = null; return;
+      }
+      if (!res.ok) { clearTokens(); accessToken = null; return; }
       spotifyUser = await res.json();
       const name = spotifyUser.display_name || spotifyUser.id;
       document.getElementById('userBarName').textContent = name;
@@ -720,6 +773,7 @@
     }
 
     function logoutSpotify() {
+      clearTokens();
       accessToken = null; spotifyUser = null;
       coverBase64 = null; matchedTracks = [];
       document.getElementById('step3').classList.add('hidden');
