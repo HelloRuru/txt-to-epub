@@ -516,8 +516,8 @@
 
         <div class="divider-or"><span>或手動貼上</span></div>
 
-        <textarea id="songInput" placeholder="每行一首，格式不拘：&#10;突然的自我 - 伍佰&#10;挪威的森林 - 伍佰&#10;有歌手名更準確"></textarea>
-        <div class="hint">支援格式：歌名 - 歌手 / 歌名, 歌手 / 只有歌名</div>
+        <textarea id="songInput" placeholder="每行一首，格式不拘：&#10;伍佰 - 突然的自我&#10;伍佰 - 挪威的森林&#10;有歌手名更準確"></textarea>
+        <div class="hint">支援格式：歌手 - 歌名 / 歌手, 歌名 / 只有歌名都行</div>
 
         <div class="input-row input-row-target">
           <label>目標歌單</label>
@@ -1077,7 +1077,8 @@
 
           document.getElementById('songInput').value = songs.join('\n');
           if (data.name) document.getElementById('playlistName').value = data.name;
-          showYTMStatus('success', `成功抓到 ${songs.length} 首歌！`);
+          showYTMStatus('success', `成功抓到 ${songs.length} 首歌，搜尋 Spotify 中...`);
+          if (accessToken) startSearch();
           return true;
         } catch { continue; }
       }
@@ -1094,7 +1095,8 @@
             );
             document.getElementById('songInput').value = songs.join('\n');
             if (data.title) document.getElementById('playlistName').value = data.title;
-            showYTMStatus('success', `成功抓到 ${songs.length} 首歌！`);
+            showYTMStatus('success', `成功抓到 ${songs.length} 首歌，搜尋 Spotify 中...`);
+            if (accessToken) startSearch();
             return true;
           }
         }
@@ -1626,7 +1628,8 @@
         });
     }
 
-    // ===== Spotify API with Rate Limit =====
+    // ===== Spotify API with Rate Limit + Token Refresh =====
+    let _refreshingToken = false;
     async function spotifyFetch(url, options = {}) {
       const res = await fetch(url, {
         ...options,
@@ -1640,6 +1643,16 @@
         const wait = parseInt(res.headers.get('Retry-After') || '3', 10);
         await sleep(wait * 1000);
         return spotifyFetch(url, options);
+      }
+      if (res.status === 401 && !_refreshingToken) {
+        _refreshingToken = true;
+        const saved = loadTokens();
+        if (saved?.refresh_token) {
+          const ok = await refreshAccessToken(saved.refresh_token);
+          _refreshingToken = false;
+          if (ok) return spotifyFetch(url, options);
+        }
+        _refreshingToken = false;
       }
       return res;
     }
