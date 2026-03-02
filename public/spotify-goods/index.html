@@ -71,7 +71,7 @@
       { "@type": "Question", "name": "支援哪些網址？", "acceptedAnswer": { "@type": "Answer", "text": "YouTube 影片、YouTube Music 歌單、頻道頁面都可以，也能直接手動輸入歌名。" }},
       { "@type": "Question", "name": "可以加進現有的 Spotify 歌單嗎？", "acceptedAnswer": { "@type": "Answer", "text": "可以，搜尋完成後選擇「加進現有歌單」，從你的歌單清單中挑選即可。" }},
       { "@type": "Question", "name": "為什麼有些歌在 Spotify 找不到？", "acceptedAnswer": { "@type": "Answer", "text": "可能是 Spotify 沒有上架，或歌名與 Spotify 上的版本不同。你可以手動修改歌名再搜尋。" }},
-      { "@type": "Question", "name": "YouTube 播放電台能用嗎？", "acceptedAnswer": { "@type": "Answer", "text": "電台是 YouTube 隨機推薦的，每個人不同，無法透過網址抓取。建議改貼一般歌單連結。" }}
+      { "@type": "Question", "name": "YouTube 合輯和播放電台能用嗎？", "acceptedAnswer": { "@type": "Answer", "text": "合輯和電台是 YouTube 為你個人推薦的，每個人不同，沒辦法透過網址抓取。你可以用「抓歌小書籤」在 YouTube 頁面一鍵複製歌名，再回來貼上搜尋。" }}
     ]
   }
   </script>
@@ -382,6 +382,14 @@
     .continue-section .btn { min-width: 160px; }
     .input-row-target { margin-top: 14px; }
 
+    /* Bookmarklet link */
+    .bkmk-link {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      background: rgba(232,168,124,0.10); color: #D09060; font-size: 0.78rem;
+      font-weight: 500; text-decoration: none; cursor: grab; white-space: nowrap;
+    }
+    .bkmk-link:hover { background: rgba(232,168,124,0.20); text-decoration: none; }
+
     /* FAQ cards */
     .faq-card {
       background: var(--c-card); border-radius: var(--radius-sm);
@@ -456,6 +464,7 @@
       .divider-or span { background: var(--c-card); }
       .divider-or::before { background: var(--c-border); }
       .faq-card { background: var(--c-card); border-left-color: var(--c-lavender); }
+      .bkmk-link { background: rgba(240,184,140,0.12); color: #F0B88C; }
       select {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23918A8D' stroke-width='2'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
       }
@@ -562,7 +571,7 @@
         <div class="divider-or"><span>或手動貼上</span></div>
 
         <textarea id="songInput" placeholder="每行一首，格式不拘：&#10;伍佰 - 突然的自我&#10;伍佰 - 挪威的森林&#10;有歌手名更準確"></textarea>
-        <div class="hint">支援格式：歌手 - 歌名 / 歌手, 歌名 / 只有歌名都行</div>
+        <div class="hint">支援格式：歌手 - 歌名 / 歌手, 歌名 / 只有歌名都行<br>合輯 / 電台抓不到？把這個拖到書籤列 → <a class="bkmk-link" href="javascript:void(function(){var s=[];document.querySelectorAll('ytd-playlist-panel-video-renderer #video-title').forEach(function(e){var t=e.textContent.trim();if(t)s.push(t)});if(!s.length)document.querySelectorAll('ytmusic-responsive-list-item-renderer .title').forEach(function(e){var t=e.textContent.trim();if(t)s.push(t)});if(!s.length){alert('找不到歌曲，請確認頁面上有播放清單');return}navigator.clipboard.writeText(s.join('\n')).then(function(){alert('已複製 '+s.length+' 首歌！回 Spotify Goods 貼上吧')}).catch(function(){prompt('自動複製失敗，請手動複製：',s.join('\n'))})}())">抓歌小書籤</a></div>
 
         <div class="input-row input-row-target">
           <label>目標歌單</label>
@@ -643,7 +652,7 @@
         <div class="faq-card"><b>支援哪些網址？</b><p>YouTube 影片、YouTube Music 歌單、頻道頁面都可以，也能直接手動輸入歌名。</p></div>
         <div class="faq-card"><b>可以加進現有的 Spotify 歌單嗎？</b><p>可以，搜尋完成後選擇「加進現有歌單」，從你的歌單清單中挑選即可。</p></div>
         <div class="faq-card"><b>為什麼有些歌找不到？</b><p>可能是 Spotify 沒有上架，或歌名與 Spotify 上的版本不同。你可以手動修改歌名再搜尋。</p></div>
-        <div class="faq-card"><b>YouTube「播放電台」能用嗎？</b><p>電台是 YouTube 隨機推薦的，每個人不同，無法透過網址抓取。建議改貼一般歌單連結。</p></div>
+        <div class="faq-card"><b>YouTube 合輯 / 播放電台能用嗎？</b><p>合輯和電台是 YouTube 為你個人推薦的，每個人不同，沒辦法透過網址抓取。<br>你可以用上面的「抓歌小書籤」，在 YouTube 頁面一鍵複製歌名，再回來貼上。</p></div>
       </div>
     </details>
 
@@ -1145,11 +1154,11 @@
         if (await fetchVideoSongs(videoId)) { btn.disabled = false; return; }
       }
 
-      // 4. Radio playlist (RD) — try anyway as last resort
+      // 4. Radio / Mix playlist (RD) — try anyway as last resort
       if (playlistId && playlistId.startsWith('RD')) {
-        showYTMStatus('loading', '嘗試抓取電台清單...');
+        showYTMStatus('loading', '嘗試抓取合輯 / 電台清單...');
         if (await fetchPlaylistSongs(playlistId)) { btn.disabled = false; return; }
-        showYTMStatus('error', '這個是 YouTube 幫你隨機配的「播放電台」，每個人看到的歌都不一樣，所以我沒辦法幫你抓 &#x1F625; 你可以直接把想要的歌名打在上面，我來幫你找！');
+        showYTMStatus('error', '「合輯」和「播放電台」是 YouTube 為你個人推薦的，每個人不同，沒辦法透過網址抓取。<br>把下面的 <b>抓歌小書籤</b> 拖到書籤列，在 YouTube 頁面按一下就能複製歌名，再回來貼上！');
         btn.disabled = false; return;
       }
 

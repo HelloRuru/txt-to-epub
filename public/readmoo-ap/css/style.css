@@ -1,45 +1,47 @@
 /* ============================================
-   讀墨 AP 接龍工具 — DS v1.9 + 電子書閱讀風格
+   讀墨 AP 接龍工具 — DS 文青 V0.1
+   延伸 DS v1.9，鼠尾草綠主調 + 源雲明朝體
    ============================================ */
 
-/* ---- DS v1.9 CSS Variables ---- */
+/* ---- DS 文青 V0.1 CSS Variables ---- */
 :root {
-  /* Brand */
-  --color-rose: #D4A5A5;
-  --color-lavender: #B8A9C9;
-  --color-gray-rose: #C9929A;
+  /* Brand — 鼠尾草綠 + 薰衣草灰 */
   --color-sage: #A8B5A0;
-  --color-blush: #F5D0C5;
-  --color-nadeshiko: #E8B4B8;
-  --color-sakura: #FEDFE1;
-  --color-lotus: #9B7E93;
-  --color-wisteria: #C4B7D7;
-  --color-bellflower: #8F77B5;
-  --color-fog: #E8E4E1;
-  --color-warm-gray: #B5ADA7;
-  --color-charcoal: #5C5856;
+  --color-sage-dark: #889B7E;
+  --color-sage-light: #C5CFBF;
+  --color-sage-bg: rgba(168, 181, 160, 0.10);
+  --color-lavender-gray: #AEA8B8;
+  --color-lavender-light: #C8C3D0;
+  --color-lavender-bg: rgba(174, 168, 184, 0.10);
+  --color-ink: #5C4A3A;
+  --color-rose: #A8B5A0;
+  --color-lavender: #AEA8B8;
+  --color-gray-rose: #889B7E;
+  --color-fog: #E5E0DB;
+  --color-warm-gray: #B0A99F;
+  --color-charcoal: #5C5650;
 
-  /* Text */
-  --text-primary: #333333;
-  --text-secondary: #4A4A4A;
-  --text-muted: #888888;
-  --text-hint: #AAAAAA;
+  /* Text — 暖棕色系 */
+  --text-primary: #3D3833;
+  --text-secondary: #5C5650;
+  --text-muted: #8A847E;
+  --text-hint: #B0A99F;
 
-  /* Background — e-book paper feel */
-  --bg-page: #FAF8F5;
+  /* Background — 米白書頁 */
+  --bg-page: #F7F5F2;
   --bg-card: #FFFFFF;
   --bg-elevated: #FFFFFF;
-  --border-color: #E8E4E1;
+  --border-color: #E5E0DB;
 
   /* Status */
   --status-success: #A8B5A0;
   --status-success-bg: rgba(168, 181, 160, 0.15);
-  --status-warning: #D4A5A5;
-  --status-warning-bg: rgba(212, 165, 165, 0.12);
-  --status-error: #C9929A;
-  --status-error-bg: rgba(201, 146, 154, 0.12);
-  --status-info: #B8A9C9;
-  --status-info-bg: rgba(184, 169, 201, 0.12);
+  --status-warning: #D4B896;
+  --status-warning-bg: rgba(212, 184, 150, 0.12);
+  --status-error: #C9928A;
+  --status-error-bg: rgba(201, 146, 138, 0.12);
+  --status-info: #8BBCB0;
+  --status-info-bg: rgba(139, 188, 176, 0.10);
 
   /* Radius */
   --radius-sm: 8px;
@@ -47,15 +49,15 @@
   --radius-lg: 24px;
   --radius-full: 50%;
 
-  /* Shadow */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+  /* Shadow — 暖調 */
+  --shadow-sm: 0 2px 8px rgba(92, 74, 58, 0.06);
+  --shadow-md: 0 4px 16px rgba(92, 74, 58, 0.08);
+  --shadow-lg: 0 8px 32px rgba(92, 74, 58, 0.12);
 
-  /* Gradient */
-  --gradient-primary: linear-gradient(135deg, #D4A5A5, #B8A9C9);
-  --gradient-soft: linear-gradient(180deg, #FFFFFF, #FAF8F5);
-  --gradient-pink: linear-gradient(135deg, #F5D0C5, #C4B7D7);
+  /* Gradient — 鼠尾草漸層 */
+  --gradient-primary: linear-gradient(135deg, #A8B5A0, #AEA8B8);
+  --gradient-soft: linear-gradient(180deg, #FFFFFF, #F7F5F2);
+  --gradient-pink: linear-gradient(135deg, #C5CFBF, #C8C3D0);
 
   /* Spacing */
   --space-xs: 4px;
@@ -78,41 +80,46 @@
   --z-modal: 300;
   --z-toast: 400;
   --z-tooltip: 500;
+
+  /* Font — 文青 */
+  --font-serif: 'GenWanMin2TC', 'Noto Serif TC', serif;
+  --font-body: 'GenSenRounded', 'Noto Sans TC', sans-serif;
 }
 
-/* ---- Dark Mode (暖可可) ---- */
+/* ---- Dark Mode (文青夜讀) ---- */
 html.dark {
-  --color-rose: #DAAEB0;
-  --color-lavender: #C2B4D0;
-  --color-gray-rose: #D4A0A4;
-  --color-sage: #A8B5A0;
+  --color-sage: #B0BDA8;
+  --color-sage-dark: #95A88C;
+  --color-rose: #B0BDA8;
+  --color-lavender: #B8B2C2;
+  --color-gray-rose: #95A88C;
 
-  --text-primary: #EDE8E9;
-  --text-secondary: #C4BBBF;
-  --text-muted: #918A8D;
-  --text-hint: #6B6466;
+  --text-primary: #E8E5E2;
+  --text-secondary: #C4BFB8;
+  --text-muted: #8A857E;
+  --text-hint: #6B665F;
 
-  --bg-page: #1E181B;
-  --bg-card: #282224;
-  --bg-elevated: #332C2F;
-  --border-color: #3D3538;
+  --bg-page: #1C1E1A;
+  --bg-card: #26282A;
+  --bg-elevated: #30322E;
+  --border-color: #3A3C38;
 
-  --status-success: #A8B5A0;
-  --status-success-bg: rgba(168, 181, 160, 0.12);
-  --status-warning: #DAAEB0;
-  --status-warning-bg: rgba(218, 174, 176, 0.10);
-  --status-error: #D4A0A4;
-  --status-error-bg: rgba(212, 160, 164, 0.10);
-  --status-info: #C2B4D0;
-  --status-info-bg: rgba(194, 180, 208, 0.10);
+  --status-success: #B0BDA8;
+  --status-success-bg: rgba(176, 189, 168, 0.12);
+  --status-warning: #D4C096;
+  --status-warning-bg: rgba(212, 192, 150, 0.10);
+  --status-error: #D4A09A;
+  --status-error-bg: rgba(212, 160, 154, 0.10);
+  --status-info: #8BBCB0;
+  --status-info-bg: rgba(139, 188, 176, 0.10);
 
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.30);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.40);
 
-  --gradient-primary: linear-gradient(135deg, #DAAEB0, #C2B4D0);
-  --gradient-soft: linear-gradient(180deg, #282224, #1E181B);
-  --gradient-pink: linear-gradient(135deg, #C9A69D, #C4B7D7);
+  --gradient-primary: linear-gradient(135deg, #B0BDA8, #8BBCB0);
+  --gradient-soft: linear-gradient(180deg, #26282A, #1C1E1A);
+  --gradient-pink: linear-gradient(135deg, #B0BDA8, #B8B2C2);
 }
 
 /* ---- Mode Transition ---- */
@@ -131,7 +138,7 @@ html * {
 }
 
 body {
-  font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+  font-family: var(--font-body);
   font-weight: 500;
   font-size: 16px;
   line-height: 1.8;
@@ -141,11 +148,13 @@ body {
 }
 
 h1, h2, h3 {
-  color: var(--text-primary);
-  line-height: 1.3;
+  font-family: var(--font-serif);
+  color: var(--color-ink);
+  line-height: 1.4;
+  font-weight: 600;
 }
-h2 { font-size: 28px; font-weight: 700; margin-bottom: var(--space-md); }
-h3 { font-size: 20px; font-weight: 500; margin-bottom: var(--space-sm); }
+h2 { font-size: 26px; margin-bottom: var(--space-md); }
+h3 { font-size: 19px; margin-bottom: var(--space-sm); }
 
 a {
   color: var(--color-rose);
@@ -1578,9 +1587,39 @@ html.dark .theme-toggle .icon-moon { display: none; }
 }
 
 .search-mode-btn.active {
-  background: var(--color-rose);
+  background: var(--color-sage);
   color: #fff;
-  border-color: var(--color-rose);
+  border-color: var(--color-sage);
+}
+
+/* 台灣電子書搜尋卡片 — DS 文青風格 */
+.ebook-search-card {
+  display: block;
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-md);
+  background: var(--bg-page);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  text-align: center;
+  transition: all var(--transition-normal);
+}
+.ebook-search-card:hover {
+  border-color: var(--color-sage);
+  box-shadow: var(--shadow-sm);
+}
+.ebook-search-title {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin-bottom: 4px;
+}
+.ebook-search-desc {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
 }
 
 .search-mode-btn svg {

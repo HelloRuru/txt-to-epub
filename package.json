@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@imgly/background-removal": "^1.7.0",
+    "canvas": "^3.2.1",
     "file-saver": "^2.0.5",
     "fonteditor-core": "^2.6.3",
     "jszip": "^3.10.1",

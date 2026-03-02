@@ -93,7 +93,7 @@ function initReadmooSearch() {
       }
 
       if (books.length === 0) {
-        statusEl.innerHTML = '試試其他關鍵字？又或是試試這個工具，查查這本書有沒有電子書：<a href="https://taiwan-ebook-lover.github.io/" target="_blank" rel="noopener">台灣電子書搜尋</a>';
+        statusEl.innerHTML = '輸入其他關鍵字？又或是試試這個工具，查查這本書有沒有電子書：<a href="https://taiwan-ebook-lover.github.io/" target="_blank" rel="noopener">台灣電子書搜尋</a>';
         return;
       }
 

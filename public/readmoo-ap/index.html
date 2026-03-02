@@ -29,17 +29,21 @@
   <meta name="twitter:description" content="社群專用 AP 接龍工具。管理推書夥伴連結、書單追蹤、一鍵複製書名。">
   <meta name="twitter:image" content="https://tools.helloruru.com/readmoo-ap/og.png">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <!-- Favicon + iOS Bookmark (DS 文青 V0.1) -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260302">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=20260302">
+  <link rel="icon" type="image/png" sizes="180x180" href="apple-touch-icon.png?v=20260302">
 
-  <!-- Fonts: GenSenRounded (DS v1.9) -->
+  <!-- Fonts: GenSenRounded (DS v1.9) + GenWanMin (DS 文青) -->
   <link rel="preconnect" href="https://lab.helloruru.com" crossorigin>
   <style>
     @font-face { font-family: 'GenSenRounded'; src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
     @font-face { font-family: 'GenSenRounded'; src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2'); font-weight: 500; font-display: swap; }
     @font-face { font-family: 'GenSenRounded'; src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+    @font-face { font-family: 'GenWanMin2TC'; src: url('https://lab.helloruru.com/fonts/GenWanMin2TC-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+    @font-face { font-family: 'GenWanMin2TC'; src: url('https://lab.helloruru.com/fonts/GenWanMin2TC-SemiBold.woff2') format('woff2'); font-weight: 600; font-display: swap; }
   </style>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap">
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -396,7 +400,11 @@
 
         <!-- Readmoo 搜尋區 -->
         <div id="readmoo-search-panel" class="readmoo-search-panel" style="display:none;">
-          <p class="search-hint">搜尋 Readmoo 讀墨電子書庫，找到想要的書直接加入書單。想查查一本書有沒有電子書？可利用 <a href="https://taiwan-ebook-lover.github.io/" target="_blank" rel="noopener">台灣電子書搜尋</a> 跨平台查詢。</p>
+          <p class="search-hint">搜尋 Readmoo 讀墨電子書庫，找到想要的書直接加入書單。</p>
+          <a href="https://taiwan-ebook-lover.github.io/" target="_blank" rel="noopener" class="ebook-search-card">
+            <span class="ebook-search-title">台灣電子書搜尋</span>
+            <span class="ebook-search-desc">跨平台書庫整合，查查這本書有沒有電子書。</span>
+          </a>
           <div class="search-mode-toggle">
             <button class="search-mode-btn active" data-mode="title"><i data-lucide="book-open"></i> 搜書名</button>
             <button class="search-mode-btn" data-mode="author"><i data-lucide="user"></i> 搜作者</button>
