@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+
+  <!-- SEO -->
+  <title>讀墨 AP 接龍工具 | Hello Ruru Tools</title>
+  <meta name="description" content="讀墨1500日挑戰社群專用 AP 接龍工具。管理推書夥伴連結、書單追蹤、一鍵複製書名，讓接龍買書更順暢。">
+  <meta name="keywords" content="讀墨,Readmoo,AP,推書夥伴,接龍,電子書,1500日挑戰">
+  <meta name="author" content="Hello Ruru">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://tools.helloruru.com/readmoo-ap/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="讀墨 AP 接龍工具｜1500日挑戰社群">
+  <meta property="og:description" content="社群專用 AP 接龍工具。管理推書夥伴連結、書單追蹤、一鍵複製書名。">
+  <meta property="og:url" content="https://tools.helloruru.com/readmoo-ap/">
+  <meta property="og:site_name" content="Hello Ruru Tools">
+  <meta property="og:locale" content="zh_TW">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="讀墨 AP 接龍工具｜1500日挑戰社群">
+  <meta name="twitter:description" content="社群專用 AP 接龍工具。管理推書夥伴連結、書單追蹤、一鍵複製書名。">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+  <!-- Fonts: GenSenRounded (DS v1.9) -->
+  <link rel="preconnect" href="https://lab.helloruru.com" crossorigin>
+  <style>
+    @font-face { font-family: 'GenSenRounded'; src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+    @font-face { font-family: 'GenSenRounded'; src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+    @font-face { font-family: 'GenSenRounded'; src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+  </style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "讀墨 AP 接龍工具",
+    "description": "讀墨1500日挑戰社群專用 AP 接龍管理工具",
+    "url": "https://tools.helloruru.com/readmoo-ap/",
+    "applicationCategory": "UtilityApplication",
+    "operatingSystem": "Any",
+    "author": { "@type": "Person", "name": "Kaoru Tsai" }
+  }
+  </script>
+</head>
+<body>
+  <!-- Brand Header -->
+  <script src="https://lab.helloruru.com/shared/brand-header.js"></script>
+  <hello-ruru-header title="讀墨 AP 接龍工具"></hello-ruru-header>
+
+  <!-- Tab Navigation -->
+  <nav class="tab-nav" role="tablist">
+    <button class="tab-btn active" data-tab="guide" role="tab" aria-selected="true">
+      <i data-lucide="book-open"></i>
+      <span>使用指南</span>
+    </button>
+    <button class="tab-btn" data-tab="chain" role="tab" aria-selected="false">
+      <i data-lucide="link"></i>
+      <span>AP 接龍</span>
+    </button>
+    <button class="tab-btn" data-tab="books" role="tab" aria-selected="false">
+      <i data-lucide="library"></i>
+      <span>我的書單</span>
+    </button>
+    <button class="tab-btn" data-tab="directory" role="tab" aria-selected="false">
+      <i data-lucide="users"></i>
+      <span>AP 名冊</span>
+    </button>
+    <button class="tab-btn" data-tab="changelog" role="tab" aria-selected="false">
+      <i data-lucide="file-text"></i>
+      <span>修改紀錄</span>
+    </button>
+  </nav>
+
+  <main class="main-content">
+    <!-- ============ Tab 1: 使用指南 ============ -->
+    <section id="tab-guide" class="tab-panel active" role="tabpanel">
+      <div class="guide-container">
+        <div class="welcome-card card">
+          <h2>歡迎來到讀墨 AP 接龍工具</h2>
+          <p class="welcome-text">
+            嗨，歡迎加入<strong>讀墨1500日挑戰</strong>！<br>
+            這裡是我們社群專用的小工具，讓大家買書時可以互相支持。
+          </p>
+        </div>
+
+        <div class="card guide-section">
+          <h3><i data-lucide="help-circle"></i> 什麼是 AP 推書夥伴？</h3>
+          <p>AP（Affiliate Program）是讀墨的推書夥伴功能。開通之後，你會得到一組專屬連結。</p>
+          <div class="benefit-list">
+            <div class="benefit-item">
+              <i data-lucide="coins"></i>
+              <div>
+                <strong>3% 購書回饋</strong>
+                <p>別人透過你的連結買書，你可以獲得讀墨的 3% 回饋金</p>
+              </div>
+            </div>
+            <div class="benefit-item">
+              <i data-lucide="star"></i>
+              <div>
+                <strong>魅力值加成</strong>
+                <p>可以增加你的會員等級魅力值</p>
+              </div>
+            </div>
+          </div>
+          <div class="link-group">
+            <a href="https://ap.readmoo.com/" target="_blank" rel="noopener" class="btn-secondary">
+              <i data-lucide="external-link"></i> AP 推書夥伴介紹
+            </a>
+            <a href="https://reurl.cc/DbRK35" target="_blank" rel="noopener" class="btn-secondary">
+              <i data-lucide="user-plus"></i> 社群 AP 登記表
+            </a>
+          </div>
+        </div>
+
+        <div class="card guide-section">
+          <h3><i data-lucide="list-ordered"></i> AP 接龍怎麼玩？</h3>
+          <p class="guide-intro">接龍的核心概念：<strong>每一本書搭配一個人的 AP 連結</strong>，輪流讓大家都能拿到回饋。</p>
+
+          <div class="step-list">
+            <div class="step">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <strong>事前準備</strong>
+                <p>關閉<em>所有</em>讀墨網頁，清空購物車。這很重要，確保接龍不會中斷。</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <strong>開始接龍</strong>
+                <p>點擊第一個人的 AP 連結 → 搜尋你要買的第一本書 → 加入購物車 → <strong>關閉該網頁</strong></p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <strong>重複</strong>
+                <p>點擊第二個人的 AP 連結 → 搜尋第二本書 → 加入購物車 → 關閉。依此類推。</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <strong>結帳</strong>
+                <p>全部加完後，統一結帳。完成！</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert-warning">
+            <i data-lucide="alert-triangle"></i>
+            <div>
+              <strong>注意</strong>：接龍過程中如果瀏覽了其他書籍或有其他動作，可能導致 AP 歸屬中斷。建議先用本工具的「我的書單」把想買的書都記好，接龍時直接複製書名搜尋。
+            </div>
+          </div>
+        </div>
+
+        <div class="card guide-section">
+          <h3><i data-lucide="sparkles"></i> 這個工具可以幫你</h3>
+          <ul class="feature-list">
+            <li><i data-lucide="check"></i> 從 AP 名冊勾選要接龍的夥伴</li>
+            <li><i data-lucide="check"></i> 管理你的書單，一鍵複製書名</li>
+            <li><i data-lucide="check"></i> 追蹤購買狀態（買了沒、透過誰買的）</li>
+            <li><i data-lucide="check"></i> 匯出 AP 名單分享到 LINE 群</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Tab 2: AP 接龍 ============ -->
+    <section id="tab-chain" class="tab-panel" role="tabpanel">
+      <div class="chain-container">
+        <!-- Step 1: 選人 -->
+        <div id="chain-step-select" class="chain-step">
+          <h2>選擇接龍夥伴</h2>
+          <p class="section-desc">從 AP 名冊中勾選這次要接龍的人，然後點擊「開始接龍」。</p>
+
+          <div class="chain-toolbar">
+            <label class="checkbox-label">
+              <input type="checkbox" id="chain-select-all"> 全選
+            </label>
+            <input type="text" id="chain-search" class="input-field" placeholder="搜尋成員...">
+            <span id="chain-selected-count" class="badge">已選 0 人</span>
+          </div>
+
+          <div id="chain-member-list" class="member-grid">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div class="chain-actions">
+            <button id="btn-start-chain" class="btn-primary" disabled>
+              <i data-lucide="play"></i> 開始接龍
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: 接龍模式 -->
+        <div id="chain-step-active" class="chain-step" style="display:none;">
+          <div class="chain-header">
+            <h2>接龍進行中</h2>
+            <button id="btn-exit-chain" class="btn-secondary btn-sm">
+              <i data-lucide="x"></i> 結束接龍
+            </button>
+          </div>
+
+          <div class="chain-progress">
+            <div class="progress-bar">
+              <div id="chain-progress-fill" class="progress-fill"></div>
+            </div>
+            <span id="chain-progress-text">0 / 0 完成</span>
+          </div>
+
+          <div class="chain-workspace">
+            <div class="chain-left">
+              <h3>接龍順序</h3>
+              <div id="chain-queue" class="chain-queue">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+            <div class="chain-right">
+              <h3>我的書單</h3>
+              <div id="chain-booklist" class="chain-booklist">
+                <!-- Dynamically populated -->
+              </div>
+              <p class="hint-text" id="chain-no-books" style="display:none;">
+                還沒有書單？先到「我的書單」新增想買的書。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Tab 3: 我的書單 ============ -->
+    <section id="tab-books" class="tab-panel" role="tabpanel">
+      <div class="books-container">
+        <div class="section-header">
+          <h2>我的書單</h2>
+          <div class="header-actions">
+            <button id="btn-add-book" class="btn-primary btn-sm">
+              <i data-lucide="plus"></i> 新增書籍
+            </button>
+            <button id="btn-batch-add" class="btn-secondary btn-sm">
+              <i data-lucide="clipboard-paste"></i> 快速貼入
+            </button>
+            <button id="btn-export-books" class="btn-secondary btn-sm">
+              <i data-lucide="download"></i> 匯出
+            </button>
+          </div>
+        </div>
+
+        <div class="books-filter">
+          <button class="filter-btn active" data-filter="all">全部</button>
+          <button class="filter-btn" data-filter="want">想買</button>
+          <button class="filter-btn" data-filter="bought">已購買</button>
+        </div>
+
+        <div id="books-list" class="books-list">
+          <!-- Dynamically populated -->
+        </div>
+        <p id="books-empty" class="empty-state">
+          <i data-lucide="book-plus"></i><br>
+          還沒有書呢，點擊「新增書籍」開始建立你的書單吧！
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ Tab 4: AP 名冊 ============ -->
+    <section id="tab-directory" class="tab-panel" role="tabpanel">
+      <div class="directory-container">
+        <div class="section-header">
+          <h2>AP 名冊</h2>
+          <div class="header-actions">
+            <button id="btn-edit-directory" class="btn-primary btn-sm">
+              <i data-lucide="edit"></i> 編輯名冊
+            </button>
+            <button id="btn-export-directory" class="btn-secondary btn-sm">
+              <i data-lucide="download"></i> 匯出
+            </button>
+          </div>
+        </div>
+
+        <div class="directory-toolbar">
+          <input type="text" id="directory-search" class="input-field" placeholder="搜尋成員...">
+          <span id="directory-count" class="badge">共 0 人</span>
+        </div>
+
+        <div id="directory-list" class="directory-list">
+          <!-- Dynamically populated -->
+        </div>
+
+        <div id="directory-loading" class="loading-state">
+          <div class="spinner"></div>
+          <p>正在載入 AP 名冊...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Tab 5: 修改紀錄 ============ -->
+    <section id="tab-changelog" class="tab-panel" role="tabpanel">
+      <div class="changelog-container">
+        <div class="section-header">
+          <h2>修改紀錄</h2>
+          <div class="header-actions">
+            <input type="date" id="changelog-date-filter" class="input-field">
+          </div>
+        </div>
+
+        <div id="changelog-list" class="changelog-list">
+          <!-- Dynamically populated -->
+        </div>
+        <p id="changelog-empty" class="empty-state">
+          <i data-lucide="file-text"></i><br>
+          目前沒有修改紀錄。
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ Modals ============ -->
+
+  <!-- Quiz + Registration Modal -->
+  <div id="quiz-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <button class="modal-close" id="quiz-modal-close">
+        <i data-lucide="x"></i>
+      </button>
+
+      <!-- Quiz Step -->
+      <div id="quiz-step" class="modal-step">
+        <h2>社群驗證</h2>
+        <p class="modal-desc">回答以下問題，確認你是社群成員。</p>
+
+        <div class="quiz-question" id="quiz-q1">
+          <h3>第一題：這個 LINE 社群的名稱是什麼？</h3>
+          <div class="quiz-options">
+            <label class="quiz-option"><input type="radio" name="q1" value="A"> <span>讀墨每日閱讀計畫</span></label>
+            <label class="quiz-option"><input type="radio" name="q1" value="B"> <span>電子書馬拉松讀書會</span></label>
+            <label class="quiz-option"><input type="radio" name="q1" value="C"> <span>讀墨1500日挑戰</span></label>
+            <label class="quiz-option"><input type="radio" name="q1" value="D"> <span>墨水瓶閱讀社團</span></label>
+          </div>
+        </div>
+
+        <div class="quiz-question" id="quiz-q2">
+          <h3>第二題：讀墨的牛牛吉祥物叫什麼名字？</h3>
+          <div class="quiz-options">
+            <label class="quiz-option"><input type="radio" name="q2" value="A"> <span>墨墨</span></label>
+            <label class="quiz-option"><input type="radio" name="q2" value="B"> <span>五花</span></label>
+            <label class="quiz-option"><input type="radio" name="q2" value="C"> <span>阿牧</span></label>
+            <label class="quiz-option"><input type="radio" name="q2" value="D"> <span>小讀</span></label>
+          </div>
+        </div>
+
+        <div id="quiz-error" class="alert-error" style="display:none;">
+          <i data-lucide="x-circle"></i>
+          <span>答案不正確，請再試一次。</span>
+        </div>
+
+        <button id="btn-quiz-submit" class="btn-primary">驗證</button>
+      </div>
+
+      <!-- Registration Step -->
+      <div id="register-step" class="modal-step" style="display:none;">
+        <h2>登記身份</h2>
+        <p class="modal-desc">請登記你的名字，之後的修改會記錄在你的名下。</p>
+
+        <div class="form-group">
+          <label for="register-name-select">從現有成員中選擇</label>
+          <select id="register-name-select" class="input-field">
+            <option value="">-- 選擇成員 --</option>
+          </select>
+        </div>
+
+        <div class="form-divider"><span>或</span></div>
+
+        <div class="form-group">
+          <label for="register-name-custom">自行填寫名字</label>
+          <input type="text" id="register-name-custom" class="input-field" placeholder="輸入你的名字">
+        </div>
+
+        <div class="form-group">
+          <label for="register-date">修改日期</label>
+          <input type="date" id="register-date" class="input-field">
+        </div>
+
+        <button id="btn-register-submit" class="btn-primary">確認登記</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Book Modal -->
+  <div id="book-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <button class="modal-close" id="book-modal-close">
+        <i data-lucide="x"></i>
+      </button>
+      <h2 id="book-modal-title">新增書籍</h2>
+
+      <div class="form-group">
+        <label for="book-title">書名 <span class="required">*</span></label>
+        <input type="text" id="book-title" class="input-field" placeholder="輸入書名">
+      </div>
+      <div class="form-group">
+        <label for="book-author">作者</label>
+        <input type="text" id="book-author" class="input-field" placeholder="輸入作者">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="book-version">版本</label>
+          <input type="text" id="book-version" class="input-field" placeholder="如：電子書">
+        </div>
+        <div class="form-group">
+          <label for="book-pubdate">出版日期</label>
+          <input type="text" id="book-pubdate" class="input-field" placeholder="如：2026/01">
+        </div>
+      </div>
+
+      <input type="hidden" id="book-edit-id">
+      <button id="btn-book-save" class="btn-primary">儲存</button>
+    </div>
+  </div>
+
+  <!-- Batch Add Books Modal -->
+  <div id="batch-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <button class="modal-close" id="batch-modal-close">
+        <i data-lucide="x"></i>
+      </button>
+      <h2>快速貼入書單</h2>
+      <p class="modal-desc">每行一本書名，會自動建立多筆書籍。</p>
+      <div class="form-group">
+        <textarea id="batch-input" class="input-field textarea" rows="8" placeholder="書名一&#10;書名二&#10;書名三"></textarea>
+      </div>
+      <button id="btn-batch-save" class="btn-primary">全部新增</button>
+    </div>
+  </div>
+
+  <!-- Export Modal -->
+  <div id="export-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <button class="modal-close" id="export-modal-close">
+        <i data-lucide="x"></i>
+      </button>
+      <h2 id="export-modal-title">匯出</h2>
+
+      <div class="export-options">
+        <button class="export-btn" data-format="text">
+          <i data-lucide="file-text"></i>
+          <span>純文字</span>
+          <small>可直接貼到 LINE</small>
+        </button>
+        <button class="export-btn" data-format="excel">
+          <i data-lucide="table"></i>
+          <span>Excel</span>
+          <small>.xlsx 檔案</small>
+        </button>
+      </div>
+
+      <div id="export-scope" class="export-scope">
+        <label class="radio-label"><input type="radio" name="export-scope" value="all" checked> 全部</label>
+        <label class="radio-label"><input type="radio" name="export-scope" value="selected"> 僅勾選</label>
+      </div>
+
+      <div id="export-preview" class="export-preview" style="display:none;">
+        <textarea id="export-text" class="input-field textarea" rows="10" readonly></textarea>
+        <button id="btn-copy-export" class="btn-secondary btn-sm">
+          <i data-lucide="copy"></i> 複製
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Purchase Modal -->
+  <div id="purchase-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <button class="modal-close" id="purchase-modal-close">
+        <i data-lucide="x"></i>
+      </button>
+      <h2>標記已購買</h2>
+
+      <div class="form-group">
+        <label for="purchase-date">購買日期</label>
+        <input type="date" id="purchase-date" class="input-field">
+      </div>
+      <div class="form-group">
+        <label for="purchase-via">透過誰的 AP 購買</label>
+        <select id="purchase-via" class="input-field">
+          <option value="">-- 選擇 --</option>
+        </select>
+      </div>
+
+      <input type="hidden" id="purchase-book-id">
+      <button id="btn-purchase-save" class="btn-primary">確認購買</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" style="display:none;"></div>
+
+  <!-- Dark Mode Toggle -->
+  <button class="theme-toggle" aria-label="切換深色模式">
+    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </button>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p>&copy; <span id="footer-year"></span> Kaoru Tsai. All Rights Reserved. | Contact: <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/ap-directory.js"></script>
+  <script src="js/ap-chain.js"></script>
+  <script src="js/books.js"></script>
+  <script src="js/changelog.js"></script>
+  <script src="js/export-utils.js"></script>
+</body>
+</html>
