@@ -220,6 +220,36 @@
             <li><i data-lucide="check"></i> 匯出 AP 名單分享到 LINE 群</li>
           </ul>
         </div>
+
+        <div class="card guide-section">
+          <h3><i data-lucide="shield"></i> 關於你的資料</h3>
+          <div class="faq-list">
+            <details class="faq-item">
+              <summary>我的書單存在哪裡？</summary>
+              <p>書單、購買紀錄、個人設定全部存在<strong>你自己的瀏覽器</strong>（localStorage）裡。不會上傳到任何伺服器，別人也看不到。換瀏覽器或清除瀏覽資料就會消失，建議定期用匯出功能備份。</p>
+            </details>
+            <details class="faq-item">
+              <summary>AP 名冊的資料從哪來？</summary>
+              <p>名冊資料來自社群共用的 <strong>Google 試算表</strong>，由群友自行填寫登記。這裡只是讀取顯示，方便大家查看和使用。</p>
+            </details>
+            <details class="faq-item">
+              <summary>誰可以編輯名冊？</summary>
+              <p>通過社群驗證的人都可以透過本工具編輯名冊。每次修改都會記錄<strong>修改者、時間、內容</strong>，可在「修改紀錄」查看。請不要修改別人的資料。</p>
+            </details>
+            <details class="faq-item">
+              <summary>名冊被亂改了怎麼辦？</summary>
+              <p>Google 試算表本身有<strong>版本紀錄</strong>，可以還原到任何時間點的狀態。另外每次修改都有紀錄，管理員可以追溯並還原。如果發現異常，請回報給管理員。</p>
+            </details>
+            <details class="faq-item">
+              <summary>接龍的時候別人會知道我買了什麼嗎？</summary>
+              <p><strong>不會。</strong>你的書單和購買紀錄只存在你的瀏覽器裡，沒有人能看到你買了什麼或透過誰的連結買的。</p>
+            </details>
+            <details class="faq-item">
+              <summary>搜尋讀墨書庫的資料會被記錄嗎？</summary>
+              <p>搜尋查詢會經過我們的伺服器轉發到讀墨網站，但<strong>不會記錄你的搜尋內容</strong>。搜尋結果會快取 30 分鐘以加速查詢，快取後自動刪除。</p>
+            </details>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -391,20 +421,45 @@
 
   <!-- ============ Modals ============ -->
 
-  <!-- Quiz + Registration Modal -->
+  <!-- Identity + Quiz Modal -->
   <div id="quiz-modal" class="modal-overlay" style="display:none;">
     <div class="modal-card">
       <button class="modal-close" id="quiz-modal-close">
         <i data-lucide="x"></i>
       </button>
 
-      <!-- Quiz Step -->
-      <div id="quiz-step" class="modal-step">
-        <h2>社群驗證</h2>
-        <p class="modal-desc">回答以下問題，確認你是社群成員。</p>
+      <!-- Step 1: 選擇身份 -->
+      <div id="identity-step" class="modal-step">
+        <h2>你是誰？</h2>
+        <p class="modal-desc">從名冊中選擇你的名字，就能開始使用。</p>
+
+        <div class="form-group">
+          <label for="identity-select">我是...</label>
+          <select id="identity-select" class="input-field">
+            <option value="">-- 選擇你的名字 --</option>
+          </select>
+        </div>
+
+        <button id="btn-identity-confirm" class="btn-primary" disabled>確認，這是我</button>
+
+        <div class="identity-divider"><span>或</span></div>
+
+        <div class="identity-newbie">
+          <p>我還沒有加入 AP 名冊</p>
+          <a href="https://reurl.cc/DbRK35" target="_blank" rel="noopener" class="btn-secondary">
+            <i data-lucide="user-plus"></i> 去填 AP 連結登記表
+          </a>
+          <p class="hint-text">填完登記表後，等名冊更新就能選到你的名字囉！</p>
+        </div>
+      </div>
+
+      <!-- Step 2: 快速通關 -->
+      <div id="quiz-step" class="modal-step" style="display:none;">
+        <h2>快速通關</h2>
+        <p class="modal-desc">回答兩題，確認你是社群夥伴。</p>
 
         <div class="quiz-question" id="quiz-q1">
-          <h3>第一題：這個 LINE 社群的名稱是什麼？</h3>
+          <h3>你所屬的社群名稱是？</h3>
           <div class="quiz-options">
             <label class="quiz-option"><input type="radio" name="q1" value="A"> <span>讀墨每日閱讀計畫</span></label>
             <label class="quiz-option"><input type="radio" name="q1" value="B"> <span>電子書馬拉松讀書會</span></label>
@@ -414,7 +469,7 @@
         </div>
 
         <div class="quiz-question" id="quiz-q2">
-          <h3>第二題：讀墨的牛牛吉祥物叫什麼名字？</h3>
+          <h3>讀墨的牛牛吉祥物叫什麼名字？</h3>
           <div class="quiz-options">
             <label class="quiz-option"><input type="radio" name="q2" value="A"> <span>墨墨</span></label>
             <label class="quiz-option"><input type="radio" name="q2" value="B"> <span>五花</span></label>
@@ -425,37 +480,10 @@
 
         <div id="quiz-error" class="alert-error" style="display:none;">
           <i data-lucide="x-circle"></i>
-          <span>答案不正確，請再試一次。</span>
+          <span>不對喔，再想想看？</span>
         </div>
 
-        <button id="btn-quiz-submit" class="btn-primary">驗證</button>
-      </div>
-
-      <!-- Registration Step -->
-      <div id="register-step" class="modal-step" style="display:none;">
-        <h2>登記身份</h2>
-        <p class="modal-desc">請登記你的名字，之後的修改會記錄在你的名下。</p>
-
-        <div class="form-group">
-          <label for="register-name-select">從現有成員中選擇</label>
-          <select id="register-name-select" class="input-field">
-            <option value="">-- 選擇成員 --</option>
-          </select>
-        </div>
-
-        <div class="form-divider"><span>或</span></div>
-
-        <div class="form-group">
-          <label for="register-name-custom">自行填寫名字</label>
-          <input type="text" id="register-name-custom" class="input-field" placeholder="輸入你的名字">
-        </div>
-
-        <div class="form-group">
-          <label for="register-date">修改日期</label>
-          <input type="date" id="register-date" class="input-field">
-        </div>
-
-        <button id="btn-register-submit" class="btn-primary">確認登記</button>
+        <button id="btn-quiz-submit" class="btn-primary">通關！</button>
       </div>
     </div>
   </div>

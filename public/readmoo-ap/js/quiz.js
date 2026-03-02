@@ -1,96 +1,94 @@
 /**
- * 驗證 + 註冊模組
+ * 身份選擇 + 快速驗證模組
+ * 流程：選名字 → 答一題 → 完成
+ * 新人：引導去填 AP 登記表
  */
 
-const QUIZ_ANSWERS = { q1: 'C', q2: 'B' };
+const QUIZ_ANSWERS = { q1: 'C', q2: 'B' }; // 讀墨1500日挑戰 + 五花
 
 function initQuiz() {
-  const btnSubmit = document.getElementById('btn-quiz-submit');
-  const btnRegister = document.getElementById('btn-register-submit');
+  const identityStep = document.getElementById('identity-step');
+  const quizStep = document.getElementById('quiz-step');
+  const identitySelect = document.getElementById('identity-select');
+  const btnIdentity = document.getElementById('btn-identity-confirm');
+  const btnQuizSubmit = document.getElementById('btn-quiz-submit');
   const quizError = document.getElementById('quiz-error');
-  const registerSelect = document.getElementById('register-name-select');
-  const registerCustom = document.getElementById('register-name-custom');
-  const registerDate = document.getElementById('register-date');
 
-  // Set default date to today
-  registerDate.value = new Date().toISOString().split('T')[0];
+  let selectedName = '';
 
-  // Populate member dropdown
+  // Populate member dropdown from AppState.members
   function populateMembers() {
-    registerSelect.innerHTML = '<option value="">-- 選擇成員 --</option>';
+    identitySelect.innerHTML = '<option value="">-- 選擇你的名字 --</option>';
     AppState.members.forEach(m => {
       const opt = document.createElement('option');
       opt.value = m.name;
-      opt.textContent = m.name;
-      registerSelect.appendChild(opt);
+      opt.textContent = `#${m.id} ${m.name}`;
+      identitySelect.appendChild(opt);
     });
   }
 
-  // Quiz submit
-  btnSubmit.addEventListener('click', () => {
-    const q1 = document.querySelector('input[name="q1"]:checked');
-    const q2 = document.querySelector('input[name="q2"]:checked');
+  // Enable/disable confirm button
+  identitySelect.addEventListener('change', () => {
+    btnIdentity.disabled = !identitySelect.value;
+  });
 
-    if (!q1 || !q2) {
+  // Step 1 → Step 2
+  btnIdentity.addEventListener('click', () => {
+    selectedName = identitySelect.value;
+    if (!selectedName) return;
+    identityStep.style.display = 'none';
+    quizStep.style.display = 'block';
+  });
+
+  // Quiz submit
+  btnQuizSubmit.addEventListener('click', () => {
+    const a1 = document.querySelector('input[name="q1"]:checked');
+    const a2 = document.querySelector('input[name="q2"]:checked');
+
+    if (!a1 || !a2) {
       quizError.style.display = 'flex';
-      quizError.querySelector('span').textContent = '請回答所有題目。';
+      quizError.querySelector('span').textContent = '兩題都要選喔！';
       return;
     }
 
-    if (q1.value === QUIZ_ANSWERS.q1 && q2.value === QUIZ_ANSWERS.q2) {
-      // Pass! Show registration
-      document.getElementById('quiz-step').style.display = 'none';
-      document.getElementById('register-step').style.display = 'block';
-      quizError.style.display = 'none';
-      populateMembers();
+    if (a1.value === QUIZ_ANSWERS.q1 && a2.value === QUIZ_ANSWERS.q2) {
+      // Pass!
+      const today = new Date().toISOString().split('T')[0];
+      saveUser(selectedName, today);
+      closeModal('quiz-modal');
+      showToast(`歡迎回來，${selectedName}！`);
+      resetModal();
+
+      // Execute pending auth callback
+      if (AppState._authCallback) {
+        AppState._authCallback();
+        AppState._authCallback = null;
+      }
     } else {
       quizError.style.display = 'flex';
       quizError.querySelector('span').textContent = '答案不正確，請再試一次。';
-      // Reset selections
       document.querySelectorAll('input[name="q1"], input[name="q2"]').forEach(r => r.checked = false);
     }
   });
 
-  // Mutual exclusion: select vs custom
-  registerSelect.addEventListener('change', () => {
-    if (registerSelect.value) registerCustom.value = '';
-  });
-  registerCustom.addEventListener('input', () => {
-    if (registerCustom.value) registerSelect.value = '';
-  });
-
-  // Register submit
-  btnRegister.addEventListener('click', () => {
-    const name = registerSelect.value || registerCustom.value.trim();
-    const date = registerDate.value;
-
-    if (!name) {
-      showToast('請選擇或填寫名字');
-      return;
-    }
-
-    saveUser(name, date);
-    closeModal('quiz-modal');
-    showToast(`歡迎，${name}！已登記成功。`);
-
-    // Reset modal state for next time
-    document.getElementById('quiz-step').style.display = 'block';
-    document.getElementById('register-step').style.display = 'none';
+  function resetModal() {
+    identityStep.style.display = 'block';
+    quizStep.style.display = 'none';
+    quizError.style.display = 'none';
+    identitySelect.value = '';
+    btnIdentity.disabled = true;
     document.querySelectorAll('input[name="q1"], input[name="q2"]').forEach(r => r.checked = false);
-
-    // Execute pending auth callback
-    if (AppState._authCallback) {
-      AppState._authCallback();
-      AppState._authCallback = null;
-    }
-  });
+    selectedName = '';
+  }
 
   // Close modal resets
-  document.getElementById('quiz-modal-close').addEventListener('click', () => {
-    document.getElementById('quiz-step').style.display = 'block';
-    document.getElementById('register-step').style.display = 'none';
-    quizError.style.display = 'none';
-  });
+  document.getElementById('quiz-modal-close').addEventListener('click', resetModal);
+
+  // Populate on init (members already loaded)
+  populateMembers();
+
+  // Re-populate if members update later
+  document.addEventListener('members-updated', populateMembers);
 }
 
 window.initQuiz = initQuiz;

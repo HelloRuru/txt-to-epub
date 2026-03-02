@@ -374,7 +374,8 @@ select.input-field {
   grid-template-columns: 1fr 1fr;
   gap: var(--space-md);
 }
-.form-divider {
+.form-divider,
+.identity-divider {
   display: flex;
   align-items: center;
   gap: var(--space-md);
@@ -383,11 +384,26 @@ select.input-field {
   font-size: 14px;
 }
 .form-divider::before,
-.form-divider::after {
+.form-divider::after,
+.identity-divider::before,
+.identity-divider::after {
   content: '';
   flex: 1;
   height: 1px;
   background: var(--border-color);
+}
+.identity-newbie {
+  text-align: center;
+}
+.identity-newbie > p {
+  margin-bottom: var(--space-sm);
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.identity-newbie .hint-text {
+  margin-top: var(--space-sm);
+  font-size: 12px;
+  color: var(--text-hint);
 }
 .required { color: var(--status-error); }
 
@@ -649,6 +665,47 @@ html.dark .quick-action-card:hover {
   width: 18px;
   height: 18px;
   color: var(--color-sage);
+}
+
+/* FAQ */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.faq-item {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.faq-item summary {
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-primary);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.faq-item summary::before {
+  content: '▸';
+  transition: transform var(--transition-fast);
+  color: var(--text-hint);
+}
+.faq-item[open] summary::before {
+  transform: rotate(90deg);
+}
+.faq-item summary:hover {
+  background: rgba(212, 165, 165, 0.06);
+}
+.faq-item p {
+  padding: 0 var(--space-md) var(--space-md);
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
 }
 
 /* ============ AP CHAIN TAB ============ */
