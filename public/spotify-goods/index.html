@@ -1087,7 +1087,11 @@
       }
 
       // Phase 1: try description for song list
-      const descSongs = parseSongsFromDescription(data.description || '');
+      const descSongsRaw = parseSongsFromDescription(data.description || '');
+      const descSongs = descSongsRaw.map(s => {
+        const parts = s.split(/\s*\/\s*/);
+        return parts.length >= 3 ? parts[0].trim() : s;
+      });
       if (descSongs.length >= 2) {
         document.getElementById('songInput').value = descSongs.join('\n');
         if (data.title) document.getElementById('playlistName').value = data.title;
