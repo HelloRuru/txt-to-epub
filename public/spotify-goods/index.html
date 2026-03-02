@@ -941,7 +941,7 @@
     }
 
     // Fetch a single video, parse description for song list
-    // Chain: Piped (best: chapters + description) → CF Function → CORS proxy → noembed
+    // Chain: Piped → Worker → CORS proxy → noembed
     async function fetchVideoSongs(videoId) {
       let data = null;
 
@@ -949,7 +949,7 @@
       for (const instance of PIPED_INSTANCES) {
         try {
           const ctrl = new AbortController();
-          const timer = setTimeout(() => ctrl.abort(), 10000);
+          const timer = setTimeout(() => ctrl.abort(), 8000);
           const res = await fetch(`${instance}/streams/${videoId}`, { signal: ctrl.signal });
           clearTimeout(timer);
           if (!res.ok) continue;
@@ -964,7 +964,25 @@
         } catch { continue; }
       }
 
-      // 2) CORS proxy fallback
+      // 2) Self-hosted Worker fallback (server-side YouTube page parsing)
+      if (!data) {
+        try {
+          const res = await fetch(`${WORKER_API}/video?id=${videoId}`);
+          if (res.ok) {
+            const j = await res.json();
+            if (!j.error) {
+              data = {
+                title: j.title || '',
+                author: j.author || '',
+                description: j.description || '',
+                chapters: (j.chapters || []).map(c => ({ title: c.title, start: Math.floor((c.startMs || 0) / 1000) })),
+              };
+            }
+          }
+        } catch {}
+      }
+
+      // 3) CORS proxy fallback
       if (!data) {
         const ytUrl = `https://www.youtube.com/watch?v=${videoId}`;
         const proxies = [
