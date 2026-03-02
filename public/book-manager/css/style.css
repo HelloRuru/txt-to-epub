@@ -85,27 +85,30 @@ a { color: var(--color-primary); text-decoration: none; }
   border-radius: var(--radius);
   padding: 24px 20px;
   box-shadow: var(--shadow);
-  font-size: 0.9rem;
-  line-height: 2;
+  font-size: 0.875rem;
+  line-height: 1.9;
   color: var(--color-text-light);
 }
-.guide-card p { margin-bottom: 2px; }
+.guide-card p { margin-bottom: 4px; }
+.guide-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
 .guide-divider {
   width: 40px;
   height: 1px;
   background: var(--color-border);
-  margin: 16px 0;
+  margin: 20px 0;
 }
 .guide-steps {
   color: var(--color-text);
   font-weight: 500;
   line-height: 2.2;
 }
-.guide-note {
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-  margin-top: 8px;
-}
+.guide-faq p { margin-bottom: 12px; }
+.guide-faq strong { color: var(--color-text); }
 
 /* ─── Section ─── */
 .section { margin-bottom: 32px; }

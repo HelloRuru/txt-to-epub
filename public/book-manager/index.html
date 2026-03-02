@@ -45,23 +45,6 @@
       <p>登入你的電子書平台，一鍵撈出全部藏書，自動找出重複的。</p>
     </div>
 
-    <!-- ── 使用說明 ── -->
-    <section class="section guide">
-      <div class="guide-card">
-        <p>買書的時候總覺得，欸這本好像買過了？</p>
-        <p>翻了讀墨，翻了 Kobo，翻了實體書櫃。</p>
-        <p>結果真的登記過了，哈哈。</p>
-        <div class="guide-divider"></div>
-        <p>所以做了這個小工具，幫自己整理一下：</p>
-        <p class="guide-steps">
-          ➊ 填帳密，按一下，書櫃整本撈出來<br>
-          ➋ 跨平台自動比對，重複的幫你標好<br>
-          ➌ 密碼不存、不傳、撈完就丟
-        </p>
-        <p class="guide-note">雖然就是個簡單的東西，但少買一本重複的就是開心。</p>
-      </div>
-    </section>
-
     <!-- ── 平台連接 ── -->
     <section class="section" id="section-connect">
       <h2>連接書櫃</h2>
@@ -158,6 +141,44 @@
       <!-- 空狀態 -->
       <div class="empty" id="empty-state">
         <p>連接平台或貼上書名，就能開始了。</p>
+      </div>
+    </section>
+    <!-- ── 說明 ── -->
+    <section class="section guide" id="section-guide">
+      <div class="guide-card">
+        <h3 class="guide-title">這個工具適合誰？</h3>
+        <p>我也是那種在好幾個平台都有書的人。</p>
+        <p>讀墨買一些、Kobo 買一些，實體書櫃還有一堆。</p>
+        <p>買到後來根本不記得哪些買過了，偶爾還會不小心重複買。</p>
+        <p>如果你也有這個困擾，這個工具就是幫你把散落各處的書整理在一起，順便幫你抓出重複的。</p>
+
+        <div class="guide-divider"></div>
+
+        <h3 class="guide-title">怎麼用？</h3>
+        <p class="guide-steps">
+          ➊ 在上面選平台，登入你的帳號，按「撈取書櫃」<br>
+          ➋ 工具會自動把書單全部撈回來<br>
+          ➌ 撈完之後，重複的書會自動標出來<br>
+          ➍ 本機的書可以手動貼上書名，一行一本就好
+        </p>
+        <p>撈幾個平台都可以，書單會合在一起比對。</p>
+
+        <div class="guide-divider"></div>
+
+        <h3 class="guide-title">常見問題</h3>
+        <div class="guide-faq">
+          <p><strong>密碼安全嗎？</strong><br>
+          密碼只用來即時登入撈取書單，不會儲存在任何地方。撈完就丟了。</p>
+
+          <p><strong>書單存在哪裡？</strong><br>
+          存在你的瀏覽器裡（localStorage），不會上傳到任何伺服器。換瀏覽器或清除資料就會消失。</p>
+
+          <p><strong>可以撈幾次？</strong><br>
+          想撈幾次都可以。重複撈同一個平台，已經有的書不會重複加入。</p>
+
+          <p><strong>重複是怎麼判斷的？</strong><br>
+          比對書名。會自動忽略空格、標點、副標題括號這些差異，盡量幫你抓出同一本書。</p>
+        </div>
       </div>
     </section>
   </main>
