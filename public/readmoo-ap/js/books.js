@@ -282,6 +282,12 @@ function initBooks() {
     openExportModal('books', []);
   });
 
+  // Expose render for readmoo-search module
+  window._booksRender = render;
+
+  // Listen for books-updated event
+  document.addEventListener('books-updated', render);
+
   // Initial render
   render();
 }
