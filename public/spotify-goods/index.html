@@ -711,12 +711,6 @@
         .replace(/\s*(Official|Music|Channel|公式)\s*/gi, ' ').trim();
     }
 
-    // Check if channel name looks like a generic curator (not an artist)
-    function isGenericChannel(name) {
-      if (!name || name.length < 2) return true;
-      return /playlist|mix|music|lofi|chill|compilation|best of|top \d|精選|合輯|bgm|radio/i.test(name);
-    }
-
     // Tier 3: Enrich songs with artist names via YouTube (Piped) search
     async function enrichWithYTSearch(songs) {
       const needsArtist = songs.filter(s => !s.artist);
@@ -1206,15 +1200,8 @@
         if (data.title) document.getElementById('playlistName').value = data.title;
         autoSetThumbnail(videoId);
 
-        // Tier 2: for songs without artist, try channel name
-        const channel = cleanChannelName(data.author);
-        if (!isGenericChannel(channel)) {
-          for (const song of richSongs) {
-            if (!song.artist) song.artist = channel;
-          }
-        }
-
-        // Tier 3: Piped search for songs still without artist
+        // Tier 2 skipped for multi-song: channel name is usually the curator, not the artist
+        // Tier 3: Piped search for songs without artist
         const missing = richSongs.filter(s => !s.artist);
         if (missing.length > 0) {
           showYTMStatus('loading', `抓到 ${richSongs.length} 首歌，查找歌手中...（${missing.length} 首待確認）`);
@@ -1243,13 +1230,6 @@
           ).join('\n');
           if (data.title) document.getElementById('playlistName').value = data.title;
           autoSetThumbnail(videoId);
-
-          const channel = cleanChannelName(data.author);
-          if (!isGenericChannel(channel)) {
-            for (const song of richChapters) {
-              if (!song.artist) song.artist = channel;
-            }
-          }
 
           const missing = richChapters.filter(s => !s.artist);
           if (missing.length > 0) {
@@ -2037,6 +2017,7 @@
       document.getElementById('selectAllRow').classList.add('hidden');
       document.getElementById('resultsList').innerHTML = '';
       document.getElementById('summary').classList.add('hidden');
+      document.getElementById('resultHint').classList.add('hidden');
       document.getElementById('progressBar').style.display = 'none';
       document.getElementById('progressText').textContent = '';
       document.getElementById('songInput').value = '';
@@ -2044,8 +2025,12 @@
       document.getElementById('ytmStatus').classList.add('hidden');
       document.getElementById('channelResults').classList.add('hidden');
       document.getElementById('playlistName').value = '';
-      const coverPreview = document.getElementById('coverPreview');
-      if (coverPreview) coverPreview.innerHTML = '';
+      const coverImg = document.getElementById('coverImg');
+      if (coverImg) { coverImg.src = ''; coverImg.classList.add('hidden'); }
+      const coverText = document.getElementById('coverPreviewText');
+      if (coverText) coverText.classList.remove('hidden');
+      const coverRemove = document.getElementById('coverRemove');
+      if (coverRemove) coverRemove.classList.add('hidden');
       coverBase64 = null;
       matchedTracks = [];
       ytSongQueue = null;
