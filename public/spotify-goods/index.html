@@ -527,7 +527,10 @@
         </div>
         <div class="input-row" id="playlistNameRow">
           <label>歌單名稱</label>
-          <input type="text" id="playlistName" placeholder="例如：My Playlist">
+          <div style="position:relative; flex:1;">
+            <input type="text" id="playlistName" placeholder="例如：My Playlist" style="padding-right:28px;">
+            <span id="clearPlaylistName" class="hidden" onclick="document.getElementById('playlistName').value=''; this.classList.add('hidden');" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); cursor:pointer; color:var(--c-muted); font-size:1.1rem; line-height:1;" title="清空">&#10005;</span>
+          </div>
         </div>
 
         <!-- Cover -->
@@ -711,6 +714,24 @@
         .replace(/\s*(Official|Music|Channel|公式)\s*/gi, ' ').trim();
     }
 
+    // Clean YouTube title → sensible Spotify playlist name
+    function cleanPlaylistName(title) {
+      return (title || '')
+        .replace(/【[^】]*】/g, '')           // 【作業用BGM】
+        .replace(/\[[^\]]*\]/g, '')           // [Official]
+        .replace(/\(Official.*?\)/gi, '')
+        .replace(/[\u{1F600}-\u{1F6FF}\u{1F900}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA00}-\u{1FAFF}]/gu, '') // emoji
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 60);                        // Spotify max ~100, keep it short
+    }
+
+    function setPlaylistName(name) {
+      const el = document.getElementById('playlistName');
+      el.value = name;
+      document.getElementById('clearPlaylistName').classList.toggle('hidden', !name);
+    }
+
     // Tier 3: Enrich songs with artist names via YouTube (Piped) search
     async function enrichWithYTSearch(songs) {
       const needsArtist = songs.filter(s => !s.artist);
@@ -776,7 +797,7 @@
           const saved = sessionStorage.getItem('sg_form');
           if (saved) {
             const form = JSON.parse(saved);
-            if (form.name) document.getElementById('playlistName').value = form.name;
+            if (form.name) setPlaylistName(form.name);
             if (form.songs) document.getElementById('songInput').value = form.songs;
             if (form.url) document.getElementById('ytmUrl').value = form.url;
             sessionStorage.removeItem('sg_form');
@@ -799,6 +820,10 @@
 
       const y = new Date().getFullYear();
       document.getElementById('copyrightYear').textContent = y > 2026 ? '2026\u2013' + y : '2026';
+      // Show/hide clear button on playlist name input
+      document.getElementById('playlistName').addEventListener('input', function() {
+        document.getElementById('clearPlaylistName').classList.toggle('hidden', !this.value);
+      });
       updateUI();
     });
 
@@ -897,6 +922,35 @@
       try {
         const url = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
         const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
+        if (!res.ok) return;
+        const blob = await res.blob();
+        const dataUrl = await new Promise(r => {
+          const rd = new FileReader();
+          rd.onload = () => r(rd.result);
+          rd.readAsDataURL(blob);
+        });
+        document.getElementById('coverImg').src = dataUrl;
+        document.getElementById('coverImg').classList.remove('hidden');
+        document.getElementById('coverPreviewText').classList.add('hidden');
+        document.getElementById('coverRemove').classList.remove('hidden');
+        const img = new Image();
+        img.onload = () => {
+          const c = document.createElement('canvas');
+          c.width = 300; c.height = 300;
+          const ctx = c.getContext('2d');
+          const s = Math.min(img.width, img.height);
+          ctx.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, 300, 300);
+          coverBase64 = c.toDataURL('image/jpeg', 0.9).split(',')[1];
+        };
+        img.src = dataUrl;
+      } catch {}
+    }
+
+    // Auto-set thumbnail from a direct image URL (for playlists)
+    async function autoSetThumbnailUrl(imageUrl) {
+      if (coverBase64 || !imageUrl) return;
+      try {
+        const res = await fetch(imageUrl);
         if (!res.ok) return;
         const blob = await res.blob();
         const dataUrl = await new Promise(r => {
@@ -1076,7 +1130,8 @@
           });
 
           document.getElementById('songInput').value = songs.join('\n');
-          if (data.name) document.getElementById('playlistName').value = data.name;
+          if (data.name) setPlaylistName(cleanPlaylistName(data.name));
+          if (data.thumbnailUrl) autoSetThumbnailUrl(data.thumbnailUrl);
           showYTMStatus('success', `成功抓到 ${songs.length} 首歌，搜尋 Spotify 中...`);
           if (accessToken) startSearch();
           return true;
@@ -1094,7 +1149,8 @@
               t.artist ? `${t.artist} - ${t.title}` : t.title
             );
             document.getElementById('songInput').value = songs.join('\n');
-            if (data.title) document.getElementById('playlistName').value = data.title;
+            if (data.title) setPlaylistName(cleanPlaylistName(data.title));
+            if (data.thumbnail) autoSetThumbnailUrl(data.thumbnail);
             showYTMStatus('success', `成功抓到 ${songs.length} 首歌，搜尋 Spotify 中...`);
             if (accessToken) startSearch();
             return true;
@@ -1199,7 +1255,7 @@
         document.getElementById('songInput').value = richSongs.map(s =>
           s.artist ? `${s.artist} - ${s.display}` : s.display
         ).join('\n');
-        if (data.title) document.getElementById('playlistName').value = data.title;
+        if (data.title) setPlaylistName(cleanPlaylistName(data.title));
         autoSetThumbnail(videoId);
 
         // Tier 2 skipped for multi-song: channel name is usually the curator, not the artist
@@ -1230,7 +1286,7 @@
           document.getElementById('songInput').value = richChapters.map(s =>
             s.artist ? `${s.artist} - ${s.display}` : s.display
           ).join('\n');
-          if (data.title) document.getElementById('playlistName').value = data.title;
+          if (data.title) setPlaylistName(cleanPlaylistName(data.title));
           autoSetThumbnail(videoId);
 
           const missing = richChapters.filter(s => !s.artist);
@@ -1465,7 +1521,7 @@
               return `${parsed.artist} - ${parsed.title}`;
             });
             document.getElementById('songInput').value = songs.join('\n');
-            if (data.name) document.getElementById('playlistName').value = data.name;
+            if (data.name) setPlaylistName(cleanPlaylistName(data.name));
             showYTMStatus('success', `從頻道抓到 ${songs.length} 首歌！`);
             btn.disabled = false;
             return;
@@ -1536,7 +1592,7 @@
         const existing = document.getElementById('songInput').value.trim();
         document.getElementById('songInput').value = existing ? existing + '\n' + songs.join('\n') : songs.join('\n');
         if (!document.getElementById('playlistName').value && name) {
-          document.getElementById('playlistName').value = name;
+          setPlaylistName(cleanPlaylistName(name));
         }
         showYTMStatus('success', `已加入「${name}」${songs.length} 首歌`);
       } catch {
@@ -1571,7 +1627,7 @@
           }
 
           if (!document.getElementById('playlistName').value && name) {
-            document.getElementById('playlistName').value = name;
+            setPlaylistName(cleanPlaylistName(name));
           }
 
           showYTMStatus('success', `已加入「${name}」${songs.length} 首歌`);
@@ -1694,30 +1750,34 @@
       if (typeof titles === 'string') titles = [titles];
 
       for (const title of titles) {
-        const queries = [];
+        // Phase A: with artist (if available)
         if (artist) {
-          queries.push(`track:${title} artist:${artist}`);
-          queries.push(`${title} ${artist}`);
-        } else {
-          queries.push(title);
+          const artistQueries = [`track:${title} artist:${artist}`, `${title} ${artist}`];
+          for (const query of artistQueries) {
+            const params = new URLSearchParams({ q: query, type: 'track', limit: '5', market: 'TW' });
+            const res = await spotifyFetch(`https://api.spotify.com/v1/search?${params}`);
+            if (!res.ok) return null;
+            const data = await res.json();
+            const tracks = data.tracks?.items;
+            if (!tracks?.length) continue;
+            for (const t of tracks) {
+              if (isGoodMatch(t, title, artist)) {
+                return { uri: t.uri, name: t.name, artist: t.artists.map(a => a.name).join(', '), url: t.external_urls.spotify, preview: t.preview_url || null };
+              }
+            }
+          }
         }
 
-        for (const query of queries) {
-          const params = new URLSearchParams({ q: query, type: 'track', limit: '5', market: 'TW' });
-          const res = await spotifyFetch(`https://api.spotify.com/v1/search?${params}`);
-          if (!res.ok) return null;
-          const data = await res.json();
-          const tracks = data.tracks?.items;
-          if (!tracks?.length) continue;
-
+        // Phase B: title only (fallback — artist might be wrong or absent)
+        const params = new URLSearchParams({ q: title, type: 'track', limit: '5', market: 'TW' });
+        const res = await spotifyFetch(`https://api.spotify.com/v1/search?${params}`);
+        if (!res.ok) return null;
+        const data = await res.json();
+        const tracks = data.tracks?.items;
+        if (tracks?.length) {
           for (const t of tracks) {
-            if (isGoodMatch(t, title, artist)) {
-              return {
-                uri: t.uri, name: t.name,
-                artist: t.artists.map(a => a.name).join(', '),
-                url: t.external_urls.spotify,
-                preview: t.preview_url || null,
-              };
+            if (isGoodMatch(t, title, '')) {
+              return { uri: t.uri, name: t.name, artist: t.artists.map(a => a.name).join(', '), url: t.external_urls.spotify, preview: t.preview_url || null };
             }
           }
         }
@@ -2037,7 +2097,7 @@
       document.getElementById('ytmUrl').value = '';
       document.getElementById('ytmStatus').classList.add('hidden');
       document.getElementById('channelResults').classList.add('hidden');
-      document.getElementById('playlistName').value = '';
+      setPlaylistName('');
       const coverImg = document.getElementById('coverImg');
       if (coverImg) { coverImg.src = ''; coverImg.classList.add('hidden'); }
       const coverText = document.getElementById('coverPreviewText');
