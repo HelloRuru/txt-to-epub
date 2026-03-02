@@ -658,14 +658,82 @@
     let spotifyUser = null;
     let matchedTracks = [];
     let coverBase64 = null;
+    let ytSongQueue = null; // Rich song data from YouTube auto-fetch
 
     // ===== Helpers =====
-    // "日本語 / English / 한국어 / 中文" → prefer English segment for Spotify search
-    function pickBestSlashSegment(s) {
-      const parts = s.split(/\s*\/\s*/);
-      if (parts.length < 3) return s;
-      const eng = parts.find(p => /^[A-Za-z0-9]/.test(p.trim()) && /[a-zA-Z]{2,}/.test(p));
-      return (eng || parts[0]).trim();
+    // Parse a raw description/chapter line: extract artist + multi-language title segments
+    // "Artist - スキップ / Skip / 스킵 / 跳躍" → { artist: "Artist", display: "スキップ", searchTitles: ["スキップ","Skip","스킵","跳躍"] }
+    // "スキップ / Skip / 스킵 / 跳躍" → { artist: "", display: "スキップ", searchTitles: [...] }
+    function parseRawSongLine(raw) {
+      const slashParts = raw.split(/\s*\/\s*/).map(p => p.trim()).filter(p => p.length > 0);
+      const first = slashParts[0] || raw.trim();
+
+      // Try to extract artist from first segment (Artist - Title)
+      let artist = '', title = first;
+      const seps = [' - ', ' – ', ' — '];
+      for (const sep of seps) {
+        const idx = first.indexOf(sep);
+        if (idx > 0) {
+          artist = first.substring(0, idx).trim();
+          title = first.substring(idx + sep.length).trim();
+          break;
+        }
+      }
+
+      // Build cascade search titles: original first, then english, then rest
+      const searchTitles = [title];
+      if (slashParts.length >= 3) {
+        for (let i = 1; i < slashParts.length; i++) {
+          const seg = slashParts[i].trim();
+          if (seg && !searchTitles.includes(seg)) searchTitles.push(seg);
+        }
+        // Prioritize English segment as second choice
+        const engIdx = searchTitles.findIndex((s, idx) => idx > 0 && /^[A-Za-z0-9]/.test(s) && /[a-zA-Z]{2,}/.test(s));
+        if (engIdx > 1) {
+          const [eng] = searchTitles.splice(engIdx, 1);
+          searchTitles.splice(1, 0, eng);
+        }
+      }
+
+      return { display: title, searchTitles, artist };
+    }
+
+    // Clean YouTube channel name → potential artist name
+    function cleanChannelName(name) {
+      return (name || '')
+        .replace(/\s*-\s*Topic$/, '').replace(/ VEVO$/i, '')
+        .replace(/\s*(Official|Music|Channel|公式)\s*/gi, ' ').trim();
+    }
+
+    // Check if channel name looks like a generic curator (not an artist)
+    function isGenericChannel(name) {
+      if (!name || name.length < 2) return true;
+      return /playlist|mix|music|lofi|chill|compilation|best of|top \d|精選|合輯|bgm|radio/i.test(name);
+    }
+
+    // Tier 3: Enrich songs with artist names via YouTube (Piped) search
+    async function enrichWithYTSearch(songs) {
+      const needsArtist = songs.filter(s => !s.artist);
+      if (!needsArtist.length) return;
+      const BATCH = 4;
+      for (let i = 0; i < needsArtist.length; i += BATCH) {
+        const batch = needsArtist.slice(i, i + BATCH);
+        await Promise.all(batch.map(async (song) => {
+          const q = song.searchTitles[0]; // original-language title
+          for (const inst of PIPED_INSTANCES) {
+            try {
+              const res = await fetch(`${inst}/search?q=${encodeURIComponent(q)}&filter=music_songs`, { signal: AbortSignal.timeout(5000) });
+              if (!res.ok) continue;
+              const data = await res.json();
+              const items = (data.items || []).filter(it => it.type === 'stream');
+              if (items.length > 0) {
+                song.artist = cleanChannelName(items[0].uploaderName || '');
+              }
+              return;
+            } catch { continue; }
+          }
+        }));
+      }
     }
     function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
     function esc(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
@@ -811,7 +879,7 @@
     function logoutSpotify() {
       clearTokens();
       accessToken = null; spotifyUser = null;
-      coverBase64 = null; matchedTracks = [];
+      coverBase64 = null; matchedTracks = []; ytSongQueue = null;
       document.getElementById('step3').classList.add('hidden');
       const sel = document.getElementById('playlistTarget');
       while (sel.options.length > 1) sel.remove(1);
@@ -1118,32 +1186,73 @@
       }
 
       // Phase 1: try description for song list
+      // 3-tier artist detection: ① description itself ② channel name ③ Piped search
       const descSongsRaw = parseSongsFromDescription(data.description || '');
-      const descSongs = descSongsRaw.map(s => pickBestSlashSegment(s));
-      if (descSongs.length >= 2) {
-        document.getElementById('songInput').value = descSongs.join('\n');
+      if (descSongsRaw.length >= 2) {
+        // Tier 1: parse each line for "Artist - Title / Translation / ..."
+        const richSongs = descSongsRaw.map(s => parseRawSongLine(s));
+        document.getElementById('songInput').value = richSongs.map(s =>
+          s.artist ? `${s.artist} - ${s.display}` : s.display
+        ).join('\n');
         if (data.title) document.getElementById('playlistName').value = data.title;
-        showYTMStatus('success', `從影片描述抓到 ${descSongs.length} 首歌，搜尋 Spotify 中...`);
         autoSetThumbnail(videoId);
+
+        // Tier 2: for songs without artist, try channel name
+        const channel = cleanChannelName(data.author);
+        if (!isGenericChannel(channel)) {
+          for (const song of richSongs) {
+            if (!song.artist) song.artist = channel;
+          }
+        }
+
+        // Tier 3: Piped search for songs still without artist
+        const missing = richSongs.filter(s => !s.artist);
+        if (missing.length > 0) {
+          showYTMStatus('loading', `抓到 ${richSongs.length} 首歌，查找歌手中...（${missing.length} 首待確認）`);
+          await enrichWithYTSearch(richSongs);
+        }
+
+        // Update textarea with final artist info
+        document.getElementById('songInput').value = richSongs.map(s =>
+          s.artist ? `${s.artist} - ${s.display}` : s.display
+        ).join('\n');
+        ytSongQueue = richSongs;
+        showYTMStatus('success', `${richSongs.length} 首歌已就緒，搜尋 Spotify 中...`);
         if (accessToken) startSearch();
         return true;
       }
 
-      // Phase 1.5: try chapters (Piped API returns chapter titles)
+      // Phase 1.5: try chapters (same 3-tier artist detection)
       const chapters = data.chapters || [];
       if (chapters.length >= 2) {
-        const chapterSongs = chapters
-          .map(ch => {
-            let t = (ch.title || '').trim();
-            t = pickBestSlashSegment(t);
-            return t;
-          })
-          .filter(t => t.length >= 2 && !/^(intro|outro|opening|ending|op|ed)$/i.test(t));
-        if (chapterSongs.length >= 2) {
-          document.getElementById('songInput').value = chapterSongs.join('\n');
+        const richChapters = chapters
+          .map(ch => parseRawSongLine((ch.title || '').trim()))
+          .filter(s => s.display.length >= 2 && !/^(intro|outro|opening|ending|op|ed)$/i.test(s.display));
+        if (richChapters.length >= 2) {
+          document.getElementById('songInput').value = richChapters.map(s =>
+            s.artist ? `${s.artist} - ${s.display}` : s.display
+          ).join('\n');
           if (data.title) document.getElementById('playlistName').value = data.title;
-          showYTMStatus('success', `從影片章節抓到 ${chapterSongs.length} 首歌，搜尋 Spotify 中...`);
           autoSetThumbnail(videoId);
+
+          const channel = cleanChannelName(data.author);
+          if (!isGenericChannel(channel)) {
+            for (const song of richChapters) {
+              if (!song.artist) song.artist = channel;
+            }
+          }
+
+          const missing = richChapters.filter(s => !s.artist);
+          if (missing.length > 0) {
+            showYTMStatus('loading', `抓到 ${richChapters.length} 首歌，查找歌手中...（${missing.length} 首待確認）`);
+            await enrichWithYTSearch(richChapters);
+          }
+
+          document.getElementById('songInput').value = richChapters.map(s =>
+            s.artist ? `${s.artist} - ${s.display}` : s.display
+          ).join('\n');
+          ytSongQueue = richChapters;
+          showYTMStatus('success', `${richChapters.length} 首歌已就緒，搜尋 Spotify 中...`);
           if (accessToken) startSearch();
           return true;
         }
@@ -1578,34 +1687,36 @@
       return strictMatch(normalize(track.name), normalize(queryTitle));
     }
 
-    async function searchSpotify(title, artist) {
-      // Strategy 1: field-specific search (most precise)
-      // Strategy 2: general search (fallback)
-      const queries = [];
-      if (artist) {
-        queries.push(`track:${title} artist:${artist}`);
-        queries.push(`${title} ${artist}`);
-      } else {
-        queries.push(title);
-      }
+    async function searchSpotify(titles, artist) {
+      // titles: string or array of title variants to try (original language first)
+      if (typeof titles === 'string') titles = [titles];
 
-      for (const query of queries) {
-        const params = new URLSearchParams({ q: query, type: 'track', limit: '5', market: 'TW' });
-        const res = await spotifyFetch(`https://api.spotify.com/v1/search?${params}`);
-        if (!res.ok) return null;
-        const data = await res.json();
-        const tracks = data.tracks?.items;
-        if (!tracks?.length) continue;
+      for (const title of titles) {
+        const queries = [];
+        if (artist) {
+          queries.push(`track:${title} artist:${artist}`);
+          queries.push(`${title} ${artist}`);
+        } else {
+          queries.push(title);
+        }
 
-        // Pick the first result that passes validation
-        for (const t of tracks) {
-          if (isGoodMatch(t, title, artist)) {
-            return {
-              uri: t.uri, name: t.name,
-              artist: t.artists.map(a => a.name).join(', '),
-              url: t.external_urls.spotify,
-              preview: t.preview_url || null,
-            };
+        for (const query of queries) {
+          const params = new URLSearchParams({ q: query, type: 'track', limit: '5', market: 'TW' });
+          const res = await spotifyFetch(`https://api.spotify.com/v1/search?${params}`);
+          if (!res.ok) return null;
+          const data = await res.json();
+          const tracks = data.tracks?.items;
+          if (!tracks?.length) continue;
+
+          for (const t of tracks) {
+            if (isGoodMatch(t, title, artist)) {
+              return {
+                uri: t.uri, name: t.name,
+                artist: t.artists.map(a => a.name).join(', '),
+                url: t.external_urls.spotify,
+                preview: t.preview_url || null,
+              };
+            }
           }
         }
       }
@@ -1615,8 +1726,20 @@
 
     // ===== Search Flow =====
     async function startSearch() {
-      const input = document.getElementById('songInput').value;
-      const songs = parseSongs(input);
+      // Use rich YT data if available, otherwise parse from textarea
+      let songs;
+      if (ytSongQueue) {
+        songs = ytSongQueue;
+        ytSongQueue = null;
+      } else {
+        const input = document.getElementById('songInput').value;
+        const parsed = parseSongs(input);
+        songs = parsed.map(s => ({
+          display: s.artist ? `${s.artist} - ${s.title}` : s.title,
+          searchTitles: [s.title],
+          artist: s.artist,
+        }));
+      }
       if (!songs.length) { showToast('請先貼上歌名', 'error'); return; }
 
       document.getElementById('step3').classList.remove('hidden');
@@ -1642,9 +1765,10 @@
         progressFill.style.width = pct + '%';
         progressText.textContent = `搜尋中... ${i + 1} / ${songs.length}`;
 
-        const result = await searchSpotify(song.title, song.artist);
+        const result = await searchSpotify(song.searchTitles, song.artist);
+        const queryLabel = song.artist ? `${song.display} (${song.artist})` : song.display;
         const item = {
-          query: song.artist ? `${song.title} - ${song.artist}` : song.title,
+          query: queryLabel,
           spotifyUri: result?.uri || null,
           spotifyName: result?.name || null,
           spotifyArtist: result?.artist || null,
@@ -1913,6 +2037,7 @@
       if (coverPreview) coverPreview.innerHTML = '';
       coverBase64 = null;
       matchedTracks = [];
+      ytSongQueue = null;
       closeMiniPlayer();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }

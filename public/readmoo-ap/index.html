@@ -15,15 +15,19 @@
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="讀墨 AP 接龍工具｜1500日挑戰社群">
-  <meta property="og:description" content="社群專用 AP 接龍工具。管理推書夥伴連結、書單追蹤、一鍵複製書名。">
+  <meta property="og:description" content="社群專用 AP 接龍工具。管理推書夥伴連結、書單追蹤、一鍵複製書名，讓接龍買書更順暢。">
   <meta property="og:url" content="https://tools.helloruru.com/readmoo-ap/">
   <meta property="og:site_name" content="Hello Ruru Tools">
   <meta property="og:locale" content="zh_TW">
+  <meta property="og:image" content="https://tools.helloruru.com/readmoo-ap/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
 
   <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="讀墨 AP 接龍工具｜1500日挑戰社群">
   <meta name="twitter:description" content="社群專用 AP 接龍工具。管理推書夥伴連結、書單追蹤、一鍵複製書名。">
+  <meta name="twitter:image" content="https://tools.helloruru.com/readmoo-ap/og.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -102,9 +106,15 @@
         <div class="welcome-card card">
           <h2>歡迎來到讀墨 AP 接龍工具</h2>
           <p class="welcome-text">
-            嗨，歡迎加入<strong>讀墨1500日挑戰</strong>！<br>
-            這裡是我們社群專用的小工具，讓大家買書時可以互相支持。
+            嗨，這是<strong>讀墨1500日挑戰</strong>社群專用的 AP 接龍小工具。<br>
+            我們是一群在讀墨上互相推書、用 AP 連結支持彼此的書友。
           </p>
+          <div class="welcome-links">
+            <a href="https://line.me/ti/g2/SH66tYNkpY-PdFk94oKtnwRoe-Ve6QjxVUlOHg?utm_source=invitation&utm_medium=link_copy&utm_campaign=default" target="_blank" rel="noopener" class="btn-secondary btn-sm">
+              <i data-lucide="message-circle"></i> 加入 LINE 社群
+            </a>
+            <p class="welcome-note">這是封閉社群，加入後需通過驗證才能使用工具，請安心。</p>
+          </div>
         </div>
 
         <!-- 快速操作 -->
@@ -289,13 +299,20 @@
                   <li>你的身份設定</li>
                   <li>接龍配對資料</li>
                 </ul>
-                <p>想像一下：五花開心地在手機上收藏了 10 本書。犢叔用電腦打開同一個網址 — 他只會看到自己的空書單，完全看不到五花偷偷收藏了什麼。每個人的瀏覽器是各自獨立的小世界！</p>
+                <p>想像一下：五花開心地在手機上收藏了 10 本書。莎朗用電腦打開同一個網址 — 只會看到自己的空書單，完全看不到五花偷偷收藏了什麼。犢叔在 iPad 上也一樣。每個人的瀏覽器是各自獨立的小世界！</p>
                 <p><strong>小提醒</strong>：換瀏覽器或清除瀏覽資料的話，書單就會消失喔。記得定期用匯出功能備份，才不會哭哭。</p>
               </div>
             </details>
             <details class="faq-item">
               <summary>搜尋讀墨書庫會留下紀錄嗎？</summary>
               <p>搜尋時會經過我們的伺服器轉發到讀墨網站，但<strong>不會記錄你搜了什麼</strong>。搜尋結果會快取 30 分鐘讓大家查得更快，之後就自動消失了。所以就算你搜了什麼奇怪的書名，也不會有人知道的（笑）。</p>
+            </details>
+            <details class="faq-item">
+              <summary>五花和莎朗是誰？</summary>
+              <div class="faq-detail">
+                <p><strong>五花</strong>和<strong>莎朗</strong>是讀墨的兩隻吉祥物，你會在讀墨的各種活動和頁面上看到牠們。</p>
+                <p>在這個工具裡，牠們會和犢叔一起出現在範例說明中 — 五花負責偷偷買言情小說，莎朗負責幫忙掩護。牠們不是真人，請放心。</p>
+              </div>
             </details>
             <details class="faq-item">
               <summary>AP 名冊是怎麼運作的？</summary>
@@ -507,20 +524,20 @@
         <div class="quiz-question" id="quiz-q1">
           <h3>你所屬的社群名稱是？</h3>
           <div class="quiz-options">
-            <label class="quiz-option"><input type="radio" name="q1" value="A"> <span>讀墨每日閱讀計畫</span></label>
+            <label class="quiz-option"><input type="radio" name="q1" value="A"> <span>【讀墨每日閱讀計畫】</span></label>
             <label class="quiz-option"><input type="radio" name="q1" value="B"> <span>電子書馬拉松讀書會</span></label>
-            <label class="quiz-option"><input type="radio" name="q1" value="C"> <span>讀墨1500日挑戰</span></label>
-            <label class="quiz-option"><input type="radio" name="q1" value="D"> <span>墨水瓶閱讀社團</span></label>
+            <label class="quiz-option"><input type="radio" name="q1" value="C"> <span>讀墨1500日挑戰！</span></label>
+            <label class="quiz-option"><input type="radio" name="q1" value="D"> <span>墨水瓶-閱讀社團</span></label>
           </div>
         </div>
 
         <div class="quiz-question" id="quiz-q2">
-          <h3>讀墨的牛牛吉祥物叫什麼名字？</h3>
+          <h3>讀墨的吉祥物叫什麼名字？</h3>
           <div class="quiz-options">
-            <label class="quiz-option"><input type="radio" name="q2" value="A"> <span>墨墨</span></label>
+            <label class="quiz-option"><input type="radio" name="q2" value="A"> <span>讀讀</span></label>
             <label class="quiz-option"><input type="radio" name="q2" value="B"> <span>五花</span></label>
-            <label class="quiz-option"><input type="radio" name="q2" value="C"> <span>阿牧</span></label>
-            <label class="quiz-option"><input type="radio" name="q2" value="D"> <span>小讀</span></label>
+            <label class="quiz-option"><input type="radio" name="q2" value="C"> <span>墨墨</span></label>
+            <label class="quiz-option"><input type="radio" name="q2" value="D"> <span>阿牧</span></label>
           </div>
         </div>
 
