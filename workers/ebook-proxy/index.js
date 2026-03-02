@@ -32,6 +32,14 @@ export default {
         return jsonOk({ books });
       }
 
+      // Bookmarklet 用：帶 token 直接撈書
+      if (path === '/fetch/readmoo-library' && request.method === 'POST') {
+        const { token } = await request.json();
+        if (!token) return jsonError('缺少 token', 400);
+        const books = await fetchReadmooWithToken(token);
+        return jsonOk({ books });
+      }
+
       if (path === '/health') {
         return jsonOk({ status: 'ok' });
       }
@@ -91,6 +99,49 @@ async function fetchReadmoo(email, password) {
 
     const json = await res.json();
 
+    if (json.included) {
+      for (const item of json.included) {
+        if (item.type === 'books') {
+          const attrs = item.attributes || {};
+          books.push({
+            title: attrs.title || '',
+            author: attrs.author_list || attrs.author || '',
+          });
+        }
+      }
+    }
+
+    if (!json.data || json.data.length === 0) break;
+    if (json.data.length < PAGE_SIZE) break;
+    offset += PAGE_SIZE;
+  }
+
+  return books;
+}
+
+// Bookmarklet 用：帶 token 撈書
+async function fetchReadmooWithToken(accessToken) {
+  const books = [];
+  let offset = 0;
+  const PAGE_SIZE = 100;
+
+  while (true) {
+    const res = await fetch(
+      `https://api.readmoo.com/store/v3/me/library_items?page[count]=${PAGE_SIZE}&page[offset]=${offset}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/vnd.api+json',
+        }
+      }
+    );
+
+    if (!res.ok) {
+      if (books.length > 0) break;
+      throw new Error(`讀墨 API 錯誤 (${res.status})`);
+    }
+
+    const json = await res.json();
     if (json.included) {
       for (const item of json.included) {
         if (item.type === 'books') {
