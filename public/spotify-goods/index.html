@@ -946,6 +946,8 @@
       if (playlistId && playlistId.startsWith('RD')) {
         showYTMStatus('loading', '嘗試抓取電台清單...');
         if (await fetchPlaylistSongs(playlistId)) { btn.disabled = false; return; }
+        showYTMStatus('error', '這個是 YouTube 幫你隨機配的「播放電台」，每個人看到的歌都不一樣，所以我沒辦法幫你抓 &#x1F625; 你可以直接把想要的歌名打在上面，我來幫你找！');
+        btn.disabled = false; return;
       }
 
       showYTMStatus('error', '無法辨識網址或抓取內容');
