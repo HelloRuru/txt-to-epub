@@ -73,6 +73,16 @@ const tools = [
     description: '上傳 MP3 即可 AI 辨識歌詞並同步播放。支援 LRC 上傳、歌詞編輯、時間微調、匯出下載，中英日韓多語言。',
     path: '/lyric-player/', color: 'lavender', external: true,
   },
+  {
+    id: 'book-manager', name: '電子書書櫃管理', category: 'reading',
+    description: '登入讀墨、Kobo，一鍵撈出全部藏書，跨平台自動比對重複書籍，匯出 CSV。',
+    path: '/book-manager/', color: 'lavender', external: true,
+  },
+  {
+    id: 'readmoo-ap', name: '讀墨 AP 串串樂', category: 'reading',
+    description: '讀墨 1500 日挑戰 LINE 群專用。輸入 AP 連結，自動產生串接推薦文案。',
+    path: '/readmoo-ap/', color: 'sage', external: true,
+  },
 ]
 
 // ── Color Helpers ──────────────────────────────────
@@ -248,6 +258,8 @@ const getIcon = (id) => {
     case 'card-maker': return <CardMakerIcon />
     case 'spell': return <SparklesIcon />
     case 'lyric-player': return <MusicIcon />
+    case 'book-manager': return <BookOpenIcon />
+    case 'readmoo-ap': return <BookIcon />
     default: return <BookIcon />
   }
 }

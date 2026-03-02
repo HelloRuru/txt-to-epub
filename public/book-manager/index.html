@@ -42,7 +42,7 @@
     <!-- Hero -->
     <div class="hero">
       <h1>電子書書櫃管理</h1>
-      <p>登入你的電子書平台，一鍵撈出全部藏書，自動找出重複的。</p>
+      <p>跨平台書櫃整合，自動找出重複書籍。</p>
     </div>
 
     <!-- ── 平台連接 ── -->
@@ -58,7 +58,12 @@
         </div>
         <div class="platform-form" id="form-readmoo">
           <input type="email" id="readmoo-email" class="input" placeholder="讀墨帳號（Email）" autocomplete="email">
-          <input type="password" id="readmoo-pass" class="input" placeholder="密碼" autocomplete="current-password">
+          <div class="input-pw-wrap">
+            <input type="password" id="readmoo-pass" class="input" placeholder="密碼" autocomplete="current-password">
+            <button type="button" class="btn-pw-toggle" data-target="readmoo-pass" aria-label="顯示密碼">
+              <i data-lucide="eye" width="16" height="16"></i>
+            </button>
+          </div>
           <button class="btn btn-readmoo" id="btn-fetch-readmoo">
             <i data-lucide="download-cloud" width="16" height="16"></i> 撈取書櫃
           </button>
@@ -80,7 +85,12 @@
         </div>
         <div class="platform-form" id="form-kobo">
           <input type="email" id="kobo-email" class="input" placeholder="Kobo 帳號（Email）" autocomplete="email">
-          <input type="password" id="kobo-pass" class="input" placeholder="密碼" autocomplete="current-password">
+          <div class="input-pw-wrap">
+            <input type="password" id="kobo-pass" class="input" placeholder="密碼" autocomplete="current-password">
+            <button type="button" class="btn-pw-toggle" data-target="kobo-pass" aria-label="顯示密碼">
+              <i data-lucide="eye" width="16" height="16"></i>
+            </button>
+          </div>
           <button class="btn btn-kobo" id="btn-fetch-kobo">
             <i data-lucide="download-cloud" width="16" height="16"></i> 撈取書櫃
           </button>
@@ -99,7 +109,7 @@
           <span class="platform-dot" style="background:#06A865"></span>
           <strong>本機藏書</strong>
         </div>
-        <textarea id="manual-paste" class="textarea" rows="4" placeholder="一行一本書名，或 書名,作者"></textarea>
+        <textarea id="manual-paste" class="textarea" rows="4" placeholder="一行一本，例如：&#10;被討厭的勇氣&#10;原子習慣,James Clear&#10;人類大歷史"></textarea>
         <button class="btn btn-calibre" id="btn-add-manual">
           <i data-lucide="plus" width="16" height="16"></i> 加入
         </button>
@@ -112,7 +122,8 @@
         <h2>你的書櫃 <span class="count-badge" id="total-badge">0</span></h2>
         <div class="library-actions">
           <input type="text" id="search-input" class="input input-search" placeholder="搜尋...">
-          <button class="btn btn-sm btn-outline" id="btn-export">匯出</button>
+          <button class="btn btn-sm btn-outline" id="btn-sort">按書名</button>
+          <button class="btn btn-sm btn-outline" id="btn-export">匯出 CSV</button>
           <button class="btn btn-sm btn-danger-outline" id="btn-clear">清空</button>
         </div>
       </div>

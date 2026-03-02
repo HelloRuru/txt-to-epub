@@ -3,6 +3,7 @@
 
 const WORKER_URL = 'https://ebook-proxy.vmpvmp1017.workers.dev';
 const STORAGE_KEY = 'bookManager_books';
+const EMAIL_KEY = 'bookManager_emails';
 const PLATFORMS = {
   readmoo: { name: '讀墨', color: '#00C1FF' },
   kobo:    { name: 'Kobo', color: '#BF0000' },
@@ -90,20 +91,65 @@ function showToast(msg) {
 }
 
 // ══════════════════════════════════════════════════
+// Remember Email
+// ══════════════════════════════════════════════════
+
+function loadEmails() {
+  try {
+    const raw = localStorage.getItem(EMAIL_KEY);
+    const emails = raw ? JSON.parse(raw) : {};
+    if (emails.readmoo) document.getElementById('readmoo-email').value = emails.readmoo;
+    if (emails.kobo) document.getElementById('kobo-email').value = emails.kobo;
+  } catch {}
+}
+
+function saveEmail(platform, email) {
+  try {
+    const raw = localStorage.getItem(EMAIL_KEY);
+    const emails = raw ? JSON.parse(raw) : {};
+    emails[platform] = email;
+    localStorage.setItem(EMAIL_KEY, JSON.stringify(emails));
+  } catch {}
+}
+
+// ══════════════════════════════════════════════════
+// Password Toggle
+// ══════════════════════════════════════════════════
+
+function initPasswordToggles() {
+  document.querySelectorAll('.btn-pw-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      const icon = btn.querySelector('[data-lucide]');
+      if (icon) {
+        icon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+        lucide.createIcons();
+      }
+    });
+  });
+}
+
+// ══════════════════════════════════════════════════
 // Platform Fetch (via Worker)
 // ══════════════════════════════════════════════════
 
 async function fetchPlatform(platform, email, password) {
   const statusEl = document.getElementById(`status-${platform}`);
-  const formEl = document.getElementById(`form-${platform}`);
   const progressEl = document.getElementById(`progress-${platform}`);
   const fillEl = document.getElementById(`fill-${platform}`);
   const textEl = document.getElementById(`text-${platform}`);
   const resultEl = document.getElementById(`result-${platform}`);
   const btn = document.getElementById(`btn-fetch-${platform}`);
 
-  // UI: show progress
+  // Save email
+  saveEmail(platform, email);
+
+  // UI: loading state
+  const originalHtml = btn.innerHTML;
   btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> 撈取中...';
   progressEl.style.display = '';
   resultEl.style.display = 'none';
   fillEl.style.width = '10%';
@@ -180,6 +226,8 @@ async function fetchPlatform(platform, email, password) {
     statusEl.className = 'platform-status err';
   } finally {
     btn.disabled = false;
+    btn.innerHTML = originalHtml;
+    lucide.createIcons();
   }
 }
 
@@ -247,6 +295,7 @@ function findDuplicates(books) {
 
 let currentFilter = 'all';
 let searchQuery = '';
+let sortBy = 'title'; // 'title' | 'platform'
 
 function showLibrary() {
   const section = document.getElementById('section-library');
@@ -254,6 +303,17 @@ function showLibrary() {
     section.style.display = '';
   }
   renderLibrary();
+}
+
+function sortBooks(books) {
+  return [...books].sort((a, b) => {
+    if (sortBy === 'platform') {
+      const pa = PLATFORMS[a.platform]?.name || a.platform;
+      const pb = PLATFORMS[b.platform]?.name || b.platform;
+      if (pa !== pb) return pa.localeCompare(pb, 'zh-TW');
+    }
+    return (a.title || '').localeCompare(b.title || '', 'zh-TW');
+  });
 }
 
 function renderLibrary() {
@@ -307,6 +367,9 @@ function renderLibrary() {
       (b.author || '').toLowerCase().includes(q)
     );
   }
+
+  // Sort
+  filtered = sortBooks(filtered);
 
   // Render duplicate groups
   dupGroupsEl.innerHTML = '';
@@ -387,46 +450,28 @@ function createBookItem(book) {
 // Export
 // ══════════════════════════════════════════════════
 
-function exportBooks() {
+function exportCSV() {
   if (AppState.books.length === 0) { showToast('書櫃是空的'); return; }
 
+  const lines = ['書名,作者,平台,重複'];
   const dupes = findDuplicates(AppState.books);
-  const lines = [];
-
-  // Summary
-  const counts = {};
-  for (const b of AppState.books) {
-    counts[b.platform] = (counts[b.platform] || 0) + 1;
-  }
-  lines.push(`書櫃匯出 — ${new Date().toISOString().slice(0, 10)}`);
-  lines.push(`共 ${AppState.books.length} 本` +
-    Object.entries(counts).map(([p, n]) => `${PLATFORMS[p]?.name || p} ${n}`).join('、'));
-  lines.push('');
-
-  // Duplicates
-  const dupeGroups = Object.values(dupes);
-  if (dupeGroups.length > 0) {
-    lines.push(`── 重複書籍（${dupeGroups.length} 組）──`);
-    for (const group of dupeGroups) {
-      const platforms = group.map(b => PLATFORMS[b.platform]?.name || b.platform).join(' + ');
-      lines.push(`  ${group[0].title} → ${platforms}`);
-    }
-    lines.push('');
+  const dupeIds = new Set();
+  for (const group of Object.values(dupes)) {
+    for (const book of group) dupeIds.add(book.id);
   }
 
-  // All books
-  lines.push('── 全部書籍 ──');
-  for (const b of AppState.books) {
+  for (const b of sortBooks(AppState.books)) {
     const pName = PLATFORMS[b.platform]?.name || b.platform;
-    lines.push(`[${pName}] ${b.title}${b.author ? ` — ${b.author}` : ''}`);
+    const isDupe = dupeIds.has(b.id) ? '是' : '';
+    lines.push(`"${(b.title || '').replace(/"/g, '""')}","${(b.author || '').replace(/"/g, '""')}","${pName}","${isDupe}"`);
   }
 
-  downloadFile(
-    lines.join('\n'),
-    `book-manager_${new Date().toISOString().slice(0, 10)}.txt`,
-    'text/plain'
-  );
-  showToast('已匯出');
+  downloadFile(lines.join('\n'), `book-manager_${today()}.csv`, 'text/csv');
+  showToast('CSV 已下載，可用 Excel 開啟');
+}
+
+function today() {
+  return new Date().toISOString().slice(0, 10);
 }
 
 function downloadFile(content, filename, type) {
@@ -449,6 +494,13 @@ function escapeHtml(str) {
   return d.innerHTML;
 }
 
+function triggerFetch(platform) {
+  const email = document.getElementById(`${platform}-email`).value.trim();
+  const pass = document.getElementById(`${platform}-pass`).value;
+  if (!email || !pass) { showToast('請填寫帳號密碼'); return; }
+  fetchPlatform(platform, email, pass);
+}
+
 // ══════════════════════════════════════════════════
 // Init
 // ══════════════════════════════════════════════════
@@ -456,21 +508,21 @@ function escapeHtml(str) {
 document.addEventListener('DOMContentLoaded', () => {
   AppState.load();
   initDarkMode();
+  initPasswordToggles();
+  loadEmails();
 
   // ── Readmoo fetch ──
-  document.getElementById('btn-fetch-readmoo').addEventListener('click', () => {
-    const email = document.getElementById('readmoo-email').value.trim();
-    const pass = document.getElementById('readmoo-pass').value;
-    if (!email || !pass) { showToast('請填寫帳號密碼'); return; }
-    fetchPlatform('readmoo', email, pass);
-  });
+  document.getElementById('btn-fetch-readmoo').addEventListener('click', () => triggerFetch('readmoo'));
 
   // ── Kobo fetch ──
-  document.getElementById('btn-fetch-kobo').addEventListener('click', () => {
-    const email = document.getElementById('kobo-email').value.trim();
-    const pass = document.getElementById('kobo-pass').value;
-    if (!email || !pass) { showToast('請填寫帳號密碼'); return; }
-    fetchPlatform('kobo', email, pass);
+  document.getElementById('btn-fetch-kobo').addEventListener('click', () => triggerFetch('kobo'));
+
+  // ── Enter key on password fields ──
+  document.getElementById('readmoo-pass').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') triggerFetch('readmoo');
+  });
+  document.getElementById('kobo-pass').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') triggerFetch('kobo');
   });
 
   // ── Manual paste ──
@@ -492,8 +544,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ── Export ──
-  document.getElementById('btn-export').addEventListener('click', exportBooks);
+  // ── Sort toggle ──
+  const sortBtn = document.getElementById('btn-sort');
+  if (sortBtn) {
+    sortBtn.addEventListener('click', () => {
+      sortBy = sortBy === 'title' ? 'platform' : 'title';
+      sortBtn.textContent = sortBy === 'title' ? '按書名' : '按平台';
+      renderLibrary();
+    });
+  }
+
+  // ── Export CSV ──
+  document.getElementById('btn-export').addEventListener('click', exportCSV);
 
   // ── Clear ──
   document.getElementById('btn-clear').addEventListener('click', () => {
