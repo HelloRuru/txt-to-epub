@@ -636,6 +636,13 @@
     let coverBase64 = null;
 
     // ===== Helpers =====
+    // "日本語 / English / 한국어 / 中文" → prefer English segment for Spotify search
+    function pickBestSlashSegment(s) {
+      const parts = s.split(/\s*\/\s*/);
+      if (parts.length < 3) return s;
+      const eng = parts.find(p => /^[A-Za-z0-9]/.test(p.trim()) && /[a-zA-Z]{2,}/.test(p));
+      return (eng || parts[0]).trim();
+    }
     function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
     function esc(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
 
@@ -1088,10 +1095,7 @@
 
       // Phase 1: try description for song list
       const descSongsRaw = parseSongsFromDescription(data.description || '');
-      const descSongs = descSongsRaw.map(s => {
-        const parts = s.split(/\s*\/\s*/);
-        return parts.length >= 3 ? parts[0].trim() : s;
-      });
+      const descSongs = descSongsRaw.map(s => pickBestSlashSegment(s));
       if (descSongs.length >= 2) {
         document.getElementById('songInput').value = descSongs.join('\n');
         if (data.title) document.getElementById('playlistName').value = data.title;
@@ -1107,9 +1111,7 @@
         const chapterSongs = chapters
           .map(ch => {
             let t = (ch.title || '').trim();
-            // Strip multi-language translations: "日本語 / English / 한국어 / 中文" → take first segment
-            const slashParts = t.split(/\s*\/\s*/);
-            if (slashParts.length >= 3) t = slashParts[0].trim();
+            t = pickBestSlashSegment(t);
             return t;
           })
           .filter(t => t.length >= 2 && !/^(intro|outro|opening|ending|op|ed)$/i.test(t));
