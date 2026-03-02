@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 360px;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #FAF8F5;
+      color: #2D2326;
+      padding: 16px;
+    }
+
+    h1 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      font-size: 12px;
+      color: #8B7D82;
+      margin-bottom: 16px;
+    }
+
+    .platform-card {
+      border: 1px solid #E8DFE2;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      background: #fff;
+      transition: box-shadow 0.2s;
+    }
+    .platform-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+
+    .platform-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .platform-name {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .platform-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .dot-readmoo { background: #00C1FF; }
+    .dot-kobo { background: #BF0000; }
+
+    .platform-status {
+      font-size: 12px;
+      color: #8B7D82;
+    }
+    .platform-status.logged-in { color: #06A865; }
+    .platform-status.error { color: #D64045; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-readmoo { background: #00C1FF; color: #fff; }
+    .btn-readmoo:hover:not(:disabled) { background: #00A8E0; }
+    .btn-kobo { background: #BF0000; color: #fff; }
+    .btn-kobo:hover:not(:disabled) { background: #A30000; }
+
+    .progress {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #5C4F52;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #E8DFE2;
+      border-radius: 2px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+    .fill-readmoo { background: #00C1FF; }
+    .fill-kobo { background: #BF0000; }
+
+    .result {
+      margin-top: 10px;
+      padding: 10px;
+      background: #F0EDE8;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+    .result strong { font-size: 20px; }
+
+    .actions {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+    }
+    .btn-export {
+      flex: 1;
+      background: #2D2326;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-export:hover { background: #4A3D41; }
+    .btn-export:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-open {
+      flex: 1;
+      background: #C4A882;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-open:hover { background: #B09570; }
+    .btn-open:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .total-bar {
+      margin-top: 14px;
+      padding: 10px;
+      background: #2D2326;
+      color: #FAF8F5;
+      border-radius: 8px;
+      font-size: 13px;
+      text-align: center;
+      display: none;
+    }
+    .total-bar strong { font-size: 18px; }
+
+    .footer {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 11px;
+      color: #B0A5A8;
+    }
+    .footer a { color: #C4A882; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h1>eBook Shelf Helper</h1>
+  <p class="subtitle">撈取你的電子書書櫃，跨平台去重</p>
+
+  <!-- Readmoo -->
+  <div class="platform-card" id="card-readmoo">
+    <div class="platform-header">
+      <span class="platform-name">
+        <span class="platform-dot dot-readmoo"></span> 讀墨 Readmoo
+      </span>
+      <span class="platform-status" id="status-readmoo">檢查中...</span>
+    </div>
+    <button class="btn btn-readmoo" id="btn-readmoo" disabled>撈取書櫃</button>
+    <div class="progress" id="progress-readmoo" style="display:none;">
+      <span id="progress-text-readmoo">準備中...</span>
+      <div class="progress-bar"><div class="progress-fill fill-readmoo" id="progress-fill-readmoo" style="width:0%"></div></div>
+    </div>
+    <div class="result" id="result-readmoo" style="display:none;"></div>
+  </div>
+
+  <!-- Kobo -->
+  <div class="platform-card" id="card-kobo">
+    <div class="platform-header">
+      <span class="platform-name">
+        <span class="platform-dot dot-kobo"></span> 樂天 Kobo
+      </span>
+      <span class="platform-status" id="status-kobo">檢查中...</span>
+    </div>
+    <button class="btn btn-kobo" id="btn-kobo" disabled>撈取書櫃</button>
+    <div class="progress" id="progress-kobo" style="display:none;">
+      <span id="progress-text-kobo">準備中...</span>
+      <div class="progress-bar"><div class="progress-fill fill-kobo" id="progress-fill-kobo" style="width:0%"></div></div>
+    </div>
+    <div class="result" id="result-kobo" style="display:none;"></div>
+  </div>
+
+  <!-- Total -->
+  <div class="total-bar" id="total-bar">
+    共撈到 <strong id="total-count">0</strong> 本
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn-export" id="btn-export" disabled>匯出 JSON</button>
+    <button class="btn-open" id="btn-open" disabled>開啟 Book Manager</button>
+  </div>
+
+  <div class="footer">
+    <a href="https://tools.helloruru.com/book-manager/" target="_blank">tools.helloruru.com/book-manager</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
