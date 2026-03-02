@@ -92,20 +92,25 @@ const AppState = {
 
 function initDarkMode() {
   const btn = document.getElementById('btn-dark-mode');
-  const saved = localStorage.getItem('darkMode');
+  const saved = localStorage.getItem('helloruru-theme');
 
-  if (saved === 'true' || (!saved && matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-  }
-
-  btn.addEventListener('click', () => {
-    const isDark = document.documentElement.classList.toggle('dark');
-    localStorage.setItem('darkMode', isDark);
-    const icon = btn.querySelector('[data-lucide]');
+  const applyDark = (isDark) => {
+    document.documentElement.classList.toggle('dark', isDark);
+    const icon = btn?.querySelector('[data-lucide]');
     if (icon) {
       icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
       lucide.createIcons();
     }
+  };
+
+  if (saved === 'dark' || (!saved && matchMedia('(prefers-color-scheme: dark)').matches)) {
+    applyDark(true);
+  }
+
+  btn?.addEventListener('click', () => {
+    const isDark = !document.documentElement.classList.contains('dark');
+    localStorage.setItem('helloruru-theme', isDark ? 'dark' : 'light');
+    applyDark(isDark);
   });
 }
 

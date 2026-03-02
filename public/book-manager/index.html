@@ -14,37 +14,36 @@
   <meta property="og:description" content="匯入讀墨、Kobo 書單，自動偵測重複購買，整理你的電子書收藏。">
   <meta property="og:url" content="https://tools.helloruru.com/book-manager/">
 
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <!-- Favicon & Icons (DS 文青 V0.1) -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20260302">
 
   <link rel="preconnect" href="https://lab.helloruru.com" crossorigin>
   <style>
+    /* 源雲明朝 GenWanMin2TC（標題用） */
+    @font-face { font-family: 'GenWanMin2TC'; src: url('https://lab.helloruru.com/fonts/GenWanMin2TC-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+    @font-face { font-family: 'GenWanMin2TC'; src: url('https://lab.helloruru.com/fonts/GenWanMin2TC-SemiBold.woff2') format('woff2'); font-weight: 600; font-display: swap; }
+    /* 源泉圓體 GenSenRounded（內文用） */
     @font-face { font-family: 'GenSenRounded'; src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
     @font-face { font-family: 'GenSenRounded'; src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2'); font-weight: 500; font-display: swap; }
     @font-face { font-family: 'GenSenRounded'; src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
-    @font-face { font-family: 'GenWanMinCho'; src: url('https://lab.helloruru.com/fonts/GenWanMin2TC-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
-    @font-face { font-family: 'GenWanMinCho'; src: url('https://lab.helloruru.com/fonts/GenWanMin2TC-SemiBold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
   </style>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap">
+  <!-- Google Fonts Fallback -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="brand-header">
-    <a href="https://tools.helloruru.com" class="brand-link">
-      <span class="brand-name">Hello Ruru Tools</span>
-    </a>
-    <button class="btn-icon" id="btn-dark-mode" aria-label="切換深色模式">
-      <i data-lucide="moon" width="18" height="18"></i>
-    </button>
-  </header>
+  <!-- Brand Header -->
+  <script src="https://lab.helloruru.com/shared/brand-header.js"></script>
+  <hello-ruru-header title="電子書書櫃管理"></hello-ruru-header>
 
   <main class="main">
     <!-- Hero -->
     <div class="hero">
+      <div class="accent-bar"></div>
       <h1>電子書書櫃管理</h1>
-      <p>跨平台書櫃整合，自動找出重複書籍。</p>
+      <p>翻開書頁，在鼠尾草的清香中，安靜地買書</p>
     </div>
 
     <!-- ── 說明（兩欄並排）── -->
@@ -109,7 +108,9 @@
           <div class="bm-steps">
             <p class="bm-step">➊ 把下面的按鈕拖到書籤列<span class="bm-hint">（手機：長按 → 加入書籤）</span></p>
             <div class="bm-action">
-              <a class="bm-link" id="bm-link-readmoo" href="#">📚 撈讀墨書櫃</a>
+              <a class="bm-link" id="bm-link-readmoo" href="#">
+                <i data-lucide="book-open" width="16" height="16"></i> 撈讀墨書櫃
+              </a>
               <button class="btn btn-sm btn-outline" id="btn-copy-bm">複製</button>
             </div>
             <p class="bm-step">➋ 到 readmoo.com 登入（Passkey、OTP、密碼都行）</p>
@@ -203,10 +204,11 @@
         <p>連接平台或貼上書名，就能開始了。</p>
       </div>
     </section>
+
     <!-- ── 常見問題 ── -->
     <section class="section" id="section-faq">
-      <div class="guide-card">
-        <h3 class="guide-title">常見問題</h3>
+      <div class="card-page">
+        <h3 class="card-page-title">常見問題</h3>
         <div class="guide-faq">
           <p><strong>密碼會被存起來嗎？</strong><br>
           不會。密碼只在撈取的那一刻使用，撈完即丟，不留痕跡。<br>
@@ -226,16 +228,24 @@
         </div>
       </div>
     </section>
+
+    <!-- 金線分隔 -->
+    <div class="divider-gold"></div>
   </main>
 
-  <footer class="footer">
-    <p>&copy; 2026 <a href="https://ohruru.com">Kaoru Tsai</a></p>
+  <!-- Footer (DS 文青) -->
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="https://ohruru.com">Kaoru Tsai</a>. All Rights Reserved.</p>
   </footer>
+
+  <!-- Theme Toggle (文青夜讀) -->
+  <button class="theme-toggle" id="btn-dark-mode" aria-label="切換深色模式">
+    <i data-lucide="moon" width="18" height="18"></i>
+  </button>
 
   <!-- Toast -->
   <div id="toast" class="toast" style="display:none"></div>
 
   <script src="js/app.js"></script>
 </body>
-
 </html>
