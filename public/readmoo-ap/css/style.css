@@ -1198,6 +1198,40 @@ html.dark .theme-toggle .icon-moon { display: none; }
   margin-top: var(--space-sm);
 }
 
+/* ---- User Bar ---- */
+.user-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-md);
+  max-width: 960px;
+  margin: 0 auto;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.user-bar i {
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+}
+.user-bar strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.btn-text {
+  background: none;
+  border: none;
+  color: var(--color-rose);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+.btn-text:hover {
+  background: rgba(212, 165, 165, 0.1);
+}
+
 /* ============ RESPONSIVE ============ */
 @media (max-width: 768px) {
   h2 { font-size: 24px; }

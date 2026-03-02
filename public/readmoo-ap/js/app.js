@@ -134,12 +134,26 @@ function loadUser() {
     AppState.user = JSON.parse(saved);
     AppState.isVerified = true;
   }
+  updateUserBar();
 }
 
 function saveUser(name, date) {
   AppState.user = { name, date };
   AppState.isVerified = true;
   localStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify(AppState.user));
+  updateUserBar();
+}
+
+function updateUserBar() {
+  const bar = document.getElementById('user-bar');
+  const nameEl = document.getElementById('user-bar-name');
+  if (!bar) return;
+  if (AppState.user && AppState.user.name) {
+    nameEl.textContent = AppState.user.name;
+    bar.style.display = 'flex';
+  } else {
+    bar.style.display = 'none';
+  }
 }
 
 function requireAuth(callback) {
@@ -269,6 +283,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const btnEdit = document.getElementById('btn-edit-directory');
         if (btnEdit) btnEdit.click();
       }, 300);
+    });
+  }
+
+  // Logout / switch identity
+  const btnLogout = document.getElementById('btn-logout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', () => {
+      localStorage.removeItem(CONFIG.STORAGE_KEYS.USER);
+      AppState.user = null;
+      AppState.isVerified = false;
+      updateUserBar();
+      openModal('quiz-modal');
     });
   }
 });
