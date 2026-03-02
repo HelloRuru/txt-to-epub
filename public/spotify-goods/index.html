@@ -1134,6 +1134,7 @@
       const btn = document.getElementById('btnFetchYTM');
       btn.disabled = true;
       document.getElementById('channelResults').classList.add('hidden');
+      removeCover(); // 清掉舊封面，等新的抓回來再填
 
       // 1. Channel URL
       const channelId = extractChannelId(url);
