@@ -632,12 +632,12 @@ html.dark .quick-action-card:hover {
   position: relative;
   width: 100%;
   max-width: 420px;
-  background: #FFFDE8;
+  background: #FFF8F6;
   border: none;
   border-radius: 2px;
   padding: calc(var(--space-lg) + 12px) var(--space-lg) var(--space-md);
   text-align: center;
-  box-shadow: 1px 2px 6px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.03);
+  box-shadow: 1px 2px 6px rgba(0,0,0,0.06), 0 0 0 1px rgba(212,165,165,0.12);
 }
 /* 紙膠帶 */
 .storybook-page::before {
@@ -657,17 +657,22 @@ html.dark .quick-action-card:hover {
   width: 90px;
 }
 .storybook-page:nth-child(4n+5)::before {
-  background: #F2C89B;
+  background: #E8C5C5;
   width: 72px;
 }
 .storybook-page:nth-child(4n+7)::before {
-  background: #A8D5BA;
+  background: #C5B8D6;
   width: 85px;
 }
 .page-illust {
-  font-size: 36px;
   line-height: 1;
   margin-bottom: var(--space-xs);
+  color: var(--color-rose);
+}
+.page-illust svg {
+  width: 32px;
+  height: 32px;
+  stroke-width: 1.5;
 }
 .page-label {
   font-weight: 700;
@@ -716,9 +721,13 @@ html.dark .storybook-page::before {
   border-left: 3px solid var(--color-rose);
 }
 .tip-icon {
-  font-size: 20px;
   flex-shrink: 0;
   line-height: 1;
+  color: var(--color-rose);
+}
+.tip-icon svg {
+  width: 18px;
+  height: 18px;
 }
 .tip-content {
   font-size: 13px;
