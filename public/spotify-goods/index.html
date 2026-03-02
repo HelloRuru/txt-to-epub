@@ -964,18 +964,7 @@
         } catch { continue; }
       }
 
-      // 2) CF Function fallback
-      if (!data) {
-        try {
-          const res = await fetch(`/api/yt-video?id=${videoId}`);
-          if (res.ok) {
-            const j = await res.json();
-            if (!j.error) data = j;
-          }
-        } catch {}
-      }
-
-      // 3) CORS proxy fallback
+      // 2) CORS proxy fallback
       if (!data) {
         const ytUrl = `https://www.youtube.com/watch?v=${videoId}`;
         const proxies = [
