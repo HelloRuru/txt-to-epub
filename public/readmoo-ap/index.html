@@ -252,36 +252,56 @@
           <h3><i data-lucide="shield"></i> 關於你的資料</h3>
           <div class="faq-list">
             <details class="faq-item">
-              <summary>我的書單存在哪裡？</summary>
-              <p>書單、購買紀錄、個人設定全部存在<strong>你自己的瀏覽器</strong>（localStorage）裡。不會上傳到任何伺服器，別人也看不到。換瀏覽器或清除瀏覽資料就會消失，建議定期用匯出功能備份。</p>
-            </details>
-            <details class="faq-item">
-              <summary>AP 名冊的資料從哪來？</summary>
-              <p>名冊資料來自社群共用的 <strong>Google 試算表</strong>，由群友自行填寫登記。這裡只是讀取顯示，方便大家查看和使用。</p>
-            </details>
-            <details class="faq-item">
-              <summary>誰可以編輯名冊？</summary>
-              <p>通過社群驗證的人都可以透過本工具編輯名冊。每次修改都會記錄<strong>修改者、時間、內容</strong>，可在「修改紀錄」查看。請不要修改別人的資料。</p>
-            </details>
-            <details class="faq-item">
-              <summary>有人冒用我的名字改名冊怎麼辦？</summary>
+              <summary>別人會知道我買了什麼書嗎？</summary>
               <div class="faq-detail">
-                <p>因為身份選擇沒有設密碼，理論上有人可以選你的名字去編輯。但別擔心，有以下防護：</p>
+                <p><strong>絕對不會！</strong>來看看五花和犢叔的故事：</p>
                 <ul>
-                  <li><strong>每筆修改都有紀錄</strong> — 修改者、時間、改了什麼，全部記在「修改紀錄」裡，大家都看得到</li>
-                  <li><strong>Google 試算表有版本紀錄</strong> — 管理員可以把試算表還原到被改之前的狀態</li>
-                  <li><strong>書單是你自己的</strong> — 你的書單和購買紀錄存在你自己的瀏覽器裡，別人選了你的名字也看不到你的書單</li>
-                  <li><strong>發現異常請回報</strong> — 如果看到不是你做的修改，請聯繫管理員處理</li>
+                  <li>五花偷偷透過犢叔的 AP 連結買了一本言情小說 — 只有五花自己知道，噓</li>
+                  <li>犢叔只會默默收到 3% 的回饋金，但他完全不知道五花買了什麼書</li>
+                  <li>其他人更不可能看到五花的書單、買了什麼、或透過誰買的</li>
+                </ul>
+                <p>你的閱讀口味是你的秘密，這裡幫你守好守滿。</p>
+              </div>
+            </details>
+            <details class="faq-item">
+              <summary>有人假裝是我去亂改東西怎麼辦？</summary>
+              <div class="faq-detail">
+                <p>假設犢叔調皮地選了五花的名字登入，然後跑去改名冊。這時候會怎樣呢？</p>
+                <ul>
+                  <li><strong>五花的書單安全得很</strong> — 書單住在五花自己的瀏覽器裡，犢叔就算選了五花的名字，也只會看到他自己的空書單，摸不到五花的任何資料</li>
+                  <li><strong>但名冊會被動到</strong> — 因為名冊是大家共用的 Google 試算表</li>
+                </ul>
+                <p>不過別緊張，有這些防護措施罩你：</p>
+                <ul>
+                  <li><strong>修改紀錄全都錄</strong> — 誰改的、什麼時候改、改了什麼，全部白紙黑字記在「修改紀錄」裡，大家都看得到</li>
+                  <li><strong>時光倒流大法</strong> — Google 試算表有版本紀錄，管理員可以把名冊還原到被改之前的任何時間點</li>
+                  <li><strong>發現異常快回報</strong> — 如果看到不是你做的修改，趕快跟管理員說一聲</li>
                 </ul>
               </div>
             </details>
             <details class="faq-item">
-              <summary>接龍的時候別人會知道我買了什麼嗎？</summary>
-              <p><strong>不會。</strong>你的書單和購買紀錄只存在你的瀏覽器裡，沒有人能看到你買了什麼或透過誰的連結買的。</p>
+              <summary>我的書單存在哪裡？會不會不見？</summary>
+              <div class="faq-detail">
+                <p>全部存在<strong>你自己的瀏覽器</strong>裡（技術上叫 localStorage），包括：</p>
+                <ul>
+                  <li>你的書單和購買紀錄</li>
+                  <li>你的身份設定</li>
+                  <li>接龍配對資料</li>
+                </ul>
+                <p>想像一下：五花開心地在手機上收藏了 10 本書。犢叔用電腦打開同一個網址 — 他只會看到自己的空書單，完全看不到五花偷偷收藏了什麼。每個人的瀏覽器是各自獨立的小世界！</p>
+                <p><strong>小提醒</strong>：換瀏覽器或清除瀏覽資料的話，書單就會消失喔。記得定期用匯出功能備份，才不會哭哭。</p>
+              </div>
             </details>
             <details class="faq-item">
-              <summary>搜尋讀墨書庫的資料會被記錄嗎？</summary>
-              <p>搜尋查詢會經過我們的伺服器轉發到讀墨網站，但<strong>不會記錄你的搜尋內容</strong>。搜尋結果會快取 30 分鐘以加速查詢，快取後自動刪除。</p>
+              <summary>搜尋讀墨書庫會留下紀錄嗎？</summary>
+              <p>搜尋時會經過我們的伺服器轉發到讀墨網站，但<strong>不會記錄你搜了什麼</strong>。搜尋結果會快取 30 分鐘讓大家查得更快，之後就自動消失了。所以就算你搜了什麼奇怪的書名，也不會有人知道的（笑）。</p>
+            </details>
+            <details class="faq-item">
+              <summary>AP 名冊是怎麼運作的？</summary>
+              <div class="faq-detail">
+                <p>名冊資料來自社群共用的 <strong>Google 試算表</strong>，由群友自行填寫登記。這裡只是幫大家把名冊漂漂亮亮地顯示出來。</p>
+                <p>通過社群驗證的人都可以編輯名冊，但每次修改都會自動記錄<strong>誰改的、什麼時候改、改了什麼</strong>，通通記在「修改紀錄」裡。所以請乖乖只改自己的資料喔。</p>
+              </div>
             </details>
           </div>
         </div>
@@ -635,9 +655,13 @@
   <!-- Footer -->
   <footer class="site-footer">
     <p>&copy; <span id="footer-year"></span> Kaoru Tsai（嚕嚕在看書！）</p>
-    <p class="footer-legal">本工具專為「讀墨1500日挑戰」LINE 社群成員製作，非 <a href="https://readmoo.com" target="_blank" rel="noopener">Readmoo 讀墨</a>官方產品。</p>
-    <p class="footer-legal">書籍搜尋資料來自 Readmoo 公開頁面，僅供社群成員個人使用，不作商業用途。所有書籍內容、商標及相關權利歸原權利人所有。</p>
-    <p class="footer-legal">書單資料儲存於你的瀏覽器（localStorage），不會上傳至任何伺服器。AP 名冊資料來自社群共用試算表。</p>
+    <div class="footer-legal">
+      <p><strong>聲明</strong>：本工具專為「讀墨1500日挑戰」LINE 社群成員製作，並非 <a href="https://readmoo.com" target="_blank" rel="noopener">Readmoo 讀墨電子書</a>官方產品，與 Readmoo 讀墨股份有限公司無任何隸屬、合作或授權關係。</p>
+      <p><strong>商標與著作權</strong>：「Readmoo」、「讀墨」、「mooInk」、「五花」及相關標誌為 Readmoo 讀墨股份有限公司之商標或註冊商標。所有書籍內容、封面圖片及相關權利歸原權利人所有。本工具使用上述名稱僅為說明用途，不構成任何商業使用。</p>
+      <p><strong>資料來源</strong>：書籍搜尋結果來自 Readmoo 公開頁面，僅供社群成員個人查詢使用。AP 名冊資料來自社群共用 Google 試算表。</p>
+      <p><strong>隱私</strong>：你的書單、購買紀錄及個人設定儲存於你的瀏覽器（localStorage），不會上傳至任何伺服器，也不會與第三方共享。搜尋查詢不會被記錄。</p>
+      <p><strong>免責</strong>：本工具依「現況」提供，不保證搜尋結果的即時性或完整性。AP 推書夥伴回饋機制由 Readmoo 管理，本工具不承擔任何交易相關責任。</p>
+    </div>
     <p class="footer-contact">問題回報：<a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
   </footer>
 
