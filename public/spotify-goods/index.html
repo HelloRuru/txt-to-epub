@@ -432,7 +432,7 @@
   </style>
 </head>
 <body>
-  <hello-ruru-header title="Spotify Goods — 歌單搬家"></hello-ruru-header>
+  <hello-ruru-header title="Spotify Goods — 歌曲整理小幫手"></hello-ruru-header>
 
   <header class="hero">
     <div class="hero-icons">
@@ -457,6 +457,11 @@
   </header>
 
   <main class="container">
+
+    <div class="how-to" style="font-size:0.82rem; color:var(--c-muted); line-height:1.7; margin-bottom:16px; padding:12px 16px; background:var(--c-bg); border-radius:var(--radius-sm);">
+      <b style="color:var(--c-ink); opacity:0.75;">怎麼用？</b>
+      連接 Spotify → 貼上 YouTube 網址或手動輸入歌名 → 自動比對 → 一鍵建立歌單。也可以上傳封面圖片。
+    </div>
 
     <!-- User bar: shown after login, replaces Step 1 -->
     <div class="user-bar hidden" id="userBar">
@@ -560,6 +565,7 @@
         <div class="summary-item found"><div class="summary-num" id="foundCount">0</div><div class="summary-label">找到</div></div>
         <div class="summary-item not-found"><div class="summary-num" id="notFoundCount">0</div><div class="summary-label">沒找到</div></div>
       </div>
+      <div class="hint hidden" id="resultHint" style="margin:8px 0 4px; text-align:center;">可取消勾選不需要的歌曲，或回上方修改歌名後重新搜尋</div>
       <div class="hidden select-all-row" id="selectAllRow">
         <label class="select-all-label">
           <input type="checkbox" class="track-checkbox" id="selectAllBox" checked onchange="toggleSelectAll(this.checked)">
@@ -715,11 +721,12 @@
     async function enrichWithYTSearch(songs) {
       const needsArtist = songs.filter(s => !s.artist);
       if (!needsArtist.length) return;
+      let done = 0;
       const BATCH = 4;
       for (let i = 0; i < needsArtist.length; i += BATCH) {
         const batch = needsArtist.slice(i, i + BATCH);
         await Promise.all(batch.map(async (song) => {
-          const q = song.searchTitles[0]; // original-language title
+          const q = song.searchTitles[0];
           for (const inst of PIPED_INSTANCES) {
             try {
               const res = await fetch(`${inst}/search?q=${encodeURIComponent(q)}&filter=music_songs`, { signal: AbortSignal.timeout(5000) });
@@ -733,6 +740,8 @@
             } catch { continue; }
           }
         }));
+        done += batch.length;
+        showYTMStatus('loading', `查找歌手中... ${needsArtist[Math.min(done, needsArtist.length) - 1]?.display || ''} (${done}/${needsArtist.length})`);
       }
     }
     function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -1744,6 +1753,7 @@
 
       document.getElementById('step3').classList.remove('hidden');
       document.getElementById('summary').classList.add('hidden');
+      document.getElementById('resultHint').classList.add('hidden');
       document.getElementById('createSection').classList.add('hidden');
       document.getElementById('createStatus').classList.add('hidden');
       document.getElementById('selectAllRow').classList.add('hidden');
@@ -1785,6 +1795,7 @@
 
       progressText.textContent = '搜尋完成';
       document.getElementById('summary').classList.remove('hidden');
+      document.getElementById('resultHint').classList.remove('hidden');
       document.getElementById('totalCount').textContent = songs.length;
       document.getElementById('foundCount').textContent = found;
       document.getElementById('notFoundCount').textContent = notFound;
