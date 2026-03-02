@@ -10,8 +10,22 @@ function initReadmooSearch() {
   const btnGo = document.getElementById('btn-readmoo-go');
   const statusEl = document.getElementById('readmoo-search-status');
   const resultsEl = document.getElementById('readmoo-search-results');
+  const modeBtns = document.querySelectorAll('.search-mode-btn');
 
   let isOpen = false;
+  let debounceTimer = null;
+  let searchMode = 'title'; // 'title' or 'author'
+
+  // Search mode toggle
+  modeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      modeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      searchMode = btn.dataset.mode;
+      input.placeholder = searchMode === 'author' ? '輸入作者名...' : '輸入書名...';
+      input.focus();
+    });
+  });
 
   // Toggle search panel
   btnToggle.addEventListener('click', () => {
@@ -20,18 +34,33 @@ function initReadmooSearch() {
     if (isOpen) input.focus();
   });
 
-  // Search on Enter
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') doSearch();
+  // Debounced search on typing (300ms)
+  input.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    const q = input.value.trim();
+    if (q.length >= 2) {
+      debounceTimer = setTimeout(doSearch, 300);
+    }
   });
 
-  // Search on button click
-  btnGo.addEventListener('click', doSearch);
+  // Search on Enter (immediate)
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      clearTimeout(debounceTimer);
+      doSearch();
+    }
+  });
+
+  // Search on button click (immediate)
+  btnGo.addEventListener('click', () => {
+    clearTimeout(debounceTimer);
+    doSearch();
+  });
 
   async function doSearch() {
     const query = input.value.trim();
     if (!query) {
-      showToast('請輸入書名');
+      showToast(searchMode === 'author' ? '請輸入作者名' : '請輸入書名');
       return;
     }
 
@@ -52,13 +81,25 @@ function initReadmooSearch() {
       const data = await res.json();
       const cacheHit = res.headers.get('X-Cache') === 'HIT';
 
-      if (data.books.length === 0) {
-        statusEl.innerHTML = '找不到相關書籍，試試其他關鍵字？';
+      let books = data.books;
+
+      // Client-side filtering by search mode
+      if (searchMode === 'author' && books.length > 0) {
+        const q = query.toLowerCase();
+        books = books.filter(b => b.author && b.author.toLowerCase().includes(q));
+      } else if (searchMode === 'title' && books.length > 0) {
+        const q = query.toLowerCase();
+        books = books.filter(b => b.title && b.title.toLowerCase().includes(q));
+      }
+
+      if (books.length === 0) {
+        statusEl.innerHTML = '試試其他關鍵字？又或是試試這個工具，查查這本書有沒有電子書：<a href="https://taiwan-ebook-lover.github.io/" target="_blank" rel="noopener">台灣電子書搜尋</a>';
         return;
       }
 
-      statusEl.innerHTML = `找到 ${data.count} 本${cacheHit ? ' <span class="cache-badge">快取</span>' : ''}`;
-      renderResults(data.books);
+      const modeLabel = searchMode === 'author' ? '作者' : '書名';
+      statusEl.innerHTML = `${modeLabel}「${escapeHtml(query)}」找到 ${books.length} 本${cacheHit ? ' <span class="cache-badge">快取</span>' : ''}`;
+      renderResults(books);
     } catch (err) {
       statusEl.innerHTML = `<span class="search-error">搜尋失敗：${escapeHtml(err.message)}</span>`;
     }

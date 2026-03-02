@@ -48,7 +48,7 @@
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
   <!-- Styles -->
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.min.css">
 
   <!-- Schema.org -->
   <script type="application/ld+json">
@@ -113,7 +113,7 @@
             <a href="https://line.me/ti/g2/SH66tYNkpY-PdFk94oKtnwRoe-Ve6QjxVUlOHg?utm_source=invitation&utm_medium=link_copy&utm_campaign=default" target="_blank" rel="noopener" class="btn-secondary btn-sm">
               <i data-lucide="message-circle"></i> 加入 LINE 社群
             </a>
-            <p class="welcome-note">這是封閉社群，加入後需通過驗證才能使用工具，請安心。</p>
+            <p class="welcome-note">本社群成員專屬工具，方便 AP 接龍使用所製</p>
           </div>
         </div>
 
@@ -143,7 +143,7 @@
           <a href="#chain" class="quick-action-card">
             <i data-lucide="link"></i>
             <div>
-              <strong>我要開始接龍買書</strong>
+              <strong>買書AP接龍，回饋GOGO！</strong>
               <p>選人、排順序，一步一步跟著買</p>
             </div>
           </a>
@@ -396,9 +396,13 @@
 
         <!-- Readmoo 搜尋區 -->
         <div id="readmoo-search-panel" class="readmoo-search-panel" style="display:none;">
-          <p class="search-hint">搜尋 Readmoo 讀墨電子書庫，找到想要的書直接加入書單。搜不到不代表其他平台沒有喔！</p>
+          <p class="search-hint">搜尋 Readmoo 讀墨電子書庫，找到想要的書直接加入書單。想查查一本書有沒有電子書？可利用 <a href="https://taiwan-ebook-lover.github.io/" target="_blank" rel="noopener">台灣電子書搜尋</a> 跨平台查詢。</p>
+          <div class="search-mode-toggle">
+            <button class="search-mode-btn active" data-mode="title"><i data-lucide="book-open"></i> 搜書名</button>
+            <button class="search-mode-btn" data-mode="author"><i data-lucide="user"></i> 搜作者</button>
+          </div>
           <div class="search-input-row">
-            <input type="text" id="readmoo-search-input" class="input-field" placeholder="在讀墨書庫搜尋書名...">
+            <input type="text" id="readmoo-search-input" class="input-field" placeholder="輸入書名...">
             <button id="btn-readmoo-go" class="btn-primary btn-sm">
               <i data-lucide="search"></i>
             </button>
@@ -685,13 +689,13 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="js/app.js"></script>
-  <script src="js/quiz.js"></script>
-  <script src="js/ap-directory.js"></script>
-  <script src="js/ap-chain.js"></script>
-  <script src="js/books.js"></script>
-  <script src="js/changelog.js"></script>
-  <script src="js/export-utils.js"></script>
-  <script src="js/readmoo-search.js"></script>
+  <script src="js/app.min.js"></script>
+  <script src="js/quiz.min.js"></script>
+  <script src="js/ap-directory.min.js"></script>
+  <script src="js/ap-chain.min.js"></script>
+  <script src="js/books.min.js"></script>
+  <script src="js/changelog.min.js"></script>
+  <script src="js/export-utils.min.js"></script>
+  <script src="js/readmoo-search.min.js"></script>
 </body>
 </html>
