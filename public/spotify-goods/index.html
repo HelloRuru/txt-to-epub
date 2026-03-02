@@ -562,7 +562,10 @@
         <div class="step-title">比對結果</div>
       </div>
       <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
-      <div class="progress-text" id="progressText">搜尋中...</div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
+        <div class="progress-text" id="progressText">搜尋中...</div>
+        <button class="btn hidden" id="btnCancelSearch" onclick="cancelSearch()" style="font-size:0.75rem; padding:3px 10px; min-width:auto; background:var(--c-card); color:var(--c-muted); border:1px solid var(--c-border);">取消</button>
+      </div>
       <div class="summary hidden" id="summary">
         <div class="summary-item total"><div class="summary-num" id="totalCount">0</div><div class="summary-label">總共</div></div>
         <div class="summary-item found"><div class="summary-num" id="foundCount">0</div><div class="summary-label">找到</div></div>
@@ -1787,6 +1790,13 @@
     }
 
     // ===== Search Flow =====
+    let searchAborted = false;
+
+    function cancelSearch() {
+      searchAborted = true;
+      document.getElementById('btnCancelSearch').classList.add('hidden');
+    }
+
     async function startSearch() {
       // Use rich YT data if available, otherwise parse from textarea
       let songs;
@@ -1804,6 +1814,7 @@
       }
       if (!songs.length) { showToast('請先貼上歌名', 'error'); return; }
 
+      searchAborted = false;
       document.getElementById('step3').classList.remove('hidden');
       document.getElementById('summary').classList.add('hidden');
       document.getElementById('resultHint').classList.add('hidden');
@@ -1817,12 +1828,16 @@
       const progressFill = document.getElementById('progressFill');
       const progressText = document.getElementById('progressText');
       const btnSearch = document.getElementById('btnSearch');
+      const btnCancel = document.getElementById('btnCancelSearch');
       btnSearch.disabled = true;
       progressFill.style.width = '0%';
+      if (songs.length >= 5) btnCancel.classList.remove('hidden');
 
       let found = 0, notFound = 0;
 
       for (let i = 0; i < songs.length; i++) {
+        if (searchAborted) break;
+
         const song = songs[i];
         const pct = ((i + 1) / songs.length * 100).toFixed(0);
         progressFill.style.width = pct + '%';
@@ -1846,10 +1861,12 @@
         if (i < songs.length - 1) await sleep(200);
       }
 
-      progressText.textContent = '搜尋完成';
+      btnCancel.classList.add('hidden');
+      const searched = found + notFound;
+      progressText.textContent = searchAborted ? `已取消（已搜 ${searched} / ${songs.length} 首）` : '搜尋完成';
       document.getElementById('summary').classList.remove('hidden');
       document.getElementById('resultHint').classList.remove('hidden');
-      document.getElementById('totalCount').textContent = songs.length;
+      document.getElementById('totalCount').textContent = searched;
       document.getElementById('foundCount').textContent = found;
       document.getElementById('notFoundCount').textContent = notFound;
       btnSearch.disabled = false;
@@ -2056,12 +2073,17 @@
           if (!addRes.ok) throw new Error('加入歌曲失敗');
         }
 
-        if (coverBase64 && target === 'new') {
-          await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}/images`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'image/jpeg' },
-            body: coverBase64,
-          });
+        if (coverBase64) {
+          statusDiv.textContent = '上傳封面中...';
+          try {
+            await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}/images`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'image/jpeg' },
+              body: coverBase64,
+            });
+          } catch {
+            showToast('封面上傳失敗，歌曲已加入', 'error');
+          }
         }
 
         const verb = target === 'new' ? '建立成功' : '已加入';
@@ -2083,6 +2105,8 @@
 
     // ===== Reset to Home =====
     function resetToHome() {
+      searchAborted = true;
+      document.getElementById('btnCancelSearch').classList.add('hidden');
       document.getElementById('step3').classList.add('hidden');
       document.getElementById('continueSection').classList.add('hidden');
       document.getElementById('createSection').classList.add('hidden');
