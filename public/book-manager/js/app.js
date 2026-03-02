@@ -15,66 +15,29 @@ const PLATFORMS = {
 // ══════════════════════════════════════════════════
 
 function getReadmooBookmarklet() {
-  // Bookmarklet v2：在 readmoo.com 上執行
-  // 1. 全面搜尋 token（localStorage / sessionStorage / cookie / JS 變數）
-  // 2. 把 token 送到我們的 Worker（繞過 CORS）
-  // 3. Worker 呼叫讀墨 API 撈書
-  // 4. 編碼後跳轉到 book-manager
-  const WORKER = WORKER_URL; // 'https://ebook-proxy.vmpvmp1017.workers.dev'
-  const code = `void((async()=>{`
-    // ── 顯示狀態列 ──
-    + `const S=s=>{let d=document.getElementById('_bm');`
-    + `if(!d){d=document.createElement('div');d.id='_bm';`
-    + `d.style.cssText='position:fixed;top:0;left:0;right:0;background:#00C1FF;color:#fff;`
-    + `padding:12px;text-align:center;z-index:99999;font:16px system-ui;`
-    + `box-shadow:0 2px 8px rgba(0,0,0,.2)';`
-    + `document.body.appendChild(d)}d.textContent=s};`
-    + `try{S('正在搜尋讀墨認證...');`
-    // ── 全面搜尋 token ──
-    + `let t;`
-    // 方法 1: 搜尋 storage 裡的 JSON（access_token / accessToken / token）
-    + `const P=[/["']access_token["']\\s*[:=]\\s*["']([^"']+)["']/,`
-    + `/["']accessToken["']\\s*[:=]\\s*["']([^"']+)["']/,`
-    + `/["']token["']\\s*[:=]\\s*["']([^"']+)["']/];`
-    + `const F=s=>{for(let i=0;i<s.length;i++){try{`
-    + `const k=s.key(i),v=s.getItem(k);`
-    // 直接 key 名稱匹配
-    + `if(/^(access_?token|token|auth_?token)$/i.test(k)&&v&&!v.startsWith('{'))return v;`
-    // JSON 值裡搜尋
-    + `if(v)for(const p of P){const m=v.match(p);if(m)return m[1]}`
-    + `}catch{}}};`
+  // Bookmarklet v3：只找 token → 帶回 book-manager → 由 book-manager 打 Worker
+  // 完全不在 readmoo.com 上做 fetch，避開 CSP 限制
+  const code = `void(function(){`
+    + `try{let t;`
+    // ── 搜 localStorage / sessionStorage ──
+    + `const P=[/"access_token"\\s*:\\s*"([^"]+)"/,/"accessToken"\\s*:\\s*"([^"]+)"/,/"token"\\s*:\\s*"([^"]+)"/];`
+    + `const F=function(s){for(let i=0;i<s.length;i++){try{`
+    + `var k=s.key(i),v=s.getItem(k);`
+    + `if(/^(access_?token|token|auth_?token)$/i.test(k)&&v&&v.length>20&&!v.startsWith('{'))return v;`
+    + `if(v){for(var j=0;j<P.length;j++){var m=v.match(P[j]);if(m&&m[1].length>20)return m[1]}}`
+    + `}catch(e){}}return null};`
     + `t=F(localStorage)||F(sessionStorage);`
-    // 方法 2: cookie 裡找
-    + `if(!t){const c=document.cookie;`
-    + `const cm=c.match(/(?:^|;\\s*)(?:access_token|token|auth_token)=([^;]+)/);`
-    + `if(cm)t=cm[1]}`
-    // 方法 3: JS 全域變數
-    + `if(!t&&window.__NEXT_DATA__){try{`
-    + `const nd=JSON.stringify(window.__NEXT_DATA__);`
-    + `const nm=nd.match(/"access_?[Tt]oken"\\s*:\\s*"([^"]+)"/);`
-    + `if(nm)t=nm[1]}catch{}}`
-    // ── 找到 token 了嗎？ ──
-    + `if(!t){document.getElementById('_bm')?.remove();`
-    + `alert('找不到讀墨認證 token。\\n\\n請確認：\\n1. 已登入 readmoo.com\\n2. 在此頁面點擊書籤');return}`
-    // ── 送到 Worker 撈書 ──
-    + `S('Token 找到了！正在透過伺服器撈取書櫃...');`
-    + `const r=await fetch('${WORKER}/fetch/readmoo-library',`
-    + `{method:'POST',headers:{'Content-Type':'application/json'},`
-    + `body:JSON.stringify({token:t})});`
-    + `if(!r.ok){const e=await r.json().catch(()=>({}));`
-    + `throw Error(e.error||'撈取失敗 ('+r.status+')')}`
-    + `const d=await r.json();`
-    + `const b=d.books||[];`
-    + `document.getElementById('_bm')?.remove();`
-    + `if(!b.length){alert('書櫃是空的');return}`
-    // ── 編碼跳轉 ──
-    + `const c=b.map(x=>[x.title||'',x.author||'']);`
-    + `alert('撈到 '+b.length+' 本！即將跳轉到 Book Manager');`
-    + `location.href='https://tools.helloruru.com/book-manager/#readmoo='`
-    + `+btoa(unescape(encodeURIComponent(JSON.stringify(c))))`
-    + `}catch(e){document.getElementById('_bm')?.remove();`
-    + `alert('撈取失敗：'+e.message)}`
-    + `})())`;
+    // ── 搜 cookie ──
+    + `if(!t){var c=document.cookie,cm=c.match(/(?:^|;\\s*)(?:access_token|token|auth_token)=([^;]{20,})/);if(cm)t=cm[1]}`
+    // ── 搜 JS 全域變數 ──
+    + `if(!t){try{var nd=JSON.stringify(window.__NEXT_DATA__||{});var nm=nd.match(/"access.?[Tt]oken"\\s*:\\s*"([^"]{20,})"/);if(nm)t=nm[1]}catch(e){}}`
+    // ── Debug: 沒找到時顯示 storage 的 key 列表 ──
+    + `if(!t){var keys=[];for(var i=0;i<localStorage.length;i++)keys.push(localStorage.key(i));`
+    + `alert('找不到讀墨認證 token\\n\\nlocalStorage keys:\\n'+keys.join('\\n')+'\\n\\n請確認已登入 readmoo.com');return}`
+    // ── 帶 token 跳轉到 book-manager（不做任何 fetch）──
+    + `location.href='https://tools.helloruru.com/book-manager/#readmoo-token='+encodeURIComponent(t)`
+    + `}catch(e){alert('錯誤：'+e.message)}`
+    + `}())`;
   return 'javascript:' + code;
 }
 
@@ -570,14 +533,103 @@ function triggerFetch(platform) {
 }
 
 // ══════════════════════════════════════════════════
+// Fetch with Token (Bookmarklet v3 帶回 token)
+// ══════════════════════════════════════════════════
+
+async function fetchWithToken(platform, token) {
+  const statusEl = document.getElementById(`status-${platform}`);
+  const progressEl = document.getElementById(`progress-${platform}`);
+  const fillEl = document.getElementById(`fill-${platform}`);
+  const textEl = document.getElementById(`text-${platform}`);
+  const resultEl = document.getElementById(`result-${platform}`);
+
+  // UI: loading
+  progressEl.style.display = '';
+  resultEl.style.display = 'none';
+  fillEl.style.width = '30%';
+  textEl.textContent = 'Bookmarklet 認證成功，正在撈取書櫃...';
+
+  try {
+    const res = await fetch(`${WORKER_URL}/fetch/${platform}-library`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+
+    fillEl.style.width = '80%';
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+      throw new Error(err.error || '撈取失敗');
+    }
+
+    const data = await res.json();
+    fillEl.style.width = '100%';
+    textEl.textContent = '完成！';
+
+    if (!data.books || data.books.length === 0) {
+      throw new Error('書櫃是空的，或 token 已過期');
+    }
+
+    const books = data.books.map(b => ({
+      title: b.title || '',
+      author: b.author || '',
+      platform
+    }));
+
+    // 去重
+    const existingKeys = new Set(
+      AppState.books.filter(b => b.platform === platform).map(b => normalizeTitle(b.title))
+    );
+    const newBooks = books.filter(b => !existingKeys.has(normalizeTitle(b.title)));
+    const skipCount = books.length - newBooks.length;
+
+    if (newBooks.length > 0) AppState.addBooks(newBooks);
+
+    resultEl.className = 'platform-result';
+    resultEl.innerHTML = `<strong>${books.length}</strong> 本書（Bookmarklet 匯入）` +
+      (skipCount > 0 ? `<br>${skipCount} 本已存在，新增 ${newBooks.length} 本` : '');
+    resultEl.style.display = '';
+
+    statusEl.textContent = '已連接';
+    statusEl.className = 'platform-status ok';
+
+    showToast(`${PLATFORMS[platform].name}：成功撈取 ${books.length} 本`);
+    showLibrary();
+
+  } catch (err) {
+    fillEl.style.width = '0%';
+    textEl.textContent = '';
+    progressEl.style.display = 'none';
+
+    resultEl.className = 'platform-result err';
+    resultEl.textContent = err.message;
+    resultEl.style.display = '';
+
+    statusEl.textContent = '失敗';
+    statusEl.className = 'platform-status err';
+  }
+}
+
+// ══════════════════════════════════════════════════
 // Hash Import (Bookmarklet 帶回的資料)
 // ══════════════════════════════════════════════════
 
-function checkHashImport() {
+async function checkHashImport() {
   const hash = location.hash;
   if (!hash) return;
 
-  // 格式: #readmoo=BASE64_JSON
+  // ── 格式 A: #readmoo-token=TOKEN（Bookmarklet 帶回 token，需打 Worker）──
+  const tokenMatch = hash.match(/^#(readmoo|kobo)-token=(.+)$/);
+  if (tokenMatch) {
+    const platform = tokenMatch[1];
+    const token = decodeURIComponent(tokenMatch[2]);
+    history.replaceState(null, '', location.pathname);
+    await fetchWithToken(platform, token);
+    return;
+  }
+
+  // ── 格式 B: #readmoo=BASE64_JSON（直接帶書單資料）──
   const match = hash.match(/^#(readmoo|kobo)=(.+)$/);
   if (!match) return;
 
