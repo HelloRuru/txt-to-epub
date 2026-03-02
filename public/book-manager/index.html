@@ -6,17 +6,13 @@
 
   <title>電子書書櫃管理 | Hello Ruru Tools</title>
   <meta name="description" content="跨平台電子書書櫃整合工具。匯入讀墨、Kobo 書單，自動偵測重複購買，整理你的電子書收藏。">
-  <meta name="keywords" content="電子書,書櫃,讀墨,Readmoo,Kobo,重複,去重,管理">
   <meta name="author" content="Hello Ruru">
-  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://tools.helloruru.com/book-manager/">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="電子書書櫃管理｜跨平台去重">
   <meta property="og:description" content="匯入讀墨、Kobo 書單，自動偵測重複購買，整理你的電子書收藏。">
   <meta property="og:url" content="https://tools.helloruru.com/book-manager/">
-  <meta property="og:site_name" content="Hello Ruru Tools">
-  <meta property="og:locale" content="zh_TW">
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
@@ -27,233 +23,136 @@
     @font-face { font-family: 'GenSenRounded'; src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
   </style>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap">
-
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
   <link rel="stylesheet" href="css/style.css">
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "電子書書櫃管理",
-    "url": "https://tools.helloruru.com/book-manager/",
-    "description": "跨平台電子書書櫃整合工具，自動偵測重複購買",
-    "applicationCategory": "UtilitiesApplication",
-    "operatingSystem": "All",
-    "author": { "@type": "Person", "name": "Kaoru Tsai" }
-  }
-  </script>
 </head>
 <body>
-  <!-- Brand Header -->
+  <!-- Header -->
   <header class="brand-header">
     <a href="https://tools.helloruru.com" class="brand-link">
       <span class="brand-name">Hello Ruru Tools</span>
     </a>
-    <div class="header-actions">
-      <button class="btn-icon" id="btn-dark-mode" aria-label="切換深色模式">
-        <i data-lucide="moon" width="18" height="18"></i>
-      </button>
-    </div>
+    <button class="btn-icon" id="btn-dark-mode" aria-label="切換深色模式">
+      <i data-lucide="moon" width="18" height="18"></i>
+    </button>
   </header>
 
-  <!-- Page Title -->
-  <div class="page-title">
-    <h1><i data-lucide="library" width="24" height="24"></i> 電子書書櫃管理</h1>
-    <p class="page-subtitle">匯入各平台書單，一眼找出重複購買</p>
-  </div>
+  <main class="main">
+    <!-- Hero -->
+    <div class="hero">
+      <h1>電子書書櫃管理</h1>
+      <p>登入你的電子書平台，一鍵撈出全部藏書，自動找出重複的。</p>
+    </div>
 
-  <!-- Tab Navigation -->
-  <nav class="tab-nav" role="tablist">
-    <button class="tab active" data-tab="import" role="tab" aria-selected="true">
-      <i data-lucide="upload" width="16" height="16"></i>
-      <span class="tab-label">匯入</span>
-    </button>
-    <button class="tab" data-tab="library" role="tab" aria-selected="false">
-      <i data-lucide="book-open" width="16" height="16"></i>
-      <span class="tab-label">書櫃</span>
-      <span class="tab-badge" id="badge-library" style="display:none">0</span>
-    </button>
-    <button class="tab" data-tab="stats" role="tab" aria-selected="false">
-      <i data-lucide="bar-chart-3" width="16" height="16"></i>
-      <span class="tab-label">統計</span>
-    </button>
-  </nav>
+    <!-- ── 平台連接 ── -->
+    <section class="section" id="section-connect">
+      <h2>連接書櫃</h2>
 
-  <!-- Tab Content -->
-  <main class="tab-content">
-
-    <!-- ── Tab: Import ── -->
-    <section id="panel-import" class="panel active" role="tabpanel">
-      <!-- Drop zone -->
-      <div class="import-section">
-        <h2><i data-lucide="file-json" width="18" height="18"></i> 從擴充匯入</h2>
-        <p class="section-desc">使用 eBook Shelf Helper 擴充撈取書櫃後，匯出的 JSON 檔拖到這裡。</p>
-        <div class="drop-zone" id="drop-zone">
-          <i data-lucide="upload-cloud" width="40" height="40"></i>
-          <p>拖放 JSON 檔案到這裡</p>
-          <p class="drop-hint">或點擊選擇檔案</p>
-          <input type="file" id="file-input" accept=".json,.csv" style="display:none">
+      <!-- 讀墨 -->
+      <div class="platform-card" id="card-readmoo">
+        <div class="platform-head">
+          <span class="platform-dot" style="background:#00C1FF"></span>
+          <strong>讀墨 Readmoo</strong>
+          <span class="platform-status" id="status-readmoo"></span>
         </div>
-      </div>
-
-      <!-- Paste -->
-      <div class="import-section">
-        <h2><i data-lucide="clipboard-paste" width="18" height="18"></i> 手動貼上書名</h2>
-        <p class="section-desc">一行一本。格式：<code>書名</code> 或 <code>書名,作者</code></p>
-        <div class="paste-controls">
-          <select id="paste-platform" class="select">
-            <option value="readmoo">讀墨 Readmoo</option>
-            <option value="kobo">樂天 Kobo</option>
-            <option value="calibre">Calibre / 本機</option>
-          </select>
-        </div>
-        <textarea id="paste-area" class="textarea" rows="6" placeholder="被討厭的勇氣&#10;原子習慣,James Clear&#10;人類大歷史"></textarea>
-        <button class="btn btn-primary" id="btn-paste-import">
-          <i data-lucide="plus" width="16" height="16"></i> 匯入
-        </button>
-      </div>
-
-      <!-- CSV upload -->
-      <div class="import-section">
-        <h2><i data-lucide="file-spreadsheet" width="18" height="18"></i> CSV 上傳</h2>
-        <p class="section-desc">CSV 檔案需含 <code>title</code> 或 <code>書名</code> 欄位。</p>
-        <div class="csv-upload">
-          <button class="btn btn-outline" id="btn-csv-upload">
-            <i data-lucide="upload" width="16" height="16"></i> 選擇 CSV 檔
+        <div class="platform-form" id="form-readmoo">
+          <input type="email" id="readmoo-email" class="input" placeholder="讀墨帳號（Email）" autocomplete="email">
+          <input type="password" id="readmoo-pass" class="input" placeholder="密碼" autocomplete="current-password">
+          <button class="btn btn-readmoo" id="btn-fetch-readmoo">
+            <i data-lucide="download-cloud" width="16" height="16"></i> 撈取書櫃
           </button>
-          <input type="file" id="csv-input" accept=".csv" style="display:none">
-          <select id="csv-platform" class="select">
-            <option value="readmoo">讀墨</option>
-            <option value="kobo">Kobo</option>
-            <option value="calibre">Calibre / 本機</option>
-          </select>
+          <p class="form-note">密碼不會儲存，僅用於即時登入撈取。</p>
         </div>
+        <div class="platform-progress" id="progress-readmoo" style="display:none">
+          <div class="progress-bar"><div class="progress-fill fill-readmoo" id="fill-readmoo"></div></div>
+          <span class="progress-text" id="text-readmoo">撈取中...</span>
+        </div>
+        <div class="platform-result" id="result-readmoo" style="display:none"></div>
       </div>
 
-      <!-- Import Preview Modal -->
-      <div class="modal-overlay" id="modal-preview" style="display:none">
-        <div class="modal">
-          <div class="modal-header">
-            <h3>匯入預覽</h3>
-            <button class="btn-icon modal-close" id="btn-preview-close">
-              <i data-lucide="x" width="18" height="18"></i>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p id="preview-summary"></p>
-            <div class="preview-list" id="preview-list"></div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-outline" id="btn-preview-cancel">取消</button>
-            <button class="btn btn-primary" id="btn-preview-confirm">
-              <i data-lucide="check" width="16" height="16"></i> 確認匯入
-            </button>
-          </div>
+      <!-- Kobo -->
+      <div class="platform-card" id="card-kobo">
+        <div class="platform-head">
+          <span class="platform-dot" style="background:#BF0000"></span>
+          <strong>樂天 Kobo</strong>
+          <span class="platform-status" id="status-kobo"></span>
         </div>
+        <div class="platform-form" id="form-kobo">
+          <input type="email" id="kobo-email" class="input" placeholder="Kobo 帳號（Email）" autocomplete="email">
+          <input type="password" id="kobo-pass" class="input" placeholder="密碼" autocomplete="current-password">
+          <button class="btn btn-kobo" id="btn-fetch-kobo">
+            <i data-lucide="download-cloud" width="16" height="16"></i> 撈取書櫃
+          </button>
+          <p class="form-note">密碼不會儲存，僅用於即時登入撈取。</p>
+        </div>
+        <div class="platform-progress" id="progress-kobo" style="display:none">
+          <div class="progress-bar"><div class="progress-fill fill-kobo" id="fill-kobo"></div></div>
+          <span class="progress-text" id="text-kobo">撈取中...</span>
+        </div>
+        <div class="platform-result" id="result-kobo" style="display:none"></div>
+      </div>
+
+      <!-- 本機 / 手動 -->
+      <div class="platform-card" id="card-calibre">
+        <div class="platform-head">
+          <span class="platform-dot" style="background:#06A865"></span>
+          <strong>本機藏書</strong>
+        </div>
+        <textarea id="manual-paste" class="textarea" rows="4" placeholder="一行一本書名，或 書名,作者"></textarea>
+        <button class="btn btn-calibre" id="btn-add-manual">
+          <i data-lucide="plus" width="16" height="16"></i> 加入
+        </button>
       </div>
     </section>
 
-    <!-- ── Tab: Library ── -->
-    <section id="panel-library" class="panel" role="tabpanel" style="display:none">
-      <div class="library-toolbar">
-        <div class="search-box">
-          <i data-lucide="search" width="16" height="16"></i>
-          <input type="text" id="library-search" placeholder="搜尋書名或作者...">
-        </div>
-        <div class="filter-group">
-          <button class="filter-btn active" data-filter="all">全部</button>
-          <button class="filter-btn" data-filter="duplicate">重複</button>
-          <button class="filter-btn" data-filter="readmoo">讀墨</button>
-          <button class="filter-btn" data-filter="kobo">Kobo</button>
-          <button class="filter-btn" data-filter="calibre">本機</button>
+    <!-- ── 書櫃 + 去重 ── -->
+    <section class="section" id="section-library" style="display:none">
+      <div class="library-header">
+        <h2>你的書櫃 <span class="count-badge" id="total-badge">0</span></h2>
+        <div class="library-actions">
+          <input type="text" id="search-input" class="input input-search" placeholder="搜尋...">
+          <button class="btn btn-sm btn-outline" id="btn-export">匯出</button>
+          <button class="btn btn-sm btn-danger-outline" id="btn-clear">清空</button>
         </div>
       </div>
 
-      <div class="library-info" id="library-info"></div>
-
-      <!-- Duplicate groups -->
-      <div id="duplicate-groups"></div>
-
-      <!-- Book list -->
-      <div class="book-list" id="book-list">
-        <div class="empty-state" id="empty-library">
-          <i data-lucide="book-x" width="48" height="48"></i>
-          <p>書櫃是空的</p>
-          <p class="empty-hint">到「匯入」分頁加入你的書單</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── Tab: Stats ── -->
-    <section id="panel-stats" class="panel" role="tabpanel" style="display:none">
-      <div class="stats-grid" id="stats-grid">
-        <div class="stat-card">
-          <div class="stat-number" id="stat-total">0</div>
-          <div class="stat-label">總藏書</div>
-        </div>
-        <div class="stat-card stat-danger">
-          <div class="stat-number" id="stat-duplicates">0</div>
-          <div class="stat-label">重複書</div>
-        </div>
-        <div class="stat-card" style="--accent:#00C1FF">
-          <div class="stat-number" id="stat-readmoo">0</div>
-          <div class="stat-label">讀墨</div>
-        </div>
-        <div class="stat-card" style="--accent:#BF0000">
-          <div class="stat-number" id="stat-kobo">0</div>
-          <div class="stat-label">Kobo</div>
-        </div>
-        <div class="stat-card" style="--accent:#06A865">
-          <div class="stat-number" id="stat-calibre">0</div>
-          <div class="stat-label">本機</div>
-        </div>
+      <!-- 篩選 -->
+      <div class="filter-row">
+        <button class="pill active" data-filter="all">全部</button>
+        <button class="pill" data-filter="duplicate">重複</button>
+        <button class="pill pill-readmoo" data-filter="readmoo">讀墨</button>
+        <button class="pill pill-kobo" data-filter="kobo">Kobo</button>
+        <button class="pill pill-calibre" data-filter="calibre">本機</button>
       </div>
 
-      <!-- Chart -->
-      <div class="chart-section">
-        <h2>平台分布</h2>
-        <div class="pie-chart" id="pie-chart"></div>
+      <!-- 重複提示 -->
+      <div class="dup-banner" id="dup-banner" style="display:none">
+        <i data-lucide="alert-triangle" width="18" height="18"></i>
+        <span id="dup-banner-text"></span>
       </div>
 
-      <!-- Export -->
-      <div class="export-section">
-        <h2><i data-lucide="download" width="18" height="18"></i> 匯出</h2>
-        <div class="export-buttons">
-          <button class="btn btn-outline" id="btn-export-json">
-            <i data-lucide="file-json" width="16" height="16"></i> JSON 備份
-          </button>
-          <button class="btn btn-outline" id="btn-export-csv">
-            <i data-lucide="file-spreadsheet" width="16" height="16"></i> CSV
-          </button>
-          <button class="btn btn-outline" id="btn-export-text">
-            <i data-lucide="file-text" width="16" height="16"></i> 純文字
-          </button>
-          <button class="btn btn-outline" id="btn-export-dupes">
-            <i data-lucide="copy" width="16" height="16"></i> 僅重複書
-          </button>
-        </div>
-      </div>
+      <!-- 重複群組 -->
+      <div id="dup-groups"></div>
 
-      <!-- Danger zone -->
-      <div class="danger-section">
-        <button class="btn btn-danger" id="btn-clear-all">
-          <i data-lucide="trash-2" width="16" height="16"></i> 清空全部資料
-        </button>
+      <!-- 書單 -->
+      <div id="book-list"></div>
+
+      <!-- 空狀態 -->
+      <div class="empty" id="empty-state">
+        <p>連接平台或貼上書名，就能開始了。</p>
       </div>
     </section>
   </main>
 
-  <!-- Footer -->
-  <footer class="site-footer">
-    <p>&copy; 2026 <a href="https://ohruru.com" target="_blank">Kaoru Tsai</a>. All rights reserved.</p>
+  <footer class="footer">
+    <p>&copy; 2026 <a href="https://ohruru.com">Kaoru Tsai</a></p>
   </footer>
 
-  <!-- Scripts -->
+  <!-- Toast -->
+  <div id="toast" class="toast" style="display:none"></div>
+
   <script src="js/app.js"></script>
-  <script src="js/import.js"></script>
-  <script src="js/library.js"></script>
 </body>
+
 </html>
