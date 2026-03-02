@@ -382,6 +382,16 @@
     .continue-section .btn { min-width: 160px; }
     .input-row-target { margin-top: 14px; }
 
+    /* FAQ cards */
+    .faq-card {
+      background: var(--c-card); border-radius: var(--radius-sm);
+      padding: 14px 18px; box-shadow: var(--shadow-sm);
+      border-left: 3px solid var(--c-lavender);
+      font-size: 0.85rem; line-height: 1.7;
+    }
+    .faq-card b { color: var(--c-ink); display: block; margin-bottom: 4px; }
+    .faq-card p { color: var(--c-muted); margin: 0; }
+
     /* Footer — DS 2.0 居中漸層淡線 */
     .footer {
       text-align: center; margin-top: 32px; padding: 32px 16px 20px;
@@ -445,6 +455,7 @@
       .cover-preview { background: #332C2F; }
       .divider-or span { background: var(--c-card); }
       .divider-or::before { background: var(--c-border); }
+      .faq-card { background: var(--c-card); border-left-color: var(--c-lavender); }
       select {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23918A8D' stroke-width='2'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
       }
@@ -624,16 +635,16 @@
     </div>
 
     <div style="width:120px; height:1px; background:linear-gradient(90deg, transparent, var(--c-rose), transparent); margin:32px auto 24px; opacity:0.5;"></div>
-    <details class="faq" style="margin: 0 0 16px; font-size: 0.85rem; line-height: 1.8;">
-      <summary style="cursor:pointer; font-weight:700; color:var(--c-ink); opacity:0.7;">常見問題</summary>
-      <ul style="margin:12px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:14px; color:var(--c-muted);">
-        <li><b style="color:var(--c-ink); opacity:0.85;">Q. 這是免費的嗎？</b><br>完全免費，不用註冊，也沒有廣告。</li>
-        <li><b style="color:var(--c-ink); opacity:0.85;">Q. 我的資料安全嗎？</b><br>所有操作都在你的瀏覽器完成，登入資訊不會上傳到任何伺服器。</li>
-        <li><b style="color:var(--c-ink); opacity:0.85;">Q. 支援哪些網址？</b><br>YouTube 影片、YouTube Music 歌單、頻道頁面都可以，也能直接手動輸入歌名。</li>
-        <li><b style="color:var(--c-ink); opacity:0.85;">Q. 可以加進現有的 Spotify 歌單嗎？</b><br>可以，搜尋完成後選擇「加進現有歌單」，從你的歌單清單中挑選即可。</li>
-        <li><b style="color:var(--c-ink); opacity:0.85;">Q. 為什麼有些歌找不到？</b><br>可能是 Spotify 沒有上架，或歌名與 Spotify 上的版本不同。你可以手動修改歌名再搜尋。</li>
-        <li><b style="color:var(--c-ink); opacity:0.85;">Q. YouTube「播放電台」能用嗎？</b><br>電台是 YouTube 隨機推薦的，每個人不同，無法透過網址抓取。建議改貼一般歌單連結。</li>
-      </ul>
+    <details class="faq" style="margin: 0 0 16px;">
+      <summary style="cursor:pointer; font-weight:700; font-size:0.95rem; color:var(--c-ink); opacity:0.7;">常見問題</summary>
+      <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+        <div class="faq-card"><b>這是免費的嗎？</b><p>完全免費，不用註冊，也沒有廣告。</p></div>
+        <div class="faq-card"><b>我的資料安全嗎？</b><p>所有操作都在你的瀏覽器完成，登入資訊不會上傳到任何伺服器。</p></div>
+        <div class="faq-card"><b>支援哪些網址？</b><p>YouTube 影片、YouTube Music 歌單、頻道頁面都可以，也能直接手動輸入歌名。</p></div>
+        <div class="faq-card"><b>可以加進現有的 Spotify 歌單嗎？</b><p>可以，搜尋完成後選擇「加進現有歌單」，從你的歌單清單中挑選即可。</p></div>
+        <div class="faq-card"><b>為什麼有些歌找不到？</b><p>可能是 Spotify 沒有上架，或歌名與 Spotify 上的版本不同。你可以手動修改歌名再搜尋。</p></div>
+        <div class="faq-card"><b>YouTube「播放電台」能用嗎？</b><p>電台是 YouTube 隨機推薦的，每個人不同，無法透過網址抓取。建議改貼一般歌單連結。</p></div>
+      </div>
     </details>
 
     <footer class="footer">
