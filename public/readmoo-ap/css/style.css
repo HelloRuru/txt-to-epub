@@ -632,19 +632,37 @@ html.dark .quick-action-card:hover {
   position: relative;
   width: 100%;
   max-width: 420px;
-  background: #FFFDF8;
-  border: 2px solid var(--color-fog);
-  border-radius: var(--radius-md);
-  padding: var(--space-lg) var(--space-lg) var(--space-md);
+  background: #FFFDE8;
+  border: none;
+  border-radius: 2px;
+  padding: calc(var(--space-lg) + 12px) var(--space-lg) var(--space-md);
   text-align: center;
-  box-shadow: 2px 3px 0 var(--color-fog);
-  transform: rotate(-0.5deg);
+  box-shadow: 1px 2px 6px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.03);
 }
-.storybook-page:nth-child(4n+3) {
-  transform: rotate(0.5deg);
+/* 紙膠帶 */
+.storybook-page::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 22px;
+  border-radius: 1px;
+  opacity: 0.65;
+  background: var(--color-rose);
 }
-.storybook-page:nth-child(4n+5) {
-  transform: rotate(-0.3deg);
+.storybook-page:nth-child(4n+3)::before {
+  background: var(--color-lavender);
+  width: 90px;
+}
+.storybook-page:nth-child(4n+5)::before {
+  background: #F2C89B;
+  width: 72px;
+}
+.storybook-page:nth-child(4n+7)::before {
+  background: #A8D5BA;
+  width: 85px;
 }
 .page-illust {
   font-size: 36px;
@@ -673,15 +691,17 @@ html.dark .quick-action-card:hover {
   font-style: italic;
 }
 .storybook-connector {
-  font-size: 24px;
+  font-size: 20px;
   color: var(--color-warm-gray);
-  padding: var(--space-xs) 0;
+  padding: 2px 0;
   line-height: 1;
 }
 html.dark .storybook-page {
-  background: var(--bg-elevated);
-  border-color: var(--border-color);
-  box-shadow: 2px 3px 0 rgba(0,0,0,0.15);
+  background: #3a3828;
+  box-shadow: 1px 2px 6px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.04);
+}
+html.dark .storybook-page::before {
+  opacity: 0.45;
 }
 
 /* Storybook tips */
@@ -1430,8 +1450,7 @@ html.dark .theme-toggle .icon-moon { display: none; }
 
   .storybook-page {
     max-width: 100%;
-    padding: var(--space-md);
-    transform: rotate(0deg) !important;
+    padding: calc(var(--space-md) + 12px) var(--space-md) var(--space-md);
   }
   .page-illust {
     font-size: 28px;
