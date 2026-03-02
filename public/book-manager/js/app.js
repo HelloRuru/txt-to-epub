@@ -1,5 +1,5 @@
 // ─── Book Manager — Unified App ───
-// 單頁式：登入 → Worker 撈書 → 去重 → 匯出
+// 單頁式：登入/Bookmarklet → Worker 撈書 → 去重 → 匯出
 
 const WORKER_URL = 'https://ebook-proxy.vmpvmp1017.workers.dev';
 const STORAGE_KEY = 'bookManager_books';
@@ -9,6 +9,54 @@ const PLATFORMS = {
   kobo:    { name: 'Kobo', color: '#BF0000' },
   calibre: { name: '本機', color: '#06A865' }
 };
+
+// ══════════════════════════════════════════════════
+// Readmoo Bookmarklet Code
+// ══════════════════════════════════════════════════
+
+function getReadmooBookmarklet() {
+  // Bookmarklet 在 readmoo.com 上執行：
+  // 1. 搜尋 localStorage/sessionStorage 找 access_token
+  // 2. 用 token 或 cookie 呼叫讀墨 API 分頁撈書
+  // 3. 編碼後跳轉到 book-manager 頁面
+  const code = [
+    "void((async()=>{",
+    "const S=s=>{let d=document.getElementById('_bm');",
+    "if(!d){d=document.createElement('div');d.id='_bm';",
+    "d.style.cssText='position:fixed;top:0;left:0;right:0;background:#00C1FF;color:#fff;",
+    "padding:12px;text-align:center;z-index:99999;font:16px system-ui;",
+    "box-shadow:0 2px 8px rgba(0,0,0,.2)';",
+    "document.body.appendChild(d)}d.textContent=s};",
+    "try{S('正在撈取讀墨書櫃...');",
+    "let t;const f=s=>{for(let i=0;i<s.length;i++){try{",
+    "const v=s.getItem(s.key(i)),",
+    "m=v.match(/\"access_token\"\\s*:\\s*\"([^\"]+)\"/);",
+    "if(m)return m[1]}catch{}}};",
+    "t=f(localStorage)||f(sessionStorage);",
+    "const b=[],h={Accept:'application/vnd.api+json'};",
+    "if(t)h.Authorization='Bearer '+t;",
+    "let o=0;while(1){",
+    "const r=await fetch('https://api.readmoo.com/store/v3/me/library_items",
+    "?page[count]=100&page[offset]='+o,",
+    "t?{headers:h}:{headers:h,credentials:'include'});",
+    "if(!r.ok){if(b.length)break;throw Error('API '+r.status)}",
+    "const j=await r.json();",
+    "if(j.included)for(const i of j.included)",
+    "if(i.type==='books'){const a=i.attributes||{};",
+    "b.push([a.title||'',a.author_list||a.author||''])}",
+    "S('已撈取 '+b.length+' 本...');",
+    "if(!j.data||j.data.length<100)break;o+=100}",
+    "document.getElementById('_bm')?.remove();",
+    "if(!b.length){alert('書櫃是空的，或尚未登入讀墨');return}",
+    "alert('撈到 '+b.length+' 本！即將跳轉到 Book Manager');",
+    "location.href='https://tools.helloruru.com/book-manager/#readmoo='",
+    "+btoa(unescape(encodeURIComponent(JSON.stringify(b))))",
+    "}catch(e){document.getElementById('_bm')?.remove();",
+    "alert('撈取失敗：'+e.message+'\\n請確認已登入 readmoo.com')}",
+    "})())"
+  ].join('');
+  return 'javascript:' + code;
+}
 
 // ══════════════════════════════════════════════════
 // State
@@ -124,7 +172,7 @@ function initPasswordToggles() {
       input.type = isPassword ? 'text' : 'password';
       const icon = btn.querySelector('[data-lucide]');
       if (icon) {
-        icon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+        icon.setAttribute('data-lucide', isPassword ? 'eye' : 'eye-off');
         lucide.createIcons();
       }
     });
@@ -502,6 +550,136 @@ function triggerFetch(platform) {
 }
 
 // ══════════════════════════════════════════════════
+// Hash Import (Bookmarklet 帶回的資料)
+// ══════════════════════════════════════════════════
+
+function checkHashImport() {
+  const hash = location.hash;
+  if (!hash) return;
+
+  // 格式: #readmoo=BASE64_JSON
+  const match = hash.match(/^#(readmoo|kobo)=(.+)$/);
+  if (!match) return;
+
+  const platform = match[1];
+  const b64 = match[2];
+
+  try {
+    const json = decodeURIComponent(escape(atob(b64)));
+    const compact = JSON.parse(json);
+
+    if (!Array.isArray(compact) || compact.length === 0) {
+      showToast('匯入資料為空');
+      return;
+    }
+
+    const books = compact.map(item => ({
+      title: Array.isArray(item) ? item[0] || '' : item.title || '',
+      author: Array.isArray(item) ? item[1] || '' : item.author || '',
+      platform
+    }));
+
+    // 去除已存在的
+    const existingKeys = new Set(
+      AppState.books
+        .filter(b => b.platform === platform)
+        .map(b => normalizeTitle(b.title))
+    );
+    const newBooks = books.filter(b => !existingKeys.has(normalizeTitle(b.title)));
+    const skipCount = books.length - newBooks.length;
+
+    if (newBooks.length > 0) {
+      AppState.addBooks(newBooks);
+    }
+
+    // 更新 UI
+    const statusEl = document.getElementById(`status-${platform}`);
+    const resultEl = document.getElementById(`result-${platform}`);
+    if (statusEl) {
+      statusEl.textContent = '已連接';
+      statusEl.className = 'platform-status ok';
+    }
+    if (resultEl) {
+      resultEl.className = 'platform-result';
+      resultEl.innerHTML = `<strong>${books.length}</strong> 本書（Bookmarklet 匯入）` +
+        (skipCount > 0 ? `<br>${skipCount} 本已存在，新增 ${newBooks.length} 本` : '');
+      resultEl.style.display = '';
+    }
+
+    showToast(`${PLATFORMS[platform].name}：成功匯入 ${books.length} 本`);
+    showLibrary();
+  } catch (err) {
+    showToast('匯入失敗：資料格式錯誤');
+  } finally {
+    // 清掉 hash，避免重整時重複匯入
+    history.replaceState(null, '', location.pathname);
+  }
+}
+
+// ══════════════════════════════════════════════════
+// Method Toggle (帳密 / Bookmarklet 切換)
+// ══════════════════════════════════════════════════
+
+function initMethodToggles() {
+  document.querySelectorAll('.method-toggle').forEach(toggle => {
+    const tabs = toggle.querySelectorAll('.method-tab');
+    const platform = tabs[0]?.dataset.platform;
+    if (!platform) return;
+
+    const card = toggle.closest('.platform-card');
+    const panels = card.querySelectorAll('.method-panel');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const method = tab.dataset.method;
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        panels.forEach(p => {
+          p.style.display = p.dataset.method === method ? '' : 'none';
+        });
+      });
+    });
+  });
+}
+
+// ══════════════════════════════════════════════════
+// Bookmarklet Init
+// ══════════════════════════════════════════════════
+
+function initBookmarklets() {
+  // 設定讀墨 Bookmarklet 連結
+  const bmLink = document.getElementById('bm-link-readmoo');
+  if (bmLink) {
+    bmLink.href = getReadmooBookmarklet();
+    // 在本頁點擊時不執行（要在 readmoo.com 上用才有效）
+    bmLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      showToast('請把這個按鈕拖到書籤列，在讀墨網站上使用');
+    });
+  }
+
+  // 複製按鈕
+  const copyBtn = document.getElementById('btn-copy-bm');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const code = getReadmooBookmarklet();
+      navigator.clipboard.writeText(code).then(() => {
+        showToast('已複製！新增書籤後貼上網址即可');
+      }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = code;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        showToast('已複製！新增書籤後貼上網址即可');
+      });
+    });
+  }
+}
+
+// ══════════════════════════════════════════════════
 // Init
 // ══════════════════════════════════════════════════
 
@@ -509,6 +687,8 @@ document.addEventListener('DOMContentLoaded', () => {
   AppState.load();
   initDarkMode();
   initPasswordToggles();
+  initMethodToggles();
+  initBookmarklets();
   loadEmails();
 
   // ── Readmoo fetch ──
@@ -571,4 +751,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Initial render ──
   lucide.createIcons();
   showLibrary();
+
+  // ── 檢查 Bookmarklet 帶回的資料 ──
+  checkHashImport();
 });

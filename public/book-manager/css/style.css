@@ -197,6 +197,68 @@ a { color: var(--color-primary); text-decoration: none; }
   cursor: pointer; border-radius: 6px;
 }
 .btn-pw-toggle:hover { color: var(--color-text); }
+
+/* ─── Method Toggle ─── */
+.method-toggle {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  background: var(--color-border-light);
+  border-radius: 8px;
+  padding: 3px;
+}
+.method-tab {
+  flex: 1;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.method-tab:hover { color: var(--color-text); }
+.method-tab.active {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* ─── Bookmarklet Panel ─── */
+.bm-panel { font-size: 0.85rem; }
+.bm-steps { display: flex; flex-direction: column; gap: 6px; }
+.bm-step {
+  color: var(--color-text-light);
+  line-height: 1.6;
+}
+.bm-hint {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+.bm-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+.bm-link {
+  display: inline-block;
+  padding: 8px 16px;
+  background: var(--color-readmoo);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: grab;
+  transition: background var(--transition);
+  text-decoration: none;
+}
+.bm-link:hover { background: #00A8E0; color: #fff; }
+.bm-link:active { cursor: grabbing; }
+
 @keyframes spin { to { transform: rotate(360deg); } }
 .btn .spinner {
   width: 16px; height: 16px;
