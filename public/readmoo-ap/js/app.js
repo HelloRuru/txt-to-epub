@@ -153,7 +153,7 @@ function requireAuth(callback) {
 
 // ============ Google Sheets Reader ============
 async function fetchMembersFromSheet() {
-  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json`;
+  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&headers=0`;
   try {
     const res = await fetch(url);
     const text = await res.text();

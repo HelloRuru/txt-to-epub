@@ -25,7 +25,7 @@ function initBooks() {
   const btnBookSave = document.getElementById('btn-book-save');
   const bookTitle = document.getElementById('book-title');
   const bookAuthor = document.getElementById('book-author');
-  const bookVersion = document.getElementById('book-version');
+  const bookPublisher = document.getElementById('book-publisher');
   const bookPubdate = document.getElementById('book-pubdate');
   const bookEditId = document.getElementById('book-edit-id');
   const bookModalTitle = document.getElementById('book-modal-title');
@@ -59,7 +59,7 @@ function initBooks() {
           <div class="book-title">${escapeHtml(b.title)}</div>
           <div class="book-meta">
             ${b.author ? escapeHtml(b.author) : ''}
-            ${b.version ? ' · ' + escapeHtml(b.version) : ''}
+            ${b.publisher ? ' · ' + escapeHtml(b.publisher) : ''}
             ${b.pubdate ? ' · ' + escapeHtml(b.pubdate) : ''}
           </div>
           ${b.status === 'bought' ? `
@@ -148,7 +148,7 @@ function initBooks() {
         bookModalTitle.textContent = '編輯書籍';
         bookTitle.value = book.title;
         bookAuthor.value = book.author || '';
-        bookVersion.value = book.version || '';
+        bookPublisher.value = book.version || '';
         bookPubdate.value = book.pubdate || '';
         bookEditId.value = book.id;
         openModal('book-modal');
@@ -183,7 +183,7 @@ function initBooks() {
     bookModalTitle.textContent = '新增書籍';
     bookTitle.value = '';
     bookAuthor.value = '';
-    bookVersion.value = '';
+    bookPublisher.value = '';
     bookPubdate.value = '';
     bookEditId.value = '';
     openModal('book-modal');
@@ -206,7 +206,7 @@ function initBooks() {
       if (book) {
         book.title = title;
         book.author = bookAuthor.value.trim();
-        book.version = bookVersion.value.trim();
+        book.version = bookPublisher.value.trim();
         book.pubdate = bookPubdate.value.trim();
       }
       showToast('已更新');
@@ -216,7 +216,7 @@ function initBooks() {
         id: 'book_' + Date.now(),
         title,
         author: bookAuthor.value.trim(),
-        version: bookVersion.value.trim(),
+        version: bookPublisher.value.trim(),
         pubdate: bookPubdate.value.trim(),
         status: 'want',
         createdAt: new Date().toISOString()
