@@ -59,6 +59,19 @@
     "creator": { "@type": "Organization", "name": "Hello Ruru", "url": "https://ohruru.com" }
   }
   </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "Spotify Goods 是免費的嗎？", "acceptedAnswer": { "@type": "Answer", "text": "完全免費，不用註冊，也沒有廣告。" }},
+      { "@type": "Question", "name": "我的資料安全嗎？", "acceptedAnswer": { "@type": "Answer", "text": "所有操作都在你的瀏覽器完成，登入資訊不會上傳到任何伺服器。" }},
+      { "@type": "Question", "name": "支援哪些網址？", "acceptedAnswer": { "@type": "Answer", "text": "YouTube 影片、YouTube Music 歌單、頻道頁面，或直接手動輸入歌名。" }},
+      { "@type": "Question", "name": "為什麼有些歌在 Spotify 找不到？", "acceptedAnswer": { "@type": "Answer", "text": "可能是 Spotify 沒有上架，或歌名與 Spotify 上的版本不同。你可以手動修改歌名再搜尋。" }},
+      { "@type": "Question", "name": "YouTube 播放電台能用嗎？", "acceptedAnswer": { "@type": "Answer", "text": "電台是 YouTube 隨機推薦的，每個人不同，無法透過網址抓取。建議改貼一般歌單連結。" }}
+    ]
+  }
+  </script>
 
   <style>
     @font-face { font-family: 'GenSenRounded'; src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
@@ -563,6 +576,17 @@
         <button class="btn btn-primary" onclick="resetToHome()">繼續新增</button>
       </div>
     </div>
+
+    <details class="faq" style="margin: 24px 0 16px; font-size: 0.85rem; line-height: 1.7;">
+      <summary style="cursor:pointer; font-weight:700; color:var(--c-ink); opacity:0.7;">常見問題</summary>
+      <div style="margin-top:10px; color:var(--c-muted);">
+        <p><b>這是免費的嗎？</b><br>完全免費，不用註冊，也沒有廣告。</p>
+        <p><b>我的資料安全嗎？</b><br>所有操作都在你的瀏覽器完成，登入資訊不會上傳到任何伺服器。</p>
+        <p><b>支援哪些網址？</b><br>YouTube 影片、YouTube Music 歌單、頻道頁面，或直接手動輸入歌名。</p>
+        <p><b>為什麼有些歌找不到？</b><br>可能是 Spotify 沒有上架，或歌名與 Spotify 上的版本不同。你可以手動修改歌名再搜尋。</p>
+        <p><b>YouTube「播放電台」能用嗎？</b><br>電台是 YouTube 隨機推薦的，每個人不同，無法透過網址抓取。建議改貼一般歌單連結。</p>
+      </div>
+    </details>
 
     <footer class="footer">
       <span class="footer-brand">HelloRuru</span> · <a href="https://tools.helloruru.com">更多工具</a> · <a href="https://ohruru.com">社群代操</a>
