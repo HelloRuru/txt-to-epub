@@ -276,8 +276,8 @@ function ToolCard({ tool, index }) {
       className="tool-card group relative flex flex-col p-7 rounded-3xl overflow-hidden animate-fadeInUp"
       style={{
         background: 'var(--bg-card)',
-        border: '1px solid var(--border)',
-        boxShadow: 'var(--shadow)',
+        border: '1px solid rgba(212,165,165,0.15)',
+        boxShadow: 'var(--shadow-sm)',
         animationDelay: `${index * 0.08}s`,
         textDecoration: 'none',
         color: 'inherit',
@@ -336,7 +336,7 @@ export default function Home() {
         <header className="flex justify-between items-center mb-16">
           <a href="https://lab.helloruru.com" className="flex items-center gap-4 group">
             <div
-              className="w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:rotate-[-15deg] group-hover:scale-110"
+              className="w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-300 ease-out group-hover:rotate-[-3deg] group-hover:scale-110"
               style={{
                 background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
                 boxShadow: '0 4px 20px rgba(212, 165, 165, 0.3)',
@@ -374,8 +374,8 @@ export default function Home() {
             </span>
           </h1>
           <p
-            className="font-serif text-base leading-relaxed tracking-wide mb-5"
-            style={{ color: 'var(--text-secondary)' }}
+            className="font-serif text-base leading-relaxed mb-5"
+            style={{ color: 'var(--text-secondary)', letterSpacing: '0.02em' }}
           >
             簡單好用的線上小工具。<br />全程本機處理，保護你的隱私。
           </p>
@@ -384,9 +384,9 @@ export default function Home() {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm"
               style={{
                 background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
+                border: '1px solid rgba(184,169,201,0.2)',
                 color: 'var(--text-muted)',
-                boxShadow: 'var(--shadow)',
+                letterSpacing: '0.02em',
               }}
             >
               <ShieldIcon style={{ color: 'var(--accent-primary)' }} />
@@ -418,7 +418,7 @@ export default function Home() {
                 >
                   {cat.label}
                 </h2>
-                <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+                <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, var(--border), transparent)' }} />
                 <span
                   className="hidden sm:inline text-xs whitespace-nowrap"
                   style={{ color: 'var(--text-muted)' }}
@@ -437,10 +437,9 @@ export default function Home() {
           )
         })}
 
-        {/* Footer */}
+        {/* Footer — DS 2.0 漸層淡線 */}
         <footer
-          className="mt-10 pt-12 text-center"
-          style={{ borderTop: '1px solid var(--border)' }}
+          className="mt-10 pt-12 text-center footer-gradient-line"
         >
           <p
             className="font-serif text-sm flex items-center justify-center gap-2 mb-4"

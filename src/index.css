@@ -1,4 +1,4 @@
-/* HelloRuru Design System v1.8 */
+/* HelloRuru Design System v2.0 經典版 */
 
 @tailwind base;
 @tailwind components;
@@ -39,40 +39,76 @@
   --sage: #A8B5A0;
 }
 
-/* Light Mode */
+/* Light Mode — DS 2.0 經典版 */
 body {
   --bg-primary: #FFFCFA;
   --bg-secondary: #FDF6F0;
   --bg-card: #FFFFFF;
+  --bg-card-hover: #FDF8F7;
   --text-primary: #3D3535;
-  --text-secondary: #6B5B5B;
-  --text-muted: #A09090;
+  --text-secondary: #4A4A4A;
+  --text-muted: #AAAAAA;
   --accent-primary: #D4A5A5;
   --accent-secondary: #B8A9C9;
   --accent-tertiary: #C9929A;
+  --c-coral: #E8A87C;
+  --c-gray-rose: #C9929A;
   --border: rgba(212, 165, 165, 0.15);
-  --shadow: 0 4px 24px rgba(212, 165, 165, 0.12);
-  --shadow-hover: 0 12px 48px rgba(212, 165, 165, 0.2);
+  --gradient-primary: linear-gradient(135deg, #D4A5A5, #B8A9C9);
+  /* 多層柔陰影（Josh Comeau 分層法） */
+  --shadow-sm:
+    0 1px 2px rgba(212,165,165,0.07),
+    0 2px 4px rgba(212,165,165,0.07),
+    0 4px 8px rgba(212,165,165,0.07);
+  --shadow:
+    0 2px 4px rgba(212,165,165,0.07),
+    0 4px 8px rgba(212,165,165,0.07),
+    0 8px 16px rgba(212,165,165,0.07),
+    0 16px 32px rgba(212,165,165,0.07);
+  --shadow-lg:
+    0 4px 8px rgba(212,165,165,0.07),
+    0 8px 16px rgba(212,165,165,0.07),
+    0 16px 32px rgba(212,165,165,0.07),
+    0 32px 64px rgba(212,165,165,0.07);
+  --shadow-hover: var(--shadow);
   --card-glow: rgba(212, 165, 165, 0.08);
   --icon-stroke: #D4A5A5;
 }
 
-/* Dark Mode */
+/* Dark Mode — DS 2.0 暖可可 */
 body.dark {
-  --bg-primary: #1E1A1D;
-  --bg-secondary: #2A2428;
-  --bg-card: #322C30;
-  --text-primary: #F5EDE9;
-  --text-secondary: #C5B5B0;
-  --text-muted: #8A7A75;
-  --accent-primary: #E8B4B8;
-  --accent-secondary: #C9B8D4;
+  --bg-primary: #1E181B;
+  --bg-secondary: #282224;
+  --bg-card: #282224;
+  --bg-card-hover: #302A2C;
+  --text-primary: #EDE8E9;
+  --text-secondary: #C4BBBF;
+  --text-muted: #6B6466;
+  --accent-primary: #DAAEB0;
+  --accent-secondary: #C2B4D0;
   --accent-tertiary: #D4A0A8;
-  --border: rgba(232, 180, 184, 0.1);
-  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-  --shadow-hover: 0 12px 48px rgba(232, 180, 184, 0.15);
+  --c-coral: #F0B88C;
+  --c-gray-rose: #D4A0A4;
+  --border: rgba(224, 175, 175, 0.1);
+  --gradient-primary: linear-gradient(135deg, #DAAEB0, #C2B4D0);
+  /* 多層柔陰影（深色版） */
+  --shadow-sm:
+    0 1px 2px rgba(0,0,0,0.12),
+    0 2px 4px rgba(0,0,0,0.12),
+    0 4px 8px rgba(0,0,0,0.12);
+  --shadow:
+    0 2px 4px rgba(0,0,0,0.12),
+    0 4px 8px rgba(0,0,0,0.12),
+    0 8px 16px rgba(0,0,0,0.12),
+    0 16px 32px rgba(0,0,0,0.12);
+  --shadow-lg:
+    0 4px 8px rgba(0,0,0,0.15),
+    0 8px 16px rgba(0,0,0,0.15),
+    0 16px 32px rgba(0,0,0,0.15),
+    0 32px 64px rgba(0,0,0,0.15);
+  --shadow-hover: var(--shadow);
   --card-glow: rgba(232, 180, 184, 0.06);
-  --icon-stroke: #E8B4B8;
+  --icon-stroke: #DAAEB0;
 }
 
 * {
@@ -116,18 +152,21 @@ body::before {
   background-clip: text;
 }
 
-/* Cards */
+/* Cards — DS 2.0 統一卡片系統 */
 .card {
   background: var(--bg-card);
   border-radius: 24px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid rgba(212,165,165,0.15);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s ease-out, box-shadow 0.18s ease-out, background 0.4s ease;
 }
 
-.card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-hover);
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+    background: var(--bg-card-hover);
+  }
 }
 
 .card::before {
@@ -136,61 +175,79 @@ body::before {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 3px;
   background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
   border-radius: 24px 24px 0 0;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  opacity: 0.5;
+  transition: opacity 0.18s ease-out;
 }
 
-.card:hover::before {
-  opacity: 1;
+@media (hover: hover) {
+  .card:hover::before {
+    opacity: 1;
+  }
 }
 
-/* Buttons */
+/* Buttons — DS 2.0 */
 .btn-primary {
   padding: 12px 24px;
-  border-radius: 100px;
+  border-radius: 24px;
   border: none;
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
   color: white;
-  font-family: 'Noto Sans TC', sans-serif;
+  font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(212, 165, 165, 0.3);
+  transition: transform 0.18s ease-out, box-shadow 0.18s ease-out;
+  box-shadow: 0 2px 8px rgba(212, 165, 165, 0.3);
 }
 
-.btn-primary:hover {
-  transform: scale(1.05);
+@media (hover: hover) {
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(212, 165, 165, 0.4);
+  }
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.97);
+  transition-duration: 0.1s;
 }
 
 .btn-secondary {
   padding: 12px 24px;
-  border-radius: 100px;
+  border-radius: 24px;
   border: 1px solid var(--border);
   background: var(--bg-card);
   color: var(--text-secondary);
-  font-family: 'Noto Sans TC', sans-serif;
+  font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.18s ease-out, border-color 0.18s ease-out, color 0.18s ease-out;
 }
 
-.btn-secondary:hover {
-  border-color: var(--accent-primary);
-  color: var(--accent-primary);
+@media (hover: hover) {
+  .btn-secondary:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    transform: translateY(-2px);
+  }
 }
 
-/* Icon containers */
+.btn-secondary:active:not(:disabled) {
+  transform: scale(0.97);
+  transition-duration: 0.1s;
+}
+
+/* Icon containers — DS 2.0 */
 .icon-container {
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.18s ease-out;
 }
 
 .icon-container.rose {
@@ -205,8 +262,10 @@ body::before {
   background: linear-gradient(135deg, rgba(168, 181, 160, 0.2) 0%, rgba(184, 169, 201, 0.15) 100%);
 }
 
-.icon-container:hover {
-  transform: scale(1.1) rotate(-5deg);
+@media (hover: hover) {
+  .icon-container:hover {
+    transform: scale(1.1) rotate(-3deg);
+  }
 }
 
 /* Scrollbar */
@@ -294,27 +353,72 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
 }
 
-/* Tool card hover */
+/* Tool card — DS 2.0 統一卡片效果 */
 .tool-card {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 0.4s ease;
+  transition: transform 0.18s ease-out, box-shadow 0.18s ease-out, background 0.4s ease;
 }
-.tool-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-hover);
-}
-.tool-card:hover .top-bar {
-  opacity: 1 !important;
-}
+
 .tool-card .card-arrow {
   opacity: 0;
   transform: translateX(-8px);
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.18s ease-out, transform 0.18s ease-out;
 }
-.tool-card:hover .card-arrow {
-  opacity: 1;
-  transform: translateX(0);
+
+@media (hover: hover) {
+  .tool-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+    background: var(--bg-card-hover) !important;
+  }
+  .tool-card:hover .top-bar {
+    opacity: 1 !important;
+  }
+  .tool-card:hover .card-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .tool-card:hover .tool-icon {
+    transform: scale(1.1) rotate(-3deg);
+  }
 }
-.tool-card:hover .tool-icon {
-  transform: scale(1.1) rotate(-5deg);
+
+/* 連結底線滑入動畫 — DS 2.0 去 AI 感 */
+a:not(.tool-card):not(.ext-link):not([class*="btn"]):not(.back-to-top) {
+  text-decoration: none;
+  background-image: linear-gradient(var(--accent-secondary, #B8A9C9), var(--accent-secondary, #B8A9C9));
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.3s ease;
+}
+
+@media (hover: hover) {
+  a:not(.tool-card):not(.ext-link):not([class*="btn"]):not(.back-to-top):hover {
+    background-size: 100% 1px;
+  }
+}
+
+/* Footer 漸層淡線 — DS 2.0 */
+.footer-gradient-line {
+  position: relative;
+}
+.footer-gradient-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+  opacity: 0.5;
+}
+
+/* 全站無障礙動畫總開關 — DS 2.0 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
