@@ -264,11 +264,32 @@ hello-ruru-header { display: block; margin-bottom: var(--space-lg); }
   margin-bottom: var(--space-sm);
   line-height: 1.4;
 }
-.guide-steps {
-  font-family: var(--font-body);
+ol.guide-steps {
+  list-style: none;
+  counter-reset: step;
+  padding: 0;
+  margin: 0;
+}
+ol.guide-steps li {
+  counter-increment: step;
   color: var(--text-primary);
   font-weight: 500;
   line-height: 2.3;
+  padding-left: 28px;
+  position: relative;
+}
+ol.guide-steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  width: 20px; height: 20px;
+  background: var(--color-sage);
+  color: #fff;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  top: 8px;
 }
 
 /* ── 書頁卡片 C — FAQ ── */
@@ -279,7 +300,6 @@ hello-ruru-header { display: block; margin-bottom: var(--space-lg); }
   padding: var(--space-lg) var(--space-lg) var(--space-lg) calc(var(--space-lg) + 8px);
   box-shadow: 2px 3px 8px rgba(92, 74, 58, 0.08);
   position: relative;
-  transform: rotate(-0.3deg);
   font-family: var(--font-body);
   font-size: 14px;
   font-weight: 500;
@@ -322,11 +342,24 @@ html.dark .card-page::before {
   background: linear-gradient(225deg, var(--bg-page) 50%, #2E302A 50%, #383A34 60%, #24261F 60%);
 }
 
-.guide-faq p { margin-bottom: var(--space-md); }
-.guide-faq strong {
-  font-family: var(--font-serif);
+/* ── FAQ List (dl) ── */
+.faq-list { margin: 0; }
+.faq-list dt {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
   color: var(--color-ink);
-  font-weight: 600;
+  margin-top: var(--space-md);
+  padding-left: var(--space-sm);
+  border-left: 3px solid var(--color-sage);
+}
+.faq-list dt:first-child { margin-top: 0; }
+.faq-list dd {
+  margin: var(--space-xs) 0 0 0;
+  padding-left: calc(var(--space-sm) + 3px);
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.9;
 }
 
 /* ── 金線分隔 ── */
@@ -435,7 +468,32 @@ html.dark .card-page::before {
 
 /* ── Bookmarklet Panel ── */
 .bm-panel { font-size: 14px; }
-.bm-steps { display: flex; flex-direction: column; gap: var(--space-sm); }
+ol.bm-steps {
+  list-style: none;
+  counter-reset: step;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+ol.bm-steps > li {
+  counter-increment: step;
+  padding-left: 28px;
+  position: relative;
+}
+ol.bm-steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0; top: 2px;
+  width: 20px; height: 20px;
+  background: var(--color-readmoo);
+  color: #fff;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
 .bm-step { color: var(--text-secondary); line-height: 1.8; }
 .bm-hint { font-size: 12px; color: var(--text-muted); }
 .bm-action {

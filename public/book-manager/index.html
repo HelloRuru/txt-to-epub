@@ -91,12 +91,12 @@
         </div>
         <div class="guide-card">
           <h3 class="guide-title">怎麼用？</h3>
-          <p class="guide-steps">
-            ➊ 把 Bookmarklet 拖到書籤列<br>
-            ➋ 到讀墨書櫃頁面，按一下書籤<br>
-            ➌ 書單自動掃描帶回來，重複的會標出來<br>
-            ➍ 其他平台的書，手動貼上書名就好
-          </p>
+          <ol class="guide-steps">
+            <li>把 Bookmarklet 拖到書籤列</li>
+            <li>到讀墨書櫃頁面，按一下書籤</li>
+            <li>書單自動掃描帶回來</li>
+            <li>重複的書自動標出來，也可以搜尋、篩選、匯出 CSV</li>
+          </ol>
           <p>不需要輸入密碼，用你平常的方式登入讀墨就行。</p>
           <p>書單只存在你的瀏覽器裡，不會上傳到任何地方。</p>
         </div>
@@ -116,18 +116,18 @@
         </div>
 
         <div class="bm-panel" id="bm-readmoo">
-          <div class="bm-steps">
-            <p class="bm-step">➊ 把下面的按鈕拖到書籤列<span class="bm-hint">（手機：長按 → 加入書籤）</span></p>
+          <ol class="bm-steps">
+            <li class="bm-step">把下面的按鈕拖到書籤列<span class="bm-hint">（手機：長按 → 加入書籤）</span></li>
             <div class="bm-action">
               <a class="bm-link" id="bm-link-readmoo" href="#">
                 <i data-lucide="book-open" width="16" height="16"></i> 撈讀墨書櫃
               </a>
               <button class="btn btn-sm btn-outline" id="btn-copy-bm">複製</button>
             </div>
-            <p class="bm-step">➋ 到 <strong>read.readmoo.com</strong> 登入，打開書櫃頁面</p>
-            <p class="bm-step">➌ 在書櫃頁面點擊書籤，它會自動捲動掃描所有書</p>
-            <p class="bm-step">➍ 確認數量後，書單自動帶回這裡</p>
-          </div>
+            <li class="bm-step">到 <strong>read.readmoo.com</strong> 登入，打開書櫃頁面</li>
+            <li class="bm-step">在書櫃頁面點擊書籤，自動捲動掃描所有書</li>
+            <li class="bm-step">確認數量後自動跳回，書櫃列表就會出現在下方，重複的書會標出來</li>
+          </ol>
           <p class="form-note">不需要輸入密碼。什麼登入方式都行（Passkey、OTP、密碼）。</p>
         </div>
 
@@ -197,25 +197,23 @@
 
     <!-- ── 常見問題 ── -->
     <section class="section" id="section-faq">
-      <div class="card-page">
-        <h3 class="card-page-title">常見問題</h3>
-        <div class="guide-faq">
-          <p><strong>Bookmarklet 是什麼？</strong><br>
-          一小段存在書籤裡的程式。在讀墨書櫃頁面按一下，它會自動捲動掃描所有書名，然後帶回這裡。不需要輸入帳號密碼。</p>
+      <h2>常見問題</h2>
+      <dl class="faq-list">
+        <dt>Bookmarklet 是什麼？</dt>
+        <dd>一小段存在書籤裡的程式。在讀墨書櫃頁面按一下，它會自動捲動掃描所有書名，然後帶回這裡。不需要輸入帳號密碼。</dd>
 
-          <p><strong>需要輸入密碼嗎？</strong><br>
-          讀墨不用。你用平常的方式登入讀墨（Passkey、OTP、密碼都行），Bookmarklet 只讀頁面上的書名，不碰任何帳號資料。</p>
+        <dt>需要輸入密碼嗎？</dt>
+        <dd>讀墨不用。你用平常的方式登入讀墨（Passkey、OTP、密碼都行），Bookmarklet 只讀頁面上的書名，不碰任何帳號資料。</dd>
 
-          <p><strong>書單存在哪裡？</strong><br>
-          存在你自己的瀏覽器裡，不會上傳到任何地方。換瀏覽器或清除資料就會消失。</p>
+        <dt>書單存在哪裡？</dt>
+        <dd>存在你自己的瀏覽器裡，不會上傳到任何地方。換瀏覽器或清除資料就會消失。</dd>
 
-          <p><strong>可以撈幾次？</strong><br>
-          想撈幾次都行。同一個平台重複撈，已有的書不會重複加入。</p>
+        <dt>可以撈幾次？</dt>
+        <dd>想撈幾次都行。同一個平台重複撈，已有的書不會重複加入。</dd>
 
-          <p><strong>重複怎麼判斷的？</strong><br>
-          比對書名。空格、標點、副標題括號這些差異會自動忽略，盡量幫你把同一本書認出來。</p>
-        </div>
-      </div>
+        <dt>重複怎麼判斷的？</dt>
+        <dd>比對書名。空格、標點、副標題括號這些差異會自動忽略，盡量幫你把同一本書認出來。</dd>
+      </dl>
     </section>
 
     <!-- 金線分隔 -->
