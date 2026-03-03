@@ -14,19 +14,7 @@ function initReadmooSearch() {
 
   let isOpen = false;
   let debounceTimer = null;
-  let searchMode = 'title'; // 'title' or 'author'
   let isComposing = false; // 中文輸入法組字中，不觸發搜尋
-
-  // Search mode toggle
-  modeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      modeBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      searchMode = btn.dataset.mode;
-      input.placeholder = searchMode === 'author' ? '輸入作者名...' : '輸入書名...';
-      input.focus();
-    });
-  });
 
   // Toggle search panel
   btnToggle.addEventListener('click', () => {
@@ -41,18 +29,18 @@ function initReadmooSearch() {
     isComposing = false;
     clearTimeout(debounceTimer);
     const q = input.value.trim();
-    if (q.length >= 2) {
-      debounceTimer = setTimeout(doSearch, 300);
+    if (q.length >= 1) {
+      debounceTimer = setTimeout(doSearch, 400);
     }
   });
 
-  // Debounced search on typing (300ms)
+  // Debounced search on typing (400ms)
   input.addEventListener('input', () => {
     if (isComposing) return; // 組字中跳過
     clearTimeout(debounceTimer);
     const q = input.value.trim();
-    if (q.length >= 2) {
-      debounceTimer = setTimeout(doSearch, 300);
+    if (q.length >= 1) {
+      debounceTimer = setTimeout(doSearch, 400);
     }
   });
 
@@ -73,7 +61,7 @@ function initReadmooSearch() {
   async function doSearch() {
     const query = input.value.trim();
     if (!query) {
-      showToast(searchMode === 'author' ? '請輸入作者名' : '請輸入書名');
+      showToast('請輸入關鍵字');
       return;
     }
 
@@ -99,24 +87,14 @@ function initReadmooSearch() {
       const data = await res.json();
       const cacheHit = res.headers.get('X-Cache') === 'HIT';
 
-      let books = data.books;
-
-      // Client-side filtering by search mode
-      if (searchMode === 'author' && books.length > 0) {
-        const q = query.toLowerCase();
-        books = books.filter(b => b.author && b.author.toLowerCase().includes(q));
-      } else if (searchMode === 'title' && books.length > 0) {
-        const q = query.toLowerCase();
-        books = books.filter(b => b.title && b.title.toLowerCase().includes(q));
-      }
+      const books = data.books;
 
       if (books.length === 0) {
-        statusEl.innerHTML = '輸入其他關鍵字？又或是試試這個工具，查查這本書有沒有電子書：<a href="https://taiwan-ebook-lover.github.io/" target="_blank" rel="noopener">台灣電子書搜尋</a>';
+        statusEl.innerHTML = '找不到相關書籍，試試其他關鍵字？或用這個工具查查看：<a href="https://taiwan-ebook-lover.github.io/" target="_blank" rel="noopener">台灣電子書搜尋</a>';
         return;
       }
 
-      const modeLabel = searchMode === 'author' ? '作者' : '書名';
-      statusEl.innerHTML = `${modeLabel}「${escapeHtml(query)}」找到 ${books.length} 本${cacheHit ? ' <span class="cache-badge">快取</span>' : ''}`;
+      statusEl.innerHTML = `「${escapeHtml(query)}」找到 ${books.length} 本${cacheHit ? ' <span class="cache-badge">快取</span>' : ''}`;
       renderResults(books);
     } catch (err) {
       const isTimeout = err.name === 'AbortError';
