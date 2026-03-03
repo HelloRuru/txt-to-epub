@@ -15,6 +15,7 @@ function initReadmooSearch() {
   let isOpen = false;
   let debounceTimer = null;
   let searchMode = 'title'; // 'title' or 'author'
+  let isComposing = false; // 中文輸入法組字中，不觸發搜尋
 
   // Search mode toggle
   modeBtns.forEach(btn => {
@@ -34,8 +35,20 @@ function initReadmooSearch() {
     if (isOpen) input.focus();
   });
 
+  // 中文 IME 組字事件：組字中不觸發搜尋
+  input.addEventListener('compositionstart', () => { isComposing = true; });
+  input.addEventListener('compositionend', () => {
+    isComposing = false;
+    clearTimeout(debounceTimer);
+    const q = input.value.trim();
+    if (q.length >= 2) {
+      debounceTimer = setTimeout(doSearch, 300);
+    }
+  });
+
   // Debounced search on typing (300ms)
   input.addEventListener('input', () => {
+    if (isComposing) return; // 組字中跳過
     clearTimeout(debounceTimer);
     const q = input.value.trim();
     if (q.length >= 2) {
@@ -69,9 +82,14 @@ function initReadmooSearch() {
     resultsEl.innerHTML = '';
 
     try {
-      const apiBase = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
-        ? '' : '';
-      const res = await fetch(`/api/readmoo-search?q=${encodeURIComponent(query)}`);
+      // 10 秒超時，避免 fetch 卡住
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+
+      const res = await fetch(`/api/readmoo-search?q=${encodeURIComponent(query)}`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -101,7 +119,13 @@ function initReadmooSearch() {
       statusEl.innerHTML = `${modeLabel}「${escapeHtml(query)}」找到 ${books.length} 本${cacheHit ? ' <span class="cache-badge">快取</span>' : ''}`;
       renderResults(books);
     } catch (err) {
-      statusEl.innerHTML = `<span class="search-error">搜尋失敗：${escapeHtml(err.message)}</span>`;
+      const isTimeout = err.name === 'AbortError';
+      const msg = isTimeout
+        ? '連線逾時，可能是網路不穩。'
+        : `搜尋失敗：${escapeHtml(err.message)}`;
+      statusEl.innerHTML = `<span class="search-error">${msg}</span> <button class="btn-secondary btn-sm" id="btn-retry-search" style="margin-left:8px;">重試</button>`;
+      const retryBtn = document.getElementById('btn-retry-search');
+      if (retryBtn) retryBtn.addEventListener('click', doSearch);
     }
   }
 

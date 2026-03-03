@@ -1015,6 +1015,19 @@ html.dark .storybook-page::before {
   opacity: 0.3;
   cursor: not-allowed;
 }
+.queue-card-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md) var(--space-sm);
+  font-size: 13px;
+}
+.queue-card-footer .chain-date-input,
+.queue-card-footer .chain-order-input {
+  padding: 4px 8px;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+}
 
 .hint-text {
   color: var(--text-hint);
@@ -1509,6 +1522,9 @@ html.dark .theme-toggle .icon-moon { display: none; }
   .queue-card-body .chain-book-select {
     flex: 1 1 100%;
     order: -1;
+  }
+  .queue-card-footer {
+    flex-wrap: wrap;
   }
 
   .form-row {

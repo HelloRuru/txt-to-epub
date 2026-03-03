@@ -45,11 +45,13 @@
   </style>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap">
 
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-
-  <!-- SheetJS for Excel export -->
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <!-- Lucide Icons (async: 不阻塞頁面，載完才渲染圖示) -->
+  <script async src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"
+    onload="if(window.lucide)lucide.createIcons()"
+    onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js'"></script>
+  <!-- SheetJS for Excel export (async: 只有匯出時才用到) -->
+  <script async src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"
+    onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js'"></script>
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/style.min.css">
@@ -373,6 +375,12 @@
           <div id="chain-queue" class="chain-queue">
             <!-- Dynamically populated -->
           </div>
+
+          <div class="chain-actions" id="chain-copy-line" style="display:none;">
+            <button id="btn-copy-line-msg" class="btn-primary">
+              <i data-lucide="message-circle"></i> 複製 LINE 訊息
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -521,10 +529,10 @@
         </div>
       </div>
 
-      <!-- Step 2: 快速通關 -->
+      <!-- Step 2: 社群驗證 -->
       <div id="quiz-step" class="modal-step" style="display:none;">
-        <h2>快速通關</h2>
-        <p class="modal-desc">回答兩題，確認你是社群夥伴。</p>
+        <h2>社群驗證</h2>
+        <p class="modal-desc">因為是社群專屬工具，編輯相關功能需要回答兩個問題驗證！</p>
 
         <div class="quiz-question" id="quiz-q1">
           <h3>你所屬的社群名稱是？</h3>
@@ -669,6 +677,11 @@
         <select id="purchase-via" class="input-field">
           <option value="">-- 選擇 --</option>
         </select>
+      </div>
+      <div class="form-group">
+        <label for="purchase-order">訂單編號（後三碼遮一碼）</label>
+        <input type="text" id="purchase-order" class="input-field" placeholder="如 3*5" maxlength="3">
+        <p class="hint-text">例如訂單 12345，填 3*5（中間遮一碼）</p>
       </div>
 
       <input type="hidden" id="purchase-book-id">

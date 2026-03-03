@@ -45,16 +45,21 @@ export async function onRequest(context) {
     return resp;
   }
 
-  // --- Fetch from Readmoo ---
+  // --- Fetch from Readmoo (8 秒超時) ---
   try {
     const searchUrl = `https://readmoo.com/search/keyword?q=${encodeURIComponent(query)}`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
     const rmRes = await fetch(searchUrl, {
+      signal: controller.signal,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         'Accept-Language': 'zh-TW,zh;q=0.9',
         'Accept': 'text/html',
       },
     });
+    clearTimeout(timeout);
 
     if (!rmRes.ok) {
       return new Response(JSON.stringify({ error: `Readmoo returned ${rmRes.status}` }), {

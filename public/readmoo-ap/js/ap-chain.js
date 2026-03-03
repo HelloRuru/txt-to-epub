@@ -22,6 +22,11 @@ function initChain() {
   let chainDone = new Set();
   // Map: memberId → bookId
   let chainBookMap = {};
+  // Map: memberId → orderNumber（內嵌輸入）
+  let chainOrderMap = {};
+  // Map: memberId → purchaseDate（內嵌輸入）
+  let chainDateMap = {};
+  const todayStr = new Date().toISOString().split('T')[0];
 
   // Render member selection grid
   function renderMembers(filter = '') {
@@ -93,7 +98,10 @@ function initChain() {
 
   // Render active chain
   function renderChainActive() {
-    const books = getBooks().filter(b => b.status === 'want');
+    const allBooks = getBooks();
+    // 顯示未購買的書 + 已在接龍中配對的書（即使已購買）
+    const pairedBookIds = new Set(Object.values(chainBookMap));
+    const books = allBooks.filter(b => b.status === 'want' || pairedBookIds.has(b.id));
     const total = chainQueue.length;
     const done = chainDone.size;
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
@@ -106,6 +114,9 @@ function initChain() {
       const isDone = chainDone.has(m.id);
       const selectedBookId = chainBookMap[m.id] || '';
       const selectedBook = books.find(b => b.id === selectedBookId);
+      const orderVal = chainOrderMap[m.id] || '';
+
+      const dateVal = chainDateMap[m.id] || todayStr;
 
       return `
         <div class="queue-card ${isDone ? 'done' : ''}">
@@ -129,6 +140,13 @@ function initChain() {
               <i data-lucide="external-link"></i> AP 連結
             </a>
           </div>
+          <div class="queue-card-footer">
+            <input type="date" class="input-field chain-date-input" data-member="${m.id}"
+                   value="${dateVal}" style="width:140px;">
+            <input type="text" class="input-field chain-order-input" data-member="${m.id}"
+                   placeholder="訂單 如 3*5" maxlength="3" value="${escapeHtml(orderVal)}"
+                   style="width:80px; text-align:center;">
+          </div>
         </div>
       `;
     }).join('');
@@ -138,26 +156,43 @@ function initChain() {
       cb.addEventListener('change', () => {
         const memberId = cb.dataset.id;
         if (cb.checked) {
+          const bookId = chainBookMap[memberId];
+          if (bookId) {
+            // 直接標記書為已購買（不跳窗）
+            const member = chainQueue.find(m => m.id === memberId);
+            const orderVal = chainOrderMap[memberId] || '';
+            const dateVal = chainDateMap[memberId] || todayStr;
+            const allBooks = getBooks();
+            const book = allBooks.find(b => b.id === bookId);
+            if (book) {
+              book.status = 'bought';
+              book.purchaseDate = dateVal;
+              book.purchaseVia = member ? member.name : '';
+              book.orderNumber = orderVal;
+              saveBooks(allBooks);
+              document.dispatchEvent(new Event('books-updated'));
+            }
+          }
           chainDone.add(memberId);
-          // Mark the paired book as bought
+          renderChainActive();
+        } else {
+          chainDone.delete(memberId);
+          // 同時取消書的購買標記
           const bookId = chainBookMap[memberId];
           if (bookId) {
             const allBooks = getBooks();
             const book = allBooks.find(b => b.id === bookId);
-            if (book && book.status === 'want') {
-              const member = chainQueue.find(m => m.id === memberId);
-              book.status = 'bought';
-              book.purchaseDate = new Date().toISOString().split('T')[0];
-              book.purchaseVia = member ? member.name : '';
+            if (book && book.status === 'bought') {
+              book.status = 'want';
+              delete book.purchaseDate;
+              delete book.purchaseVia;
+              delete book.orderNumber;
               saveBooks(allBooks);
-              showToast(`已標記購買：${book.title}`);
               document.dispatchEvent(new Event('books-updated'));
             }
           }
-        } else {
-          chainDone.delete(memberId);
+          renderChainActive();
         }
-        renderChainActive();
       });
     });
 
@@ -166,6 +201,18 @@ function initChain() {
         chainBookMap[sel.dataset.member] = sel.value;
         // Re-render to update copy button state
         renderChainActive();
+      });
+    });
+
+    // 日期和訂單編號即時記住（不 re-render，避免失焦）
+    queueEl.querySelectorAll('.chain-date-input').forEach(inp => {
+      inp.addEventListener('change', () => {
+        chainDateMap[inp.dataset.member] = inp.value;
+      });
+    });
+    queueEl.querySelectorAll('.chain-order-input').forEach(inp => {
+      inp.addEventListener('input', () => {
+        chainOrderMap[inp.dataset.member] = inp.value.trim();
       });
     });
 
@@ -178,6 +225,63 @@ function initChain() {
     });
 
     if (window.lucide) lucide.createIcons();
+
+    // 有完成的接龍時顯示「複製 LINE 訊息」按鈕
+    const copyLineEl = document.getElementById('chain-copy-line');
+    if (copyLineEl) {
+      copyLineEl.style.display = done > 0 ? 'flex' : 'none';
+    }
+  }
+
+  // 產生 LINE 訊息：同訂單合併，名字前加 @
+  function generateLineMessage() {
+    const allBooks = getBooks();
+    // 收集已完成的接龍：memberId → book
+    const doneItems = [];
+    chainQueue.forEach(m => {
+      if (!chainDone.has(m.id)) return;
+      const bookId = chainBookMap[m.id];
+      if (!bookId) return;
+      const book = allBooks.find(b => b.id === bookId);
+      if (!book) return;
+      doneItems.push({
+        name: m.name,
+        orderNumber: book.orderNumber || ''
+      });
+    });
+
+    // 按訂單編號分組
+    const groups = {};
+    doneItems.forEach(item => {
+      const key = item.orderNumber || '(無編號)';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(item.name);
+    });
+
+    // 組合訊息
+    const lines = ['AP正在飛往你的路上～'];
+    let i = 1;
+    Object.entries(groups).forEach(([orderNum, names]) => {
+      const nameStr = names.map(n => `@${n}`).join(' ');
+      if (orderNum === '(無編號)') {
+        lines.push(`${i}. ${nameStr}`);
+      } else {
+        lines.push(`${i}. 訂單編號 ${orderNum} ${nameStr}`);
+      }
+      i++;
+    });
+    lines.push('請收～～');
+
+    return lines.join('\n');
+  }
+
+  // 複製 LINE 訊息按鈕
+  const btnCopyLine = document.getElementById('btn-copy-line-msg');
+  if (btnCopyLine) {
+    btnCopyLine.addEventListener('click', () => {
+      const msg = generateLineMessage();
+      copyToClipboard(msg);
+    });
   }
 
   // Initial render

@@ -284,6 +284,7 @@ function initBooks() {
   });
 
   // Purchase save
+  const purchaseOrderEl = document.getElementById('purchase-order');
   btnPurchaseSave.addEventListener('click', () => {
     const bookId = purchaseBookId.value;
     const books = getBooks();
@@ -292,10 +293,13 @@ function initBooks() {
       book.status = 'bought';
       book.purchaseDate = purchaseDate.value;
       book.purchaseVia = purchaseVia.value;
+      book.orderNumber = purchaseOrderEl ? purchaseOrderEl.value.trim() : '';
       saveBooks(books);
       closeModal('purchase-modal');
       showToast('已標記為已購買');
+
       render();
+      document.dispatchEvent(new Event('books-updated'));
     }
   });
 
