@@ -460,6 +460,8 @@ const CLASSIFY_RULES = [
   // ── 格式標記（括號內，最優先）──
   { re: /[（(]漫畫[）)]/, cat: '漫畫' },
   { re: /[（(]輕小說[）)]/, cat: '輕小說' },
+  // 英文/日文書名 +（小說）→ 輕小說（如 OVERLORD）
+  { re: /[A-Za-zァ-ヶぁ-ん].*[（(]小說[）)]/, cat: '輕小說' },
   { re: /[（(]小說[）)]/, cat: '文學小說' },
 
   // ── 漫畫 ──
@@ -537,30 +539,80 @@ function classifyByKeyword(title) {
   return null;
 }
 
-function classifyBooks() {
+async function classifyBooks() {
   const unclassified = AppState.books.filter(b => !b.category);
   if (unclassified.length === 0) {
     showToast('所有書都已分類');
     return;
   }
 
-  let classified = 0;
+  const btn = document.getElementById('btn-classify');
+  btn.disabled = true;
+
+  // ── Phase 1：關鍵字比對（瞬間）──
+  let keywordHits = 0;
   for (const book of unclassified) {
     const cat = classifyByKeyword(book.title);
     if (cat) {
       book.category = cat;
-      classified++;
+      keywordHits++;
     }
   }
 
   AppState.save();
   AppState.notify();
 
-  const remaining = unclassified.length - classified;
+  // ── Phase 2：剩餘的查讀墨書庫 ──
+  const stillUnclassified = AppState.books.filter(b => !b.category);
+
+  if (stillUnclassified.length > 0) {
+    btn.textContent = `查讀墨書庫中... (0/${stillUnclassified.length})`;
+
+    const BATCH = 10;
+    let apiHits = 0;
+    let done = 0;
+
+    for (let i = 0; i < stillUnclassified.length; i += BATCH) {
+      const batch = stillUnclassified.slice(i, i + BATCH);
+      const titles = batch.map(b => b.title);
+
+      try {
+        const res = await fetch('/api/classify-books', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ titles }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          for (const book of batch) {
+            if (data.results[book.title]) {
+              book.category = data.results[book.title];
+              apiHits++;
+            }
+          }
+        }
+      } catch (err) {
+        console.error('讀墨分類查詢失敗:', err);
+      }
+
+      done += batch.length;
+      btn.textContent = `查讀墨書庫中... (${done}/${stillUnclassified.length})`;
+      AppState.save();
+      AppState.notify();
+    }
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i data-lucide="tags" width="14" height="14"></i> 自動分類';
+  lucide.createIcons();
+
+  const total = AppState.books.filter(b => b.category).length;
+  const remaining = AppState.books.filter(b => !b.category).length;
   if (remaining > 0) {
-    showToast(`已分類 ${classified} 本，${remaining} 本需手動分類`);
+    showToast(`已分類 ${total} 本，${remaining} 本需手動分類`);
   } else {
-    showToast(`已分類 ${classified} 本`);
+    showToast(`已分類 ${total} 本`);
   }
 }
 
