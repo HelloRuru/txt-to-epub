@@ -280,7 +280,7 @@ function ToolCard({ tool, index }) {
   return (
     <CardTag
       {...cardProps}
-      className="tool-card group relative flex flex-col p-7 rounded-3xl overflow-hidden animate-fadeInUp"
+      className="tool-card group relative flex flex-col p-7 pb-16 rounded-3xl overflow-hidden animate-fadeInUp"
       style={{
         background: 'var(--bg-card)',
         border: '1px solid rgba(212,165,165,0.15)',
