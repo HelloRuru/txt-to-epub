@@ -433,34 +433,6 @@ html.dark .card-page::before {
 }
 .btn-pw-toggle:hover { color: var(--text-primary); }
 
-/* ── Method Toggle ── */
-.method-toggle {
-  display: flex;
-  margin-bottom: var(--space-md);
-  border: 2px solid var(--border-color);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-.method-tab {
-  flex: 1;
-  padding: 8px 14px;
-  border: none;
-  background: var(--bg-page);
-  color: var(--text-muted);
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-}
-.method-tab + .method-tab { border-left: 1px solid var(--border-color); }
-.method-tab:hover { color: var(--text-primary); }
-.method-tab.active {
-  background: var(--bg-card);
-  color: var(--color-ink);
-  font-weight: 600;
-}
-
 /* ── Bookmarklet Panel ── */
 .bm-panel { font-size: 14px; }
 .bm-steps { display: flex; flex-direction: column; gap: var(--space-sm); }
@@ -524,8 +496,6 @@ html.dark .card-page::before {
 .btn:active:not(:disabled) { transform: scale(0.97); }
 
 /* 平台按鈕 */
-.btn-readmoo { background: var(--color-readmoo); color: #fff; }
-.btn-readmoo:hover:not(:disabled) { background: #00A8E0; transform: translateY(-2px); box-shadow: var(--shadow-sm); }
 .btn-kobo { background: var(--color-kobo); color: #fff; }
 .btn-kobo:hover:not(:disabled) { background: #A30000; transform: translateY(-2px); box-shadow: var(--shadow-sm); }
 .btn-calibre { background: var(--color-calibre); color: #fff; }
@@ -564,7 +534,6 @@ html.dark .card-page::before {
   transition: width 0.3s;
   width: 0%;
 }
-.fill-readmoo { background: var(--color-readmoo); }
 .fill-kobo { background: var(--color-kobo); }
 .progress-text {
   display: block;
