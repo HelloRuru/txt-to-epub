@@ -1,42 +1,157 @@
-# Instagram 精選試色清單 - 2026年2月自動生成
-# 由 Claude 於 2026-02-11 根據熱門度自動整理
-# 已從 Instagram 搜尋到國外試色照
+# Instagram 精選試色清單 — 2026-03-04 大幅擴充
+# 從 Dcard / beauty321 / marieclaire / cosmopolitan 等美妝媒體整理
+# 50+ 熱門色號，有 IG URL 的已寫入 curated-posts.js
+#
+# 格式：品牌-色號（與 curated-posts.js 的 key 一致）
+# 有 ✅ 的 = 已有 IG URL，❌ = 待補充
 #
 # 完成後執行：bash auto-update.sh
 
-# YSL 聖羅蘭
-ysl-2
-https://www.instagram.com/p/DRG21z7EunS/
-https://www.instagram.com/p/DRVFshQkn2e/
+# ══════════════════════════════════════
+# Dior 迪奧（專櫃人氣王）
+# ══════════════════════════════════════
+# ✅ dior-999 — 傳奇正紅（全球最暢銷紅唇）
+# ✅ dior-720 — Icône 玫瑰木（豆沙色系）
+# ✅ dior-772 — Classic Rosewood 經典玫瑰木
+# ✅ dior-077 — 裸粉
+# ❌ dior-100 — Nude Look 高級裸
+# ❌ dior-840 — Forever Radiant
+# ❌ dior-809 — Infinite Rose 無限玫瑰
+# ❌ dior-806 — Lucky Rose 幸運玫瑰
+# ❌ dior-120 — Lip Glow 潤色護唇
 
-ysl-3
-https://www.instagram.com/p/DRG21z7EunS/
+# ══════════════════════════════════════
+# YSL 聖羅蘭（年輕女生首選）
+# ══════════════════════════════════════
+# ✅ ysl-2 — 幸運嫩粉
+# ✅ ysl-3 — 溫柔薔薇
+# ✅ ysl-1966 — 經典紅棕
+# ✅ ysl-44 — Loveshine 赤裸晨曦
+# ✅ ysl-154 — Loveshine Love Berry
+# ❌ ysl-409 — Rouge Pur Couture
+# ❌ ysl-1 — 迷幻銀河
+# ❌ ysl-7 — 巴黎草莓
 
-ysl-1966
-https://www.instagram.com/p/DRVFshQkn2e/
+# ══════════════════════════════════════
+# MAC（彩妝師愛用）
+# ══════════════════════════════════════
+# ✅ mac-ruby woo — 經典正紅（全球銷量冠軍）
+# ✅ mac-chili — 磚紅辣椒（亞洲超人氣）
+# ✅ mac-velvet teddy — 裸棕奶茶
+# ✅ mac-russian red — 經典冷紅
+# ✅ mac-taupe — 灰棕裸
+# ❌ mac-marrakesh — 橘棕
+# ❌ mac-diva — 深紅酒紅
+# ❌ mac-mehr — 乾燥玫瑰
+# ❌ mac-321 — TURNED ON 撩心莓
 
-# Dior 迪奧
-dior-077
-https://www.instagram.com/p/CxB6qShPnrq/
+# ══════════════════════════════════════
+# NARS（紐約酷女孩）
+# ══════════════════════════════════════
+# ✅ nars-dragon girl — 龍女紅（超顯白）
+# ❌ nars-dolce vita — DV豆沙色（斷貨王）
+# ❌ nars-133 — 裸色系
 
-dior-999
-https://www.instagram.com/p/Ci3p50hppN-/
-https://www.instagram.com/p/CaSuzNVPy1c/
-https://www.instagram.com/p/CxB6qShPnrq/
-
-# MAC
-mac-ruby woo
-https://www.instagram.com/p/CqueqAOugDG/
-
+# ══════════════════════════════════════
 # Chanel 香奈兒
-chanel-197
-https://www.instagram.com/p/CxnGTIzPodA/
-https://www.instagram.com/p/CnW9awbqspX/
+# ══════════════════════════════════════
+# ✅ chanel-197
+# ❌ chanel-444 — Gabrielle 正紅
+# ❌ chanel-466 — Carmen 熱情紅
+# ❌ chanel-432 — Cécile 玫瑰木
+# ❌ chanel-434 — Mademoiselle 裸粉
+# ❌ chanel-58 — Rouge Vie 深紅
 
-# 開架熱門（暫無 Instagram URL，需手動補充）
-# 凱婷怪獸級持色唇膏
-# kate-03
+# ══════════════════════════════════════
+# TOM FORD（頂級質感）
+# ══════════════════════════════════════
+# ✅ tomford-16 — Scarlet Rouge 經典紅
+# ✅ tomford-scarlet rouge — 同上（色名搜尋）
+# ❌ tomford-80 — Impassioned
+# ❌ tomford-lost cherry — 限定色
+# ❌ tomford-214 — 優雅裸棕
 
-# 媚比琳超持久霧感液態唇膏
-# maybelline-175
-# maybelline-118
+# ══════════════════════════════════════
+# Lancôme 蘭蔻
+# ══════════════════════════════════════
+# ❌ lancome-274 — French Tea 奶茶玫瑰（最美奶茶色）
+# ❌ lancome-196 — French Touch 楓紅玫瑰
+# ❌ lancome-888 — French Idol 酒漬玫瑰
+# ❌ lancome-264 — Peut être
+# ❌ lancome-40 — 裸茶色
+
+# ══════════════════════════════════════
+# Giorgio Armani 亞曼尼
+# ══════════════════════════════════════
+# ✅ armani-405 — Sultan 磚紅（Lip Maestro 經典）
+# ❌ armani-400 — The Red 正紅
+# ❌ armani-200 — Terra 陶土裸
+# ❌ armani-560 — 柔紗粉棕
+
+# ══════════════════════════════════════
+# Charlotte Tilbury
+# ══════════════════════════════════════
+# ✅ charlottetilbury-pillow talk — 夢幻裸粉（全球每2分鐘賣一支）
+# ❌ charlottetilbury-walk of shame — 深紅
+# ❌ charlottetilbury-very victoria — 裸色
+
+# ══════════════════════════════════════
+# Guerlain 嬌蘭
+# ══════════════════════════════════════
+# ❌ guerlain-325 — Rouge Kiss 正紅
+# ❌ guerlain-209 — Blooming Glow 丁香紫
+
+# ══════════════════════════════════════
+# Prada Beauty
+# ══════════════════════════════════════
+# ✅ prada-b101 — 廢裸棕（明星色）
+# ❌ prada-b107 — 峽谷紅
+# ❌ prada-r127 — 絲絨紅
+# ❌ prada-p155 — 微醺粉
+
+# ══════════════════════════════════════
+# Bobbi Brown
+# ══════════════════════════════════════
+# ❌ bobbibrown-parisian red — 巴黎紅（經典紅）
+# ❌ bobbibrown-neutral rose — 中性玫瑰
+
+# ══════════════════════════════════════
+# Estée Lauder 雅詩蘭黛
+# ══════════════════════════════════════
+# ❌ esteelauder-333 — Persuasive
+# ❌ esteelauder-420 — Rebellious Rose
+# ❌ esteelauder-185 — 流心楓糖
+
+# ══════════════════════════════════════
+# rom&nd 韓系（開架人氣王）
+# ══════════════════════════════════════
+# ✅ romand-03 — Bare Grape 葡萄裸
+# ✅ romand-04 — FigFig（舊版）
+# ✅ romand-05 — Jujube 棗紅
+# ✅ romand-06 — FigFig MLBB 冷玫瑰
+# ✅ romand-07 — Cherry Bomb 櫻桃炸彈
+# ✅ romand-33 — Bare Vine 裸藤
+# ❌ romand-28 — Bare Fig 無花果凍
+
+# ══════════════════════════════════════
+# 3CE（韓系潮牌）
+# ══════════════════════════════════════
+# ❌ 3ce-taupe — 磚紅棕（Velvet Lip Tint 經典）
+# ❌ 3ce-near and dear — Mood Recipe 裸色
+# ❌ 3ce-going right — 乾燥玫瑰
+
+# ══════════════════════════════════════
+# Maybelline 媚比琳（開架CP值王）
+# ══════════════════════════════════════
+# ✅ maybelline-vinyl ink — SuperStay Vinyl Ink 通用試色
+# ✅ maybelline-25 — 蜜桃絨泰迪
+# ✅ maybelline-60 — 玫瑰茶泰迪
+# ❌ maybelline-175
+# ❌ maybelline-118
+
+# ══════════════════════════════════════
+# 統計
+# ══════════════════════════════════════
+# ✅ 已有 IG URL：30 個色號
+# ❌ 待補充 URL：30+ 個色號
+# 總計：60+ 個熱門色號
