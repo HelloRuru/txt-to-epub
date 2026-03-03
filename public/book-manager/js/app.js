@@ -453,58 +453,115 @@ function downloadFile(content, filename, type) {
 }
 
 // ══════════════════════════════════════════════════
-// Classify (自動分類)
+// Classify (自動分類 — 純前端關鍵字比對)
 // ══════════════════════════════════════════════════
 
-async function classifyBooks() {
+const CLASSIFY_RULES = [
+  // ── 格式標記（括號內，最優先）──
+  { re: /[（(]漫畫[）)]/, cat: '漫畫' },
+  { re: /[（(]輕小說[）)]/, cat: '輕小說' },
+  { re: /[（(]小說[）)]/, cat: '文學小說' },
+
+  // ── 漫畫 ──
+  { re: /漫畫|COMIC|コミック/i, cat: '漫畫' },
+
+  // ── 輕小說 ──
+  { re: /輕小說|ライトノベル/i, cat: '輕小說' },
+
+  // ── 推理 ──
+  { re: /推理|偵探|殺人|密室|謀殺|懸疑|犯罪|兇手|詭計|凶手|事件簿|密碼/i, cat: '推理' },
+
+  // ── 科幻 ──
+  { re: /科幻|末日|星際|賽博|人工智慧|機器人|太空|反烏托邦/i, cat: '科幻' },
+
+  // ── 奇幻 ──
+  { re: /奇幻|魔法|龍族|精靈|魔王|勇者|異世界/i, cat: '奇幻' },
+
+  // ── 愛情 ──
+  { re: /愛情|戀愛|純愛|言情|甜寵|羅曼史/i, cat: '愛情' },
+
+  // ── 歷史小說 ──
+  { re: /歷史小說/i, cat: '歷史小說' },
+
+  // ── 商業 ──
+  { re: /投資|理財|經濟|商業|管理學|行銷|創業|財富|股票|基金|會計|領導|策略|談判|金融|企業/i, cat: '商業' },
+
+  // ── 自我成長 ──
+  { re: /習慣|時間管理|思考術|溝通術|說話術|勵志|致富|高效|效率|自律|成功法則/i, cat: '自我成長' },
+
+  // ── 心理 ──
+  { re: /心理學|心理治療|情緒|焦慮|憂鬱|療癒|創傷|依附|精神科|情緒勒索|依戀|內在小孩/i, cat: '心理' },
+
+  // ── 哲學 ──
+  { re: /哲學|存在主義|倫理學|尼采|柏拉圖|蘇格拉底/i, cat: '哲學' },
+
+  // ── 歷史 ──
+  { re: /歷史|文明史|帝國|世界史|人類大歷史|大歷史/i, cat: '歷史' },
+
+  // ── 科學 ──
+  { re: /科學|物理學|化學|生物學|數學|醫學|宇宙|量子|基因|演化|天文|科普|大腦|神經/i, cat: '科學' },
+
+  // ── 社會 ──
+  { re: /社會學|政治|法律|民主|資本主義|階級|不平等|新聞學/i, cat: '社會' },
+
+  // ── 傳記 ──
+  { re: /傳記|自傳|回憶錄|生平/i, cat: '傳記' },
+
+  // ── 藝術 ──
+  { re: /藝術|設計|攝影|音樂|建築|美學|繪畫|電影|插畫/i, cat: '藝術' },
+
+  // ── 教育 ──
+  { re: /教育|教學法|學習法|教養|育兒/i, cat: '教育' },
+
+  // ── 語言 ──
+  { re: /英文|日文|英語|日語|韓語|語言學|單字|文法|會話|TOEIC|TOEFL|多益/i, cat: '語言' },
+
+  // ── 兒少 ──
+  { re: /兒童|青少年|繪本|童話/i, cat: '兒少' },
+
+  // ── 身心靈 ──
+  { re: /靈修|冥想|佛學|禪修|瑜伽|占星|塔羅|能量|靈性|宗教|心靈/i, cat: '身心靈' },
+
+  // ── 生活 ──
+  { re: /料理|食譜|烘焙|旅行|旅遊|健康|運動|減肥|瘦身|收納|整理|手作|園藝/i, cat: '生活' },
+
+  // ── 工具書 ──
+  { re: /字典|辭典|百科|手冊|指南/i, cat: '工具書' },
+];
+
+function classifyByKeyword(title) {
+  if (!title) return null;
+  for (const rule of CLASSIFY_RULES) {
+    if (rule.re.test(title)) return rule.cat;
+  }
+  return null;
+}
+
+function classifyBooks() {
   const unclassified = AppState.books.filter(b => !b.category);
   if (unclassified.length === 0) {
     showToast('所有書都已分類');
     return;
   }
 
-  const btn = document.getElementById('btn-classify');
-  btn.disabled = true;
-  btn.textContent = '分類中...';
-
-  const BATCH = 30;
-  let done = 0;
-
-  for (let i = 0; i < unclassified.length; i += BATCH) {
-    const batch = unclassified.slice(i, i + BATCH);
-    const titles = batch.map(b => b.title);
-
-    try {
-      const res = await fetch('/api/classify-books', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ titles }),
-      });
-
-      if (!res.ok) throw new Error('API 回應異常');
-      const data = await res.json();
-
-      for (const book of batch) {
-        if (data.results[book.title]) {
-          book.category = data.results[book.title];
-        }
-      }
-
-      done += batch.length;
-      btn.textContent = `分類中... (${done}/${unclassified.length})`;
-    } catch (err) {
-      console.error('分類失敗:', err);
+  let classified = 0;
+  for (const book of unclassified) {
+    const cat = classifyByKeyword(book.title);
+    if (cat) {
+      book.category = cat;
+      classified++;
     }
   }
 
   AppState.save();
   AppState.notify();
-  btn.disabled = false;
-  btn.innerHTML = '<i data-lucide="tags" width="14" height="14"></i> 自動分類';
-  lucide.createIcons();
 
-  const classified = AppState.books.filter(b => b.category).length;
-  showToast(`已分類 ${classified} 本`);
+  const remaining = unclassified.length - classified;
+  if (remaining > 0) {
+    showToast(`已分類 ${classified} 本，${remaining} 本需手動分類`);
+  } else {
+    showToast(`已分類 ${classified} 本`);
+  }
 }
 
 function updateCategoryFilter() {
