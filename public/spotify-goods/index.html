@@ -158,7 +158,7 @@
       padding: 24px; box-shadow: var(--shadow-sm);
       transition: all 250ms ease;
     }
-    .step:hover { box-shadow: var(--shadow); }
+    .step:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
     .step-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
     .step-num {
       width: 32px; height: 32px; border-radius: 50%;
@@ -411,9 +411,16 @@
     .faq-card {
       background: var(--c-card); border-radius: var(--radius-sm);
       padding: 14px 18px; box-shadow: var(--shadow-sm);
-      border-left: 3px solid var(--c-lavender);
+      border: 2px solid transparent;
+      background-image:
+        linear-gradient(var(--c-card), var(--c-card)),
+        linear-gradient(135deg, var(--c-lavender), var(--c-rose));
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
       font-size: 0.85rem; line-height: 1.7;
+      transition: all 250ms ease;
     }
+    .faq-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
     .faq-card b { color: var(--c-ink); display: block; margin-bottom: 4px; }
     .faq-card p { color: var(--c-muted); margin: 0; }
 
@@ -480,7 +487,11 @@
       .cover-preview { background: #332C2F; }
       .divider-or span { background: var(--c-card); }
       .divider-or::before { background: var(--c-border); }
-      .faq-card { background: var(--c-card); border-left-color: var(--c-lavender); }
+      .faq-card {
+        background-image:
+          linear-gradient(var(--c-card), var(--c-card)),
+          linear-gradient(135deg, var(--c-lavender), var(--c-rose));
+      }
       .bkmk-link { background: rgba(240,184,140,0.12); color: #F0B88C; }
       select {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23918A8D' stroke-width='2'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
