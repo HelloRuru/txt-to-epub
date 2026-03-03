@@ -6,8 +6,9 @@ import { useTheme } from '../contexts/ThemeContext'
 
 const categories = [
   { id: 'text', label: '文字 & 轉檔', desc: '小說轉檔 · 社群排版 · AI 提示詞' },
-  { id: 'media', label: '圖片 & 多媒體', desc: '去背 · PDF · 卡片 · 問安圖 · 色票 · 歌詞播放器' },
+  { id: 'media', label: '圖片 & 多媒體', desc: '去背 · PDF · 卡片 · 問安圖 · 色票 · 歌詞 · 歌單' },
   { id: 'discover', label: '查詢 & 測驗', desc: '閱讀器推薦 · 美妝色號' },
+  { id: 'reading', label: '閱讀 & 電子書', desc: '書櫃管理 · AP 串接' },
 ]
 
 // ── Tools ──────────────────────────────────────────
@@ -72,6 +73,11 @@ const tools = [
     id: 'lyric-player', name: 'Lyric Player 歌詞播放器', category: 'media',
     description: '上傳 MP3 即可 AI 辨識歌詞並同步播放。支援 LRC 上傳、歌詞編輯、時間微調、匯出下載，中英日韓多語言。',
     path: '/lyric-player/', color: 'lavender', external: true,
+  },
+  {
+    id: 'spotify-goods', name: 'Spotify Goods 歌曲整理', category: 'media',
+    description: '貼上 YouTube 網址自動抓歌，一鍵建立 Spotify 歌單或匯入現有歌單，支援封面上傳。',
+    path: '/spotify-goods/', color: 'sage', external: true,
   },
   {
     id: 'book-manager', name: '電子書書櫃管理', category: 'reading',
@@ -258,6 +264,7 @@ const getIcon = (id) => {
     case 'card-maker': return <CardMakerIcon />
     case 'spell': return <SparklesIcon />
     case 'lyric-player': return <MusicIcon />
+    case 'spotify-goods': return <MusicIcon />
     case 'book-manager': return <BookOpenIcon />
     case 'readmoo-ap': return <BookIcon />
     default: return <BookIcon />
