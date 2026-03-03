@@ -167,10 +167,10 @@
     .step {
       background: var(--c-card); border-radius: var(--radius);
       padding: 24px; box-shadow: var(--shadow-sm);
-      transition: transform 0.18s ease-out, box-shadow 0.18s ease-out;
+      transition: transform 0.18s ease-out, box-shadow 0.18s ease-out, background 0.4s ease;
     }
     @media (hover: hover) {
-      .step:hover { box-shadow: var(--shadow); transform: translateY(-4px); }
+      .step:hover { box-shadow: var(--shadow); transform: translateY(-4px); background: var(--c-card-hover, #FDF8F7); }
     }
     .step-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
     .step-num {
@@ -236,7 +236,16 @@
     .ytm-url-row { display: flex; gap: 8px; }
     .ytm-url-row input { flex: 1; }
     .ytm-status { font-size: 0.82rem; padding: 8px 12px; border-radius: 10px; margin-top: 8px; line-height: 1.4; }
-    .ytm-status.loading { background: #F5F0FF; color: #7B6BA0; }
+    .ytm-status.loading {
+      background: linear-gradient(90deg, #F5F0FF 0%, rgba(184,169,201,0.15) 50%, #F5F0FF 100%);
+      background-size: 200% 100%;
+      animation: shimmer 2s ease-in-out infinite;
+      color: #7B6BA0;
+    }
+    @keyframes shimmer {
+      from { background-position: 200% 0; }
+      to { background-position: -200% 0; }
+    }
     .ytm-status.success { background: rgba(29,185,84,0.08); color: #1aa34a; }
     .ytm-status.error { background: rgba(192,112,112,0.08); color: var(--c-error); }
 
@@ -267,7 +276,10 @@
     }
     .channel-card-thumb {
       width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--c-border);
-      display: block;
+      display: block; transition: transform 0.3s ease-out;
+    }
+    @media (hover: hover) {
+      .channel-card:hover .channel-card-thumb { transform: scale(1.05); }
     }
     .channel-card-body { padding: 6px 8px 8px; }
     .channel-card-title {
@@ -282,7 +294,7 @@
       padding: 10px 14px; font-family: inherit; font-size: 0.9rem;
       background: var(--c-bg); color: var(--c-ink); transition: border-color 0.2s;
     }
-    input:focus { outline: none; border-color: var(--c-lavender); }
+    input:focus { outline: none; border-color: var(--c-lavender); box-shadow: 0 0 0 3px rgba(184,169,201,0.15); }
     input::placeholder { color: var(--c-muted); }
     select {
       width: 100%; border: 2px solid var(--c-border); border-radius: var(--radius-sm);
@@ -292,7 +304,7 @@
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23A09090' stroke-width='2'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
       background-repeat: no-repeat; background-position: right 14px center;
     }
-    select:focus { outline: none; border-color: var(--c-lavender); }
+    select:focus { outline: none; border-color: var(--c-lavender); box-shadow: 0 0 0 3px rgba(184,169,201,0.15); }
     textarea {
       width: 100%; min-height: 120px;
       border: 2px solid var(--c-border); border-radius: var(--radius-sm);
@@ -300,7 +312,7 @@
       line-height: 1.5; resize: vertical; transition: border-color 0.2s;
       background: var(--c-bg); color: var(--c-ink);
     }
-    textarea:focus { outline: none; border-color: var(--c-lavender); }
+    textarea:focus { outline: none; border-color: var(--c-lavender); box-shadow: 0 0 0 3px rgba(184,169,201,0.15); }
     textarea::placeholder { color: var(--c-muted); }
     .input-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
     .input-row label { font-size: 0.85rem; color: var(--c-secondary); min-width: 65px; font-weight: 500; }
@@ -386,7 +398,16 @@
     .mini-player-close:hover { color: var(--c-ink); }
 
     .progress-bar { width: 100%; height: 5px; background: #F5F0EE; border-radius: 3px; overflow: hidden; margin: 10px 0; }
-    .progress-fill { height: 100%; background: var(--gradient-primary); border-radius: 3px; transition: width 0.3s; width: 0%; }
+    .progress-fill {
+      height: 100%; border-radius: 3px; transition: width 0.3s; width: 0%;
+      background: linear-gradient(90deg, #D4A5A5, #B8A9C9, #D4A5A5);
+      background-size: 200% 100%;
+      animation: progress-glow 2s linear infinite;
+    }
+    @keyframes progress-glow {
+      from { background-position: 0% 0; }
+      to { background-position: 200% 0; }
+    }
     .progress-text { font-size: 0.78rem; color: var(--c-muted); text-align: center; }
 
     .summary { display: flex; gap: 10px; margin: 12px 0; }
@@ -407,8 +428,9 @@
       transform: translateX(-50%) translateY(80px);
       padding: 10px 22px; border-radius: var(--radius-sm);
       font-size: 0.88rem; font-weight: 500; color: #fff;
-      background: var(--c-ink); box-shadow: var(--shadow);
-      opacity: 0; transition: all 0.3s; z-index: 1000; pointer-events: none;
+      background: var(--c-ink); box-shadow: var(--shadow-lg);
+      opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; z-index: 1000; pointer-events: none;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .toast.success { background: var(--c-success); }
@@ -475,6 +497,7 @@
         --c-secondary: #C4BBBF;
         --c-bg: #1E181B;
         --c-card: #282224;
+        --c-card-hover: #302A2C;
         --c-border: #3D3538;
         --c-success: #1DB954;
         --c-error: #D4A0A4;
@@ -530,6 +553,15 @@
       .bkmk-link { background: rgba(240,184,140,0.12); color: #F0B88C; }
       select {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23918A8D' stroke-width='2'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+      }
+    }
+
+    /* Reduced motion — 無障礙總開關 */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
       }
     }
 
@@ -887,6 +919,24 @@
     }
     function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
     function esc(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
+
+    function animateCount(elId, target) {
+      const el = document.getElementById(elId);
+      if (!target || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        el.textContent = target;
+        return;
+      }
+      const duration = 600;
+      const start = performance.now();
+      const from = 0;
+      function tick(now) {
+        const t = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(from + (target - from) * ease);
+        if (t < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
 
     function showToast(msg, type) {
       let t = document.getElementById('toast');
@@ -1993,9 +2043,9 @@
       progressText.textContent = searchAborted ? `已取消（已搜 ${searched} / ${songs.length} 首）` : '搜尋完成';
       document.getElementById('summary').classList.remove('hidden');
       document.getElementById('resultHint').classList.remove('hidden');
-      document.getElementById('totalCount').textContent = searched;
-      document.getElementById('foundCount').textContent = found;
-      document.getElementById('notFoundCount').textContent = notFound;
+      animateCount('totalCount', searched);
+      animateCount('foundCount', found);
+      animateCount('notFoundCount', notFound);
       btnSearch.disabled = false;
       document.getElementById('btnSearchText').textContent = '搜尋 Spotify';
       if (found > 0) {
