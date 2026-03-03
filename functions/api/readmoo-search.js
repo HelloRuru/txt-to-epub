@@ -1,6 +1,6 @@
 // Cloudflare Pages Function: /api/readmoo-search?q=KEYWORD
 // Fetches Readmoo search results and returns parsed JSON
-// Rate limit: 20 req/min per IP, cache: 30 min per keyword
+// Rate limit: 40 req/min per IP, cache: 30 min per keyword
 
 const CORS_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -9,7 +9,7 @@ const CORS_HEADERS = {
 };
 
 const CACHE_TTL = 1800; // 30 minutes
-const RATE_LIMIT = 20;  // per minute per IP
+const RATE_LIMIT = 40;  // per minute per IP
 
 export async function onRequest(context) {
   if (context.request.method === 'OPTIONS') {
