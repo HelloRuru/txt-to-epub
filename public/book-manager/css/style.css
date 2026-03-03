@@ -747,6 +747,48 @@ ol.bm-steps > li::before {
   flex-shrink: 0;
   text-transform: uppercase;
 }
+/* ── Book Category Select ── */
+.book-category {
+  font-size: 11px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  padding: 0 6px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1px solid var(--color-lavender-light);
+  background: var(--color-lavender-bg);
+  color: var(--color-lavender-gray);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color var(--transition-fast);
+}
+.book-category:focus {
+  border-color: var(--color-lavender-gray);
+  outline: none;
+}
+
+/* ── Category Filter Dropdown ── */
+.book-category-filter {
+  font-size: 14px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  padding: var(--space-xs) var(--space-md);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+.book-category-filter:hover {
+  border-color: var(--color-sage);
+  color: var(--text-primary);
+}
+.book-category-filter:focus {
+  border-color: var(--color-sage);
+  outline: none;
+}
+
 .book-del {
   width: 28px; height: 28px;
   display: flex; align-items: center; justify-content: center;

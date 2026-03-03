@@ -67,7 +67,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 
-  <link rel="stylesheet" href="css/style.css?v=20260303">
+  <link rel="stylesheet" href="css/style.css?v=20260303b">
 </head>
 <body>
   <!-- Brand Header -->
@@ -167,6 +167,7 @@
           <button class="btn btn-sm btn-outline" id="btn-sort">按書名</button>
           <button class="btn btn-sm btn-outline" id="btn-export">匯出 CSV</button>
           <button class="btn btn-sm btn-outline" id="btn-export-txt">匯出純文字</button>
+          <button class="btn btn-sm btn-outline" id="btn-classify"><i data-lucide="tags" width="14" height="14"></i> 自動分類</button>
           <button class="btn btn-sm btn-danger-outline" id="btn-clear">清空</button>
         </div>
       </div>
@@ -178,6 +179,9 @@
         <button class="pill pill-readmoo" data-filter="readmoo">讀墨</button>
         <button class="pill pill-kobo" data-filter="kobo">Kobo</button>
         <button class="pill pill-calibre" data-filter="calibre">本機</button>
+        <select id="filter-category" class="book-category-filter">
+          <option value="">所有分類</option>
+        </select>
       </div>
 
       <!-- 重複提示 -->
@@ -236,6 +240,6 @@
   <!-- Toast -->
   <div id="toast" class="toast" style="display:none"></div>
 
-  <script src="js/app.js?v=20260303"></script>
+  <script src="js/app.js?v=20260303b"></script>
 </body>
 </html>

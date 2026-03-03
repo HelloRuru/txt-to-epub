@@ -8,6 +8,13 @@ const PLATFORMS = {
   calibre: { name: '本機', color: '#06A865' }
 };
 
+const CATEGORIES = [
+  '文學小說', '推理', '科幻', '奇幻', '愛情', '歷史小說', '輕小說',
+  '商業', '自我成長', '心理', '哲學', '歷史', '科學',
+  '社會', '傳記', '漫畫', '生活', '藝術', '教育',
+  '兒少', '身心靈', '語言', '工具書', '其他'
+];
+
 // ══════════════════════════════════════════════════
 // Readmoo Bookmarklet Code
 // ══════════════════════════════════════════════════
@@ -190,6 +197,7 @@ function findDuplicates(books) {
 let currentFilter = 'all';
 let searchQuery = '';
 let sortBy = 'title'; // 'title' | 'platform'
+let categoryFilter = '';
 
 function showLibrary() {
   const section = document.getElementById('section-library');
@@ -262,6 +270,13 @@ function renderLibrary() {
     );
   }
 
+  // Category filter
+  if (categoryFilter === '__none__') {
+    filtered = filtered.filter(b => !b.category);
+  } else if (categoryFilter) {
+    filtered = filtered.filter(b => b.category === categoryFilter);
+  }
+
   // Sort
   filtered = sortBooks(filtered);
 
@@ -311,6 +326,7 @@ function renderLibrary() {
     bookList.appendChild(p);
   }
 
+  updateCategoryFilter();
   lucide.createIcons();
 }
 
@@ -331,6 +347,18 @@ function createBookItem(book) {
     </button>
   `;
 
+  // 分類下拉
+  const catSelect = document.createElement('select');
+  catSelect.className = 'book-category';
+  catSelect.innerHTML = '<option value="">—</option>' +
+    CATEGORIES.map(c => `<option value="${c}"${book.category === c ? ' selected' : ''}>${c}</option>`).join('');
+  catSelect.addEventListener('change', () => {
+    book.category = catSelect.value || '';
+    AppState.save();
+    updateCategoryFilter();
+  });
+  el.insertBefore(catSelect, el.querySelector('.book-badge'));
+
   el.querySelector('.book-del').addEventListener('click', (e) => {
     e.stopPropagation();
     AppState.removeBook(book.id);
@@ -347,7 +375,7 @@ function createBookItem(book) {
 function exportCSV() {
   if (AppState.books.length === 0) { showToast('書櫃是空的'); return; }
 
-  const lines = ['書名,作者,平台,重複'];
+  const lines = ['書名,作者,平台,分類,重複'];
   const dupes = findDuplicates(AppState.books);
   const dupeIds = new Set();
   for (const group of Object.values(dupes)) {
@@ -357,7 +385,8 @@ function exportCSV() {
   for (const b of sortBooks(AppState.books)) {
     const pName = PLATFORMS[b.platform]?.name || b.platform;
     const isDupe = dupeIds.has(b.id) ? '是' : '';
-    lines.push(`"${(b.title || '').replace(/"/g, '""')}","${(b.author || '').replace(/"/g, '""')}","${pName}","${isDupe}"`);
+    const cat = b.category || '';
+    lines.push(`"${(b.title || '').replace(/"/g, '""')}","${(b.author || '').replace(/"/g, '""')}","${pName}","${cat}","${isDupe}"`);
   }
 
   downloadFile(lines.join('\n'), `book-manager_${today()}.csv`, 'text/csv');
@@ -387,8 +416,9 @@ function exportPlainText() {
     lines.push(`── ${info.name} (${platBooks.length} 本) ──`);
     platBooks.forEach((b, i) => {
       const author = b.author ? ` / ${b.author}` : '';
+      const cat = b.category ? ` [${b.category}]` : '';
       const dup = dupeIds.has(b.id) ? ' [重複]' : '';
-      lines.push(`${i + 1}. ${b.title}${author}${dup}`);
+      lines.push(`${i + 1}. ${b.title}${author}${cat}${dup}`);
     });
     lines.push('');
   }
@@ -420,6 +450,80 @@ function downloadFile(content, filename, type) {
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ══════════════════════════════════════════════════
+// Classify (自動分類)
+// ══════════════════════════════════════════════════
+
+async function classifyBooks() {
+  const unclassified = AppState.books.filter(b => !b.category);
+  if (unclassified.length === 0) {
+    showToast('所有書都已分類');
+    return;
+  }
+
+  const btn = document.getElementById('btn-classify');
+  btn.disabled = true;
+  btn.textContent = '分類中...';
+
+  const BATCH = 30;
+  let done = 0;
+
+  for (let i = 0; i < unclassified.length; i += BATCH) {
+    const batch = unclassified.slice(i, i + BATCH);
+    const titles = batch.map(b => b.title);
+
+    try {
+      const res = await fetch('/api/classify-books', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ titles }),
+      });
+
+      if (!res.ok) throw new Error('API 回應異常');
+      const data = await res.json();
+
+      for (const book of batch) {
+        if (data.results[book.title]) {
+          book.category = data.results[book.title];
+        }
+      }
+
+      done += batch.length;
+      btn.textContent = `分類中... (${done}/${unclassified.length})`;
+    } catch (err) {
+      console.error('分類失敗:', err);
+    }
+  }
+
+  AppState.save();
+  AppState.notify();
+  btn.disabled = false;
+  btn.innerHTML = '<i data-lucide="tags" width="14" height="14"></i> 自動分類';
+  lucide.createIcons();
+
+  const classified = AppState.books.filter(b => b.category).length;
+  showToast(`已分類 ${classified} 本`);
+}
+
+function updateCategoryFilter() {
+  const select = document.getElementById('filter-category');
+  if (!select) return;
+
+  const cats = [...new Set(AppState.books.map(b => b.category).filter(Boolean))].sort();
+  const uncategorized = AppState.books.filter(b => !b.category).length;
+
+  const current = select.value;
+  select.innerHTML = '<option value="">所有分類</option>';
+  if (uncategorized > 0) {
+    select.innerHTML += `<option value="__none__">未分類 (${uncategorized})</option>`;
+  }
+  for (const cat of cats) {
+    const count = AppState.books.filter(b => b.category === cat).length;
+    select.innerHTML += `<option value="${cat}">${cat} (${count})</option>`;
+  }
+  select.value = current;
 }
 
 // ══════════════════════════════════════════════════
@@ -577,6 +681,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Export ──
   document.getElementById('btn-export').addEventListener('click', exportCSV);
   document.getElementById('btn-export-txt')?.addEventListener('click', exportPlainText);
+
+  // ── Classify ──
+  document.getElementById('btn-classify')?.addEventListener('click', classifyBooks);
+
+  // ── Category filter ──
+  const catFilter = document.getElementById('filter-category');
+  if (catFilter) {
+    catFilter.addEventListener('change', () => {
+      categoryFilter = catFilter.value;
+      renderLibrary();
+    });
+  }
 
   // ── Clear ──
   document.getElementById('btn-clear').addEventListener('click', () => {
