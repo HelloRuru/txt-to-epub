@@ -120,28 +120,7 @@
           <span class="platform-status" id="status-readmoo"></span>
         </div>
 
-        <div class="method-toggle">
-          <button class="method-tab active" data-method="password" data-platform="readmoo">帳密登入</button>
-          <button class="method-tab" data-method="bookmarklet" data-platform="readmoo">Bookmarklet</button>
-        </div>
-
-        <!-- 方法 ① 帳密登入 -->
-        <div class="platform-form method-panel" id="form-readmoo" data-method="password">
-          <input type="email" id="readmoo-email" class="input" placeholder="讀墨帳號（Email）" autocomplete="email">
-          <div class="input-pw-wrap">
-            <input type="password" id="readmoo-pass" class="input" placeholder="密碼" autocomplete="current-password">
-            <button type="button" class="btn-pw-toggle" data-target="readmoo-pass" aria-label="顯示密碼">
-              <i data-lucide="eye-off" width="16" height="16"></i>
-            </button>
-          </div>
-          <button class="btn btn-readmoo" id="btn-fetch-readmoo">
-            <i data-lucide="download-cloud" width="16" height="16"></i> 撈取書櫃
-          </button>
-          <p class="form-note">密碼不會儲存。2025/08 後需至讀墨重新設定密碼。</p>
-        </div>
-
-        <!-- 方法 ② Bookmarklet -->
-        <div class="bm-panel method-panel" id="bm-readmoo" data-method="bookmarklet" style="display:none">
+        <div class="bm-panel" id="bm-readmoo">
           <div class="bm-steps">
             <p class="bm-step">➊ 把下面的按鈕拖到書籤列<span class="bm-hint">（手機：長按 → 加入書籤）</span></p>
             <div class="bm-action">
@@ -157,10 +136,6 @@
           <p class="form-note">不需要輸入密碼。什麼登入方式都行（Passkey、OTP、密碼）。</p>
         </div>
 
-        <div class="platform-progress" id="progress-readmoo" style="display:none">
-          <div class="progress-bar"><div class="progress-fill fill-readmoo" id="fill-readmoo"></div></div>
-          <span class="progress-text" id="text-readmoo">撈取中...</span>
-        </div>
         <div class="platform-result" id="result-readmoo" style="display:none"></div>
       </div>
 

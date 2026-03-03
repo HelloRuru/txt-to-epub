@@ -1,5 +1,5 @@
 // ─── Book Manager — Unified App ───
-// 單頁式：登入/Bookmarklet → Worker 撈書 → 去重 → 匯出
+// Bookmarklet 掃 DOM → 去重 → 匯出
 
 const WORKER_URL = 'https://ebook-proxy.vmpvmp1017.workers.dev';
 const STORAGE_KEY = 'bookManager_books';
@@ -604,32 +604,6 @@ function checkHashImport() {
 }
 
 // ══════════════════════════════════════════════════
-// Method Toggle (帳密 / Bookmarklet 切換)
-// ══════════════════════════════════════════════════
-
-function initMethodToggles() {
-  document.querySelectorAll('.method-toggle').forEach(toggle => {
-    const tabs = toggle.querySelectorAll('.method-tab');
-    const platform = tabs[0]?.dataset.platform;
-    if (!platform) return;
-
-    const card = toggle.closest('.platform-card');
-    const panels = card.querySelectorAll('.method-panel');
-
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const method = tab.dataset.method;
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        panels.forEach(p => {
-          p.style.display = p.dataset.method === method ? '' : 'none';
-        });
-      });
-    });
-  });
-}
-
-// ══════════════════════════════════════════════════
 // Bookmarklet Init
 // ══════════════════════════════════════════════════
 
@@ -674,21 +648,14 @@ document.addEventListener('DOMContentLoaded', () => {
   AppState.load();
   initDarkMode();
   initPasswordToggles();
-  initMethodToggles();
   initBookmarklets();
   loadEmails();
 
-  // ── Readmoo fetch ──
-  document.getElementById('btn-fetch-readmoo').addEventListener('click', () => triggerFetch('readmoo'));
-
   // ── Kobo fetch ──
-  document.getElementById('btn-fetch-kobo').addEventListener('click', () => triggerFetch('kobo'));
+  document.getElementById('btn-fetch-kobo')?.addEventListener('click', () => triggerFetch('kobo'));
 
-  // ── Enter key on password fields ──
-  document.getElementById('readmoo-pass').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') triggerFetch('readmoo');
-  });
-  document.getElementById('kobo-pass').addEventListener('keydown', (e) => {
+  // ── Enter key on Kobo password field ──
+  document.getElementById('kobo-pass')?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') triggerFetch('kobo');
   });
 
