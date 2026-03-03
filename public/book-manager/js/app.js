@@ -1,9 +1,7 @@
 // ─── Book Manager — Unified App ───
 // Bookmarklet 掃 DOM → 去重 → 匯出
 
-const WORKER_URL = 'https://ebook-proxy.vmpvmp1017.workers.dev';
 const STORAGE_KEY = 'bookManager_books';
-const EMAIL_KEY = 'bookManager_emails';
 const PLATFORMS = {
   readmoo: { name: '讀墨', color: '#00C1FF' },
   kobo:    { name: 'Kobo', color: '#BF0000' },
@@ -126,146 +124,6 @@ function showToast(msg) {
   el._timer = setTimeout(() => { el.style.display = 'none'; }, 3000);
 }
 
-// ══════════════════════════════════════════════════
-// Remember Email
-// ══════════════════════════════════════════════════
-
-function loadEmails() {
-  try {
-    const raw = localStorage.getItem(EMAIL_KEY);
-    const emails = raw ? JSON.parse(raw) : {};
-    if (emails.readmoo) document.getElementById('readmoo-email').value = emails.readmoo;
-    if (emails.kobo) document.getElementById('kobo-email').value = emails.kobo;
-  } catch {}
-}
-
-function saveEmail(platform, email) {
-  try {
-    const raw = localStorage.getItem(EMAIL_KEY);
-    const emails = raw ? JSON.parse(raw) : {};
-    emails[platform] = email;
-    localStorage.setItem(EMAIL_KEY, JSON.stringify(emails));
-  } catch {}
-}
-
-// ══════════════════════════════════════════════════
-// Password Toggle
-// ══════════════════════════════════════════════════
-
-function initPasswordToggles() {
-  document.querySelectorAll('.btn-pw-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const input = document.getElementById(btn.dataset.target);
-      const isPassword = input.type === 'password';
-      input.type = isPassword ? 'text' : 'password';
-      const icon = btn.querySelector('[data-lucide]');
-      if (icon) {
-        icon.setAttribute('data-lucide', isPassword ? 'eye' : 'eye-off');
-        lucide.createIcons();
-      }
-    });
-  });
-}
-
-// ══════════════════════════════════════════════════
-// Platform Fetch (via Worker)
-// ══════════════════════════════════════════════════
-
-async function fetchPlatform(platform, email, password) {
-  const statusEl = document.getElementById(`status-${platform}`);
-  const progressEl = document.getElementById(`progress-${platform}`);
-  const fillEl = document.getElementById(`fill-${platform}`);
-  const textEl = document.getElementById(`text-${platform}`);
-  const resultEl = document.getElementById(`result-${platform}`);
-  const btn = document.getElementById(`btn-fetch-${platform}`);
-
-  // Save email
-  saveEmail(platform, email);
-
-  // UI: loading state
-  const originalHtml = btn.innerHTML;
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> 撈取中...';
-  progressEl.style.display = '';
-  resultEl.style.display = 'none';
-  fillEl.style.width = '10%';
-  textEl.textContent = '登入中...';
-  statusEl.textContent = '';
-  statusEl.className = 'platform-status';
-
-  try {
-    fillEl.style.width = '30%';
-    textEl.textContent = '正在撈取書櫃...';
-
-    const res = await fetch(`${WORKER_URL}/fetch/${platform}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-
-    fillEl.style.width = '80%';
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-      throw new Error(err.error || '撈取失敗');
-    }
-
-    const data = await res.json();
-    fillEl.style.width = '100%';
-    textEl.textContent = '完成！';
-
-    if (!data.books || data.books.length === 0) {
-      throw new Error('書櫃是空的，或帳號密碼錯誤');
-    }
-
-    // Success
-    const books = data.books.map(b => ({
-      title: b.title || '',
-      author: b.author || '',
-      platform
-    }));
-
-    // Check duplicates with existing
-    const existingKeys = new Set(
-      AppState.books
-        .filter(b => b.platform === platform)
-        .map(b => normalizeTitle(b.title))
-    );
-    const newBooks = books.filter(b => !existingKeys.has(normalizeTitle(b.title)));
-    const skipCount = books.length - newBooks.length;
-
-    if (newBooks.length > 0) {
-      AppState.addBooks(newBooks);
-    }
-
-    resultEl.className = 'platform-result';
-    resultEl.innerHTML = `<strong>${books.length}</strong> 本書` +
-      (skipCount > 0 ? `（${skipCount} 本已存在，新增 ${newBooks.length} 本）` : '');
-    resultEl.style.display = '';
-
-    statusEl.textContent = '已連接';
-    statusEl.className = 'platform-status ok';
-
-    showToast(`${PLATFORMS[platform].name}：成功撈取 ${books.length} 本`);
-    showLibrary();
-
-  } catch (err) {
-    fillEl.style.width = '0%';
-    textEl.textContent = '';
-    progressEl.style.display = 'none';
-
-    resultEl.className = 'platform-result err';
-    resultEl.textContent = err.message;
-    resultEl.style.display = '';
-
-    statusEl.textContent = '失敗';
-    statusEl.className = 'platform-status err';
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = originalHtml;
-    lucide.createIcons();
-  }
-}
 
 // ══════════════════════════════════════════════════
 // Manual Paste (本機藏書)
@@ -506,6 +364,50 @@ function exportCSV() {
   showToast('CSV 已下載，可用 Excel 開啟');
 }
 
+function exportPlainText() {
+  if (AppState.books.length === 0) { showToast('書櫃是空的'); return; }
+
+  const dupes = findDuplicates(AppState.books);
+  const dupeIds = new Set();
+  for (const group of Object.values(dupes)) {
+    for (const book of group) dupeIds.add(book.id);
+  }
+
+  const lines = [];
+  lines.push('讀墨書櫃整理 — 書單匯出');
+  lines.push(`日期：${today()}`);
+  lines.push(`共 ${AppState.books.length} 本`);
+  lines.push('');
+
+  // 按平台分組
+  for (const [key, info] of Object.entries(PLATFORMS)) {
+    const platBooks = sortBooks(AppState.books.filter(b => b.platform === key));
+    if (platBooks.length === 0) continue;
+
+    lines.push(`── ${info.name} (${platBooks.length} 本) ──`);
+    platBooks.forEach((b, i) => {
+      const author = b.author ? ` / ${b.author}` : '';
+      const dup = dupeIds.has(b.id) ? ' [重複]' : '';
+      lines.push(`${i + 1}. ${b.title}${author}${dup}`);
+    });
+    lines.push('');
+  }
+
+  // 重複摘要
+  const dupeEntries = Object.values(dupes);
+  if (dupeEntries.length > 0) {
+    lines.push(`── 重複書籍 (${dupeEntries.length} 組) ──`);
+    for (const group of dupeEntries) {
+      const platforms = [...new Set(group.map(b => PLATFORMS[b.platform]?.name || b.platform))].join(', ');
+      lines.push(`- ${group[0].title} (${platforms})`);
+    }
+    lines.push('');
+  }
+
+  downloadFile(lines.join('\n'), `book-manager_${today()}.txt`, 'text/plain');
+  showToast('純文字已下載');
+}
+
 function today() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -530,12 +432,6 @@ function escapeHtml(str) {
   return d.innerHTML;
 }
 
-function triggerFetch(platform) {
-  const email = document.getElementById(`${platform}-email`).value.trim();
-  const pass = document.getElementById(`${platform}-pass`).value;
-  if (!email || !pass) { showToast('請填寫帳號密碼'); return; }
-  fetchPlatform(platform, email, pass);
-}
 
 // ══════════════════════════════════════════════════
 // Hash Import (Bookmarklet v4 帶回的書單資料)
@@ -647,17 +543,7 @@ function initBookmarklets() {
 document.addEventListener('DOMContentLoaded', () => {
   AppState.load();
   initDarkMode();
-  initPasswordToggles();
   initBookmarklets();
-  loadEmails();
-
-  // ── Kobo fetch ──
-  document.getElementById('btn-fetch-kobo')?.addEventListener('click', () => triggerFetch('kobo'));
-
-  // ── Enter key on Kobo password field ──
-  document.getElementById('kobo-pass')?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') triggerFetch('kobo');
-  });
 
   // ── Manual paste ──
   document.getElementById('btn-add-manual').addEventListener('click', handleManualAdd);
@@ -688,8 +574,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ── Export CSV ──
+  // ── Export ──
   document.getElementById('btn-export').addEventListener('click', exportCSV);
+  document.getElementById('btn-export-txt')?.addEventListener('click', exportPlainText);
 
   // ── Clear ──
   document.getElementById('btn-clear').addEventListener('click', () => {
