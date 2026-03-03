@@ -69,7 +69,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 
-  <link rel="stylesheet" href="css/style.css?v=20260303d">
+  <link rel="stylesheet" href="css/style.css?v=20260303f">
 </head>
 <body>
   <!-- Brand Header -->
@@ -154,9 +154,15 @@
           <strong>本機藏書</strong>
         </div>
         <textarea id="manual-paste" class="textarea" rows="4" placeholder="一行一本，例如：&#10;被討厭的勇氣&#10;原子習慣,James Clear&#10;人類大歷史"></textarea>
-        <button class="btn btn-calibre" id="btn-add-manual">
-          <i data-lucide="plus" width="16" height="16"></i> 加入
-        </button>
+        <div class="calibre-actions">
+          <button class="btn btn-calibre" id="btn-add-manual">
+            <i data-lucide="plus" width="16" height="16"></i> 加入
+          </button>
+          <button class="btn btn-outline btn-sm" id="btn-scan-folder">
+            <i data-lucide="folder-open" width="16" height="16"></i> 選擇資料夾
+          </button>
+          <input type="file" id="folder-input" webkitdirectory multiple style="display:none">
+        </div>
       </div>
     </section>
 

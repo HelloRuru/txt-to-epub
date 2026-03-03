@@ -160,6 +160,44 @@ function handleManualAdd() {
 }
 
 // ══════════════════════════════════════════════════
+// Folder Scan (資料夾讀取)
+// ══════════════════════════════════════════════════
+
+const BOOK_EXTENSIONS = new Set([
+  'epub', 'pdf', 'mobi', 'azw', 'azw3', 'fb2',
+  'cbz', 'cbr', 'djvu', 'txt',
+]);
+
+function cleanFileName(name) {
+  // 去掉副檔名
+  const base = name.replace(/\.[^.]+$/, '');
+  // 常見分隔符轉空格
+  return base.replace(/[_]/g, ' ').trim();
+}
+
+function handleFolderScan(files) {
+  const bookFiles = Array.from(files).filter(f => {
+    const ext = f.name.split('.').pop().toLowerCase();
+    return BOOK_EXTENSIONS.has(ext);
+  });
+
+  if (bookFiles.length === 0) {
+    showToast('資料夾裡沒有找到電子書檔案（.epub, .pdf, .mobi...）');
+    return;
+  }
+
+  const books = bookFiles.map(f => ({
+    title: cleanFileName(f.name),
+    author: '',
+    platform: 'calibre',
+  }));
+
+  AppState.addBooks(books);
+  showToast(`從資料夾匯入 ${books.length} 本`);
+  showLibrary();
+}
+
+// ══════════════════════════════════════════════════
 // Normalize + Dedup
 // ══════════════════════════════════════════════════
 
@@ -760,6 +798,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Manual paste ──
   document.getElementById('btn-add-manual').addEventListener('click', handleManualAdd);
+
+  // ── Folder scan ──
+  const folderInput = document.getElementById('folder-input');
+  document.getElementById('btn-scan-folder')?.addEventListener('click', () => folderInput.click());
+  folderInput?.addEventListener('change', () => {
+    if (folderInput.files.length > 0) handleFolderScan(folderInput.files);
+    folderInput.value = '';
+  });
 
   // ── Search ──
   document.getElementById('search-input').addEventListener('input', (e) => {

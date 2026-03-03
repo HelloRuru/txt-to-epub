@@ -558,6 +558,7 @@ ol.bm-steps > li::before {
 .btn-kobo:hover:not(:disabled) { background: #A30000; transform: translateY(-2px); box-shadow: var(--shadow-sm); }
 .btn-calibre { background: var(--color-calibre); color: #fff; }
 .btn-calibre:hover:not(:disabled) { background: #058B55; transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.calibre-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
 /* 次要 / 小 / 危險 */
 .btn-sm { padding: 6px 14px; font-size: 14px; }
