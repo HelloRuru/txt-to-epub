@@ -168,7 +168,8 @@ function normalizeTitle(title) {
   return title
     .toLowerCase()
     .replace(/\s+/g, '')
-    .replace(/[（(].+?[）)]/g, '')
+    .replace(/[（(](\d{1,3})[）)]/g, '$1')
+    .replace(/[（(][^）)]+[）)]/g, '')
     .replace(/[【\[].+?[】\]]/g, '')
     .replace(/[:：\-—─·・,，.。、!！?？~～「」『』""''《》〈〉]/g, '')
     .replace(/[Ａ-Ｚａ-ｚ０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
