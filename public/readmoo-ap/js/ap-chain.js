@@ -30,9 +30,10 @@ function initChain() {
 
   // Render member selection grid
   function renderMembers(filter = '') {
-    const members = filter
+    const members = (filter
       ? AppState.members.filter(m => m.name.toLowerCase().includes(filter.toLowerCase()))
-      : AppState.members;
+      : [...AppState.members]
+    ).sort((a, b) => Number(a.id) - Number(b.id));
 
     memberListEl.innerHTML = members.map(m => `
       <label class="member-item ${selectedIds.has(m.id) ? 'selected' : ''}" data-id="${m.id}">
@@ -144,8 +145,9 @@ function initChain() {
             <input type="date" class="input-field chain-date-input" data-member="${m.id}"
                    value="${dateVal}" style="width:140px;">
             <input type="text" class="input-field chain-order-input" data-member="${m.id}"
-                   placeholder="訂單 如 3*5" maxlength="3" value="${escapeHtml(orderVal)}"
-                   style="width:80px; text-align:center;">
+                   placeholder="訂單編號" value="${escapeHtml(orderVal)}"
+                   style="width:120px; text-align:center;">
+            <span class="queue-footer-hint">書名純紀錄，日期+訂單可產生 LINE 訊息</span>
           </div>
         </div>
       `;

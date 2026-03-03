@@ -54,7 +54,7 @@
     onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js'"></script>
 
   <!-- Styles -->
-  <link rel="stylesheet" href="css/style.min.css?v=20260303b">
+  <link rel="stylesheet" href="css/style.min.css?v=20260303n">
 
   <!-- Schema.org -->
   <script type="application/ld+json">
@@ -113,7 +113,7 @@
           <h2>歡迎來到讀墨 AP 接龍工具</h2>
           <p class="welcome-text">
             嗨，這是<strong>讀墨1500日挑戰</strong>社群專用的 AP 接龍小工具。<br>
-            我們是一群在讀墨上互相推書、用 AP 連結支持彼此的書友。
+            這裡是一群在讀墨上互相推書、用 AP 連結支持彼此的書友。
           </p>
           <div class="welcome-links">
             <a href="https://line.me/ti/g2/SH66tYNkpY-PdFk94oKtnwRoe-Ve6QjxVUlOHg?utm_source=invitation&utm_medium=link_copy&utm_campaign=default" target="_blank" rel="noopener" class="btn-secondary btn-sm">
@@ -147,7 +147,7 @@
             </div>
           </a>
           <a href="#chain" class="quick-action-card">
-            <i data-lucide="link"></i>
+            <i data-lucide="shuffle"></i>
             <div>
               <strong>買書AP接龍，回饋GOGO！</strong>
               <p>選人、排順序，一步一步跟著買</p>
@@ -195,9 +195,9 @@
               <div class="page-text">
                 把想買的書丟進<strong>「我的書單」</strong>。<br>
                 關掉所有讀墨的網頁。<br>
-                <strong>清空購物車</strong>。
+                <strong>清空購物車</strong>，也要把要買的書<strong>從待購清單移除</strong>。
               </div>
-              <div class="page-why">購物車裡不能有先放的書，一定要透過 AP 連結加進去才算。</div>
+              <div class="page-why">書如果留在待購清單，讀墨會判定「不是透過他人推薦而購買」，AP 分潤就不算了。</div>
             </div>
 
             <div class="storybook-connector">↓</div>
@@ -234,6 +234,7 @@
               <div class="page-label">最後結帳</div>
               <div class="page-text">
                 全部加完，打開讀墨購物車。<br>
+                結帳前再確認：<strong>待購清單裡沒有這次要買的書</strong>。<br>
                 <strong>一次結帳</strong>，搞定。
               </div>
             </div>
@@ -256,18 +257,38 @@
 
         <div class="card guide-section">
           <h3><i data-lucide="sparkles"></i> 這個工具可以幫你</h3>
+          <div class="flow-bar">
+            <div class="flow-step"><span class="flow-icon"><i data-lucide="search"></i></span><span class="flow-label">找書</span></div>
+            <div class="flow-arrow"><i data-lucide="chevron-right"></i></div>
+            <div class="flow-step"><span class="flow-icon"><i data-lucide="users"></i></span><span class="flow-label">選人</span></div>
+            <div class="flow-arrow"><i data-lucide="chevron-right"></i></div>
+            <div class="flow-step"><span class="flow-icon"><i data-lucide="shopping-cart"></i></span><span class="flow-label">買書</span></div>
+            <div class="flow-arrow"><i data-lucide="chevron-right"></i></div>
+            <div class="flow-step"><span class="flow-icon"><i data-lucide="message-circle"></i></span><span class="flow-label">回報</span></div>
+            <div class="flow-arrow"><i data-lucide="chevron-right"></i></div>
+            <div class="flow-step"><span class="flow-icon"><i data-lucide="check-circle"></i></span><span class="flow-label">追蹤</span></div>
+          </div>
           <ul class="feature-list">
+            <li><i data-lucide="check"></i> 搜尋讀墨書庫，把想買的書加入書單</li>
             <li><i data-lucide="check"></i> 從 AP 名冊勾選要接龍的夥伴</li>
-            <li><i data-lucide="check"></i> 管理你的書單，一鍵複製書名</li>
-            <li><i data-lucide="check"></i> 追蹤購買狀態（買了沒、透過誰買的）</li>
-            <li><i data-lucide="check"></i> 匯出 AP 名單分享到 LINE 群</li>
-            <li><i data-lucide="shield"></i> 不存取你的任何資料，一切都只存在你的裝置上</li>
+            <li><i data-lucide="check"></i> 一鍵複製書名，照順序透過 AP 連結購買</li>
+            <li><i data-lucide="check"></i> 填訂單編號，產生 LINE 訊息傳給你送 AP 的人</li>
+            <li><i data-lucide="check"></i> 追蹤購買狀態，記錄購買日期、買了沒、透過誰買的</li>
           </ul>
         </div>
 
         <div class="card guide-section">
           <h3><i data-lucide="shield"></i> 關於你的資料</h3>
           <div class="faq-list">
+            <details class="faq-item">
+              <summary>為什麼沒有帳號登入？</summary>
+              <div class="faq-detail">
+                <p>因為你的書單<strong>只存在你自己的瀏覽器裡</strong>，不需要帳號。</p>
+                <p>沒有伺服器、沒有資料庫、沒有人看得到你存了什麼。打開就是你的書單，關掉別人也看不到。比帳號制更簡單，也更隱私。</p>
+                <p>有些功能會請你選擇「你是誰」，這只是存在本機的標記，方便顯示你的書單和名字，不會傳到任何地方。</p>
+                <p><strong>小缺點</strong>：換瀏覽器或清瀏覽資料，書單就會消失。記得用匯出功能定期備份。</p>
+              </div>
+            </details>
             <details class="faq-item">
               <summary>別人會知道我買了什麼書嗎？</summary>
               <div class="faq-detail">
@@ -299,25 +320,19 @@
             <details class="faq-item">
               <summary>我的書單存在哪裡？會不會不見？</summary>
               <div class="faq-detail">
-                <p>全部存在<strong>你自己的瀏覽器</strong>裡（技術上叫 localStorage），包括：</p>
-                <ul>
-                  <li>你的書單和購買紀錄</li>
-                  <li>你的身份設定</li>
-                  <li>接龍配對資料</li>
-                </ul>
-                <p>想像一下：五花開心地在手機上收藏了 10 本書。莎朗用電腦打開同一個網址 — 只會看到自己的空書單，完全看不到五花偷偷收藏了什麼。犢叔在 iPad 上也一樣。每個人的瀏覽器是各自獨立的小世界！</p>
-                <p><strong>小提醒</strong>：換瀏覽器或清除瀏覽資料的話，書單就會消失喔。記得定期用匯出功能備份，才不會哭哭。</p>
+                <p>全部存在<strong>你自己的瀏覽器</strong>裡（書單、購買紀錄、身份設定、接龍配對資料都是）。五花在手機上收藏了 10 本書，莎朗用電腦打開同一個網址只會看到自己的空書單，完全看不到五花收藏了什麼。每個人的瀏覽器是各自獨立的小世界！</p>
+                <p><strong>小提醒</strong>：換瀏覽器或清除瀏覽資料的話，書單就會消失。記得定期用匯出功能備份！</p>
               </div>
             </details>
             <details class="faq-item">
               <summary>搜尋讀墨書庫會留下紀錄嗎？</summary>
-              <p>搜尋時會經過我們的伺服器轉發到讀墨網站，但<strong>不會記錄你搜了什麼</strong>。搜尋結果會快取 30 分鐘讓大家查得更快，之後就自動消失了。所以就算你搜了什麼奇怪的書名，也不會有人知道的（笑）。</p>
+              <p>搜尋時會經過社群小精靈的伺服器轉發到讀墨網站，但<strong>不會記錄你搜了什麼</strong>。搜尋結果會快取 30 分鐘讓大家查得更快，之後就自動消失了。所以就算你搜了什麼奇怪的書名，也不會有人知道的（笑）。</p>
             </details>
             <details class="faq-item">
               <summary>AP 名冊是怎麼運作的？</summary>
               <div class="faq-detail">
                 <p>名冊資料來自社群共用的 <strong>Google 試算表</strong>，由群友自行填寫登記。這裡只是幫大家把名冊漂漂亮亮地顯示出來。</p>
-                <p>通過社群驗證的人都可以編輯名冊，但每次修改都會自動記錄<strong>誰改的、什麼時候改、改了什麼</strong>，通通記在「修改紀錄」裡。所以請乖乖只改自己的資料喔。</p>
+                <p>通過社群驗證的人都可以編輯名冊，但每次修改都會自動記錄<strong>誰改的、什麼時候改、改了什麼</strong>，通通記在「修改紀錄」裡，所以請乖乖只改自己的資料喔！</p>
               </div>
             </details>
           </div>
@@ -389,7 +404,8 @@
     <section id="tab-books" class="tab-panel" role="tabpanel">
       <div class="books-container">
         <div class="section-header">
-          <h2>我的書單</h2>
+          <h2 id="books-title">我的書單</h2>
+          <p class="section-subtitle"><i data-lucide="smartphone"></i> 存在這台裝置，不需登入，別人看不到</p>
           <div class="header-actions">
             <button id="btn-search-readmoo" class="btn-primary btn-sm">
               <i data-lucide="search"></i> 搜尋讀墨
@@ -406,6 +422,32 @@
           </div>
         </div>
 
+        <!-- 每日 $99 -->
+        <div id="daily-99" class="daily-99-card" style="display:none;">
+          <div class="daily-99-badge">今日 $99</div>
+          <div class="daily-99-body">
+            <div class="daily-99-cover">
+              <img id="daily-99-cover" src="" alt="" loading="lazy">
+            </div>
+            <div class="daily-99-info">
+              <div class="daily-99-title" id="daily-99-title"></div>
+              <div class="daily-99-meta" id="daily-99-meta"></div>
+              <div class="daily-99-price">
+                <span class="daily-99-original" id="daily-99-original"></span>
+                <span class="daily-99-promo">NT$ 99</span>
+              </div>
+              <div class="daily-99-actions">
+                <button class="btn-primary btn-sm" id="daily-99-add">
+                  <i data-lucide="plus"></i> 加入書單
+                </button>
+                <a id="daily-99-link" href="#" target="_blank" rel="noopener" class="btn-secondary btn-sm">
+                  <i data-lucide="external-link"></i> 讀墨
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Readmoo 搜尋區 -->
         <div id="readmoo-search-panel" class="readmoo-search-panel" style="display:none;">
           <p class="search-hint">搜尋 Readmoo 讀墨電子書庫，找到想要的書直接加入書單。</p>
@@ -414,19 +456,29 @@
             <span class="ebook-search-desc">跨平台書庫整合，查查這本書有沒有電子書。</span>
           </a>
           <div class="search-input-row">
-            <input type="text" id="readmoo-search-input" class="input-field" placeholder="輸入書名或作者...">
+            <input type="text" id="readmoo-search-input" class="input-field" placeholder="輸入書名、作者或 ISBN...">
             <button id="btn-readmoo-go" class="btn-primary btn-sm">
               <i data-lucide="search"></i>
             </button>
           </div>
           <div id="readmoo-search-status" class="search-status" style="display:none;"></div>
           <div id="readmoo-search-results" class="readmoo-results"></div>
+          <div class="search-fallback-hint">
+            <i data-lucide="info" style="width:14px;height:14px;"></i>
+            搜尋不能用？<a id="readmoo-direct-link" href="https://readmoo.com/search/keyword" target="_blank" rel="noopener">直接到讀墨官網搜尋</a>，找到書後用「手動新增」加入書單。
+            <button class="btn-text btn-sm" onclick="runDiagnostics()" style="margin-left:auto;font-size:12px;color:var(--color-muted);">
+              <i data-lucide="activity" style="width:12px;height:12px;"></i> 診斷
+            </button>
+          </div>
         </div>
 
         <div class="books-filter">
           <button class="filter-btn active" data-filter="all">全部</button>
           <button class="filter-btn" data-filter="want">想買</button>
           <button class="filter-btn" data-filter="bought">已購買</button>
+          <button id="btn-clear-bought" class="btn-text btn-sm" style="display:none; margin-left:auto; color:var(--color-error, #C97070); font-size:12px; gap:4px;">
+            <i data-lucide="trash-2" style="width:14px;height:14px;"></i> 清除已購買
+          </button>
         </div>
 
         <div id="books-list" class="books-list">
@@ -706,13 +758,13 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="js/app.min.js?v=20260303b"></script>
-  <script src="js/quiz.min.js?v=20260303b"></script>
-  <script src="js/ap-directory.min.js?v=20260303b"></script>
-  <script src="js/ap-chain.min.js?v=20260303b"></script>
-  <script src="js/books.min.js?v=20260303b"></script>
-  <script src="js/changelog.min.js?v=20260303b"></script>
-  <script src="js/export-utils.min.js?v=20260303b"></script>
-  <script src="js/readmoo-search.min.js?v=20260303b"></script>
+  <script src="js/app.min.js?v=20260303n"></script>
+  <script src="js/quiz.min.js?v=20260303n"></script>
+  <script src="js/ap-directory.min.js?v=20260303n"></script>
+  <script src="js/ap-chain.min.js?v=20260303n"></script>
+  <script src="js/books.min.js?v=20260303n"></script>
+  <script src="js/changelog.min.js?v=20260303n"></script>
+  <script src="js/export-utils.min.js?v=20260303n"></script>
+  <script src="js/readmoo-search.min.js?v=20260303n"></script>
 </body>
 </html>

@@ -1,15 +1,13 @@
 // Cloudflare Pages Function: /api/readmoo-search?q=KEYWORD
-// Fetches Readmoo search results and returns parsed JSON
-// Rate limit: 40 req/min per IP, cache: 30 min per keyword
+// 搜尋讀墨書庫，回傳 JSON
 
 const CORS_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
-  'Access-Control-Allow-Origin': 'https://tools.helloruru.com',
+  'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
 };
 
-const CACHE_TTL = 1800; // 30 minutes
-const RATE_LIMIT = 40;  // per minute per IP
+const CACHE_TTL = 1800;
 
 export async function onRequest(context) {
   if (context.request.method === 'OPTIONS') {
@@ -20,84 +18,82 @@ export async function onRequest(context) {
   const query = url.searchParams.get('q')?.trim();
 
   if (!query || query.length < 1 || query.length > 100) {
-    return new Response(JSON.stringify({ error: '請輸入 1~100 字的搜尋關鍵字' }), {
-      status: 400, headers: CORS_HEADERS,
-    });
+    return resp({ error: '請輸入 1~100 字的搜尋關鍵字' }, 400);
   }
 
-  // --- Rate Limiting (via CF KV or simple header check) ---
-  const clientIP = context.request.headers.get('CF-Connecting-IP') || 'unknown';
-  // Note: For production, use Cloudflare KV or D1 for persistent rate limiting.
-  // This is a basic per-request check using Cache API as a counter.
-
-  // --- Cache Check ---
-  const cacheKey = `readmoo-search:${encodeURIComponent(query.toLowerCase())}`;
-  const cache = caches.default;
-  const cacheUrl = new URL(context.request.url);
-  cacheUrl.searchParams.set('_cache_key', cacheKey);
-  const cacheRequest = new Request(cacheUrl.toString());
-
-  const cached = await cache.match(cacheRequest);
-  if (cached) {
-    const resp = new Response(cached.body, {
-      headers: { ...CORS_HEADERS, 'X-Cache': 'HIT' },
-    });
-    return resp;
+  // 健康檢查
+  if (query === '__ping__') {
+    return resp({ ok: true, ts: Date.now() });
   }
 
-  // --- Fetch from Readmoo (8 秒超時) ---
   try {
-    const searchUrl = `https://readmoo.com/search/keyword?q=${encodeURIComponent(query)}`;
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
+    // Cache（安全包裝，失敗就跳過）
+    let cache = null;
+    let cacheKey = null;
+    try {
+      cache = caches.default;
+      const cacheUrl = new URL(context.request.url);
+      cacheUrl.searchParams.set('_ck', query.toLowerCase());
+      cacheKey = new Request(cacheUrl.toString());
+      const cached = await cache.match(cacheKey);
+      if (cached) {
+        return new Response(cached.body, {
+          headers: { ...CORS_HEADERS, 'X-Cache': 'HIT' },
+        });
+      }
+    } catch (e) {
+      // cache 不可用就跳過
+    }
 
+    const searchUrl = `https://readmoo.com/search/keyword?q=${encodeURIComponent(query)}`;
     const rmRes = await fetch(searchUrl, {
-      signal: controller.signal,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         'Accept-Language': 'zh-TW,zh;q=0.9',
         'Accept': 'text/html',
       },
     });
-    clearTimeout(timeout);
 
     if (!rmRes.ok) {
-      return new Response(JSON.stringify({ error: `Readmoo returned ${rmRes.status}` }), {
-        status: 502, headers: CORS_HEADERS,
-      });
+      return resp({ error: `Readmoo ${rmRes.status}` }, 502);
     }
 
     const html = await rmRes.text();
-    const books = parseSearchResults(html);
+    const allBooks = parseSearchResults(html);
+    // 最多回傳 20 本（減少回應大小 + 出版日期抓取時間）
+    const books = allBooks.slice(0, 20);
+
+    // 平行抓每本書的出版日期（從詳情頁）
+    await fetchPublishDates(books);
 
     const body = JSON.stringify({ query, count: books.length, books });
 
-    // --- Store in cache ---
-    const cacheResponse = new Response(body, {
-      headers: {
-        ...CORS_HEADERS,
-        'Cache-Control': `public, max-age=${CACHE_TTL}`,
-      },
-    });
-    context.waitUntil(cache.put(cacheRequest, cacheResponse.clone()));
+    // 寫入 cache（失敗不影響回應）
+    if (cache && cacheKey) {
+      try {
+        const cacheResponse = new Response(body, {
+          headers: { ...CORS_HEADERS, 'Cache-Control': `public, max-age=${CACHE_TTL}` },
+        });
+        context.waitUntil(cache.put(cacheKey, cacheResponse.clone()));
+      } catch (e) { /* 跳過 */ }
+    }
 
     return new Response(body, {
       headers: { ...CORS_HEADERS, 'X-Cache': 'MISS' },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500, headers: CORS_HEADERS,
-    });
+    return resp({ error: err.name === 'AbortError' ? '連線逾時' : err.message }, 500);
   }
 }
 
-/**
- * Parse Readmoo search HTML and extract book data
- */
+function resp(obj, status = 200) {
+  return new Response(JSON.stringify(obj), { status, headers: CORS_HEADERS });
+}
+
 function parseSearchResults(html) {
   const books = [];
 
-  // Strategy 1: Extract embedded JSON (const items = [...])
+  // Strategy 1: 從嵌入的 JS 變數抓書籍資料
   const itemsMatch = html.match(/const\s+items\s*=\s*(\[[\s\S]*?\]);/);
   let itemsMap = {};
   if (itemsMatch) {
@@ -111,60 +107,74 @@ function parseSearchResults(html) {
           publisher: item.item_brand,
         };
       });
-    } catch (e) { /* ignore parse error */ }
+    } catch (e) { /* 跳過 */ }
   }
 
-  // Strategy 2: Extract cover images + authors from HTML
-  // Pattern: <a href="/book/ID" class="book-cover product-link" data-readmoo-id="ID" aria-label="TITLE">
-  //   <img ... data-lazy-original="COVER_URL" alt="TITLE">
+  // Strategy 2: 從 HTML 抓封面 + 作者
   const coverPattern = /<a\s+href="https?:\/\/readmoo\.com\/book\/(\d+)"[^>]*class="book-cover product-link"[^>]*aria-label="([^"]*)"[^>]*>[\s\S]*?data-lazy-original="([^"]*)"[^>]*>/g;
   let match;
   const coverMap = {};
   while ((match = coverPattern.exec(html)) !== null) {
-    coverMap[match[1]] = {
-      title: match[2],
-      cover: match[3],
-    };
+    coverMap[match[1]] = { title: match[2], cover: match[3] };
   }
 
-  // Extract authors: <a href="/contributor/ID" aria-label="作者 NAME">NAME</a>
-  // Authors appear after each book block, associate by order
   const authorPattern = /<a\s+href="https?:\/\/readmoo\.com\/contributor\/\d+"[^>]*aria-label="作者\s+([^"]*)"[^>]*>/g;
   const authors = [];
   while ((match = authorPattern.exec(html)) !== null) {
     authors.push(match[1]);
   }
 
-  // Merge data: use itemsMap as base, enrich with cover + author
+  // 合併
   const ids = Object.keys(itemsMap);
   if (ids.length > 0) {
     ids.forEach((id, index) => {
       const item = itemsMap[id];
       const cover = coverMap[id];
       books.push({
-        id: item.id,
-        title: item.title,
-        price: item.price,
-        publisher: item.publisher,
-        author: authors[index] || '',
+        id: item.id, title: item.title, price: item.price,
+        publisher: item.publisher, author: authors[index] || '',
         cover: cover?.cover || '',
         url: `https://readmoo.com/book/${item.id}`,
       });
     });
   } else {
-    // Fallback: parse from HTML only
     Object.entries(coverMap).forEach(([id, data], index) => {
       books.push({
-        id,
-        title: data.title,
-        price: 0,
-        publisher: '',
-        author: authors[index] || '',
-        cover: data.cover,
+        id, title: data.title, price: 0, publisher: '',
+        author: authors[index] || '', cover: data.cover,
         url: `https://readmoo.com/book/${id}`,
       });
     });
   }
 
   return books;
+}
+
+// 平行抓出版日期（每本書打一次詳情頁，最多 10 本）
+const FETCH_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Accept-Language': 'zh-TW,zh;q=0.9',
+  'Accept': 'text/html',
+};
+
+async function fetchPublishDates(books) {
+  // 最多抓前 10 本，避免打太多 request
+  const targets = books.slice(0, 10);
+
+  const results = await Promise.allSettled(
+    targets.map(async (book) => {
+      try {
+        const res = await fetch(book.url, { headers: FETCH_HEADERS });
+        if (!res.ok) return;
+        const html = await res.text();
+        // 格式：<span>出版日期：2024-02-21</span>
+        const match = html.match(/出版日期：(\d{4}-\d{2}-\d{2})/);
+        if (match) {
+          book.pubdate = match[1];
+        }
+      } catch (e) {
+        // 單本抓不到就跳過，不影響其他
+      }
+    })
+  );
 }

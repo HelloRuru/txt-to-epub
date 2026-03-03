@@ -48,6 +48,23 @@ function initBooks() {
 
   function render() {
     const books = getBooks();
+    const wantCount = books.filter(b => b.status === 'want').length;
+    const boughtCount = books.filter(b => b.status === 'bought').length;
+
+    // 更新 filter 按鈕上的數量
+    filterBtns.forEach(btn => {
+      const f = btn.dataset.filter;
+      if (f === 'all') btn.textContent = books.length > 0 ? `全部 ${books.length}` : '全部';
+      else if (f === 'want') btn.textContent = wantCount > 0 ? `想買 ${wantCount}` : '想買';
+      else if (f === 'bought') btn.textContent = boughtCount > 0 ? `已購買 ${boughtCount}` : '已購買';
+    });
+
+    // 「清除已購買」按鈕：已購買 tab + 有已購買的書時顯示
+    const clearBtn = document.getElementById('btn-clear-bought');
+    if (clearBtn) {
+      clearBtn.style.display = (currentFilter === 'bought' && boughtCount > 0) ? 'inline-flex' : 'none';
+    }
+
     const filtered = currentFilter === 'all' ? books
       : currentFilter === 'want' ? books.filter(b => b.status === 'want')
       : books.filter(b => b.status === 'bought');
@@ -109,6 +126,9 @@ function initBooks() {
 
     if (window.lucide) lucide.createIcons();
     bindBookEvents();
+
+    // 刷新 user-bar 的書本數量
+    if (typeof updateUserBar === 'function') updateUserBar();
   }
 
   function bindBookEvents() {
@@ -307,6 +327,24 @@ function initBooks() {
   btnExport.addEventListener('click', () => {
     openExportModal('books', []);
   });
+
+  // 一鍵清除已購買
+  const btnClearBought = document.getElementById('btn-clear-bought');
+  if (btnClearBought) {
+    btnClearBought.addEventListener('click', () => {
+      const books = getBooks();
+      const boughtCount = books.filter(b => b.status === 'bought').length;
+      if (boughtCount === 0) {
+        showToast('沒有已購買的書可以清除');
+        return;
+      }
+      if (!confirm(`確定要清除 ${boughtCount} 本已購買的書嗎？清除後無法復原。`)) return;
+      const remaining = books.filter(b => b.status !== 'bought');
+      saveBooks(remaining);
+      showToast(`已清除 ${boughtCount} 本已購買的書`);
+      render();
+    });
+  }
 
   // Expose render for readmoo-search module
   window._booksRender = render;

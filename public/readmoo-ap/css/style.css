@@ -438,6 +438,16 @@ select.input-field {
   margin-bottom: var(--space-lg);
 }
 .section-header h2 { margin-bottom: 0; }
+.section-subtitle {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: var(--color-caption);
+  margin: -4px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.section-subtitle i { width: 14px; height: 14px; }
 .header-actions {
   display: flex;
   gap: var(--space-sm);
@@ -746,10 +756,9 @@ html.dark .storybook-page::before {
   gap: var(--space-sm);
   align-items: flex-start;
   padding: var(--space-md);
-  background: rgba(212, 165, 165, 0.08);
+  background: rgba(212, 165, 165, 0.06);
   border-radius: var(--radius-sm);
   margin-top: var(--space-md);
-  border-left: 3px solid var(--color-rose);
 }
 .tip-icon {
   flex-shrink: 0;
@@ -767,6 +776,134 @@ html.dark .storybook-page::before {
 }
 .tip-content strong {
   color: var(--text-primary);
+}
+
+/* Flow bar */
+.flow-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-bottom: var(--space-md);
+  padding: var(--space-sm) 0;
+}
+.flow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.flow-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(168,181,160,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.flow-icon i {
+  width: 16px;
+  height: 16px;
+  color: var(--color-sage);
+}
+.flow-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.flow-arrow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+  opacity: 0.45;
+}
+.flow-arrow i {
+  width: 12px;
+  height: 12px;
+  color: var(--text-hint);
+}
+@media (max-width: 480px) {
+  .flow-icon { width: 28px; height: 28px; }
+  .flow-icon i { width: 14px; height: 14px; }
+  .flow-label { font-size: 10px; }
+  .flow-arrow { margin-bottom: 14px; }
+  .flow-arrow i { width: 10px; height: 10px; }
+}
+
+/* Daily 99 card */
+.daily-99-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+  box-shadow: var(--shadow-light);
+  position: relative;
+  overflow: hidden;
+}
+.daily-99-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #C97070, #D4A5A5);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 8px;
+  margin-bottom: var(--space-sm);
+}
+.daily-99-body {
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+}
+.daily-99-cover {
+  flex-shrink: 0;
+  width: 80px;
+}
+.daily-99-cover img {
+  width: 100%;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.daily-99-info {
+  flex: 1;
+  min-width: 0;
+}
+.daily-99-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+.daily-99-meta {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.daily-99-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.daily-99-original {
+  font-size: 13px;
+  color: var(--text-hint);
+  text-decoration: line-through;
+}
+.daily-99-promo {
+  font-size: 18px;
+  font-weight: 700;
+  color: #C97070;
+}
+.daily-99-actions {
+  display: flex;
+  gap: 8px;
+}
+@media (max-width: 480px) {
+  .daily-99-cover { width: 60px; }
+  .daily-99-title { font-size: 14px; }
+  .daily-99-promo { font-size: 16px; }
 }
 
 .feature-list {
@@ -1027,6 +1164,12 @@ html.dark .storybook-page::before {
   padding: 4px 8px;
   font-size: 13px;
   border-radius: var(--radius-sm);
+}
+.queue-footer-hint {
+  font-size: 11px;
+  color: var(--color-caption);
+  flex-basis: 100%;
+  margin-top: 2px;
 }
 
 .hint-text {
@@ -1479,6 +1622,12 @@ html.dark .theme-toggle .icon-moon { display: none; }
   color: var(--text-primary);
   font-weight: 500;
 }
+.local-hint {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-hint);
+  margin-left: 4px;
+}
 .btn-text {
   background: none;
   border: none;
@@ -1663,6 +1812,31 @@ html.dark .theme-toggle .icon-moon { display: none; }
 
 .search-error {
   color: var(--status-error);
+}
+
+.search-fallback {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  align-items: center;
+}
+
+.search-fallback-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(168, 181, 160, 0.08);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+.search-fallback-hint a {
+  color: var(--color-rose);
+  font-weight: 500;
 }
 
 .cache-badge {

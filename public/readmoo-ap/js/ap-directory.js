@@ -160,16 +160,19 @@ function initDirectory(members) {
       const link = prompt('AP 連結（moo.im/a/...）：');
       if (!link || !link.trim()) return;
 
+      // 用最大 ID + 1，避免重複
+      const maxId = Math.max(0, ...AppState.members.map(m => parseInt(m.id) || 0));
+      const nextId = String(maxId + 1);
+
       if (CONFIG.APPS_SCRIPT_URL) {
-        const result = await writeToSheet('add', { name: name.trim(), link: link.trim() });
+        const result = await writeToSheet('add', { id: nextId, name: name.trim(), link: link.trim() });
         if (result.success) {
-          addChangelogEntry('add', `新增成員：${name.trim()}`);
+          addChangelogEntry('add', `新增成員 #${nextId}：${name.trim()}`);
           showToast('新增成功');
           render(searchEl.value);
         }
       } else {
-        const newId = String(AppState.members.length + 1);
-        AppState.members.push({ id: newId, name: name.trim(), link: link.trim() });
+        AppState.members.push({ id: nextId, name: name.trim(), link: link.trim() });
         localStorage.setItem(CONFIG.STORAGE_KEYS.AP_CACHE, JSON.stringify({
           data: AppState.members, time: Date.now()
         }));

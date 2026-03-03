@@ -1,0 +1,26 @@
+# Cloudflare Pages custom headers
+# HTML + index 強制不快取（no-store = 連瀏覽器都不存）
+
+/*.html
+  Cache-Control: no-store, no-cache, must-revalidate
+  Pragma: no-cache
+
+/readmoo-ap/
+  Cache-Control: no-store, no-cache, must-revalidate
+  Pragma: no-cache
+
+/readmoo-ap/*
+  Cache-Control: no-store, no-cache, must-revalidate
+  Pragma: no-cache
+
+/book-manager/
+  Cache-Control: no-store, no-cache, must-revalidate
+  Pragma: no-cache
+
+/post-writer/
+  Cache-Control: no-store, no-cache, must-revalidate
+  Pragma: no-cache
+
+# API: 短快取
+/api/*
+  Cache-Control: public, max-age=300

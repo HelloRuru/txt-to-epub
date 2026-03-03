@@ -32,10 +32,27 @@ function initQuiz() {
     btnIdentity.disabled = !identitySelect.value;
   });
 
-  // Step 1 → Step 2
+  // Step 1 → 判斷是否跳過 quiz
   btnIdentity.addEventListener('click', () => {
     selectedName = identitySelect.value;
     if (!selectedName) return;
+
+    // 書單/接龍只需選身分，不需答題
+    if (AppState._identityOnly) {
+      const today = new Date().toISOString().split('T')[0];
+      saveUser(selectedName, today);
+      closeModal('quiz-modal');
+      showToast(`歡迎，${selectedName}！`);
+      resetModal();
+      if (AppState._authCallback) {
+        AppState._authCallback();
+        AppState._authCallback = null;
+      }
+      AppState._identityOnly = false;
+      return;
+    }
+
+    // 名冊編輯需要答題
     identityStep.style.display = 'none';
     quizStep.style.display = 'block';
   });
@@ -82,7 +99,10 @@ function initQuiz() {
   }
 
   // Close modal resets
-  document.getElementById('quiz-modal-close').addEventListener('click', resetModal);
+  document.getElementById('quiz-modal-close').addEventListener('click', () => {
+    resetModal();
+    AppState._identityOnly = false;
+  });
 
   // Populate on init (members already loaded)
   populateMembers();

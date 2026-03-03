@@ -32,7 +32,9 @@ function initTabs() {
   const tabs = document.querySelectorAll('.tab-btn');
   const panels = document.querySelectorAll('.tab-panel');
 
-  function switchTab(tabId) {
+  const AUTH_TABS = new Set(['books', 'chain']);
+
+  function doSwitchTab(tabId) {
     tabs.forEach(t => {
       t.classList.toggle('active', t.dataset.tab === tabId);
       t.setAttribute('aria-selected', t.dataset.tab === tabId);
@@ -43,22 +45,33 @@ function initTabs() {
     window.location.hash = tabId;
   }
 
+  function switchTab(tabId) {
+    if (AUTH_TABS.has(tabId) && !AppState.user) {
+      requireIdentity(() => doSwitchTab(tabId));
+      return;
+    }
+    doSwitchTab(tabId);
+  }
+
   tabs.forEach(tab => {
     tab.addEventListener('click', () => switchTab(tab.dataset.tab));
   });
 
-  // Hash routing
-  const hash = window.location.hash.slice(1);
-  if (hash && document.getElementById(`tab-${hash}`)) {
-    switchTab(hash);
-  }
-
+  // Hash routing（延後到 applyInitialHash 呼叫，等成員載入完成）
   window.addEventListener('hashchange', () => {
     const h = window.location.hash.slice(1);
     if (h && document.getElementById(`tab-${h}`)) {
       switchTab(h);
     }
   });
+
+  // 初始 hash 路由：等成員載入後才觸發，避免空下拉選單
+  window._applyInitialHash = function() {
+    const hash = window.location.hash.slice(1);
+    if (hash && document.getElementById(`tab-${hash}`)) {
+      switchTab(hash);
+    }
+  };
 }
 
 // ============ Dark Mode ============
@@ -147,12 +160,17 @@ function saveUser(name, date) {
 function updateUserBar() {
   const bar = document.getElementById('user-bar');
   const nameEl = document.getElementById('user-bar-name');
+  const booksTitle = document.getElementById('books-title');
   if (!bar) return;
   if (AppState.user && AppState.user.name) {
-    nameEl.textContent = AppState.user.name;
+    const books = typeof getBooks === 'function' ? getBooks() : [];
+    const countText = books.length > 0 ? ` · ${books.length} 本書` : '';
+    nameEl.innerHTML = `${AppState.user.name} <span class="local-hint">本機紀錄${countText}</span>`;
     bar.style.display = 'flex';
+    if (booksTitle) booksTitle.textContent = `${AppState.user.name} 的書單`;
   } else {
     bar.style.display = 'none';
+    if (booksTitle) booksTitle.textContent = '我的書單';
   }
 }
 
@@ -160,6 +178,18 @@ function requireAuth(callback) {
   if (AppState.isVerified) {
     callback();
   } else {
+    AppState._identityOnly = false;
+    openModal('quiz-modal');
+    AppState._authCallback = callback;
+  }
+}
+
+// 輕量身分選擇（書單/接龍用，不需答題）
+function requireIdentity(callback) {
+  if (AppState.user) {
+    callback();
+  } else {
+    AppState._identityOnly = true;
     openModal('quiz-modal');
     AppState._authCallback = callback;
   }
@@ -178,21 +208,40 @@ async function fetchMembersFromSheet() {
 
     const rows = json.table.rows;
     const members = [];
+    const sheetLogs = [];
     for (let i = 0; i < rows.length; i++) {
       const cells = rows[i].c;
       const id = cells[0]?.v;
       const name = cells[1]?.v;
       const link = cells[2]?.v;
+      const notes = cells[4]?.v; // E 欄：操作紀錄
       if (id && name) {
         members.push({
           id: String(id),
           name: String(name),
           link: link ? String(link) : ''
         });
+        // 解析 E 欄的 log（格式：ver.20260303 由 XXX 新增）
+        if (notes) {
+          String(notes).split('\n').forEach(line => {
+            const m = line.match(/ver\.(\d{8})\s+由\s+(.+?)\s+(新增|編輯|刪除)/);
+            if (m) {
+              sheetLogs.push({
+                date: m[1],
+                editor: m[2],
+                action: m[3],
+                memberId: String(id),
+                memberName: String(name),
+                raw: line.trim()
+              });
+            }
+          });
+        }
       }
     }
 
     AppState.members = members;
+    AppState.sheetLogs = sheetLogs;
     // Cache
     localStorage.setItem(CONFIG.STORAGE_KEYS.AP_CACHE, JSON.stringify({
       data: members,
@@ -214,6 +263,10 @@ async function fetchMembersFromSheet() {
 
 // ============ Apps Script Writer ============
 async function writeToSheet(action, data) {
+  if (!AppState.user?.name) {
+    showToast('請先選擇你的身分');
+    return { success: false };
+  }
   if (!CONFIG.APPS_SCRIPT_URL) {
     showToast('Apps Script 尚未設定，請聯繫管理員');
     return { success: false };
@@ -223,7 +276,7 @@ async function writeToSheet(action, data) {
       method: 'POST',
       body: JSON.stringify({
         action,
-        editor: AppState.user?.name || '匿名',
+        editor: AppState.user.name,
         ...data
       })
     });
@@ -255,10 +308,10 @@ function initFooter() {
 // ============ Init ============
 document.addEventListener('DOMContentLoaded', async () => {
   initDarkMode();
+  loadUser();
   initTabs();
   initModalCloses();
   initFooter();
-  loadUser();
 
   // Initialize Lucide icons
   if (window.lucide) lucide.createIcons();
@@ -272,6 +325,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.initChain) initChain();
   if (window.initBooks) initBooks();
   if (window.initChangelog) initChangelog();
+
+  // 成員載入完成，觸發初始 hash 路由
+  if (window._applyInitialHash) window._applyInitialHash();
 
   // Quick action: "修改 AP 連結" → switch to directory tab + open edit mode
   const qaEditLink = document.getElementById('qa-edit-link');
@@ -297,4 +353,78 @@ document.addEventListener('DOMContentLoaded', async () => {
       openModal('quiz-modal');
     });
   }
+
+  // 每日 $99 特惠書
+  loadDaily99();
 });
+
+// ============ Daily 99 ============
+async function loadDaily99() {
+  try {
+    const res = await fetch('/api/daily-99');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.today) return;
+
+    const book = data.today;
+    const card = document.getElementById('daily-99');
+    if (!card) return;
+
+    document.getElementById('daily-99-title').textContent = book.title;
+    document.getElementById('daily-99-meta').textContent =
+      [book.author, book.publisher].filter(Boolean).join(' · ');
+    document.getElementById('daily-99-original').textContent =
+      book.originalPrice ? `NT$ ${book.originalPrice}` : '';
+    document.getElementById('daily-99-link').href = book.url;
+
+    const coverImg = document.getElementById('daily-99-cover');
+    if (book.cover) {
+      coverImg.src = book.cover;
+      coverImg.alt = book.title;
+    }
+
+    // 加入書單
+    const btnAdd = document.getElementById('daily-99-add');
+    const existingBooks = getBooks();
+    const alreadyHas = existingBooks.some(b =>
+      b.title.toLowerCase() === book.title.toLowerCase()
+    );
+
+    if (alreadyHas) {
+      btnAdd.innerHTML = '<i data-lucide="check"></i> 已在書單';
+      btnAdd.disabled = true;
+      btnAdd.classList.remove('btn-primary');
+      btnAdd.classList.add('btn-secondary');
+    }
+
+    btnAdd.addEventListener('click', () => {
+      const books = getBooks();
+      books.push({
+        id: 'book_' + Date.now(),
+        title: book.title,
+        author: book.author,
+        version: '電子書',
+        pubdate: '',
+        publisher: book.publisher,
+        price: String(book.promoPrice),
+        cover: book.cover,
+        readmooUrl: book.url,
+        status: 'want',
+        createdAt: new Date().toISOString(),
+      });
+      saveBooks(books);
+      btnAdd.innerHTML = '<i data-lucide="check"></i> 已加入';
+      btnAdd.disabled = true;
+      btnAdd.classList.remove('btn-primary');
+      btnAdd.classList.add('btn-secondary');
+      if (window.lucide) lucide.createIcons();
+      showToast(`已加入書單：${book.title}`);
+      document.dispatchEvent(new Event('books-updated'));
+    });
+
+    card.style.display = 'block';
+    if (window.lucide) lucide.createIcons();
+  } catch (e) {
+    console.error('Daily 99 load failed:', e);
+  }
+}
