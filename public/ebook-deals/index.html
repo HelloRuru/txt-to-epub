@@ -665,44 +665,112 @@
     }
     .btn-sage:active { transform: scale(0.97); }
 
-    /* --- Search Results --- */
-    .search-results { text-align: left; }
+    /* --- Search Results (DS 文青 V0.2 卡片) --- */
+    .search-results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    .search-results:empty { display: none; }
+    .search-results .status-msg {
+      grid-column: 1 / -1;
+    }
     .search-result-card {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      border-radius: var(--radius-sm);
-      border-left: 3px solid var(--border-color);
+      text-align: center;
+      gap: 10px;
+      padding: 16px 12px;
       background: var(--bg-card);
-      margin-bottom: 6px;
-      font-size: 14px;
-      transition: background var(--transition-fast);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--transition-normal),
+                  box-shadow var(--transition-normal),
+                  background var(--transition-normal);
       background-image: none;
     }
-    .search-result-card:hover { background: var(--bg-card-hover); }
-    .search-result-card.readmoo { border-left-color: #0098CC; }
-    .search-result-card.books { border-left-color: #5A7A94; }
-    .search-result-card.kobo { border-left-color: #B04040; }
-    .result-title {
-      flex: 1;
-      font-family: var(--font-serif);
-      font-weight: 400;
-      color: var(--text-primary);
+    @media (hover: hover) {
+      .search-result-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+        background: var(--bg-card-hover);
+      }
+    }
+    .search-cover {
+      width: 100px;
+      height: 150px;
+      border-radius: 2px 6px 6px 2px;
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      position: relative;
+      box-shadow:
+        3px 1px 4px rgba(92, 74, 58, 0.15),
+        6px 4px 12px rgba(92, 74, 58, 0.1),
+        1px 1px 2px rgba(92, 74, 58, 0.12);
+    }
+    html.dark .search-cover {
+      box-shadow:
+        3px 1px 4px rgba(0,0,0,0.3),
+        6px 4px 12px rgba(0,0,0,0.2);
+    }
+    .search-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .search-cover::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(90deg, rgba(0,0,0,0.12), transparent);
+      z-index: 1;
+    }
+    .result-title {
+      font-family: var(--font-serif);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-ink);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .result-author {
+      font-size: 12px;
+      color: var(--text-muted);
     }
     .result-price {
+      font-size: 20px;
       font-weight: 700;
       color: var(--color-gold);
       font-variant-numeric: tabular-nums;
-      flex-shrink: 0;
     }
     .result-platform {
       font-size: 11px;
-      color: var(--text-hint);
-      flex-shrink: 0;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 999px;
+      border: 1px solid;
+      letter-spacing: 0.02em;
+    }
+    .result-platform.readmoo {
+      color: #0098CC;
+      border-color: rgba(0, 152, 204, 0.3);
+      background: rgba(0, 152, 204, 0.06);
+    }
+    .result-platform.books {
+      color: #5A7A94;
+      border-color: rgba(90, 122, 148, 0.3);
+      background: rgba(90, 122, 148, 0.06);
+    }
+    .result-platform.kobo {
+      color: #B04040;
+      border-color: rgba(176, 64, 64, 0.3);
+      background: rgba(176, 64, 64, 0.06);
     }
 
     /* --- Upcoming Section --- */
@@ -1243,13 +1311,18 @@
           sr.innerHTML = '<div class="status-msg">\u6C92\u6709\u627E\u5230\u76F8\u95DC\u66F8\u7C4D</div>';
           return;
         }
-        sr.innerHTML = all.map(r =>
-          '<a href="' + escapeHtml(r.url || r.bookUrl || '#') + '" class="search-result-card ' + r.platform + '" target="_blank" rel="noopener">' +
+        sr.innerHTML = all.map(r => {
+          const cover = r.coverUrl
+            ? '<img src="' + escapeHtml(r.coverUrl) + '" alt="' + escapeHtml(r.title) + '" loading="lazy" onerror="this.outerHTML=\'<div class=book-cover-placeholder>' + escapeHtml(r.title.slice(0, 6)) + '</div>\'">'
+            : '<div class="book-cover-placeholder">' + escapeHtml(r.title.slice(0, 6)) + '</div>';
+          return '<a href="' + escapeHtml(r.url || r.bookUrl || '#') + '" class="search-result-card" target="_blank" rel="noopener">' +
+            '<div class="search-cover">' + cover + '</div>' +
+            '<span class="result-platform ' + r.platform + '">' + (names[r.platform] || r.platform) + '</span>' +
             '<span class="result-title">' + escapeHtml(r.title) + '</span>' +
-            '<span class="result-price">' + (r.price ? '$' + r.price : '') + '</span>' +
-            '<span class="result-platform">' + (names[r.platform] || r.platform) + '</span>' +
-          '</a>'
-        ).join('');
+            (r.author ? '<span class="result-author">' + escapeHtml(r.author) + '</span>' : '') +
+            (r.price ? '<span class="result-price">$' + r.price + '</span>' : '') +
+          '</a>';
+        }).join('');
       } catch (err) {
         sr.innerHTML = '<div class="status-msg error">\u641C\u5C0B\u5931\u6557\uFF1A' + escapeHtml(err.message) + '</div>';
       }
