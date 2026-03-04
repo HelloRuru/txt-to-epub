@@ -1257,7 +1257,7 @@
         const names = { readmoo: 'Readmoo', books: '\u535A\u5BA2\u4F86', kobo: 'Kobo' };
         let all = [];
         for (const p of platforms) {
-          const results = data[p]?.results || [];
+          const results = data.results?.[p] || [];
           all.push(...results.map(r => ({ ...r, platform: p })));
         }
         if (all.length === 0) {
