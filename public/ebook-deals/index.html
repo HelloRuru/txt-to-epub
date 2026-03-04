@@ -1120,7 +1120,9 @@
 
     // === Render Deals ===
     function renderDeals(data) {
-      const today = new Date().toISOString().split('T')[0];
+      // 用本地時間（台灣 UTC+8），不用 UTC，否則凌晨會差一天
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
       const upcomingDeals = [];
 
       for (const platform of ['readmoo', 'books', 'kobo']) {
