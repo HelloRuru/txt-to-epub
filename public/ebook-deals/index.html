@@ -275,36 +275,6 @@
       cursor: not-allowed;
     }
 
-    /* --- Platform Tabs --- */
-    .platform-tabs {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 32px;
-      flex-wrap: wrap;
-    }
-    .tab {
-      padding: 8px 20px;
-      border: 1px solid var(--border-color);
-      border-radius: 999px;
-      background: transparent;
-      color: var(--text-muted);
-      font-family: var(--font-body);
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all var(--transition-normal);
-    }
-    .tab:hover {
-      border-color: var(--color-sage);
-      color: var(--text-primary);
-    }
-    .tab.active {
-      background: var(--color-sage);
-      color: #fff;
-      border-color: var(--color-sage);
-    }
-
     /* --- Platform Sections (垂直堆疊) --- */
     .platform-columns {
       display: flex;
@@ -665,13 +635,14 @@
     }
     .btn-sage:active { transform: scale(0.97); }
 
-    /* --- Search Results（比價表格風） --- */
+    /* --- Search Results（同書分組比價） --- */
     .search-results {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 20px;
       max-width: 700px;
       margin: 0 auto;
+      text-align: left;
     }
     .search-summary {
       font-size: 13px;
@@ -679,163 +650,115 @@
       text-align: center;
       margin-bottom: 4px;
     }
-    .search-result-row {
-      display: grid;
-      grid-template-columns: 80px 1fr auto auto;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
+    /* 一本書的分組 */
+    .book-group {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      transition: all var(--transition-fast);
-      background-image: none;
+      overflow: hidden;
     }
-    @media (hover: hover) {
-      .search-result-row:hover {
-        background: var(--bg-card-hover);
-        box-shadow: var(--shadow-sm);
-        transform: translateX(4px);
-      }
+    .book-group-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
     }
-    .search-result-row.cheapest {
-      border-color: var(--color-sage);
-      background: var(--color-sage-bg);
-    }
-    .result-platform {
-      font-size: 12px;
-      font-weight: 700;
-      text-align: center;
-      padding: 4px 0;
-      border-radius: var(--radius-sm);
-      letter-spacing: 0.02em;
-    }
-    .result-platform.readmoo { color: #0098CC; }
-    .result-platform.books { color: #5A7A94; }
-    .result-platform.kobo { color: #B04040; }
-    .result-info {
-      min-width: 0;
-    }
-    .result-title {
+    .book-group-title {
       font-family: var(--font-serif);
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 600;
       color: var(--color-ink);
       line-height: 1.4;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
-    .result-author {
-      font-size: 12px;
+    .book-group-author {
+      font-size: 13px;
       color: var(--text-muted);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      margin-top: 2px;
     }
-    .result-price {
-      font-size: 20px;
+    /* 各平台價格列 */
+    .price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border-color);
+      transition: background var(--transition-fast);
+      background-image: none;
+    }
+    .price-row:last-child { border-bottom: none; }
+    @media (hover: hover) {
+      .price-row:hover { background: var(--bg-card-hover); }
+    }
+    .price-row.cheapest-row {
+      background: var(--color-sage-bg);
+    }
+    .price-row-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .price-row-platform {
+      font-size: 13px;
       font-weight: 700;
-      color: var(--color-gold);
-      font-variant-numeric: tabular-nums;
-      text-align: right;
-      white-space: nowrap;
+      min-width: 80px;
     }
-    .result-price.no-price {
-      font-size: 12px;
-      font-weight: 400;
-      color: var(--text-hint);
-    }
-    .cheapest-badge {
+    .price-row-platform.readmoo { color: #0098CC; }
+    .price-row-platform.books { color: #5A7A94; }
+    .price-row-platform.kobo { color: #B04040; }
+    .price-row-platform.googlebooks { color: #4285F4; }
+    .cheapest-tag {
       font-size: 11px;
       font-weight: 700;
       color: var(--color-sage-dark);
       background: var(--color-sage-bg);
       border: 1px solid rgba(168, 181, 160, 0.4);
-      padding: 2px 8px;
+      padding: 1px 8px;
       border-radius: 999px;
+    }
+    html.dark .cheapest-tag { color: var(--color-sage); }
+    .price-row-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .price-row-amount {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-gold);
+      font-variant-numeric: tabular-nums;
+    }
+    .price-row-amount.no-price {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-hint);
+    }
+    .price-row-link {
+      font-size: 12px;
+      color: var(--color-sage);
+      background-image: none;
       white-space: nowrap;
     }
-    html.dark .cheapest-badge { color: var(--color-sage); }
-    @media (max-width: 768px) {
-      .search-result-row {
-        grid-template-columns: 60px 1fr auto;
-        gap: 8px;
-        padding: 10px 12px;
-      }
-      .cheapest-badge { display: none; }
-      .search-result-row.cheapest { border-left: 3px solid var(--color-sage); }
-      .result-title { font-size: 14px; }
-      .result-price { font-size: 18px; }
+    .price-row-link:hover { color: var(--color-sage-dark); }
+    /* 搜尋 shimmer */
+    .search-shimmer {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 700px;
+      margin: 0 auto;
     }
-
-    /* --- Upcoming Section --- */
-    .upcoming-section h2 { text-align: center; margin-bottom: 4px; }
-    .upcoming-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 12px;
-      margin-top: 20px;
-    }
-    .upcoming-card {
-      background: var(--bg-card-warm);
+    .search-shimmer-item {
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
       padding: 16px;
-      text-align: center;
-      position: relative;
-      transition: all var(--transition-normal);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
-    /* Dog-ear 摺角 */
-    .upcoming-card::before {
-      content: '';
-      position: absolute;
-      top: 0; right: 0;
-      width: 20px; height: 20px;
-      background: linear-gradient(225deg, var(--bg-page) 50%, #EDE9E4 50%, #E5E0DB 60%, var(--bg-card-warm) 60%);
-      border-radius: 0 var(--radius-md) 0 0;
-    }
-    html.dark .upcoming-card::before {
-      background: linear-gradient(225deg, var(--bg-page) 50%, #2E2820 50%, #383028 60%, var(--bg-card-warm) 60%);
-    }
-    /* 書脊線 */
-    .upcoming-card::after {
-      content: '';
-      position: absolute;
-      top: 10px; bottom: 10px; left: 12px;
-      width: 2px;
-      background: var(--color-sage);
-      opacity: 0.12;
-      border-radius: 1px;
-    }
-    @media (hover: hover) {
-      .upcoming-card:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-sm);
-      }
-    }
-    .upcoming-date {
-      font-size: 12px;
-      color: var(--text-hint);
-      margin-bottom: 6px;
-      font-variant-numeric: tabular-nums;
-    }
-    .upcoming-title {
-      font-family: var(--font-serif);
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--text-primary);
-      line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .upcoming-price {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--color-gold);
-      margin-top: 6px;
+    @media (max-width: 768px) {
+      .price-row { padding: 8px 12px; }
+      .price-row-platform { min-width: 60px; font-size: 12px; }
+      .price-row-amount { font-size: 16px; }
+      .book-group-title { font-size: 15px; }
     }
 
     /* --- Loading Shimmer --- */
@@ -1010,7 +933,6 @@
       .deal-title { font-size: 15px; }
       .price-deal { font-size: 20px; }
       .search-box { flex-direction: column; }
-      .upcoming-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
     }
 
     /* --- Accessibility --- */
@@ -1231,14 +1153,6 @@
         '</div></article>';
     }
 
-    function renderUpcomingCard(deal) {
-      return '<div class="upcoming-card">' +
-        '<p class="upcoming-date">' + formatDate(deal.date) + '</p>' +
-        '<p class="upcoming-title">' + escapeHtml(deal.title) + '</p>' +
-        '<p class="upcoming-price">$' + deal.dealPrice + '</p>' +
-      '</div>';
-    }
-
     // === Load Rating (Async) ===
     async function loadRating(el) {
       try {
@@ -1287,50 +1201,111 @@
       if (e.key === 'Enter') doSearch();
     });
 
+    // 前端也過濾一次試讀本
+    function isTrialBook(title) {
+      return /(試讀本|精華試讀|試閱版|體驗版|免費試讀|試讀精華)/.test(title || '');
+    }
+
+    // 把書名標準化，用來分組同本書
+    function normalizeTitle(title) {
+      return (title || '')
+        .replace(/\s*[\(（]電子書[\)）]\s*/g, '')
+        .replace(/\s*[\(（][^)）]*[\)）]\s*$/g, '')
+        .trim()
+        .toLowerCase();
+    }
+
     async function doSearch() {
       const query = document.getElementById('search-input').value.trim();
       if (!query) return;
       const sr = document.getElementById('search-results');
-      sr.innerHTML = '<div class="status-msg">\u641C\u5C0B\u4E2D...</div>';
+      // Shimmer loading
+      sr.innerHTML = '<div class="search-shimmer">' +
+        [1,2,3].map(() =>
+          '<div class="search-shimmer-item">' +
+            '<div class="shimmer-block shimmer-title"></div>' +
+            '<div class="shimmer-block shimmer-text"></div>' +
+            '<div class="shimmer-block" style="height:14px;width:50%"></div>' +
+          '</div>'
+        ).join('') + '</div>';
       try {
         const res = await fetch(API_BASE + '/api/search?q=' + encodeURIComponent(query));
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
-        const platforms = ['readmoo', 'books', 'kobo'];
-        const names = { readmoo: 'Readmoo', books: '\u535A\u5BA2\u4F86', kobo: 'Kobo' };
+        const platforms = ['readmoo', 'books', 'kobo', 'googlebooks'];
+        const names = { readmoo: 'Readmoo', books: '博客來', kobo: 'Kobo', googlebooks: 'Google Books' };
         let all = [];
         for (const p of platforms) {
           const results = data.results?.[p] || [];
-          all.push(...results.map(r => ({ ...r, platform: p })));
+          all.push(...results
+            .filter(r => !isTrialBook(r.title))
+            .map(r => ({ ...r, platform: r.platform || p }))
+          );
         }
         if (all.length === 0) {
-          sr.innerHTML = '<div class="status-msg">\u6C92\u6709\u627E\u5230\u76F8\u95DC\u66F8\u7C4D</div>';
+          sr.innerHTML = '<div class="status-msg">沒有找到相關書籍</div>';
           return;
         }
-        // 依價格排序（有價格的在前，最便宜的排第一；無價格的排最後）
-        all.sort((a, b) => {
-          if (!a.price && !b.price) return 0;
-          if (!a.price) return 1;
-          if (!b.price) return -1;
-          return a.price - b.price;
-        });
-        const cheapestPrice = all.find(r => r.price > 0)?.price || 0;
 
-        let html = '<p class="search-summary">' + all.length + ' 筆結果，依價格排序</p>';
-        html += all.map(r => {
-          const isCheapest = r.price > 0 && r.price === cheapestPrice;
-          return '<a href="' + escapeHtml(r.url || r.bookUrl || '#') + '" class="search-result-row' + (isCheapest ? ' cheapest' : '') + '" target="_blank" rel="noopener">' +
-            '<span class="result-platform ' + r.platform + '">' + (names[r.platform] || r.platform) + '</span>' +
-            '<span class="result-info"><span class="result-title">' + escapeHtml(r.title) + '</span>' +
-              (r.author ? '<br><span class="result-author">' + escapeHtml(r.author) + '</span>' : '') +
-            '</span>' +
-            (r.price ? '<span class="result-price">$' + r.price + '</span>' : '<span class="result-price no-price">未標價</span>') +
-            (isCheapest ? '<span class="cheapest-badge">最便宜</span>' : '<span></span>') +
-          '</a>';
+        // 同書分組：用標準化書名做 key
+        const groups = new Map();
+        for (const r of all) {
+          const key = normalizeTitle(r.title);
+          if (!groups.has(key)) {
+            groups.set(key, {
+              title: r.title,
+              author: r.author || '',
+              items: [],
+            });
+          }
+          const g = groups.get(key);
+          // 補作者（有些平台沒抓到作者）
+          if (!g.author && r.author) g.author = r.author;
+          g.items.push(r);
+        }
+
+        // 每組內依價格排序
+        for (const g of groups.values()) {
+          g.items.sort((a, b) => {
+            if (!a.price && !b.price) return 0;
+            if (!a.price) return 1;
+            if (!b.price) return -1;
+            return a.price - b.price;
+          });
+          g.cheapest = g.items.find(r => r.price > 0)?.price || 0;
+        }
+
+        // 多平台的組排前面（比價更有意義）
+        const sorted = [...groups.values()].sort((a, b) => b.items.length - a.items.length);
+
+        let html = '<p class="search-summary">找到 ' + all.length + ' 筆，' + sorted.length + ' 本書</p>';
+        html += sorted.map(g => {
+          let inner = '<div class="book-group">';
+          inner += '<div class="book-group-header">';
+          inner += '<div class="book-group-title">' + escapeHtml(g.title) + '</div>';
+          if (g.author) inner += '<div class="book-group-author">' + escapeHtml(g.author) + '</div>';
+          inner += '</div>';
+
+          inner += g.items.map(r => {
+            const isCheapest = g.items.length > 1 && r.price > 0 && r.price === g.cheapest;
+            return '<div class="price-row' + (isCheapest ? ' cheapest-row' : '') + '">' +
+              '<div class="price-row-left">' +
+                '<span class="price-row-platform ' + r.platform + '">' + (names[r.platform] || r.platformName || r.platform) + '</span>' +
+                (isCheapest ? '<span class="cheapest-tag">最便宜</span>' : '') +
+              '</div>' +
+              '<div class="price-row-right">' +
+                (r.price ? '<span class="price-row-amount">$' + r.price + '</span>' : '<span class="price-row-amount no-price">未標價</span>') +
+                '<a href="' + escapeHtml(r.url || r.bookUrl || '#') + '" class="price-row-link" target="_blank" rel="noopener">前往</a>' +
+              '</div>' +
+            '</div>';
+          }).join('');
+
+          inner += '</div>';
+          return inner;
         }).join('');
         sr.innerHTML = html;
       } catch (err) {
-        sr.innerHTML = '<div class="status-msg error">\u641C\u5C0B\u5931\u6557\uFF1A' + escapeHtml(err.message) + '</div>';
+        sr.innerHTML = '<div class="status-msg error">搜尋失敗：' + escapeHtml(err.message) + '</div>';
       }
     }
 
