@@ -34,7 +34,7 @@
     bindImageUpload();
     bindWatermark();
     bindExport();
-    bindScrollArrow();
+    bindFabPreview();
     buildFields();
     renderPreview();
     updatePreviewSize();
@@ -193,25 +193,25 @@
     });
   }
 
-  /* ─── Scroll Arrow ─── */
-  function bindScrollArrow() {
-    const panel = document.getElementById('controlsPanel');
-    const arrow = document.getElementById('scrollDown');
-    if (!panel || !arrow) return;
+  /* ─── Floating Preview Button (mobile) ─── */
+  function bindFabPreview() {
+    const fab = document.getElementById('fabPreview');
+    if (!fab) return;
 
-    arrow.addEventListener('click', () => {
-      panel.scrollBy({ top: 200, behavior: 'smooth' });
+    fab.addEventListener('click', () => {
+      previewWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
 
-    function checkScroll() {
-      const atBottom = panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 10;
-      arrow.classList.toggle('hidden', atBottom);
+    function checkVisibility() {
+      if (window.innerWidth > 900) { fab.classList.add('hidden'); return; }
+      const rect = previewWrapper.getBoundingClientRect();
+      const inView = rect.top < window.innerHeight && rect.bottom > 0;
+      fab.classList.toggle('hidden', inView);
     }
 
-    panel.addEventListener('scroll', checkScroll);
-    /* Re-check after fields change */
-    new MutationObserver(checkScroll).observe(panel, { childList: true, subtree: true });
-    setTimeout(checkScroll, 300);
+    window.addEventListener('scroll', checkVisibility, { passive: true });
+    window.addEventListener('resize', checkVisibility);
+    checkVisibility();
   }
 
   /* ─── Render Preview ─── */
@@ -225,11 +225,9 @@
   function updatePreviewSize() {
     const sz = SIZES[currentSize];
     const wrapperW = previewWrapper.clientWidth - 40;
-    const wrapperH = previewWrapper.clientHeight - 40;
+    const maxH = currentSize === 'story' ? 600 : window.innerHeight * 0.75;
 
     const scaleX = wrapperW / sz.w;
-    /* If wrapper has no fixed height (mobile), use 75vh as fallback */
-    const maxH = wrapperH > 100 ? wrapperH : window.innerHeight * 0.65;
     const scaleY = maxH / sz.h;
     const scale = Math.min(scaleX, scaleY, 0.6);
 
@@ -238,12 +236,7 @@
     previewCanvas.style.transform = `scale(${scale})`;
     previewCanvas.style.transformOrigin = 'top center';
 
-    /* On mobile (no fixed wrapper height), set wrapper height to fit */
-    if (wrapperH <= 100) {
-      previewWrapper.style.height = (sz.h * scale + 40) + 'px';
-    } else {
-      previewWrapper.style.height = '';
-    }
+    previewWrapper.style.height = (sz.h * scale + 40) + 'px';
   }
 
   /* ─── Export PNG ─── */
