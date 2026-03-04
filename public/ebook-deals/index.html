@@ -305,21 +305,20 @@
       border-color: var(--color-sage);
     }
 
-    /* --- Three-Column Layout --- */
+    /* --- Platform Sections (垂直堆疊) --- */
     .platform-columns {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
     }
     .platform-column {
       min-width: 0;
     }
     .column-header {
       font-family: var(--font-serif);
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 600;
       color: var(--color-ink);
-      text-align: center;
       padding: 10px 0;
       margin-bottom: 16px;
       border-bottom: 1px solid var(--border-color);
@@ -331,9 +330,10 @@
       color: var(--text-hint);
       margin-left: 4px;
     }
+    /* 書卡橫列（日曆風） */
     .deals-grid {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 16px;
     }
 
@@ -935,16 +935,13 @@
     }
 
     /* --- Responsive --- */
-    @media (max-width: 1023px) {
-      .platform-columns { grid-template-columns: 1fr 1fr; }
-    }
     @media (max-width: 768px) {
       h1 { font-size: 26px; }
       h2 { font-size: 20px; }
       .hero { padding: 28px 0 24px; }
       .container { padding: 0 16px 48px; }
-      .platform-columns { grid-template-columns: 1fr; }
-      .deal-card { padding: 14px; gap: 12px; }
+      .deals-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+      .deal-card { padding: 14px; gap: 10px; }
       .book-cover { width: 100px; height: 150px; }
       .deal-title { font-size: 15px; }
       .price-deal { font-size: 20px; }
