@@ -23,8 +23,8 @@
 }
 
 .search-box__input-wrap:focus-within {
-  border-color: var(--color-primary);
-  box-shadow: 0 4px 20px rgba(212, 165, 165, 0.2);
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px rgba(184,169,201,0.15), 0 4px 20px rgba(212, 165, 165, 0.2);
 }
 
 .search-box__icon {
@@ -63,7 +63,7 @@
 
 .search-box__btn {
   flex-shrink: 0;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  background: var(--gradient-primary);
   color: #fff;
   border: none;
   border-radius: 100px;
@@ -72,14 +72,16 @@
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity var(--transition), transform var(--transition), box-shadow var(--transition);
+  transition: transform 0.1s ease-out, box-shadow var(--transition);
   min-height: 44px;
-  box-shadow: 0 2px 8px rgba(212, 165, 165, 0.25);
+  box-shadow: 0 2px 8px rgba(212, 165, 165, 0.3);
 }
 
-.search-box__btn:hover {
-  box-shadow: 0 4px 12px rgba(212, 165, 165, 0.4);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .search-box__btn:hover {
+    box-shadow: 0 4px 16px rgba(212, 165, 165, 0.4);
+    transform: translateY(-2px);
+  }
 }
 
 .search-box__btn:active {
@@ -180,9 +182,11 @@
   align-items: center;
 }
 
-.filter-pill:hover {
-  color: var(--color-primary);
-  border-bottom-color: rgba(212, 165, 165, 0.3);
+@media (hover: hover) {
+  .filter-pill:hover {
+    color: var(--color-primary);
+    border-bottom-color: rgba(212, 165, 165, 0.3);
+  }
 }
 
 .filter-pill--active {
@@ -222,9 +226,11 @@
   align-items: center;
 }
 
-.category-pill:hover {
-  color: var(--color-secondary);
-  border-bottom-color: rgba(184, 169, 201, 0.3);
+@media (hover: hover) {
+  .category-pill:hover {
+    color: var(--color-secondary);
+    border-bottom-color: rgba(184, 169, 201, 0.3);
+  }
 }
 
 .category-pill:active {
@@ -283,11 +289,13 @@
   text-align: left;
 }
 
-.popular-color-chip:hover {
-  border-color: var(--color-primary);
-  background: rgba(212, 165, 165, 0.06);
-  box-shadow: 0 2px 12px rgba(212, 165, 165, 0.15);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .popular-color-chip:hover {
+    border-color: var(--color-primary);
+    background: var(--color-card-hover);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+  }
 }
 
 .popular-color-chip:active {
@@ -348,9 +356,11 @@
   min-height: 32px;
 }
 
-.search-history__clear:hover {
-  color: var(--color-primary);
-  background: rgba(212, 165, 165, 0.08);
+@media (hover: hover) {
+  .search-history__clear:hover {
+    color: var(--color-primary);
+    background: rgba(212, 165, 165, 0.08);
+  }
 }
 
 .search-history__list {
@@ -376,10 +386,12 @@
   min-height: 36px;
 }
 
-.search-history__item:hover {
-  border-color: var(--color-primary);
-  background: rgba(212, 165, 165, 0.06);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .search-history__item:hover {
+    border-color: var(--color-primary);
+    background: rgba(212, 165, 165, 0.06);
+    transform: translateY(-1px);
+  }
 }
 
 .search-history__query {
@@ -459,11 +471,13 @@
   text-align: left;
 }
 
-.trending-chip:hover {
-  border-color: var(--color-primary);
-  background: rgba(212, 165, 165, 0.06);
-  box-shadow: var(--shadow-sm);
-  transform: translateX(4px);
+@media (hover: hover) {
+  .trending-chip:hover {
+    border-color: var(--color-primary);
+    background: var(--color-card-hover);
+    box-shadow: var(--shadow-sm);
+    transform: translateX(4px);
+  }
 }
 
 .trending-chip:active {

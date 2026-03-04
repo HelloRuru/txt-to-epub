@@ -51,13 +51,15 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
-  transition: all 0.3s ease;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: transform 0.18s ease-out, box-shadow 0.18s ease-out, background 0.4s ease;
+  border: 1px solid rgba(212, 165, 165, 0.15);
 }
 
-.top-rec-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .top-rec-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+  }
 }
 
 .top-rec-card__link {
@@ -70,8 +72,10 @@
   transition: background-color 0.2s ease;
 }
 
-.top-rec-card__link:hover {
-  background: rgba(212, 165, 165, 0.04);
+@media (hover: hover) {
+  .top-rec-card__link:hover {
+    background: var(--color-card-hover);
+  }
 }
 
 .top-rec-card__icon {
@@ -115,9 +119,11 @@
   transition: color 0.2s ease, transform 0.2s ease;
 }
 
-.top-rec-card__link:hover .top-rec-card__arrow {
-  color: var(--color-primary);
-  transform: translateX(2px);
+@media (hover: hover) {
+  .top-rec-card__link:hover .top-rec-card__arrow {
+    color: var(--color-primary);
+    transform: translateX(2px);
+  }
 }
 
 .top-rec-card__copy {
@@ -127,18 +133,20 @@
   gap: 6px;
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  background: var(--gradient-primary);
   color: #FFFFFF;
   border: none;
   font-family: var(--font-main);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.18s ease-out;
 }
 
-.top-rec-card__copy:hover {
-  opacity: 0.9;
+@media (hover: hover) {
+  .top-rec-card__copy:hover {
+    opacity: 0.9;
+  }
 }
 
 .top-rec-card__copy:active {

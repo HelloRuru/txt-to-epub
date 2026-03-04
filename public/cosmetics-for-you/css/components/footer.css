@@ -7,7 +7,17 @@
   text-align: center;
   padding: 48px 24px 40px;
   margin-top: 48px;
-  border-top: 1px solid var(--color-border);
+  position: relative;
+}
+
+.site-footer::before {
+  content: '';
+  display: block;
+  width: 120px;
+  height: 1px;
+  margin: 0 auto 48px;
+  background: var(--gradient-primary);
+  opacity: 0.5;
 }
 
 .site-footer p {

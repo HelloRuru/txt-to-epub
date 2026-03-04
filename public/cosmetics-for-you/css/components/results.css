@@ -67,12 +67,14 @@
   align-items: center;
 }
 
-.brand-chip:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary-dark);
-  background: rgba(212, 165, 165, 0.08);
-  box-shadow: var(--shadow-sm);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .brand-chip:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary-dark);
+    background: var(--color-card-hover);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-2px);
+  }
 }
 
 .brand-chip:active {
@@ -83,10 +85,12 @@
   border-color: rgba(184, 169, 201, 0.3);
 }
 
-.brand-chip--drugstore:hover {
-  border-color: var(--color-secondary);
-  color: var(--color-secondary-dark);
-  background: rgba(184, 169, 201, 0.08);
+@media (hover: hover) {
+  .brand-chip--drugstore:hover {
+    border-color: var(--color-secondary);
+    color: var(--color-secondary-dark);
+    background: rgba(184, 169, 201, 0.08);
+  }
 }
 
 /* ─── Results ──────────────────────────── */
@@ -151,8 +155,8 @@
   box-shadow: var(--shadow-sm);
   text-decoration: none;
   color: inherit;
-  transition: transform var(--transition), box-shadow var(--transition);
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: transform 0.18s ease-out, box-shadow 0.18s ease-out, background 0.4s ease;
+  border: 1px solid rgba(212, 165, 165, 0.15);
   position: relative;
   overflow: hidden;
 }
@@ -168,9 +172,12 @@
   pointer-events: none;
 }
 
-.result-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+@media (hover: hover) {
+  .result-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    background: var(--color-card-hover);
+  }
 }
 
 .result-card:active {
@@ -215,9 +222,11 @@
   z-index: 1;
 }
 
-.result-card:hover .result-card__arrow {
-  color: var(--color-primary);
-  transform: translateX(2px);
+@media (hover: hover) {
+  .result-card:hover .result-card__arrow {
+    color: var(--color-primary);
+    transform: translateX(2px);
+  }
 }
 
 /* ─── Image Search Card ───────────────── */
@@ -251,14 +260,16 @@
   pointer-events: none;
 }
 
-.image-search-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-primary);
-}
+@media (hover: hover) {
+  .image-search-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+  }
 
-.image-search-card:hover::before {
-  opacity: 1;
+  .image-search-card:hover::before {
+    opacity: 1;
+  }
 }
 
 .image-search-card:active {
@@ -314,9 +325,11 @@
   transition: color var(--transition), transform var(--transition);
 }
 
-.image-search-card:hover .image-search-card__arrow {
-  color: var(--color-primary);
-  transform: translateX(2px);
+@media (hover: hover) {
+  .image-search-card:hover .image-search-card__arrow {
+    color: var(--color-primary);
+    transform: translateX(2px);
+  }
 }
 
 [data-theme="dark"] .image-search-card {
@@ -359,14 +372,16 @@
   pointer-events: none;
 }
 
-.ig-search-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: #E1306C;
-}
+@media (hover: hover) {
+  .ig-search-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: #E1306C;
+  }
 
-.ig-search-card:hover::before {
-  opacity: 1;
+  .ig-search-card:hover::before {
+    opacity: 1;
+  }
 }
 
 .ig-search-card:active {
@@ -419,9 +434,11 @@
   transition: color var(--transition), transform var(--transition);
 }
 
-.ig-search-card:hover .ig-search-card__arrow {
-  color: #E1306C;
-  transform: translateX(2px);
+@media (hover: hover) {
+  .ig-search-card:hover .ig-search-card__arrow {
+    color: #E1306C;
+    transform: translateX(2px);
+  }
 }
 
 [data-theme="dark"] .ig-search-card {
@@ -441,6 +458,12 @@
   background: linear-gradient(135deg, rgba(225, 48, 108, 0.04), rgba(131, 58, 180, 0.04));
   border: 1px solid rgba(225, 48, 108, 0.12);
   border-radius: var(--radius-lg);
+  animation: igBreathe 4s ease-in-out infinite;
+}
+
+@keyframes igBreathe {
+  0%, 100% { border-color: rgba(225, 48, 108, 0.12); }
+  50% { border-color: rgba(225, 48, 108, 0.25); }
 }
 
 .ig-curated-card__header {
@@ -519,10 +542,12 @@
   border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.ig-curated-card__post:hover {
-  transform: scale(1.05);
-  box-shadow: var(--shadow-md);
-  z-index: 1;
+@media (hover: hover) {
+  .ig-curated-card__post:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+    z-index: 1;
+  }
 }
 
 .ig-curated-card__placeholder {

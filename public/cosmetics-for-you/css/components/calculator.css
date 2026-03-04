@@ -36,8 +36,10 @@
   transition: background var(--transition);
 }
 
-.exchange-calc__toggle:hover {
-  background: rgba(212, 165, 165, 0.06);
+@media (hover: hover) {
+  .exchange-calc__toggle:hover {
+    background: rgba(212, 165, 165, 0.06);
+  }
 }
 
 .exchange-calc__toggle:active {
@@ -133,7 +135,8 @@
 }
 
 .exchange-calc__input:focus {
-  border-color: var(--color-primary);
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px rgba(184,169,201,0.15);
 }
 
 .exchange-calc__input::placeholder {
