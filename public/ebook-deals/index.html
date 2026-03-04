@@ -1010,12 +1010,6 @@
       <div id="search-results" class="search-results"></div>
     </section>
 
-    <section id="upcoming-section" class="upcoming-section" style="display:none">
-      <div class="divider-gold"></div>
-      <h2>即將登場</h2>
-      <p class="section-desc" style="text-align:center">Readmoo 未來幾天的特價預告</p>
-      <div id="upcoming-grid" class="upcoming-grid"></div>
-    </section>
 
     <section id="exhibitions-section" style="display:none">
       <div class="divider-gold"></div>
@@ -1124,33 +1118,21 @@
 
       for (const platform of ['readmoo', 'books', 'kobo']) {
         const deals = data[platform]?.deals || [];
-        const todayDeals = [];
-
-        for (const deal of deals) {
-          if (platform === 'readmoo') {
-            if (deal.date === today) todayDeals.push(deal);
-            else if (deal.date > today) upcomingDeals.push(deal);
-          } else {
-            todayDeals.push(deal);
-          }
-        }
+        // Readmoo：所有日期都顯示（今天 + 未來），按日期排序
+        // 博客來/Kobo：全部顯示
+        const showDeals = platform === 'readmoo'
+          ? deals.filter(d => d.date >= today).sort((a, b) => a.date.localeCompare(b.date))
+          : deals;
 
         const grid = document.getElementById('grid-' + platform);
         const header = grid.previousElementSibling;
-        if (todayDeals.length === 0) {
+        if (showDeals.length === 0) {
           grid.innerHTML = '<div class="empty-state"><p>\u4ECA\u5929\u7121\u7279\u50F9</p></div>';
         } else {
-          header.innerHTML = header.textContent.split('<')[0] + '<span class="col-count">' + todayDeals.length + ' \u672C</span>';
-          grid.innerHTML = todayDeals.map(deal => renderDealCard(deal)).join('');
+          header.innerHTML = header.textContent.split('<')[0] + '<span class="col-count">' + showDeals.length + ' \u672C</span>';
+          grid.innerHTML = showDeals.map(deal => renderDealCard(deal)).join('');
           grid.querySelectorAll('.deal-rec[data-title]').forEach(el => loadRating(el));
         }
-      }
-
-      if (upcomingDeals.length > 0) {
-        document.getElementById('upcoming-section').style.display = '';
-        document.getElementById('upcoming-grid').innerHTML =
-          upcomingDeals.sort((a, b) => a.date.localeCompare(b.date))
-            .map(d => renderUpcomingCard(d)).join('');
       }
     }
 
