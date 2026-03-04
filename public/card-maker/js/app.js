@@ -34,6 +34,7 @@
     bindImageUpload();
     bindWatermark();
     bindExport();
+    bindScrollArrow();
     buildFields();
     renderPreview();
     updatePreviewSize();
@@ -192,6 +193,27 @@
     });
   }
 
+  /* ─── Scroll Arrow ─── */
+  function bindScrollArrow() {
+    const panel = document.getElementById('controlsPanel');
+    const arrow = document.getElementById('scrollDown');
+    if (!panel || !arrow) return;
+
+    arrow.addEventListener('click', () => {
+      panel.scrollBy({ top: 200, behavior: 'smooth' });
+    });
+
+    function checkScroll() {
+      const atBottom = panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 10;
+      arrow.classList.toggle('hidden', atBottom);
+    }
+
+    panel.addEventListener('scroll', checkScroll);
+    /* Re-check after fields change */
+    new MutationObserver(checkScroll).observe(panel, { childList: true, subtree: true });
+    setTimeout(checkScroll, 300);
+  }
+
   /* ─── Render Preview ─── */
   function renderPreview() {
     const tmpl = TEMPLATES[currentTemplate];
@@ -203,24 +225,17 @@
   function updatePreviewSize() {
     const sz = SIZES[currentSize];
     const wrapperW = previewWrapper.clientWidth - 40; /* padding */
-    /* Limit max preview height: 600px for story, 80vh otherwise */
-    const maxH = currentSize === 'story' ? 600 : window.innerHeight * 0.75;
+    const wrapperH = previewWrapper.clientHeight - 40;
 
-    /* Calc scale to fit */
+    /* Calc scale to fit within wrapper */
     const scaleX = wrapperW / sz.w;
-    const scaleY = maxH / sz.h;
-    const scale = Math.min(scaleX, scaleY, 0.6); /* cap at 60% for readability */
+    const scaleY = wrapperH / sz.h;
+    const scale = Math.min(scaleX, scaleY, 0.6);
 
     previewCanvas.style.width = sz.w + 'px';
     previewCanvas.style.height = sz.h + 'px';
     previewCanvas.style.transform = `scale(${scale})`;
     previewCanvas.style.transformOrigin = 'top center';
-
-    /* Adjust wrapper to match scaled canvas */
-    const scaledW = sz.w * scale;
-    const scaledH = sz.h * scale;
-    previewWrapper.style.height = (scaledH + 40) + 'px';
-    previewWrapper.style.width = '100%';
   }
 
   /* ─── Export PNG ─── */

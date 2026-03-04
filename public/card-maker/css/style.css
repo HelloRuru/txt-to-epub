@@ -17,10 +17,18 @@ html, body {
 
 .app-layout {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 360px 1fr;
   gap: 24px;
   align-items: start;
   height: 100%;
+}
+
+/* ─── Controls Column (wrapper for panel + arrow) ─── */
+.controls-col {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
 }
 
 /* ─── Controls Panel ─── */
@@ -29,7 +37,8 @@ html, body {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
   padding: 16px;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   scrollbar-width: none;           /* Firefox */
   -ms-overflow-style: none;        /* IE/Edge */
@@ -37,6 +46,35 @@ html, body {
 
 .controls-panel::-webkit-scrollbar {
   display: none;                    /* Chrome/Safari */
+}
+
+/* ─── Scroll Arrow ─── */
+.scroll-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: opacity 0.3s;
+  animation: bounce-down 1.5s ease-in-out infinite;
+}
+
+.scroll-arrow:hover {
+  color: var(--color-rose);
+}
+
+.scroll-arrow.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes bounce-down {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
 }
 
 .panel-title {
@@ -231,8 +269,9 @@ html, body {
 /* ─── Theme Dots ─── */
 .theme-grid {
   display: grid;
-  grid-template-columns: repeat(4, 30px);
+  grid-template-columns: repeat(8, 1fr);
   gap: 8px;
+  justify-items: center;
 }
 
 .theme-dot {
@@ -901,9 +940,17 @@ html, body {
     height: auto;
   }
 
+  .controls-col {
+    height: auto;
+  }
+
   .controls-panel {
     height: auto;
     overflow-y: visible;
+  }
+
+  .scroll-arrow {
+    display: none;
   }
 
   .preview-panel {
