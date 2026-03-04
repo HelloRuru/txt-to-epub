@@ -33,6 +33,69 @@
   display: none;
 }
 
+/* ─── Scroll Arrows ─── */
+.scroll-arrow {
+  position: sticky;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0 auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-card);
+  color: var(--color-muted);
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: var(--shadow-sm);
+  transition: opacity 0.18s ease-out, color 0.18s ease-out;
+  flex-shrink: 0;
+}
+
+.scroll-arrow--up {
+  top: 0;
+  margin-bottom: 4px;
+}
+
+.scroll-arrow--down {
+  bottom: 0;
+  margin-top: 4px;
+}
+
+@media (hover: hover) {
+  .scroll-arrow:hover {
+    color: var(--color-rose);
+  }
+}
+
+.scroll-arrow.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ─── Watermark Field ─── */
+.watermark-field input {
+  width: 100%;
+  padding: 5px 10px;
+  border: 1.5px solid var(--color-mist);
+  border-radius: var(--radius-sm);
+  background: var(--color-card);
+  font-family: var(--font-main);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink);
+  transition: border-color 0.2s;
+}
+
+.watermark-field input:focus {
+  outline: none;
+  border-color: var(--color-rose);
+  box-shadow: 0 0 0 3px rgba(184, 169, 201, 0.15);
+}
+
 /* ─── Floating Preview Button (mobile only) ─── */
 .fab-preview {
   display: none;

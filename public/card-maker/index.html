@@ -67,8 +67,8 @@
   <link rel="preload" as="font" type="font/woff2" href="https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2" crossorigin>
 
   <!-- Styles -->
-  <link rel="stylesheet" href="css/base.css?v=20260304">
-  <link rel="stylesheet" href="css/style.css?v=20260304">
+  <link rel="stylesheet" href="css/base.css?v=20260305">
+  <link rel="stylesheet" href="css/style.css?v=20260305">
 
   <!-- html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
@@ -82,7 +82,12 @@
     <div class="app-layout">
 
       <!-- Left Panel: Controls -->
-      <aside class="controls-panel">
+      <aside class="controls-panel" id="controlsPanel">
+        <!-- Scroll Up Arrow -->
+        <button class="scroll-arrow scroll-arrow--up hidden" id="scrollArrowUp" aria-label="往上捲動">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+
         <h2 class="panel-title">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
           卡片設定
@@ -195,14 +200,22 @@
           </button>
         </section>
 
-        <!-- Watermark Toggle -->
+        <!-- Watermark -->
         <section class="control-section">
           <label class="control-label toggle-label">
             <span>品牌浮水印</span>
             <input type="checkbox" id="watermarkToggle" checked>
             <span class="toggle-switch"></span>
           </label>
+          <div class="field-group watermark-field" id="watermarkFieldGroup" style="margin-top: 6px;">
+            <input type="text" id="watermarkText" value="helloruru.com" placeholder="浮水印文字" maxlength="40">
+          </div>
         </section>
+
+        <!-- Scroll Down Arrow -->
+        <button class="scroll-arrow scroll-arrow--down hidden" id="scrollArrowDown" aria-label="往下捲動">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
       </aside>
 
       <!-- Right Panel: Preview + Export -->
@@ -238,7 +251,7 @@
   <div class="toast" id="toast"></div>
 
   <!-- App Scripts -->
-  <script src="js/templates.js?v=20260304"></script>
-  <script src="js/app.js?v=20260304"></script>
+  <script src="js/templates.js?v=20260305"></script>
+  <script src="js/app.js?v=20260305"></script>
 </body>
 </html>

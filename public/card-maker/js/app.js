@@ -11,6 +11,7 @@
   let fieldData = {};
   let uploadedImage = null;
   window.__watermarkOn = true;
+  window.__watermarkText = 'helloruru.com';
 
   /* ─── DOM Refs ─── */
   const previewCanvas = document.getElementById('previewCanvas');
@@ -35,6 +36,7 @@
     bindWatermark();
     bindExport();
     bindFabPreview();
+    bindScrollArrows();
     buildFields();
     renderPreview();
     updatePreviewSize();
@@ -166,13 +168,46 @@
   function handleImageFile(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
-      uploadedImage = e.target.result;
-      uploadArea.classList.add('has-image');
-      uploadArea.innerHTML = `<img src="${uploadedImage}" alt="uploaded preview">`;
-      clearImageBtn.style.display = 'inline-flex';
-      renderPreview();
+      resizeImage(e.target.result, 1920, 0.85, (resized) => {
+        uploadedImage = resized;
+        uploadArea.classList.add('has-image');
+        uploadArea.innerHTML = `<img src="${uploadedImage}" alt="uploaded preview">`;
+        clearImageBtn.style.display = 'inline-flex';
+        renderPreview();
+      });
     };
     reader.readAsDataURL(file);
+  }
+
+  /**
+   * 自動壓縮圖片：限制最大邊 maxPx，輸出 JPEG quality
+   * 如果原圖已夠小則不壓縮
+   */
+  function resizeImage(dataUrl, maxPx, quality, callback) {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      /* 已經夠小，不壓縮 */
+      if (width <= maxPx && height <= maxPx) {
+        callback(dataUrl);
+        return;
+      }
+      /* 等比縮放 */
+      if (width > height) {
+        height = Math.round(height * maxPx / width);
+        width = maxPx;
+      } else {
+        width = Math.round(width * maxPx / height);
+        height = maxPx;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      callback(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = dataUrl;
   }
 
   function resetImageUpload() {
@@ -185,12 +220,48 @@
     imageInput.value = '';
   }
 
-  /* ─── Watermark Toggle ─── */
+  /* ─── Watermark Toggle + Text ─── */
   function bindWatermark() {
+    const watermarkTextInput = document.getElementById('watermarkText');
+    const watermarkFieldGroup = document.getElementById('watermarkFieldGroup');
+
     watermarkToggle.addEventListener('change', () => {
       window.__watermarkOn = watermarkToggle.checked;
+      watermarkFieldGroup.style.display = watermarkToggle.checked ? 'block' : 'none';
       renderPreview();
     });
+
+    watermarkTextInput.addEventListener('input', () => {
+      window.__watermarkText = watermarkTextInput.value || 'helloruru.com';
+      renderPreview();
+    });
+  }
+
+  /* ─── Scroll Arrows ─── */
+  function bindScrollArrows() {
+    const panel = document.getElementById('controlsPanel');
+    const arrowUp = document.getElementById('scrollArrowUp');
+    const arrowDown = document.getElementById('scrollArrowDown');
+    if (!panel || !arrowUp || !arrowDown) return;
+
+    function updateArrows() {
+      const { scrollTop, scrollHeight, clientHeight } = panel;
+      arrowUp.classList.toggle('hidden', scrollTop < 10);
+      arrowDown.classList.toggle('hidden', scrollTop + clientHeight >= scrollHeight - 10);
+    }
+
+    arrowUp.addEventListener('click', () => {
+      panel.scrollBy({ top: -150, behavior: 'smooth' });
+    });
+
+    arrowDown.addEventListener('click', () => {
+      panel.scrollBy({ top: 150, behavior: 'smooth' });
+    });
+
+    panel.addEventListener('scroll', updateArrows, { passive: true });
+    /* 初次 + resize 重新判斷 */
+    window.addEventListener('resize', updateArrows);
+    setTimeout(updateArrows, 100);
   }
 
   /* ─── Floating Preview Button (mobile) ─── */

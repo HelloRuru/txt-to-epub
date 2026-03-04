@@ -114,7 +114,8 @@ const TEMPLATES = {
 /* Shared watermark helper — attached at init */
 function _watermarkHtml() {
   if (!window.__watermarkOn) return '';
-  return '<div class="card-watermark">helloruru.com</div>';
+  const text = esc(window.__watermarkText || 'helloruru.com');
+  return `<div class="card-watermark">${text}</div>`;
 }
 
 /* Escape HTML */
