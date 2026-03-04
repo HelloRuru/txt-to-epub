@@ -1,34 +1,22 @@
 /* ─── Card Maker — Layout + Controls + Templates ─── */
 
-/* ─── Page Lock (desktop) ─── */
-html, body {
-  height: 100%;
-  overflow: hidden;
-}
-
-/* ─── App Layout ─── */
+/* ─── App Layout (mobile-first) ─── */
 .app {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 24px 20px 0;
-  height: calc(100vh - 60px);
-  overflow: hidden;
+  padding: 24px 20px 40px;
 }
 
 .app-layout {
   display: grid;
-  grid-template-columns: 360px 1fr;
+  grid-template-columns: 1fr;
   gap: 24px;
-  align-items: start;
-  height: 100%;
 }
 
 /* ─── Controls Column (wrapper for panel + arrow) ─── */
 .controls-col {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  position: relative;
 }
 
 /* ─── Controls Panel ─── */
@@ -37,44 +25,11 @@ html, body {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
   padding: 16px;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: none;           /* Firefox */
-  -ms-overflow-style: none;        /* IE/Edge */
 }
 
-.controls-panel::-webkit-scrollbar {
-  display: none;                    /* Chrome/Safari */
-}
-
-/* ─── Scroll Arrow ─── */
+/* ─── Scroll Arrow (hidden by default, shown on desktop) ─── */
 .scroll-arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 6px 0;
-  background: none;
-  border: none;
-  color: var(--color-muted);
-  cursor: pointer;
-  transition: opacity 0.3s;
-  animation: bounce-down 1.5s ease-in-out infinite;
-}
-
-.scroll-arrow:hover {
-  color: var(--color-rose);
-}
-
-.scroll-arrow.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-@keyframes bounce-down {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(4px); }
+  display: none;
 }
 
 .panel-title {
@@ -923,45 +878,71 @@ html, body {
    RESPONSIVE
    ═══════════════════════════════════════════ */
 
-@media (max-width: 900px) {
-  html, body {
-    height: auto;
-    overflow: auto;
-  }
-
+/* ─── Desktop: lock page, only controls scrollable ─── */
+@media (min-width: 901px) {
   .app {
-    height: auto;
-    overflow: auto;
-    padding-bottom: 40px;
+    padding-bottom: 0;
+    height: calc(100vh - 60px);
+    overflow: hidden;
   }
 
   .app-layout {
-    grid-template-columns: 1fr;
-    height: auto;
+    grid-template-columns: 360px 1fr;
+    height: 100%;
   }
 
   .controls-col {
-    height: auto;
+    height: 100%;
   }
 
   .controls-panel {
-    height: auto;
-    overflow-y: visible;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
-  .scroll-arrow {
+  .controls-panel::-webkit-scrollbar {
     display: none;
   }
 
+  .scroll-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 6px 0;
+    background: none;
+    border: none;
+    color: var(--color-muted);
+    cursor: pointer;
+    animation: bounce-down 1.5s ease-in-out infinite;
+  }
+
+  .scroll-arrow:hover {
+    color: var(--color-rose);
+  }
+
+  .scroll-arrow.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .preview-panel {
-    height: auto;
-    overflow: visible;
+    height: 100%;
+    overflow: hidden;
   }
 
   .preview-wrapper {
-    padding: 12px;
-    flex: none;
+    flex: 1;
+    min-height: 0;
   }
+}
+
+@keyframes bounce-down {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
 }
 
 @media (max-width: 480px) {

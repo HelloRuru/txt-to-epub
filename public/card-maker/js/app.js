@@ -224,18 +224,26 @@
   /* ─── Preview Sizing ─── */
   function updatePreviewSize() {
     const sz = SIZES[currentSize];
-    const wrapperW = previewWrapper.clientWidth - 40; /* padding */
+    const wrapperW = previewWrapper.clientWidth - 40;
     const wrapperH = previewWrapper.clientHeight - 40;
 
-    /* Calc scale to fit within wrapper */
     const scaleX = wrapperW / sz.w;
-    const scaleY = wrapperH / sz.h;
+    /* If wrapper has no fixed height (mobile), use 75vh as fallback */
+    const maxH = wrapperH > 100 ? wrapperH : window.innerHeight * 0.65;
+    const scaleY = maxH / sz.h;
     const scale = Math.min(scaleX, scaleY, 0.6);
 
     previewCanvas.style.width = sz.w + 'px';
     previewCanvas.style.height = sz.h + 'px';
     previewCanvas.style.transform = `scale(${scale})`;
     previewCanvas.style.transformOrigin = 'top center';
+
+    /* On mobile (no fixed wrapper height), set wrapper height to fit */
+    if (wrapperH <= 100) {
+      previewWrapper.style.height = (sz.h * scale + 40) + 'px';
+    } else {
+      previewWrapper.style.height = '';
+    }
   }
 
   /* ─── Export PNG ─── */
