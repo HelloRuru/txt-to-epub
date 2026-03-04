@@ -223,8 +223,8 @@
 
 /* ─── Theme Dots ─── */
 .theme-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(8, 30px);
   gap: 8px;
 }
 
