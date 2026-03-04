@@ -298,14 +298,7 @@ export default function EpubConvert() {
               </p>
               <button
                 onClick={handleReset}
-                className="px-8 py-3 rounded-full text-sm font-medium transition-all"
-                style={{ 
-                  background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                  color: 'white',
-                  boxShadow: '0 4px 16px rgba(212, 165, 165, 0.3)'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                className="btn-gradient px-8 py-3 text-sm"
               >
                 轉換另一個檔案
               </button>
@@ -471,21 +464,13 @@ export default function EpubConvert() {
                 <button
                   onClick={handleConvert}
                   disabled={isProcessing}
-                  className="px-8 py-3 rounded-full text-sm font-medium transition-all flex items-center gap-2"
-                  style={{ 
-                    background: isProcessing 
-                      ? 'var(--bg-secondary)' 
-                      : 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                    color: isProcessing ? 'var(--text-muted)' : 'white',
-                    cursor: isProcessing ? 'wait' : 'pointer',
-                    boxShadow: isProcessing ? 'none' : '0 4px 16px rgba(212, 165, 165, 0.3)'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isProcessing) e.currentTarget.style.transform = 'scale(1.05)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)'
-                  }}
+                  className="btn-gradient px-8 py-3 text-sm flex items-center gap-2"
+                  style={isProcessing ? {
+                    background: 'var(--bg-secondary)',
+                    color: 'var(--text-muted)',
+                    cursor: 'wait',
+                    boxShadow: 'none',
+                  } : {}}
                 >
                   <ConvertIcon />
                   {isProcessing ? '轉換中...' : '開始轉換'}

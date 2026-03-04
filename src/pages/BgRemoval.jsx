@@ -1242,13 +1242,7 @@ export default function BgRemoval() {
                         setSuggestion(null)
                         if (doneCount > 0) recompositeWithLevel(target)
                       }}
-                      className="px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all"
-                      style={{
-                        background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                        color: 'white',
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                      className="btn-gradient px-4 py-1.5 text-xs whitespace-nowrap"
                     >
                       切換到{LEVELS[suggestion.target].label}
                     </button>
@@ -1293,14 +1287,7 @@ export default function BgRemoval() {
                 {!isProcessing && images.some(i => i.status !== 'done') && (
                   <button
                     onClick={processAll}
-                    className="px-6 py-2.5 rounded-full text-sm font-medium transition-all flex items-center gap-2"
-                    style={{
-                      background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                      color: 'white',
-                      boxShadow: '0 4px 16px rgba(212, 165, 165, 0.3)',
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    className="btn-gradient px-6 py-2.5 text-sm flex items-center gap-2"
                   >
                     <ScissorsIcon />
                     開始去背
@@ -1475,13 +1462,7 @@ export default function BgRemoval() {
                       {img.status === 'done' && (
                         <button
                           onClick={() => downloadOne(img)}
-                          className="px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1"
-                          style={{
-                            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                            color: 'white',
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                          className="btn-gradient px-3 py-1 text-xs flex items-center gap-1"
                         >
                           <DownloadIcon />
                           存檔

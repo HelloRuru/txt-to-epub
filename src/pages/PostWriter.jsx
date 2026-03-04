@@ -92,7 +92,7 @@ export default function PostWriter() {
           <div className="flex items-center gap-4">
             <Link to="/" className="group flex items-center">
               <div
-                className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:rotate-[-15deg] group-hover:scale-110"
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:rotate-[-3deg] group-hover:scale-110"
                 style={{
                   background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
                   boxShadow: '0 4px 20px rgba(212, 165, 165, 0.3)',
@@ -219,7 +219,7 @@ export default function PostWriter() {
           <button
             onClick={handleCopy}
             disabled={!text}
-            className="inline-flex items-center justify-center gap-2.5 px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="btn-gradient inline-flex items-center justify-center gap-2.5 px-8 sm:px-10 py-3.5 sm:py-4 text-sm whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed"
             style={{
               background: copyState === 'success'
                 ? 'linear-gradient(135deg, #A8B5A0, #8FA888)'
@@ -251,19 +251,13 @@ export default function PostWriter() {
           </div>
         )}
 
-        {/* ═══ Footer ═══════════════════════════════════ */}
-        <footer className="mt-24 sm:mt-32 pt-12 pb-8 text-center">
-          {/* 裝飾分隔 */}
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="h-px flex-1 max-w-[80px]" style={{ background: 'var(--border)' }} />
-            <span className="text-xs tracking-widest" style={{ color: 'var(--border)' }}>✦</span>
-            <div className="h-px flex-1 max-w-[80px]" style={{ background: 'var(--border)' }} />
-          </div>
+        {/* ═══ Footer — DS 2.0 漸層淡線 ═══════════════════ */}
+        <footer className="footer-gradient-line mt-24 sm:mt-32 pt-12 pb-8 text-center">
           <p className="text-xs" style={{ color: 'var(--text-muted)', opacity: 0.6 }}>
             全程本機處理，文字不會上傳到任何伺服器
           </p>
           <p className="text-xs mt-2" style={{ color: 'var(--text-muted)', opacity: 0.6 }}>
-            © {new Date().getFullYear()} Kaoru Tsai · <a href="https://helloruru.com" style={{ color: 'var(--accent-primary)' }}>HelloRuru</a>
+            &copy; {new Date().getFullYear()} Kaoru Tsai &middot; <a href="https://helloruru.com" style={{ color: 'var(--accent-primary)' }}>HelloRuru</a>
           </p>
         </footer>
       </div>
@@ -390,7 +384,7 @@ function EditorMode({
           <span className="text-sm font-medium">編輯區</span>
           <button
             onClick={onPaste}
-            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+            className="btn-outline ml-auto flex items-center gap-1.5 px-3 py-1.5 text-xs"
             style={{
               background: 'var(--bg-secondary)',
               color: 'var(--text-muted)',

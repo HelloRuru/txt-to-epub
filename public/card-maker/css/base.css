@@ -1,4 +1,4 @@
-/* ─── Card Maker — DS v1.8 Base ─── */
+/* ─── Card Maker — DS 2.0 經典版 Base ─── */
 
 @font-face {
   font-family: 'GenSenRounded';
@@ -17,11 +17,12 @@
 }
 
 :root {
-  /* DS v1.8 Colors */
+  /* DS 2.0 Colors */
   --color-rose: #D4A5A5;
   --color-lavender: #B8A9C9;
   --color-blush: #F5D0C5;
   --color-grey-rose: #C9929A;
+  --color-coral: #E8A87C;
   --color-nadeshiko: #E8B4B8;
   --color-sakura: #FEDFE1;
   --color-wisteria: #C4B7D7;
@@ -34,8 +35,10 @@
   --color-body: #4A4A4A;
   --color-muted: #888888;
   --color-light: #AAAAAA;
-  --color-bg: #FAFAFA;
+  --color-bg: #FFFCFA;
   --color-card: #FFFFFF;
+  --color-card-hover: #FDF8F7;
+  --color-border: rgba(212, 165, 165, 0.15);
 
   /* Fonts */
   --font-main: 'GenSenRounded', 'Noto Sans TC', sans-serif;
@@ -59,10 +62,24 @@
   --radius-lg: 24px;
   --radius-full: 50%;
 
-  /* Shadows */
-  --shadow-soft: 0 2px 8px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  /* Shadows — DS 2.0 多層柔陰影（Josh Comeau 分層法） */
+  --shadow-sm:
+    0 1px 2px rgba(212,165,165,0.07),
+    0 2px 4px rgba(212,165,165,0.07),
+    0 4px 8px rgba(212,165,165,0.07);
+  --shadow:
+    0 2px 4px rgba(212,165,165,0.07),
+    0 4px 8px rgba(212,165,165,0.07),
+    0 8px 16px rgba(212,165,165,0.07),
+    0 16px 32px rgba(212,165,165,0.07);
+  --shadow-lg:
+    0 4px 8px rgba(212,165,165,0.07),
+    0 8px 16px rgba(212,165,165,0.07),
+    0 16px 32px rgba(212,165,165,0.07),
+    0 32px 64px rgba(212,165,165,0.07);
+  /* 向後相容舊名 */
+  --shadow-soft: var(--shadow-sm);
+  --shadow-md: var(--shadow);
 
   /* Gradients */
   --gradient-main: linear-gradient(135deg, #D4A5A5, #B8A9C9);
@@ -82,7 +99,7 @@ body {
   font-family: var(--font-main);
   font-weight: var(--weight-medium);
   font-size: var(--text-body);
-  line-height: 1.6;
+  line-height: 1.8;
   background: var(--color-bg);
   color: var(--color-body);
   min-height: 100vh;

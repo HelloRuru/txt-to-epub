@@ -1,4 +1,4 @@
-/* ─── Card Maker — Layout + Controls + Templates ─── */
+/* ─── Card Maker — DS 2.0 經典版 Layout + Controls + Templates ─── */
 
 /* ─── App Layout ─── */
 .app {
@@ -18,7 +18,8 @@
 .controls-panel {
   background: var(--color-card);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
   padding: 16px;
   position: sticky;
   top: 80px;
@@ -46,7 +47,7 @@
   gap: 8px;
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--color-mist);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .control-section {
@@ -82,12 +83,14 @@
   font-size: 11px;
   font-weight: var(--weight-medium);
   color: var(--color-body);
-  transition: all 0.2s;
+  transition: border-color 0.18s ease-out, background 0.18s ease-out, color 0.18s ease-out;
 }
 
-.template-btn:hover {
-  border-color: var(--color-lavender);
-  background: #F8F5FC;
+@media (hover: hover) {
+  .template-btn:hover {
+    border-color: var(--color-lavender);
+    background: #F8F5FC;
+  }
 }
 
 .template-btn.active {
@@ -128,12 +131,14 @@
   font-size: 11px;
   font-weight: var(--weight-medium);
   color: var(--color-body);
-  transition: all 0.2s;
+  transition: border-color 0.18s ease-out, background 0.18s ease-out, color 0.18s ease-out;
   text-align: center;
 }
 
-.size-pill:hover {
-  border-color: var(--color-lavender);
+@media (hover: hover) {
+  .size-pill:hover {
+    border-color: var(--color-lavender);
+  }
 }
 
 .size-pill.active {
@@ -172,11 +177,13 @@
   font-size: 10px;
   font-weight: var(--weight-medium);
   color: var(--color-body);
-  transition: all 0.2s;
+  transition: border-color 0.18s ease-out, background 0.18s ease-out, color 0.18s ease-out;
 }
 
-.texture-btn:hover {
-  border-color: var(--color-lavender);
+@media (hover: hover) {
+  .texture-btn:hover {
+    border-color: var(--color-lavender);
+  }
 }
 
 .texture-btn.active {
@@ -240,12 +247,14 @@
   border-radius: var(--radius-full);
   border: 2.5px solid transparent;
   cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: var(--shadow-soft);
+  transition: transform 0.18s ease-out, border-color 0.18s ease-out;
+  box-shadow: var(--shadow-sm);
 }
 
-.theme-dot:hover {
-  transform: scale(1.15);
+@media (hover: hover) {
+  .theme-dot:hover {
+    transform: scale(1.15);
+  }
 }
 
 .theme-dot.active {
@@ -285,7 +294,7 @@
 .field-group textarea:focus {
   outline: none;
   border-color: var(--color-rose);
-  box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.15);
+  box-shadow: 0 0 0 3px rgba(184, 169, 201, 0.15);
 }
 
 .field-group input::placeholder,
@@ -300,7 +309,7 @@
   padding: 14px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.18s ease-out, background 0.18s ease-out, color 0.18s ease-out;
   color: var(--color-light);
 }
 
@@ -309,11 +318,18 @@
   height: 24px;
 }
 
-.upload-area:hover,
 .upload-area.drag-over {
   border-color: var(--color-rose);
   background: #FEF5F5;
   color: var(--color-rose);
+}
+
+@media (hover: hover) {
+  .upload-area:hover {
+    border-color: var(--color-rose);
+    background: #FEF5F5;
+    color: var(--color-rose);
+  }
 }
 
 .upload-area p {
@@ -345,11 +361,13 @@
   font-family: var(--font-main);
   font-size: var(--text-caption);
   color: var(--color-muted);
-  transition: color 0.2s;
+  transition: color 0.18s ease-out;
 }
 
-.btn-clear-image:hover {
-  color: var(--color-grey-rose);
+@media (hover: hover) {
+  .btn-clear-image:hover {
+    color: var(--color-grey-rose);
+  }
 }
 
 /* ─── Toggle Switch ─── */
@@ -440,17 +458,20 @@
   font-size: var(--text-body);
   font-weight: var(--weight-bold);
   cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: var(--shadow-md);
+  transition: transform 0.18s ease-out, box-shadow 0.18s ease-out;
+  box-shadow: var(--shadow);
 }
 
-.btn-export:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+@media (hover: hover) {
+  .btn-export:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
 }
 
 .btn-export:active {
-  transform: translateY(0);
+  transform: scale(0.97);
+  transition-duration: 0.1s;
 }
 
 .btn-export.loading {
@@ -458,21 +479,41 @@
   pointer-events: none;
 }
 
-/* ─── Footer ─── */
+/* ─── Footer — DS 2.0 漸層淡線 ─── */
 .site-footer {
   text-align: center;
   padding: 24px 20px;
   font-size: 14px;
   color: var(--color-muted);
+  position: relative;
+}
+
+.site-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-rose), transparent);
+  opacity: 0.5;
 }
 
 .site-footer a {
   color: var(--color-rose);
   text-decoration: none;
+  background-image: linear-gradient(var(--color-lavender), var(--color-lavender));
+  background-size: 0% 1px;
+  background-position: left bottom;
+  background-repeat: no-repeat;
+  transition: background-size 0.3s ease;
 }
 
-.site-footer a:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .site-footer a:hover {
+    background-size: 100% 1px;
+  }
 }
 
 /* ─── Toast ─── */
@@ -916,7 +957,8 @@
   }
 
   .fab-preview:active {
-    transform: scale(0.95);
+    transform: scale(0.97);
+    transition-duration: 0.1s;
   }
 
   .fab-preview.hidden {
@@ -934,4 +976,13 @@
   .template-grid { grid-template-columns: repeat(4, 1fr); gap: 4px; }
 
   .size-pills { flex-wrap: wrap; }
+}
+
+/* ─── DS 2.0 無障礙：減少動態總開關 ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
