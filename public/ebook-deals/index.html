@@ -224,7 +224,7 @@
 
     /* --- Layout --- */
     .container {
-      max-width: 900px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 0 24px 64px;
     }
@@ -253,6 +253,26 @@
       font-size: 12px;
       color: var(--text-hint);
       margin-top: 8px;
+    }
+    .refresh-btn {
+      background: none;
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      margin-left: 4px;
+    }
+    .refresh-btn:hover {
+      border-color: var(--color-sage);
+      color: var(--color-sage-dark);
+    }
+    .refresh-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     /* --- Platform Tabs --- */
@@ -285,21 +305,49 @@
       border-color: var(--color-sage);
     }
 
-    /* --- Deals Grid --- */
-    .deals-grid {
+    /* --- Three-Column Layout --- */
+    .platform-columns {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .platform-column {
+      min-width: 0;
+    }
+    .column-header {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-ink);
+      text-align: center;
+      padding: 10px 0;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .column-header .col-count {
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-hint);
+      margin-left: 4px;
+    }
+    .deals-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
-    /* --- Deal Card --- */
+    /* --- Deal Card (Vertical for columns) --- */
     .deal-card {
       display: flex;
-      gap: 20px;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
-      padding: 24px;
+      padding: 20px 16px;
       box-shadow: var(--shadow-sm);
       transition: transform var(--transition-normal),
                   box-shadow var(--transition-normal),
@@ -319,8 +367,8 @@
       perspective: 800px;
     }
     .book-cover {
-      width: 100px;
-      height: 150px;
+      width: 120px;
+      height: 180px;
       border-radius: 2px 6px 6px 2px;
       overflow: hidden;
       position: relative;
@@ -409,6 +457,7 @@
     .deal-meta {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       margin-bottom: 6px;
       flex-wrap: wrap;
@@ -466,6 +515,7 @@
     .deal-pricing {
       display: flex;
       align-items: baseline;
+      justify-content: center;
       gap: 10px;
       margin-bottom: 10px;
     }
@@ -885,23 +935,21 @@
     }
 
     /* --- Responsive --- */
+    @media (max-width: 1023px) {
+      .platform-columns { grid-template-columns: 1fr 1fr; }
+    }
     @media (max-width: 768px) {
       h1 { font-size: 26px; }
       h2 { font-size: 20px; }
       .hero { padding: 28px 0 24px; }
       .container { padding: 0 16px 48px; }
-      .deal-card { padding: 16px; gap: 14px; }
-      .book-cover { width: 80px; height: 120px; }
-      .deal-title { font-size: 16px; }
+      .platform-columns { grid-template-columns: 1fr; }
+      .deal-card { padding: 14px; gap: 12px; }
+      .book-cover { width: 100px; height: 150px; }
+      .deal-title { font-size: 15px; }
       .price-deal { font-size: 20px; }
       .search-box { flex-direction: column; }
       .upcoming-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-    }
-    @media (max-width: 480px) {
-      .deal-card { flex-direction: column; align-items: center; text-align: center; }
-      .deal-meta { justify-content: center; }
-      .deal-pricing { justify-content: center; }
-      .deal-rec { text-align: center; }
     }
 
     /* --- Accessibility --- */
@@ -927,21 +975,29 @@
       <div class="accent-bar"></div>
       <h1>每日好書推薦</h1>
       <p class="hero-sub">Readmoo・博客來・Kobo — 今天又有哪些書在特價？</p>
-      <p class="hero-updated" id="updated-at"></p>
+      <p class="hero-updated"><span id="updated-at"></span> <button id="refresh-btn" class="refresh-btn" title="重新抓取最新資料" style="display:none">重新整理</button></p>
     </section>
 
-    <nav class="platform-tabs" id="platform-tabs">
-      <button class="tab active" data-platform="all">全部</button>
-      <button class="tab" data-platform="readmoo">Readmoo</button>
-      <button class="tab" data-platform="books">博客來</button>
-      <button class="tab" data-platform="kobo">Kobo</button>
-    </nav>
-
     <section id="deals-section">
-      <div id="deals-grid" class="deals-grid">
-        <div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-text"></div><div class="shimmer-block shimmer-price"></div></div></div>
-        <div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-text"></div><div class="shimmer-block shimmer-price"></div></div></div>
-        <div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-text"></div><div class="shimmer-block shimmer-price"></div></div></div>
+      <div class="platform-columns" id="platform-columns">
+        <div class="platform-column">
+          <div class="column-header">Readmoo</div>
+          <div class="deals-grid" id="grid-readmoo">
+            <div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-price"></div></div></div>
+          </div>
+        </div>
+        <div class="platform-column">
+          <div class="column-header">博客來</div>
+          <div class="deals-grid" id="grid-books">
+            <div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-price"></div></div></div>
+          </div>
+        </div>
+        <div class="platform-column">
+          <div class="column-header">Kobo</div>
+          <div class="deals-grid" id="grid-kobo">
+            <div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-price"></div></div></div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1025,22 +1081,11 @@
 
     // === State ===
     let allDealsData = null;
-    let currentPlatform = 'all';
-
-    // === Tab Switching ===
-    document.getElementById('platform-tabs').addEventListener('click', (e) => {
-      const btn = e.target.closest('.tab');
-      if (!btn) return;
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      btn.classList.add('active');
-      currentPlatform = btn.dataset.platform;
-      if (allDealsData) renderDeals(allDealsData);
-    });
 
     // === Fetch Deals ===
-    async function fetchDeals() {
+    async function fetchDeals(endpoint = '/api/deals') {
       try {
-        const res = await fetch(API_BASE + '/api/deals');
+        const res = await fetch(API_BASE + endpoint);
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         allDealsData = data;
@@ -1050,22 +1095,38 @@
             '\u6700\u5F8C\u66F4\u65B0\uFF1A' + d.toLocaleDateString('zh-TW') + ' ' +
             d.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
         }
+        document.getElementById('refresh-btn').style.display = '';
         renderDeals(data);
         renderExhibitions(data.exhibitions);
       } catch (err) {
-        document.getElementById('deals-grid').innerHTML =
+        document.getElementById('grid-readmoo').innerHTML =
           '<div class="status-msg error">\u8F09\u5165\u5931\u6557\uFF1A' + escapeHtml(err.message) + '</div>';
       }
     }
 
+    // === Refresh Button ===
+    document.getElementById('refresh-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('refresh-btn');
+      btn.disabled = true;
+      btn.textContent = '\u6293\u53D6\u4E2D...';
+      for (const p of ['readmoo','books','kobo']) {
+        document.getElementById('grid-' + p).innerHTML =
+          '<div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-price"></div></div></div>';
+      }
+      await fetchDeals('/api/refresh');
+      btn.disabled = false;
+      btn.textContent = '\u91CD\u65B0\u6574\u7406';
+    });
+
     // === Render Deals ===
     function renderDeals(data) {
       const today = new Date().toISOString().split('T')[0];
-      const todayDeals = [];
       const upcomingDeals = [];
 
       for (const platform of ['readmoo', 'books', 'kobo']) {
         const deals = data[platform]?.deals || [];
+        const todayDeals = [];
+
         for (const deal of deals) {
           if (platform === 'readmoo') {
             if (deal.date === today) todayDeals.push(deal);
@@ -1074,20 +1135,17 @@
             todayDeals.push(deal);
           }
         }
+
+        const grid = document.getElementById('grid-' + platform);
+        const header = grid.previousElementSibling;
+        if (todayDeals.length === 0) {
+          grid.innerHTML = '<div class="empty-state"><p>\u4ECA\u5929\u7121\u7279\u50F9</p></div>';
+        } else {
+          header.innerHTML = header.textContent.split('<')[0] + '<span class="col-count">' + todayDeals.length + ' \u672C</span>';
+          grid.innerHTML = todayDeals.map(deal => renderDealCard(deal)).join('');
+          grid.querySelectorAll('.deal-rec[data-title]').forEach(el => loadRating(el));
+        }
       }
-
-      const filtered = currentPlatform === 'all'
-        ? todayDeals
-        : todayDeals.filter(d => d.platform === currentPlatform);
-
-      const grid = document.getElementById('deals-grid');
-      if (filtered.length === 0) {
-        grid.innerHTML = '<div class="empty-state"><p>\u4ECA\u5929\u6C92\u6709\u627E\u5230\u7279\u50F9\u66F8</p></div>';
-        return;
-      }
-
-      grid.innerHTML = filtered.map(deal => renderDealCard(deal)).join('');
-      grid.querySelectorAll('.deal-rec[data-title]').forEach(el => loadRating(el));
 
       if (upcomingDeals.length > 0) {
         document.getElementById('upcoming-section').style.display = '';
@@ -1111,7 +1169,6 @@
         '<div class="book-cover-wrap"><div class="book-cover">' + cover + '</div></div>' +
         '<div class="deal-info">' +
           '<div class="deal-meta">' +
-            '<span class="platform-badge ' + p + '">' + escapeHtml(pName) + '</span>' +
             (deal.dealType ? '<span class="deal-type">' + escapeHtml(deal.dealType) + '</span>' : '') +
             '<span class="deal-date">' + formatDate(deal.date) + '</span>' +
           '</div>' +
