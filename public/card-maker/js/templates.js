@@ -6,9 +6,9 @@ const SIZES = {
   'wide':    { w: 1920, h: 1080, label: '1920 x 1080 px' },
 };
 
-const THEMES = ['rose', 'lavender', 'sage', 'warm', 'cool'];
+const THEMES = ['rose', 'lavender', 'sage', 'sunset', 'ocean', 'mocha', 'berry', 'ink'];
 
-const TEXTURES = ['none', 'washi', 'watercolor', 'kraft', 'linen', 'torn'];
+const TEXTURES = ['none', 'grain', 'watercolor', 'kraft', 'linen', 'frost'];
 
 const TEMPLATES = {
   'tool-intro': {

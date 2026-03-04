@@ -190,42 +190,42 @@
 }
 
 .texture-preview--none {
-  background: linear-gradient(160deg, #FDF2F0 0%, #ECD5E0 100%);
+  background: linear-gradient(160deg, #F8E8E8, #D4A5A5);
 }
 
-.texture-preview--washi {
-  background: #F5F3F0;
-  background-image:
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 60 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cline x1='5' y1='8' x2='18' y2='12' stroke='%23A0B8D0' stroke-width='0.7' opacity='0.5'/%3E%3Cline x1='35' y1='5' x2='50' y2='3' stroke='%23B8A9C9' stroke-width='0.5' opacity='0.4'/%3E%3Cline x1='20' y1='25' x2='38' y2='28' stroke='%23A0B8D0' stroke-width='0.6' opacity='0.45'/%3E%3Cline x1='42' y1='30' x2='55' y2='35' stroke='%23B8A9C9' stroke-width='0.5' opacity='0.35'/%3E%3C/svg%3E");
+.texture-preview--grain {
+  background: linear-gradient(160deg, #E8D0D4, #C8A8B0);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.25'/%3E%3C/svg%3E");
 }
 
 .texture-preview--watercolor {
-  background: #F8F5F0;
+  background: #F0E8E0;
   background-image:
-    radial-gradient(circle at 30% 40%, rgba(212,165,165,0.15) 0%, transparent 60%),
-    radial-gradient(circle at 70% 60%, rgba(184,169,201,0.12) 0%, transparent 50%);
+    radial-gradient(circle at 30% 40%, rgba(212,165,165,0.25) 0%, transparent 55%),
+    radial-gradient(circle at 70% 60%, rgba(184,169,201,0.20) 0%, transparent 45%);
 }
 
 .texture-preview--kraft {
-  background: linear-gradient(160deg, #D4C5A9, #C8B896);
+  background: linear-gradient(160deg, #D4C0A0, #C0A880);
 }
 
 .texture-preview--linen {
-  background: #F0EDE8;
+  background: #ECE8E0;
   background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px),
-    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px);
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 3px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 3px);
 }
 
-.texture-preview--torn {
-  background:
-    linear-gradient(to bottom, #F5F0ED 0%, #F5F0ED 35%, #8B6B6B 40%, #8B6B6B 60%, #F5F0ED 65%, #F5F0ED 100%);
+.texture-preview--frost {
+  background: linear-gradient(160deg, #F0E8F0, #D8D0E0);
+  background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.5) 0%, transparent 70%);
 }
 
 /* ─── Theme Dots ─── */
 .theme-grid {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .theme-dot {
@@ -539,28 +539,43 @@
 
 /* ─── Theme Backgrounds ─── */
 .card.theme-rose {
-  background: linear-gradient(160deg, #FDF2F0 0%, #F5E1E6 40%, #ECD5E0 70%, #E5D0E8 100%);
-  color: #4A3F45;
+  background: linear-gradient(160deg, #F8E8E8 0%, #F0D0D4 35%, #E8C0C8 65%, #D4A5A5 100%);
+  color: #4A3540;
 }
 
 .card.theme-lavender {
-  background: linear-gradient(160deg, #F5F0FA 0%, #EBE3F5 40%, #E0D8EE 70%, #DDD5F0 100%);
-  color: #3F3A4A;
+  background: linear-gradient(160deg, #F0EAF8 0%, #E0D0F0 35%, #D0BBE5 65%, #B8A9C9 100%);
+  color: #3A3548;
 }
 
 .card.theme-sage {
-  background: linear-gradient(160deg, #F2F5F0 0%, #E5EDE0 40%, #D8E5D3 70%, #D0DFC9 100%);
-  color: #3A4538;
+  background: linear-gradient(160deg, #EEF2EA 0%, #D5E0CC 35%, #C0D4B0 65%, #A8B5A0 100%);
+  color: #354038;
 }
 
-.card.theme-warm {
-  background: linear-gradient(160deg, #FDF5F0 0%, #F8EAE0 40%, #F0DDD0 70%, #EBD5C5 100%);
-  color: #4A4038;
+.card.theme-sunset {
+  background: linear-gradient(160deg, #FFF0E5 0%, #FFD8B8 35%, #F0C098 65%, #E8A878 100%);
+  color: #4A3528;
 }
 
-.card.theme-cool {
-  background: linear-gradient(160deg, #F0F3F8 0%, #E3E9F2 40%, #D5DFEB 70%, #CDD8E8 100%);
-  color: #383D4A;
+.card.theme-ocean {
+  background: linear-gradient(160deg, #E8F0F8 0%, #C0D8F0 35%, #98C0E0 65%, #7098C0 100%);
+  color: #283848;
+}
+
+.card.theme-mocha {
+  background: linear-gradient(160deg, #F5EDE5 0%, #E0D0C0 35%, #C8B8A0 65%, #B09880 100%);
+  color: #3D3028;
+}
+
+.card.theme-berry {
+  background: linear-gradient(160deg, #F8E5F0 0%, #F0C0D8 35%, #E0A0C0 65%, #C87098 100%);
+  color: #482838;
+}
+
+.card.theme-ink {
+  background: linear-gradient(160deg, #F0F0F0 0%, #D8D8D8 35%, #C0C0C0 65%, #989898 100%);
+  color: #2A2A2A;
 }
 
 /* ─── Pill Badge ─── */
@@ -574,11 +589,14 @@
   margin-bottom: 24px;
 }
 
-.theme-rose .card-pill { background: rgba(212,165,165,0.25); color: #9B6B6B; }
-.theme-lavender .card-pill { background: rgba(184,169,201,0.25); color: #6B5F8A; }
-.theme-sage .card-pill { background: rgba(168,181,160,0.25); color: #5A6B55; }
-.theme-warm .card-pill { background: rgba(245,208,197,0.3); color: #8B6B5A; }
-.theme-cool .card-pill { background: rgba(184,197,214,0.3); color: #5A6B80; }
+.theme-rose .card-pill { background: rgba(212,165,165,0.3); color: #8B5558; }
+.theme-lavender .card-pill { background: rgba(184,169,201,0.3); color: #5F4F7A; }
+.theme-sage .card-pill { background: rgba(145,170,130,0.3); color: #4A5F42; }
+.theme-sunset .card-pill { background: rgba(232,168,120,0.3); color: #8B5A30; }
+.theme-ocean .card-pill { background: rgba(112,152,192,0.3); color: #385878; }
+.theme-mocha .card-pill { background: rgba(176,152,128,0.3); color: #6B5038; }
+.theme-berry .card-pill { background: rgba(200,112,152,0.3); color: #882858; }
+.theme-ink .card-pill { background: rgba(120,120,120,0.25); color: #484848; }
 
 /* ─── Card Title ─── */
 .card-title {
@@ -692,11 +710,14 @@
   font-weight: 700;
 }
 
-.theme-rose .card-list-num { background: rgba(212,165,165,0.3); color: #9B6B6B; }
-.theme-lavender .card-list-num { background: rgba(184,169,201,0.3); color: #6B5F8A; }
-.theme-sage .card-list-num { background: rgba(168,181,160,0.3); color: #5A6B55; }
-.theme-warm .card-list-num { background: rgba(245,208,197,0.35); color: #8B6B5A; }
-.theme-cool .card-list-num { background: rgba(184,197,214,0.35); color: #5A6B80; }
+.theme-rose .card-list-num { background: rgba(212,165,165,0.35); color: #8B5558; }
+.theme-lavender .card-list-num { background: rgba(184,169,201,0.35); color: #5F4F7A; }
+.theme-sage .card-list-num { background: rgba(145,170,130,0.35); color: #4A5F42; }
+.theme-sunset .card-list-num { background: rgba(232,168,120,0.35); color: #8B5A30; }
+.theme-ocean .card-list-num { background: rgba(112,152,192,0.35); color: #385878; }
+.theme-mocha .card-list-num { background: rgba(176,152,128,0.35); color: #6B5038; }
+.theme-berry .card-list-num { background: rgba(200,112,152,0.35); color: #882858; }
+.theme-ink .card-list-num { background: rgba(120,120,120,0.3); color: #484848; }
 
 /* ─── Text Template ─── */
 .card-text-title {
@@ -724,41 +745,45 @@
   margin: 20px 0;
 }
 
-.theme-rose .card-divider { background: rgba(212,165,165,0.5); }
-.theme-lavender .card-divider { background: rgba(184,169,201,0.5); }
-.theme-sage .card-divider { background: rgba(168,181,160,0.5); }
-.theme-warm .card-divider { background: rgba(245,208,197,0.6); }
-.theme-cool .card-divider { background: rgba(184,197,214,0.6); }
+.theme-rose .card-divider { background: rgba(212,165,165,0.6); }
+.theme-lavender .card-divider { background: rgba(184,169,201,0.6); }
+.theme-sage .card-divider { background: rgba(145,170,130,0.6); }
+.theme-sunset .card-divider { background: rgba(232,168,120,0.6); }
+.theme-ocean .card-divider { background: rgba(112,152,192,0.6); }
+.theme-mocha .card-divider { background: rgba(176,152,128,0.6); }
+.theme-berry .card-divider { background: rgba(200,112,152,0.6); }
+.theme-ink .card-divider { background: rgba(120,120,120,0.5); }
 
 /* ═══════════════════════════════════════════
-   PAPER TEXTURE EFFECTS
+   TEXTURE EFFECTS (Behance 2026 style)
    ═══════════════════════════════════════════ */
 
-/* ─── Washi (和紙) ─── */
-/* 桑皮紙風格：細纖維散佈 + 紙張顆粒 */
-.card.texture-washi::before {
+/* ─── Grain (細顆粒) ─── */
+/* Behance 最流行的 grainy gradient 效果 */
+.card.texture-grain::before {
   background:
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cline x1='20' y1='45' x2='65' y2='52' stroke='%23899EC2' stroke-width='1' opacity='0.3' stroke-linecap='round'/%3E%3Cline x1='150' y1='20' x2='195' y2='15' stroke='%23A0B0D0' stroke-width='0.8' opacity='0.25' stroke-linecap='round'/%3E%3Cline x1='280' y1='80' x2='330' y2='75' stroke='%23B0A0C8' stroke-width='0.7' opacity='0.28' stroke-linecap='round'/%3E%3Cline x1='90' y1='130' x2='120' y2='140' stroke='%23899EC2' stroke-width='0.9' opacity='0.22' stroke-linecap='round'/%3E%3Cline x1='350' y1='155' x2='385' y2='160' stroke='%23A0B0D0' stroke-width='0.7' opacity='0.3' stroke-linecap='round'/%3E%3Cline x1='45' y1='200' x2='90' y2='195' stroke='%23B0A0C8' stroke-width='0.8' opacity='0.2' stroke-linecap='round'/%3E%3Cline x1='220' y1='230' x2='270' y2='225' stroke='%23899EC2' stroke-width='0.6' opacity='0.32' stroke-linecap='round'/%3E%3Cline x1='310' y1='260' x2='345' y2='265' stroke='%23A0B0D0' stroke-width='0.9' opacity='0.18' stroke-linecap='round'/%3E%3Cline x1='60' y1='300' x2='100' y2='310' stroke='%23B0A0C8' stroke-width='0.7' opacity='0.26' stroke-linecap='round'/%3E%3Cline x1='180' y1='340' x2='225' y2='335' stroke='%23899EC2' stroke-width='0.8' opacity='0.24' stroke-linecap='round'/%3E%3Cline x1='370' y1='340' x2='395' y2='350' stroke='%23A0B0D0' stroke-width='0.6' opacity='0.2' stroke-linecap='round'/%3E%3Cline x1='120' y1='380' x2='160' y2='375' stroke='%23B0A0C8' stroke-width='0.7' opacity='0.28' stroke-linecap='round'/%3E%3Cline x1='260' y1='370' x2='300' y2='380' stroke='%23899EC2' stroke-width='0.5' opacity='0.22' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-size: 512px 512px, 400px 400px;
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  mix-blend-mode: overlay;
 }
 
-/* ─── Watercolor (水彩紙) ─── */
-/* 粗糙紙面 + 不規則色暈 */
+/* ─── Watercolor (水彩暈染) ─── */
+/* 大膽色塊 + 粗顆粒紙面 */
 .card.texture-watercolor::before {
   background:
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.45' numOctaves='8' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.1'/%3E%3C/svg%3E"),
-    radial-gradient(ellipse at 15% 20%, rgba(212,165,165,0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 75%, rgba(184,169,201,0.06) 0%, transparent 45%),
-    radial-gradient(ellipse at 50% 50%, rgba(168,181,160,0.04) 0%, transparent 60%);
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='8' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.14'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 10% 15%, rgba(212,165,165,0.18) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 80%, rgba(184,169,201,0.15) 0%, transparent 40%),
+    radial-gradient(ellipse at 60% 30%, rgba(168,181,160,0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 25% 75%, rgba(200,180,160,0.12) 0%, transparent 45%);
 }
 
 /* ─── Kraft (牛皮紙) ─── */
-/* 棕色調顆粒 + 紙面深淺變化 */
+/* 復古棕色 + 粗顆粒 + 纖維感 */
 .card.texture-kraft::before {
   background:
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.015 0.06' numOctaves='3' seed='7'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='0.06'/%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.02 0.08' numOctaves='3' seed='7'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='0.08'/%3E%3C/svg%3E");
 }
 
 .card.texture-kraft {
@@ -768,89 +793,52 @@
 .card.texture-kraft.theme-rose { background: linear-gradient(160deg, #E8D5C0 0%, #D8C4AC 40%, #CEBB9E 70%, #C8B494 100%); }
 .card.texture-kraft.theme-lavender { background: linear-gradient(160deg, #DDD0BE 0%, #D0C2AC 40%, #C8BA9E 70%, #C2B394 100%); }
 .card.texture-kraft.theme-sage { background: linear-gradient(160deg, #D5CDB8 0%, #C8C0A6 40%, #BEB898 70%, #B8B290 100%); }
-.card.texture-kraft.theme-warm { background: linear-gradient(160deg, #EBD8C2 0%, #DFCBB0 40%, #D5C0A0 70%, #CEB894 100%); }
-.card.texture-kraft.theme-cool { background: linear-gradient(160deg, #D8D0C0 0%, #CCC4B0 40%, #C4BCA8 70%, #BEB8A0 100%); }
+.card.texture-kraft.theme-sunset { background: linear-gradient(160deg, #EBD8C2 0%, #DFCBB0 40%, #D5C0A0 70%, #CEB894 100%); }
+.card.texture-kraft.theme-ocean { background: linear-gradient(160deg, #D0CCBE 0%, #C4BEB0 40%, #BCB8A4 70%, #B4B098 100%); }
+.card.texture-kraft.theme-mocha { background: linear-gradient(160deg, #D8C8B0 0%, #CCC0A0 40%, #C0B490 70%, #B4A882 100%); }
+.card.texture-kraft.theme-berry { background: linear-gradient(160deg, #E0CCB8 0%, #D4C0A8 40%, #C8B89C 70%, #C0B090 100%); }
+.card.texture-kraft.theme-ink { background: linear-gradient(160deg, #D0CCC4 0%, #C4C0B8 40%, #BCB8B0 70%, #B0ACA4 100%); }
 
-.card.texture-kraft .card-pill { background: rgba(100,70,40,0.15) !important; color: #6B4F32 !important; }
-.card.texture-kraft .card-list-num { background: rgba(100,70,40,0.15) !important; color: #6B4F32 !important; }
-.card.texture-kraft .card-divider { background: rgba(100,70,40,0.3) !important; }
+.card.texture-kraft .card-pill { background: rgba(100,70,40,0.18) !important; color: #6B4F32 !important; }
+.card.texture-kraft .card-list-num { background: rgba(100,70,40,0.18) !important; color: #6B4F32 !important; }
+.card.texture-kraft .card-divider { background: rgba(100,70,40,0.35) !important; }
 
-/* ─── Linen (亞麻紙) ─── */
-/* 十字交織布紋 */
+/* ─── Linen (亞麻布) ─── */
+/* 十字交織布紋，加強對比 */
 .card.texture-linen::before {
   background:
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E"),
     repeating-linear-gradient(
       0deg,
       transparent,
-      transparent 3px,
-      rgba(0,0,0,0.02) 3px,
-      rgba(0,0,0,0.02) 4px
+      transparent 2px,
+      rgba(0,0,0,0.04) 2px,
+      rgba(0,0,0,0.04) 3px
     ),
     repeating-linear-gradient(
       90deg,
       transparent,
-      transparent 3px,
-      rgba(0,0,0,0.02) 3px,
-      rgba(0,0,0,0.02) 4px
+      transparent 2px,
+      rgba(0,0,0,0.04) 2px,
+      rgba(0,0,0,0.04) 3px
     );
 }
 
-/* ─── Torn (撕紙) ─── */
-/* 上下兩層紙，中間露出深色 */
-.card.texture-torn {
-  position: relative;
-}
-
-.card.texture-torn::before {
+/* ─── Frost (磨砂霧面) ─── */
+/* 柔和霧面質感，大面積 noise + 邊角暈染 */
+.card.texture-frost::before {
   background:
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(255,255,255,0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.15) 0%, transparent 70%);
+  background-size: 256px 256px, 100% 100%, 100% 100%, 100% 100%;
+  mix-blend-mode: soft-light;
 }
 
-/* 撕紙暗色帶 */
-.card.texture-torn::after {
+.card.texture-frost::after {
   background:
-    linear-gradient(to bottom,
-      transparent 0%,
-      transparent 42%,
-      rgba(80,50,55,0.08) 44%,
-      rgba(80,50,55,0.15) 47%,
-      rgba(80,50,55,0.15) 53%,
-      rgba(80,50,55,0.08) 56%,
-      transparent 58%,
-      transparent 100%
-    ),
-    radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.04) 100%);
-}
-
-/* 撕裂邊緣不規則遮罩 */
-.card.texture-torn > *:not(.card-watermark) {
-  position: relative;
-  z-index: 3;
-}
-
-.theme-rose .card.texture-torn::after,
-.card.texture-torn.theme-rose::after {
-  background:
-    linear-gradient(to bottom,
-      transparent 0%, transparent 42%,
-      rgba(160,100,100,0.1) 44%, rgba(160,100,100,0.18) 47%,
-      rgba(160,100,100,0.18) 53%, rgba(160,100,100,0.1) 56%,
-      transparent 58%, transparent 100%
-    ),
-    radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.04) 100%);
-}
-
-.theme-lavender .card.texture-torn::after,
-.card.texture-torn.theme-lavender::after {
-  background:
-    linear-gradient(to bottom,
-      transparent 0%, transparent 42%,
-      rgba(100,80,130,0.1) 44%, rgba(100,80,130,0.18) 47%,
-      rgba(100,80,130,0.18) 53%, rgba(100,80,130,0.1) 56%,
-      transparent 58%, transparent 100%
-    ),
-    radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.04) 100%);
+    radial-gradient(ellipse at center, transparent 40%, rgba(255,255,255,0.15) 100%);
 }
 
 /* ─── Watermark ─── */
