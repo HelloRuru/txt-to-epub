@@ -28,9 +28,16 @@ export function parseBrandAndColor(input) {
     colorCode = colorMatch[1]
     brandPart = trimmed.slice(0, colorMatch.index).trim()
   } else {
-    // 沒有色號，整段當品牌名 + 可能的額外關鍵字
-    colorCode = ''
-    brandPart = trimmed
+    // 沒空格時嘗試拆分：DIOR999 → DIOR + 999、YSL1966 → YSL + 1966
+    const noSpaceMatch = trimmed.match(/^([A-Za-z]+)(\d[\w-]*)$/)
+    if (noSpaceMatch) {
+      brandPart = noSpaceMatch[1]
+      colorCode = noSpaceMatch[2]
+    } else {
+      // 沒有色號，整段當品牌名 + 可能的額外關鍵字
+      colorCode = ''
+      brandPart = trimmed
+    }
   }
 
   // 嘗試完整 brandPart 精確匹配品牌
