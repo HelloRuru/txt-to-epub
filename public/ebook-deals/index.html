@@ -350,9 +350,8 @@
       padding: 12px 8px;
       transition: background var(--transition-normal);
     }
-    .deal-card:nth-child(7n) { border-right: none; }
-    .deal-card:last-child ~ .deal-card,
-    .deals-grid .deal-card:nth-last-child(-n+7) { border-bottom: none; }
+    .deal-card:last-child { border-right: none; }
+    .deals-grid .deal-card { border-bottom: none; }
     .deal-card.is-today {
       background: var(--color-sage-bg);
     }
@@ -1182,25 +1181,39 @@
     // === Render Deals ===
     function renderCalendarHeader(deals, today, headerId, gridId) {
       const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-      const dates = [...new Set(deals.map(d => d.date))].sort();
       const headerEl = document.getElementById(headerId);
       const gridEl = document.getElementById(gridId);
-      if (!headerEl || dates.length === 0) return;
+      if (!headerEl || deals.length === 0) return;
 
-      // 動態設定欄數（= 書的數量，一格一本）
       const cols = deals.length;
       const colStyle = `repeat(${cols}, 1fr)`;
-      headerEl.style.gridTemplateColumns = colStyle;
       if (gridEl) gridEl.style.gridTemplateColumns = colStyle;
 
-      // 表頭：每本書對應的日期（可重複）
-      headerEl.innerHTML = deals.map(deal => {
-        const d = new Date(deal.date + 'T00:00:00');
-        const isToday = deal.date === today;
+      // 計算每個日期佔幾欄（同日合併）
+      const dateGroups = [];
+      let prev = null;
+      for (const deal of deals) {
+        if (prev && prev.date === deal.date) {
+          prev.count++;
+        } else {
+          prev = { date: deal.date, count: 1 };
+          dateGroups.push(prev);
+        }
+      }
+
+      // 標頭用 gridColumn span 合併同日
+      headerEl.style.gridTemplateColumns = colStyle;
+      headerEl.innerHTML = dateGroups.map(g => {
+        const d = new Date(g.date + 'T00:00:00');
+        const isToday = g.date === today;
         const dayName = weekdays[d.getDay()];
         const dateLabel = `${d.getMonth() + 1}/${d.getDate()}`;
-        return '<span' + (isToday ? ' class="is-today-col"' : '') + '>' +
-          dayName + '<br>' + dateLabel + (isToday ? '<br>今天' : '') + '</span>';
+        const spanAttr = g.count > 1 ? ` style="grid-column: span ${g.count}"` : '';
+        return '<span' + (isToday ? ' class="is-today-col"' : '') + spanAttr + '>' +
+          dayName + '<br>' + dateLabel +
+          (isToday ? '<br>今天' : '') +
+          (g.count > 1 ? `<br>${g.count} 本` : '') +
+          '</span>';
       }).join('');
     }
 
@@ -1210,11 +1223,12 @@
 
       for (const platform of ['readmoo', 'books', 'kobo']) {
         const deals = data[platform]?.deals || [];
-        // Readmoo：今天 + 未來，按日期排序
-        // 博客來/Kobo：全部顯示，按日期排（新的在前）
-        const showDeals = platform === 'readmoo'
-          ? deals.filter(d => d.date >= today).sort((a, b) => a.date.localeCompare(b.date))
-          : deals.sort((a, b) => b.date.localeCompare(a.date));
+        // 全部按日期升冪排（日曆由左到右）
+        // Readmoo：只顯示今天 + 未來
+        const showDeals = (platform === 'readmoo'
+          ? deals.filter(d => d.date >= today)
+          : deals
+        ).sort((a, b) => a.date.localeCompare(b.date));
 
         const grid = document.getElementById('grid-' + platform);
         const calHeader = document.getElementById('cal-header-' + platform);
