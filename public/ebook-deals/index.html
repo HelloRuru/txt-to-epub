@@ -325,7 +325,8 @@
     .calendar-header span.is-today-col {
       color: var(--color-sage-dark);
       font-weight: 700;
-      background: rgba(168, 181, 160, 0.15);
+      background: rgba(168, 181, 160, 0.22);
+      box-shadow: inset 0 -3px 0 var(--color-sage);
     }
     html.dark .calendar-header span.is-today-col {
       color: var(--color-sage);
@@ -351,14 +352,19 @@
       border-right: 1px solid var(--border-color);
       border-bottom: 1px solid var(--border-color);
       padding: 12px 8px;
-      transition: background var(--transition-normal);
+      transition: background var(--transition-normal), transform var(--transition-normal), box-shadow var(--transition-normal);
+      position: relative;
     }
     .deal-card:last-child { border-right: none; }
     .deals-grid .deal-card { border-bottom: none; }
     .deal-card.is-today {
-      background: var(--color-sage-bg);
+      background: rgba(168, 181, 160, 0.15);
+      box-shadow: inset 0 0 0 2px rgba(168, 181, 160, 0.3);
     }
-    html.dark .deal-card.is-today { background: rgba(168, 181, 160, 0.06); }
+    html.dark .deal-card.is-today {
+      background: rgba(168, 181, 160, 0.10);
+      box-shadow: inset 0 0 0 2px rgba(168, 181, 160, 0.2);
+    }
     .deal-card.is-past { opacity: 0.45; }
     .deal-card.is-past .deal-link { display: none; }
     .deal-card.is-today .deal-date {
@@ -369,6 +375,17 @@
     @media (hover: hover) {
       .deal-card:hover {
         background: var(--bg-card-hover);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+        z-index: 1;
+      }
+      .deal-card.is-today:hover {
+        background: rgba(168, 181, 160, 0.22);
+        box-shadow: var(--shadow-md), inset 0 0 0 2px rgba(168, 181, 160, 0.4);
+      }
+      .deal-card.is-past:hover {
+        transform: none;
+        box-shadow: none;
       }
     }
 
