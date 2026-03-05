@@ -307,35 +307,33 @@
       overflow: hidden;
       background: var(--bg-card);
     }
-    /* 週幾表頭列 */
+    /* 週幾表頭列（欄數由 JS 動態設） */
     .calendar-header {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
       background: var(--color-sage-bg);
       border-bottom: 1px solid var(--border-color);
     }
     html.dark .calendar-header { background: rgba(168, 181, 160, 0.08); }
     .calendar-header span {
       text-align: center;
-      padding: 10px 0;
+      padding: 8px 0;
       font-family: var(--font-body);
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-body);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-hint);
     }
     .calendar-header span.is-today-col {
       color: var(--color-sage-dark);
       font-weight: 700;
-      background: rgba(168, 181, 160, 0.18);
+      background: rgba(168, 181, 160, 0.15);
     }
     html.dark .calendar-header span.is-today-col {
       color: var(--color-sage);
       background: rgba(168, 181, 160, 0.12);
     }
-    /* 週曆橫排 */
+    /* 週曆橫排（欄數由 JS 動態設） */
     .deals-grid {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
       gap: 0;
     }
 
@@ -979,11 +977,8 @@
       .hero { padding: 28px 0 24px; }
       .container { padding: 0 16px 48px; }
       .calendar-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-      .calendar-header { grid-template-columns: repeat(7, minmax(120px, 1fr)); }
-      .deals-grid {
-        grid-template-columns: repeat(7, minmax(120px, 1fr));
-        scroll-snap-type: x mandatory;
-      }
+      .calendar-header span { min-width: 120px; }
+      .deal-card { min-width: 120px; }
       .deal-card { scroll-snap-align: start; padding: 10px 6px; gap: 6px; }
       .book-cover { width: 80px; height: 120px; }
       .deal-title { font-size: 13px; }
@@ -1184,15 +1179,23 @@
     });
 
     // === Render Deals ===
-    function renderCalendarHeader(deals, today, headerId) {
+    function renderCalendarHeader(deals, today, headerId, gridId) {
       const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-      // 從 deals 的日期建出表頭
       const dates = [...new Set(deals.map(d => d.date))].sort();
       const headerEl = document.getElementById(headerId);
+      const gridEl = document.getElementById(gridId);
       if (!headerEl || dates.length === 0) return;
-      headerEl.innerHTML = dates.map(dateStr => {
-        const d = new Date(dateStr + 'T00:00:00');
-        const isToday = dateStr === today;
+
+      // 動態設定欄數（= 書的數量，一格一本）
+      const cols = deals.length;
+      const colStyle = `repeat(${cols}, 1fr)`;
+      headerEl.style.gridTemplateColumns = colStyle;
+      if (gridEl) gridEl.style.gridTemplateColumns = colStyle;
+
+      // 表頭：每本書對應的日期（可重複）
+      headerEl.innerHTML = deals.map(deal => {
+        const d = new Date(deal.date + 'T00:00:00');
+        const isToday = deal.date === today;
         const dayName = weekdays[d.getDay()];
         const dateLabel = `${d.getMonth() + 1}/${d.getDate()}`;
         return '<span' + (isToday ? ' class="is-today-col"' : '') + '>' +
@@ -1214,7 +1217,6 @@
 
         const grid = document.getElementById('grid-' + platform);
         const calHeader = document.getElementById('cal-header-' + platform);
-        // column-header 在 calendar-wrap 外面
         const columnHeader = grid.closest('.platform-column').querySelector('.column-header');
 
         if (showDeals.length === 0) {
@@ -1222,7 +1224,7 @@
           grid.innerHTML = '<div class="empty-state"><p>今天無特價</p></div>';
         } else {
           columnHeader.innerHTML = columnHeader.textContent.split('<')[0] + '<span class="col-count">' + showDeals.length + ' 本</span>';
-          renderCalendarHeader(showDeals, today, 'cal-header-' + platform);
+          renderCalendarHeader(showDeals, today, 'cal-header-' + platform, 'grid-' + platform);
           grid.innerHTML = showDeals.map(deal => renderDealCard(deal, today)).join('');
         }
       }
