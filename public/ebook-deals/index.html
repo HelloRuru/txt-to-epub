@@ -331,6 +331,9 @@
       color: var(--color-sage);
       background: rgba(168, 181, 160, 0.12);
     }
+    .calendar-header span.is-past-col {
+      opacity: 0.45;
+    }
     /* 週曆橫排（欄數由 JS 動態設） */
     .deals-grid {
       display: grid;
@@ -356,6 +359,8 @@
       background: var(--color-sage-bg);
     }
     html.dark .deal-card.is-today { background: rgba(168, 181, 160, 0.06); }
+    .deal-card.is-past { opacity: 0.45; }
+    .deal-card.is-past .deal-link { display: none; }
     .deal-card.is-today .deal-date {
       color: var(--color-sage-dark);
       font-weight: 700;
@@ -1210,10 +1215,13 @@
         const isToday = g.date === today;
         const dayName = weekdays[d.getDay()];
         const dateLabel = `${d.getMonth() + 1}/${d.getDate()}`;
+        const isPast = g.date < today;
         const spanAttr = g.count > 1 ? ` style="grid-column: span ${g.count}"` : '';
-        return '<span' + (isToday ? ' class="is-today-col"' : '') + spanAttr + '>' +
+        const cls = isToday ? 'is-today-col' : isPast ? 'is-past-col' : '';
+        return '<span' + (cls ? ` class="${cls}"` : '') + spanAttr + '>' +
           dayName + '<br>' + dateLabel +
           (isToday ? '<br>今天' : '') +
+          (isPast ? '<br>已過' : '') +
           (g.count > 1 ? `<br>${g.count} 本` : '') +
           '</span>';
       }).join('');
@@ -1250,6 +1258,7 @@
     function renderDealCard(deal, today) {
       const p = deal.platform || '';
       const isToday = deal.date === today;
+      const isPast = deal.date < today;
       const disc = deal.originalPrice > 0
         ? Math.round((1 - deal.dealPrice / deal.originalPrice) * 100) : 0;
 
@@ -1257,7 +1266,7 @@
         ? '<img src="' + escapeHtml(deal.coverUrl) + '" alt="' + escapeHtml(deal.title) + '" loading="lazy" onerror="this.outerHTML=\'<div class=book-cover-placeholder>' + escapeHtml(deal.title.slice(0, 8)) + '</div>\'">'
         : '<div class="book-cover-placeholder">' + escapeHtml(deal.title.slice(0, 8)) + '</div>';
 
-      return '<article class="deal-card' + (isToday ? ' is-today' : '') + '" data-platform="' + p + '">' +
+      return '<article class="deal-card' + (isToday ? ' is-today' : isPast ? ' is-past' : '') + '" data-platform="' + p + '">' +
         '<div class="book-cover-wrap"><div class="book-cover">' + cover + '</div></div>' +
         '<div class="deal-info">' +
           '<h3 class="deal-title">' + escapeHtml(deal.title) + '</h3>' +
