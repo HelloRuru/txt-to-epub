@@ -300,11 +300,43 @@
       color: var(--text-hint);
       margin-left: 4px;
     }
+    /* 週曆容器 */
+    .calendar-wrap {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--bg-card);
+    }
+    /* 週幾表頭列 */
+    .calendar-header {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background: var(--color-sage-bg);
+      border-bottom: 1px solid var(--border-color);
+    }
+    html.dark .calendar-header { background: rgba(168, 181, 160, 0.08); }
+    .calendar-header span {
+      text-align: center;
+      padding: 8px 0;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-hint);
+    }
+    .calendar-header span.is-today-col {
+      color: var(--color-sage-dark);
+      font-weight: 700;
+      background: rgba(168, 181, 160, 0.15);
+    }
+    html.dark .calendar-header span.is-today-col {
+      color: var(--color-sage);
+      background: rgba(168, 181, 160, 0.12);
+    }
     /* 週曆橫排 */
     .deals-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 10px;
+      gap: 0;
     }
 
     /* --- Deal Card (週曆格) --- */
@@ -315,18 +347,18 @@
       text-align: center;
       gap: 8px;
       background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
       padding: 12px 8px;
-      box-shadow: var(--shadow-sm);
-      transition: transform var(--transition-normal),
-                  box-shadow var(--transition-normal),
-                  background var(--transition-normal);
+      transition: background var(--transition-normal);
     }
+    .deal-card:nth-child(7n) { border-right: none; }
+    .deal-card:last-child ~ .deal-card,
+    .deals-grid .deal-card:nth-last-child(-n+7) { border-bottom: none; }
     .deal-card.is-today {
-      border-color: var(--color-sage);
       background: var(--color-sage-bg);
     }
+    html.dark .deal-card.is-today { background: rgba(168, 181, 160, 0.06); }
     .deal-card.is-today .deal-date {
       color: var(--color-sage-dark);
       font-weight: 700;
@@ -334,8 +366,6 @@
     html.dark .deal-card.is-today .deal-date { color: var(--color-sage); }
     @media (hover: hover) {
       .deal-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-md);
         background: var(--bg-card-hover);
       }
     }
@@ -465,9 +495,14 @@
       background: rgba(176, 64, 64, 0.06);
     }
     .deal-date {
-      font-size: 12px;
-      color: var(--text-hint);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--color-sage-bg);
+      padding: 2px 10px;
+      border-radius: 999px;
     }
+    html.dark .deal-date { background: rgba(168, 181, 160, 0.08); }
     .deal-type {
       font-size: 11px;
       color: var(--text-hint);
@@ -802,64 +837,64 @@
     .shimmer-text { height: 16px; width: 45%; }
     .shimmer-price { height: 28px; width: 30%; }
 
-    /* --- Exhibitions --- */
-    .exhibitions-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    /* --- Quick Links (書展入口) --- */
+    .quick-links {
+      display: flex;
       gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
       margin-top: 24px;
     }
-    .exhibition-card {
-      display: block;
+    .quick-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      overflow: hidden;
+      padding: 16px 24px;
       box-shadow: var(--shadow-sm);
+      text-decoration: none;
+      color: var(--text-primary);
       transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+      min-width: 200px;
     }
     @media (hover: hover) {
-      .exhibition-card:hover {
-        transform: translateY(-4px);
+      .quick-link:hover {
+        transform: translateY(-3px);
         box-shadow: var(--shadow-md);
       }
     }
-    .exhibition-banner {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
-      display: block;
-      background: var(--bg-card-warm);
-    }
-    .exhibition-info {
-      padding: 12px 16px;
-    }
-    .exhibition-title {
-      font-family: var(--font-body);
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-primary);
-      line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .exhibition-source {
-      font-size: 12px;
-      color: var(--text-hint);
-      margin-top: 4px;
-    }
-    .exhibition-placeholder {
-      width: 100%;
-      aspect-ratio: 16 / 9;
+    .quick-link-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--color-sage-bg);
-      color: var(--color-sage);
-      font-family: var(--font-serif);
-      font-size: 18px;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .quick-link-icon.books { background: #e8f0fe; color: #1a73e8; }
+    .quick-link-icon.readmoo { background: #fce4ec; color: #c62828; }
+    .quick-link-icon.kobo { background: #f3e5f5; color: #7b1fa2; }
+    .dark .quick-link-icon.books { background: #1e3a5f; color: #8ab4f8; }
+    .dark .quick-link-icon.readmoo { background: #4a2028; color: #e0afaf; }
+    .dark .quick-link-icon.kobo { background: #3a2040; color: #c8b9db; }
+    .quick-link-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .quick-link-name {
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .quick-link-desc {
+      font-size: 12px;
+      color: var(--text-hint);
     }
 
     /* --- Footer --- */
@@ -943,12 +978,11 @@
       h2 { font-size: 20px; }
       .hero { padding: 28px 0 24px; }
       .container { padding: 0 16px 48px; }
+      .calendar-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .calendar-header { grid-template-columns: repeat(7, minmax(120px, 1fr)); }
       .deals-grid {
         grid-template-columns: repeat(7, minmax(120px, 1fr));
-        overflow-x: auto;
         scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 4px;
       }
       .deal-card { scroll-snap-align: start; padding: 10px 6px; gap: 6px; }
       .book-cover { width: 80px; height: 120px; }
@@ -999,20 +1033,29 @@
       <div class="platform-columns" id="platform-columns">
         <div class="platform-column">
           <div class="column-header">Readmoo</div>
-          <div class="deals-grid" id="grid-readmoo">
-            <div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-price"></div></div></div>
+          <div class="calendar-wrap">
+            <div class="calendar-header" id="cal-header-readmoo"></div>
+            <div class="deals-grid" id="grid-readmoo">
+              <div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-price"></div></div></div>
+            </div>
           </div>
         </div>
         <div class="platform-column">
           <div class="column-header">博客來</div>
-          <div class="deals-grid" id="grid-books">
-            <div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-price"></div></div></div>
+          <div class="calendar-wrap">
+            <div class="calendar-header" id="cal-header-books"></div>
+            <div class="deals-grid" id="grid-books">
+              <div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-price"></div></div></div>
+            </div>
           </div>
         </div>
         <div class="platform-column">
           <div class="column-header">Kobo</div>
-          <div class="deals-grid" id="grid-kobo">
-            <div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-price"></div></div></div>
+          <div class="calendar-wrap">
+            <div class="calendar-header" id="cal-header-kobo"></div>
+            <div class="deals-grid" id="grid-kobo">
+              <div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-price"></div></div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1020,11 +1063,33 @@
 
 
 
-    <section id="exhibitions-section" style="display:none">
+    <section id="quick-links-section">
       <div class="divider-gold"></div>
-      <h2>書展活動</h2>
-      <p class="section-desc" style="text-align:center">博客來・Readmoo 電子書展覽與促銷活動</p>
-      <div id="exhibitions-grid" class="exhibitions-grid"></div>
+      <h2>書展 &amp; 促銷入口</h2>
+      <p class="section-desc" style="text-align:center">逛逛各平台目前的電子書活動</p>
+      <div class="quick-links">
+        <a href="https://www.books.com.tw/web/exhibition_cebook" class="quick-link" target="_blank" rel="noopener">
+          <div class="quick-link-icon books">B</div>
+          <div class="quick-link-text">
+            <span class="quick-link-name">博客來電子書展</span>
+            <span class="quick-link-desc">2026 線上國際書展</span>
+          </div>
+        </a>
+        <a href="https://readmoo.com/" class="quick-link" target="_blank" rel="noopener">
+          <div class="quick-link-icon readmoo">R</div>
+          <div class="quick-link-text">
+            <span class="quick-link-name">Readmoo 促銷活動</span>
+            <span class="quick-link-desc">首頁看最新活動</span>
+          </div>
+        </a>
+        <a href="https://www.kobo.com/tw/zh/p/BestSellers-ebooks" class="quick-link" target="_blank" rel="noopener">
+          <div class="quick-link-icon kobo">K</div>
+          <div class="quick-link-text">
+            <span class="quick-link-name">Kobo 暢銷特價</span>
+            <span class="quick-link-desc">每日 99 元專區</span>
+          </div>
+        </a>
+      </div>
     </section>
   </main>
 
@@ -1098,7 +1163,6 @@
         }
         document.getElementById('refresh-btn').style.display = '';
         renderDeals(data);
-        renderExhibitions(data.exhibitions);
       } catch (err) {
         document.getElementById('grid-readmoo').innerHTML =
           '<div class="status-msg error">\u8F09\u5165\u5931\u6557\uFF1A' + escapeHtml(err.message) + '</div>';
@@ -1120,6 +1184,22 @@
     });
 
     // === Render Deals ===
+    function renderCalendarHeader(deals, today, headerId) {
+      const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+      // 從 deals 的日期建出表頭
+      const dates = [...new Set(deals.map(d => d.date))].sort();
+      const headerEl = document.getElementById(headerId);
+      if (!headerEl || dates.length === 0) return;
+      headerEl.innerHTML = dates.map(dateStr => {
+        const d = new Date(dateStr + 'T00:00:00');
+        const isToday = dateStr === today;
+        const dayName = weekdays[d.getDay()];
+        const dateLabel = `${d.getMonth() + 1}/${d.getDate()}`;
+        return '<span' + (isToday ? ' class="is-today-col"' : '') + '>' +
+          dayName + '<br>' + dateLabel + (isToday ? '<br>今天' : '') + '</span>';
+      }).join('');
+    }
+
     function renderDeals(data) {
       const now = new Date();
       const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
@@ -1133,11 +1213,16 @@
           : deals.sort((a, b) => b.date.localeCompare(a.date));
 
         const grid = document.getElementById('grid-' + platform);
-        const header = grid.previousElementSibling;
+        const calHeader = document.getElementById('cal-header-' + platform);
+        // column-header 在 calendar-wrap 外面
+        const columnHeader = grid.closest('.platform-column').querySelector('.column-header');
+
         if (showDeals.length === 0) {
+          if (calHeader) calHeader.innerHTML = '';
           grid.innerHTML = '<div class="empty-state"><p>今天無特價</p></div>';
         } else {
-          header.innerHTML = header.textContent.split('<')[0] + '<span class="col-count">' + showDeals.length + ' 本</span>';
+          columnHeader.innerHTML = columnHeader.textContent.split('<')[0] + '<span class="col-count">' + showDeals.length + ' 本</span>';
+          renderCalendarHeader(showDeals, today, 'cal-header-' + platform);
           grid.innerHTML = showDeals.map(deal => renderDealCard(deal, today)).join('');
         }
       }
@@ -1154,7 +1239,6 @@
         : '<div class="book-cover-placeholder">' + escapeHtml(deal.title.slice(0, 8)) + '</div>';
 
       return '<article class="deal-card' + (isToday ? ' is-today' : '') + '" data-platform="' + p + '">' +
-        '<span class="deal-date">' + formatDate(deal.date) + (isToday ? ' 今天' : '') + '</span>' +
         '<div class="book-cover-wrap"><div class="book-cover">' + cover + '</div></div>' +
         '<div class="deal-info">' +
           '<h3 class="deal-title">' + escapeHtml(deal.title) + '</h3>' +
@@ -1192,24 +1276,6 @@
       } catch {}
     }
 
-    // === Exhibitions ===
-    function renderExhibitions(exData) {
-      if (!exData || !exData.exhibitions || exData.exhibitions.length === 0) return;
-      document.getElementById('exhibitions-section').style.display = '';
-      const sources = { books: '博客來', readmoo: 'Readmoo' };
-      document.getElementById('exhibitions-grid').innerHTML =
-        exData.exhibitions.slice(0, 12).map(ex => {
-          const banner = ex.bannerUrl
-            ? '<img class="exhibition-banner" src="' + escapeHtml(ex.bannerUrl) + '" alt="' + escapeHtml(ex.title) + '" loading="lazy" onerror="this.outerHTML=\'<div class=exhibition-placeholder>書展</div>\'">'
-            : '<div class="exhibition-placeholder">書展</div>';
-          return '<a href="' + escapeHtml(ex.url) + '" class="exhibition-card" target="_blank" rel="noopener">' +
-            banner +
-            '<div class="exhibition-info">' +
-              '<p class="exhibition-title">' + escapeHtml(ex.title) + '</p>' +
-              '<p class="exhibition-source">' + (sources[ex.source] || ex.source) + '</p>' +
-            '</div></a>';
-        }).join('');
-    }
 
     // === Search ===
     document.getElementById('search-btn').addEventListener('click', doSearch);
