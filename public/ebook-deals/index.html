@@ -1101,7 +1101,7 @@
             <span class="quick-link-desc">首頁看最新活動</span>
           </div>
         </a>
-        <a href="https://www.kobo.com/tw/zh/p/BestSellers-ebooks" class="quick-link" target="_blank" rel="noopener">
+        <a href="https://www.kobo.com/tw/zh" class="quick-link" target="_blank" rel="noopener">
           <div class="quick-link-icon kobo">K</div>
           <div class="quick-link-text">
             <span class="quick-link-name">Kobo 暢銷特價</span>
@@ -1248,6 +1248,7 @@
       const now = new Date();
       const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
 
+      const platformNames = { readmoo: 'Readmoo', books: '博客來', kobo: 'Kobo' };
       for (const platform of ['readmoo', 'books', 'kobo']) {
         const deals = data[platform]?.deals || [];
         // 全部按日期升冪排（日曆由左到右）
@@ -1263,9 +1264,10 @@
 
         if (showDeals.length === 0) {
           if (calHeader) calHeader.innerHTML = '';
+          columnHeader.innerHTML = platformNames[platform];
           grid.innerHTML = '<div class="empty-state"><p>今天無特價</p></div>';
         } else {
-          columnHeader.innerHTML = columnHeader.textContent.split('<')[0] + '<span class="col-count">' + showDeals.length + ' 本</span>';
+          columnHeader.innerHTML = platformNames[platform] + ' <span class="col-count">' + showDeals.length + ' 本</span>';
           renderCalendarHeader(showDeals, today, 'cal-header-' + platform, 'grid-' + platform);
           grid.innerHTML = showDeals.map(deal => renderDealCard(deal, today)).join('');
         }
