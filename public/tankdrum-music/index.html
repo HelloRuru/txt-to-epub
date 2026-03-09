@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>空靈鼓簡譜集 | 水晶音樂</title>
+<meta name="description" content="空靈鼓水晶音樂簡譜集，收錄華語經典流行歌曲與動漫 OST，支援八音鼓與十五音鼓，適合初學者。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+@font-face { font-family:'GenSenRounded'; src:url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2'); font-weight:400; font-display:swap; }
+@font-face { font-family:'GenSenRounded'; src:url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2'); font-weight:500; font-display:swap; }
+@font-face { font-family:'GenSenRounded'; src:url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2'); font-weight:700; font-display:swap; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F8F3EB;--card:#FFFDF8;--title:#3D2B1F;--body:#4A4A4A;--muted:#888;
+  --ink:#5C4033;--ink-light:#8B7355;--border:#E8E0D4;--gold:#C5A55A;--gold-light:#E8D5A0;
+  --rose:#D4A5A5;--lavender:#B8A9C9;
+}
+body{font-family:'GenSenRounded','Noto Sans TC',sans-serif;font-weight:500;background:var(--bg);color:var(--body);line-height:1.8;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(212,165,165,.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(184,169,201,.06) 0%,transparent 50%);pointer-events:none;z-index:0}
+
+/* 古風邊框 */
+.page-border{position:fixed;inset:8px;border:1px solid var(--border);pointer-events:none;z-index:100;border-radius:8px}
+.page-border::before,.page-border::after{content:'';position:absolute;width:24px;height:24px;border-color:var(--gold);border-style:solid}
+.page-border::before{top:-1px;left:-1px;border-width:2px 0 0 2px;border-radius:8px 0 0 0}
+.page-border::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0;border-radius:0 0 8px 0}
+
+/* Header */
+.site-header{text-align:center;padding:48px 24px 24px;position:relative;z-index:1}
+.site-header h1{font-family:'Noto Serif TC',serif;font-size:36px;font-weight:700;color:var(--title);letter-spacing:6px;margin-bottom:4px}
+.site-header .sub{font-size:14px;color:var(--ink-light);letter-spacing:4px}
+.deco{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:12px}
+.deco .ln{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.deco .dt{width:6px;height:6px;background:var(--gold);border-radius:50%}
+
+/* 模式切換 */
+.mode-bar{display:flex;justify-content:center;gap:0;margin:16px auto 24px;max-width:280px;background:var(--card);border-radius:24px;padding:4px;border:1px solid var(--border);position:relative;z-index:1}
+.mode-bar button{flex:1;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;border-radius:20px;transition:.3s}
+.mode-bar button.on{background:var(--ink);color:#FFFDF8}
+
+/* 歌曲列表 */
+.list{max-width:820px;margin:0 auto;padding:0 24px 32px;position:relative;z-index:1}
+.list h2{font-family:'Noto Serif TC',serif;font-size:20px;color:var(--title);text-align:center;margin-bottom:20px;letter-spacing:2px}
+.filters{display:flex;justify-content:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.fbtn{padding:6px 16px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--body);cursor:pointer;font-size:14px;font-family:inherit;transition:.2s}
+.fbtn:hover{border-color:var(--gold-light);color:var(--gold)}
+.fbtn.on{background:var(--gold);border-color:var(--gold);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;cursor:pointer;transition:.3s;overflow:hidden}
+.card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.08);border-color:var(--gold-light)}
+.card .t{font-family:'Noto Serif TC',serif;font-size:17px;font-weight:700;color:var(--title);margin-bottom:2px}
+.card .a{font-size:13px;color:var(--ink-light)}
+.card .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:8px;background:var(--gold-light);color:var(--ink);margin-top:8px}
+.card .tag.warn{background:#F5D0C5}
+
+/* 譜面 */
+.score-view{display:none;max-width:720px;margin:0 auto;padding:0 24px 48px;position:relative;z-index:1}
+.score-view.on{display:block}
+.score-head{text-align:center;margin-bottom:24px}
+.back{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:14px;color:var(--ink-light);background:none;border:none;cursor:pointer;margin-bottom:12px;padding:8px 16px;border-radius:20px;transition:.2s}
+.back:hover{background:rgba(0,0,0,.04)}
+.score-head h2{font-family:'Noto Serif TC',serif;font-size:28px;font-weight:700;color:var(--title)}
+.score-head .info{font-size:14px;color:var(--ink-light);margin-top:2px}
+
+/* 控制列 */
+.ctrl{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px;padding:10px 20px;background:var(--card);border-radius:24px;border:1px solid var(--border)}
+.play-btn{width:44px;height:44px;border-radius:50%;border:2px solid var(--ink);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
+.play-btn:hover{background:var(--ink)}
+.play-btn:hover svg{stroke:#fff}
+.play-btn svg{width:20px;height:20px}
+.spd{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.spd input{width:80px;accent-color:var(--ink)}
+.spd b{color:var(--ink);min-width:28px}
+
+/* 圖例 */
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:20px}
+.legend i{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);font-style:normal}
+.legend i span{width:14px;height:14px;border-radius:50%;display:inline-block}
+
+/* 簡譜主體（橫排） */
+.sheet{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px 20px;margin-bottom:24px}
+.sheet-row{display:flex;flex-wrap:wrap;align-items:flex-start;margin-bottom:16px;gap:2px}
+.measure{display:inline-flex;align-items:flex-start;gap:2px;padding:4px 0;break-inside:avoid}
+.barline{width:1px;height:52px;background:var(--ink-light);margin:0 6px;flex-shrink:0;opacity:.4;align-self:center}
+
+/* 單個音符格 */
+.nc{display:inline-flex;flex-direction:column;align-items:center;min-width:32px;padding:2px 4px;cursor:pointer;border-radius:8px;transition:background .15s}
+.nc:hover{background:rgba(197,165,90,.12)}
+.nc.playing{background:rgba(197,165,90,.2);box-shadow:0 0 0 2px var(--gold)}
+.nc .dot{height:10px;font-size:18px;line-height:10px;color:transparent;user-select:none}
+.nc .dot.on{color:inherit}
+.nc .num{font-size:24px;font-weight:700;line-height:1.2;transition:transform .1s}
+.nc.playing .num{transform:scale(1.15)}
+.nc .num.dash{color:var(--muted);font-size:20px}
+.nc .num.rest{color:var(--border);font-size:16px}
+.nc .num.out{opacity:.4;text-decoration:line-through}
+
+/* 八音鼓參考 */
+.drum-sec{text-align:center;margin-top:32px}
+.drum-sec h3{font-family:'Noto Serif TC',serif;font-size:16px;color:var(--title);margin-bottom:12px;letter-spacing:2px}
+
+/* Footer */
+footer{text-align:center;padding:32px 24px;font-size:14px;color:var(--muted);position:relative;z-index:1}
+footer a{color:var(--rose);text-decoration:none}
+
+/* 提示 */
+.tip{text-align:center;font-size:13px;color:var(--muted);margin-bottom:16px;padding:8px 16px;background:rgba(197,165,90,.08);border-radius:12px}
+
+@media(max-width:767px){
+  .site-header h1{font-size:26px;letter-spacing:3px}
+  .grid{grid-template-columns:1fr 1fr}
+  .score-head h2{font-size:22px}
+  .nc{min-width:26px;padding:2px 2px}
+  .nc .num{font-size:20px}
+  .nc .dot{font-size:14px}
+  .page-border{inset:4px}
+  .sheet{padding:16px 12px}
+}
+@media(max-width:400px){
+  .grid{grid-template-columns:1fr}
+  .nc{min-width:22px}
+  .nc .num{font-size:18px}
+}
+</style>
+</head>
+<body>
+<div class="page-border"></div>
+
+<header class="site-header">
+  <h1>空靈鼓簡譜集</h1>
+  <div class="sub">水晶音樂 -- KONIX 八音</div>
+  <div class="deco"><span class="ln"></span><span class="dt"></span><span class="ln"></span></div>
+</header>
+
+<div class="mode-bar">
+  <button class="on" onclick="setMode(8)" data-m="8">八音鼓</button>
+  <button onclick="setMode(15)" data-m="15">十五音鼓</button>
+</div>
+
+<section class="list" id="listSec">
+  <h2>-- 選一首歌 --</h2>
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<section class="score-view" id="scoreSec">
+  <div class="score-head">
+    <button class="back" onclick="goBack()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+      返回曲目
+    </button>
+    <h2 id="sTitle"></h2>
+    <div class="info" id="sInfo"></div>
+  </div>
+  <div class="ctrl">
+    <button class="play-btn" id="playBtn" onclick="togglePlay()">
+      <svg id="icPlay" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <svg id="icPause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+    </button>
+    <div class="spd">
+      <span>速度</span>
+      <input type="range" id="bpmR" min="30" max="140" value="70" oninput="$('bpmV').textContent=this.value">
+      <b id="bpmV">70</b>
+    </div>
+  </div>
+  <div class="tip" id="tipBox">點擊任何數字可以試聽音色，按播放可自動演奏</div>
+  <div class="legend" id="legend"></div>
+  <div class="sheet" id="sheet"></div>
+  <div class="drum-sec">
+    <h3>-- 音位參考 --</h3>
+    <div id="drumSvg"></div>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; <span id="fy"></span> Kaoru Tsai. All Rights Reserved. | Contact: <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
+  <p style="margin-top:6px;font-size:12px;color:#AAA">簡譜為水晶音樂改編版，僅供個人學習參考</p>
+</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+
+/* ===== 音符設定 ===== */
+const N={
+  '1' :{c:'#D4A5A5',f:261.63,l:'Do'},
+  '2' :{c:'#C9929A',f:293.66,l:'Re'},
+  '3' :{c:'#B8A9C9',f:329.63,l:'Mi'},
+  '4' :{c:'#C5A55A',f:349.23,l:'Fa'},
+  '5' :{c:'#9B7E93',f:392.00,l:'Sol'},
+  '6' :{c:'#A8B5A0',f:440.00,l:'La'},
+  '7' :{c:'#6B9EC2',f:493.88,l:'Si'},
+  "1'":{c:'#E8B4B8',f:523.25,l:"Do'"},
+  "2'":{c:'#C4B7D7',f:587.33,l:"Re'"},
+  "3'":{c:'#8F77B5',f:659.25,l:"Mi'"},
+  "4'":{c:'#C5A55A',f:698.46,l:"Fa'"},
+  "5'":{c:'#7BAE7F',f:783.99,l:"Sol'"},
+  "6'":{c:'#A8B5A0',f:880.00,l:"La'"},
+  "7'":{c:'#6B9EC2',f:987.77,l:"Si'"},
+  "1''":{c:'#D4A5A5',f:1046.50,l:"Do''"},
+};
+
+const R8=['1','2','3','4','5','6','7',"1'"];
+const R15=['1','2','3','4','5','6','7',"1'","2'","3'","4'","5'","6'","7'","1''"];
+
+/* 八音替代：超出 1' 的音降八度 */
+const SUB8={"2'":"2","3'":"3","4'":"4","5'":"5","6'":"6","7'":"7","1''":"1'"};
+
+let mode=8, playing=false, timer=null, idx=0, ctx=null, curSong=null;
+
+/* ===== 30 首歌（已校正旋律） ===== */
+const SONGS=[
+/* --- 動漫 --- */
+{id:'castle',title:'天空之城',artist:'久石讓',year:1986,tag:'動漫',bpm:66,
+score:"0 0 6 7 | 1' - 7 1' | 3 - - 3 | 6 5 6 1' | 5 - - 3 | 4 3 4 1' | 3 - - 1 | 2 1 2 7 | 2 - 0 0 | 6 7 1' - | 7 1' 3 - | - 3 6 5 | 6 1' 5 - | - 3 4 1' | 7 1' 1 - | 1 - - -"},
+
+{id:'always',title:'Always With Me',artist:'久石讓（神隱少女）',year:2001,tag:'動漫',bpm:60,
+score:"4 5 6 4 | 1' 6 5 - | 1 5 4 2 | 6 4 3 - | 3 2 2 3 | 4 5 1 - | 4 5 6 6 | 5 4 - - | 4 5 6 4 | 1' 6 5 - | 1 5 4 2 | 6 4 3 - | 3 2 2 3 | 4 3 2 - | 1 - - -"},
+
+{id:'totoro',title:'豆豆龍',artist:'久石讓（龍貓）',year:1988,tag:'動漫',bpm:76,
+score:"1 1 3 3 | 5 1' 7 5 | 3 - 6 6 | 1' 1' 5 - | 1 1 3 3 | 5 1' 7 5 | 3 - 4 4 | 3 2 1 - | 5 5 6 7 | 1' - 7 - | 6 6 7 1' | 7 - 6 - | 5 3 4 5 | 6 5 4 3 | 2 3 4 - | 1 - - -"},
+
+{id:'conan',title:'名偵探柯南',artist:'大野克夫',year:1996,tag:'動漫',bpm:72,
+score:"1 7 6 3 | 1 6 7 4 | 3 2 1 2 | 1 2 3 - | 1 7 6 3 | 2 1 7 6 | 7 1 6 3 | 1 - - 0 | 5 6 7 6 | 5 6 1' - | 5 6 7 6 | 5 - - -"},
+
+{id:'butterfly',title:'Butterfly',artist:'和田光司（數碼寶貝）',year:1999,tag:'動漫',bpm:78,
+score:"5 5 5 5 | 6 5 3 - | 3 3 3 4 | 3 2 - - | 5 5 5 5 | 6 5 1' - | 7 6 5 6 | 5 - - 0 | 3 3 3 3 | 4 5 6 6 | 5 4 3 2 | 1 - - -"},
+
+{id:'nandemo',title:'なんでもないや',artist:'RADWIMPS（你的名字）',year:2016,tag:'動漫',bpm:66,
+score:"5 - 4 3 | 2 - 3 4 | 5 - 6 5 | 4 - 3 - | 5 - 4 3 | 2 - 3 4 | 5 6 7 1' | 7 - 6 - | 5 6 1' - | 7 6 5 - | 4 5 6 5 | 4 3 2 - | 1 - - -"},
+
+{id:'doraemon',title:'哆啦A夢',artist:'大杉久美子',year:1979,tag:'動漫',bpm:80,
+score:"1' 1' 1' - | 7 6 5 6 | 7 1' - - | 6 6 6 - | 5 4 3 4 | 5 6 - - | 5 5 6 5 | 4 3 3 4 | 3 2 1 - | 1 - - -"},
+
+{id:'maruko',title:'大家來跳舞',artist:'BBQ（櫻桃小丸子）',year:1990,tag:'動漫',bpm:82,
+score:"5 5 3 5 | 6 5 3 - | 5 5 3 5 | 6 - 5 - | 3 3 1 3 | 4 3 1 - | 2 3 4 5 | 6 - 5 - | 5 6 7 1' | 7 6 5 - | 3 4 5 6 | 5 - - -"},
+
+{id:'sailor',title:'月光傳說',artist:'DALI（美少女戰士）',year:1992,tag:'動漫',bpm:74,
+score:"5 5 6 - | 3 3 2 1 | 7 2 1 - | 5 5 6 - | 1' 7 6 5 | 6 5 - - | 3 4 5 6 | 7 1' 7 - | 6 5 4 3 | 2 - 1 -"},
+
+{id:'slam',title:'直到世界的盡頭',artist:'WANDS（灌籃高手）',year:1994,tag:'動漫',bpm:72,
+score:"3 3 4 5 | 5 6 5 4 | 3 2 3 - | 3 3 4 5 | 5 1' 7 6 | 5 6 - - | 6 6 7 1' | 1' 7 6 5 | 4 5 6 5 | 3 - 2 - | 1 - - -"},
+
+{id:'howl',title:'人生的旋轉木馬',artist:'久石讓（霍爾的移動城堡）',year:2004,tag:'動漫',bpm:60,
+score:"3 - 5 - | 1' - 7 - | 6 - 5 - | 4 - - - | 3 - 5 - | 7 - 6 - | 5 - 4 - | 3 - - - | 4 - 6 - | 1' - 7 - | 6 7 1' - | 7 - 6 - | 5 - 3 - | 2 - 1 -"},
+
+{id:'kiki',title:'海の見える街',artist:'久石讓（魔女宅急便）',year:1989,tag:'動漫',bpm:68,
+score:"3 4 5 1' | 7 6 5 - | 4 5 6 7 | 1' - 7 - | 6 5 4 3 | 2 3 4 - | 5 4 3 2 | 1 - - 0 | 3 4 5 1' | 7 6 5 - | 6 7 1' 7 | 6 - 5 - | 4 3 2 - | 1 - - -"},
+
+{id:'ponyo',title:'崖上的波妞',artist:'藤岡藤卷/大橋望美',year:2008,tag:'動漫',bpm:80,
+score:"1' 1' 1' 7 | 6 5 6 5 | - 3 3 3 | 4 5 6 5 | 3 - 1' 1' | 1' 7 6 5 | 6 5 3 5 | 1 - - -"},
+
+{id:'pinkm',title:'PINK MONSOON',artist:"May'n（Macross F）",year:2009,tag:'動漫',bpm:68,
+score:"5 - 6 7 | 1' - 7 6 | 5 - 6 7 | 1' - - - | 3 - 5 6 | 7 - 6 5 | 3 - 2 - | 1 - - - | 5 - 6 7 | 1' - 7 6 | 5 6 7 1' | 7 - 6 - | 5 - 3 5 | 6 - 5 3 | 2 - 1 - | 1 - - -"},
+
+/* --- 華語 --- */
+{id:'wings',title:'隱形的翅膀',artist:'張韶涵',year:2006,tag:'華語',bpm:72,
+score:"3 3 4 5 | 5 - 6 5 | 4 3 2 - | 3 3 4 5 | 5 - 6 5 | 7 6 5 - | 1' 7 1' - | 1' 7 6 5 | 5 6 5 3 | 2 - - - | 6 5 3 5 | 5 6 5 3 | 2 1 2 - | 1 - - -"},
+
+{id:'ning',title:'寧夏',artist:'梁靜茹',year:2004,tag:'華語',bpm:76,
+score:"3 5 6 5 | 3 2 3 5 | 3 2 - - | 1 2 3 5 | 3 5 6 5 | - - 3 5 | 6 5 3 2 | 3 5 3 2 | - - 1 2 | 3 5 6 1' | 1' - - -"},
+
+{id:'naxie',title:'那些年',artist:'胡夏',year:2011,tag:'華語',bpm:74,
+score:"4 4 5 6 | 6 6 7 6 | 6 5 4 5 | 5 5 7 6 | 5 4 3 4 | 3 4 3 2 | 1 1 - - | 4 5 6 7 | 1' 7 6 5 | 4 3 4 5 | 1 - - -"},
+
+{id:'later',title:'後來',artist:'劉若英',year:1999,tag:'華語',bpm:68,
+score:"1' - 7 1' | 1' 7 6 7 | 1' 1' - - | 6 7 1' 7 | 6 5 6 7 | 6 5 - - | 1' - 7 1' | 1' 7 6 5 | 6 7 - - | 5 6 7 1' | 7 6 5 3 | 5 - 1 -"},
+
+{id:'tonghua',title:'童話',artist:'光良',year:2005,tag:'華語',bpm:66,
+score:"5 5 6 6 | 5 5 3 3 | 4 4 3 2 | 1 - - - | 5 5 6 6 | 5 5 3 3 | 2 2 1 7 | 1 - - - | 5 5 6 6 | 5 5 3 3 | 4 4 3 2 | 1 - - - | 3 3 4 5 | 5 - 4 3 | 2 - - - | 1 - - -"},
+
+{id:'luckystar',title:'小幸運',artist:'田馥甄（我的少女時代）',year:2015,tag:'華語',bpm:64,
+score:"3 3 5 5 | 1' 1' 7 7 | 6 3 6 - | 6 6 7 7 | 1' 1' 3 3 | 7 3 5 - | 3 3 5 5 | 1' 1' 7 7 | 6 5 6 - | 3 5 6 5 | 3 2 1 -"},
+
+{id:'miss',title:'我懷念的',artist:'孫燕姿',year:2007,tag:'華語',bpm:62,
+score:"5 3 2 1 | 3 - 5 6 | 5 3 - - | 5 3 2 1 | 3 - 5 6 | 7 1' - - | 5 3 2 1 | 6 - 5 6 | 5 3 - - | 2 3 5 6 | 5 3 2 1 | 1 - - -"},
+
+{id:'yudie',title:'雨蝶',artist:'李翊君（還珠格格）',year:1998,tag:'華語',bpm:66,
+score:"1 3 7 6 | 1 3 7 6 | 6 1' 5 - | 4 3 4 5 | 5 3 5 1' | 3 2 3 - | 6 1 - - | 1 3 7 6 | 1 3 7 6 | 6 1' 1' - | 3 5 6 5 | 6 6 5 3 | 5 5 2 2 | 1 - - -"},
+
+{id:'moon',title:'月亮代表我的心',artist:'鄧麗君',year:1977,tag:'華語',bpm:62,
+score:"1 1 1 2 | 3 - 5 3 | 2 - 1 2 | 2 - - 0 | 5 5 5 6 | 5 - 3 - | 5 6 1' - | 1' - - 0 | 6 5 3 5 | 2 - 1 - | 1 1 1 2 | 3 - 5 3 | 2 - 1 2 | 2 - - 0 | 5 6 1' 7 | 6 5 3 5 | 2 - 1 -"},
+
+/* --- 純音樂 --- */
+{id:'summer',title:'菊次郎的夏天',artist:'久石讓',year:1999,tag:'純音樂',bpm:72,
+score:"3 4 5 1' | 7 5 3 5 | 6 7 1' 5 | 3 2 1 2 | 3 4 5 1' | 7 5 3 5 | 6 7 1' 5 | 6 - - - | 3 4 5 1' | 7 5 3 5 | 6 7 1' 5 | 3 2 1 2 | 3 - 2 - | 1 - - -"},
+
+{id:'canon',title:'Canon in D',artist:'帕海貝爾改編',year:0,tag:'純音樂',bpm:64,
+score:"5 - 4 - | 3 - 2 - | 1 - 2 - | 3 - 4 - | 5 - 4 - | 3 - 2 - | 1 - 2 3 | 4 3 2 1 | 5 4 3 4 | 5 6 7 1' | 7 6 5 4 | 3 4 5 - | 1 2 3 4 | 5 6 5 4 | 3 2 1 - | 1 - - -"},
+
+{id:'river',title:'River Flows in You',artist:'Yiruma',year:2001,tag:'純音樂',bpm:66,
+score:"6 7 1' 7 | 6 5 6 - | 4 5 6 5 | 4 3 4 - | 6 7 1' 7 | 6 5 6 7 | 1' 7 6 5 | 4 3 2 - | 3 4 5 - | 4 3 2 1 | 2 3 4 - | 3 - - 0 | 6 7 1' 7 | 6 5 4 5 | 6 5 4 3 | 2 - 1 -"},
+
+{id:'moli',title:'茉莉花',artist:'中國民謠',year:0,tag:'純音樂',bpm:72,
+score:"3 3 5 6 | 1' - 6 5 | 5 6 5 3 | 2 1 2 - | 2 2 3 5 | 3 2 1 - | 6 1 2 1 | 6 1 2 - | 2 3 5 3 | 5 6 1' - | 6 5 3 5 | 6 5 3 2 | 1 6 1 - | 2 1 6 1 | 2 - 1 -"},
+
+/* --- 台語 --- */
+{id:'shangxin',title:'傷心酒店',artist:'江蕙',year:1992,tag:'台語',bpm:64,
+score:"3 - 1 7 | 1 7 6 - | 3 2 2 1 | 2 1 7 - | 6 4 4 6 | 7 7 7 3 | 4 3 2 2 | 1 - - - | 6 5 6 5 | 3 5 2 1 | 2 - 1 -"},
+
+{id:'jiahou',title:'家後',artist:'江蕙',year:2003,tag:'台語',bpm:60,
+score:"6 - 5 6 | 6 3 3 6 | 5 5 3 5 | 1' 3 2 3 | 6 1 1 - | 1' 5 6 6 | 3 6 6 5 | 5 3 5 6 | 5 - 3 5 | 5 6 6 5 | 1 - - -"},
+
+{id:'haibolang',title:'海波浪',artist:'蔡秋鳳',year:1991,tag:'台語',bpm:68,
+score:"3 5 6 3 | 5 6 - - | 6 5 3 5 | 5 3 2 1 | 3 5 6 3 | 5 6 - - | 6 1' 6 5 | 3 5 3 2 | 1 - - -"},
+];
+
+/* ===== 解析譜面 ===== */
+function parse(str){
+  return str.split(/\s+/).map(t=>{
+    if(t==='|') return {type:'bar'};
+    if(t==='-') return {type:'dash'};
+    if(t==='0') return {type:'rest'};
+    return {type:'note',n:t};
+  });
+}
+
+/* ===== 初始化 ===== */
+function init(){
+  renderFilters();
+  renderGrid();
+  renderLegend();
+  renderDrum();
+  const sy=2026,cy=new Date().getFullYear();
+  $('fy').textContent=cy>sy?sy+'\u2013'+cy:sy;
+}
+
+/* ===== 歌曲列表 ===== */
+let curFilter='全部';
+function renderFilters(){
+  const cats=['全部',...new Set(SONGS.map(s=>s.tag))];
+  $('filters').innerHTML=cats.map(c=>{
+    const cnt=c==='全部'?SONGS.length:SONGS.filter(s=>s.tag===c).length;
+    return `<button class="fbtn${c===curFilter?' on':''}" onclick="setFilter('${c}')">${c} (${cnt})</button>`;
+  }).join('');
+}
+function setFilter(f){curFilter=f;renderFilters();renderGrid();}
+function renderGrid(){
+  const list=curFilter==='全部'?SONGS:SONGS.filter(s=>s.tag===curFilter);
+  $('grid').innerHTML=list.map(s=>{
+    const rng=mode===8?R8:R15;
+    const tokens=parse(s.score);
+    const hasOut=tokens.some(t=>t.type==='note'&&!rng.includes(t.n));
+    return `<div class="card" onclick="openSong('${s.id}')">
+      <div class="t">${s.title}</div>
+      <div class="a">${s.artist}${s.year?' ('+s.year+')':''}</div>
+      <span class="tag${hasOut?' warn':''}">${hasOut?'有改編':'原調適合'}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ===== 開啟/關閉譜面 ===== */
+function openSong(id){
+  curSong=SONGS.find(s=>s.id===id);
+  if(!curSong) return;
+  stopPlay();
+  $('listSec').style.display='none';
+  $('scoreSec').classList.add('on');
+  $('sTitle').textContent=curSong.title;
+  $('sInfo').textContent=curSong.artist+(curSong.year?' ('+curSong.year+')':'');
+  $('bpmR').value=curSong.bpm;
+  $('bpmV').textContent=curSong.bpm;
+  renderSheet(curSong);
+  renderLegend();
+  renderDrum();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goBack(){
+  stopPlay();curSong=null;
+  $('listSec').style.display='';
+  $('scoreSec').classList.remove('on');
+}
+
+/* ===== 渲染橫排簡譜 ===== */
+function renderSheet(song){
+  const el=$('sheet');
+  el.innerHTML='';
+  const tokens=parse(song.score);
+  const rng=mode===8?R8:R15;
+  const sub=mode===8?SUB8:{};
+
+  let row=document.createElement('div');
+  row.className='sheet-row';
+  let measure=document.createElement('span');
+  measure.className='measure';
+  let noteIdx=0;
+
+  tokens.forEach(tk=>{
+    if(tk.type==='bar'){
+      row.appendChild(measure);
+      const bl=document.createElement('span');
+      bl.className='barline';
+      row.appendChild(bl);
+      measure=document.createElement('span');
+      measure.className='measure';
+      return;
+    }
+
+    const cell=document.createElement('span');
+    cell.className='nc';
+    cell.dataset.i=noteIdx++;
+
+    if(tk.type==='dash'){
+      cell.innerHTML='<span class="dot">&middot;</span><span class="num dash">&mdash;</span>';
+      cell.onclick=()=>{};
+    } else if(tk.type==='rest'){
+      cell.innerHTML='<span class="dot">&middot;</span><span class="num rest">0</span>';
+      cell.onclick=()=>{};
+    } else {
+      let note=tk.n;
+      let out=false;
+      if(!rng.includes(note)){
+        out=true;
+        note=sub[note]||note;
+      }
+      const meta=N[note]||N['1'];
+      const hi=note.includes("'")&&!note.includes("''");
+      const hi2=note.includes("''");
+      const base=note.replace(/'/g,'');
+      const dotVis=hi||hi2;
+
+      cell.innerHTML=`<span class="dot${dotVis?' on':''}"${dotVis?' style="color:'+meta.c+'"':''}>${hi2?'::':'&middot;'}</span><span class="num${out?' out':''}" style="color:${meta.c}">${base}</span>`;
+      cell.onclick=()=>playNote(note);
+      cell.dataset.note=note;
+    }
+    measure.appendChild(cell);
+  });
+
+  row.appendChild(measure);
+  el.appendChild(row);
+
+  /* 每 4 小節（每 4 個 barline 後）換行 */
+  reflow();
+}
+
+function reflow(){
+  const sheet=$('sheet');
+  const items=[...sheet.querySelector('.sheet-row').children];
+  sheet.innerHTML='';
+
+  /* 把 measures 和 barlines 分組，每 4 小節一行 */
+  let row=document.createElement('div');
+  row.className='sheet-row';
+  let mCount=0;
+
+  items.forEach((item,i)=>{
+    row.appendChild(item);
+    if(item.classList.contains('measure')) mCount++;
+    if(item.classList.contains('barline')&&mCount>=4){
+      sheet.appendChild(row);
+      row=document.createElement('div');
+      row.className='sheet-row';
+      mCount=0;
+    }
+  });
+  if(row.children.length) sheet.appendChild(row);
+}
+
+/* ===== 圖例 ===== */
+function renderLegend(){
+  const notes=mode===8?R8:R15;
+  $('legend').innerHTML=notes.map(n=>{
+    const m=N[n];
+    return `<i><span style="background:${m.c}"></span>${n} ${m.l}</i>`;
+  }).join('');
+}
+
+/* ===== 鼓圖 ===== */
+function renderDrum(){
+  const notes=mode===8?R8:R15;
+  const sz=260,cx=sz/2,cy=sz/2;
+  /* KONIX 8 音鼓實際排列 */
+  const POS8={'1':[cx,220],'4':[cx,40],'2':[40,cy],'3':[220,cy],
+    "1'":[60,65],'7':[200,65],'6':[60,195],'5':[200,195]};
+  let g='';
+  notes.forEach((n,i)=>{
+    let x,y;
+    if(mode===8&&POS8[n]){[x,y]=POS8[n];}
+    else{const a=(i/notes.length)*Math.PI*2-Math.PI/2;x=cx+95*Math.cos(a);y=cy+95*Math.sin(a);}
+    const m=N[n],base=n.replace(/'/g,''),hi=n.includes("'");
+    g+=`<g onclick="playNote('${n}')" style="cursor:pointer">
+      <circle cx="${x}" cy="${y}" r="20" fill="${m.c}" stroke="#fff" stroke-width="2"/>
+      <text x="${x}" y="${y+1}" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="13" font-weight="700">${base}</text>
+      ${hi?`<circle cx="${x}" cy="${y-11}" r="2" fill="#fff"/>`:''}
+    </g>`;
+  });
+  $('drumSvg').innerHTML=`<svg viewBox="0 0 ${sz} ${sz}" width="${sz}" height="${sz}">
+    <circle cx="${cx}" cy="${cy}" r="118" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+    <circle cx="${cx}" cy="${cy}" r="18" fill="var(--border)" opacity=".4"/>
+    ${g}</svg>`;
+}
+
+/* ===== Web Audio ===== */
+function getCtx(){if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();return ctx;}
+
+function playNote(n){
+  const m=N[n];if(!m)return;
+  const c=getCtx(),now=c.currentTime;
+  /* 空間殘響（模擬空靈鼓共鳴腔） */
+  const rev=c.createConvolver();
+  const len=c.sampleRate*2.5,buf=c.createBuffer(2,len,c.sampleRate);
+  for(let ch=0;ch<2;ch++){const d=buf.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3);}
+  rev.buffer=buf;
+  const wet=c.createGain();wet.gain.value=.18;
+  const dry=c.createGain();dry.gain.value=.75;
+  rev.connect(wet);wet.connect(c.destination);dry.connect(c.destination);
+  /* 基音：溫暖正弦波，柔和起音（空靈鼓的圓潤感） */
+  const o=c.createOscillator(),g=c.createGain();
+  o.type='sine';o.frequency.setValueAtTime(m.f,now);
+  g.gain.setValueAtTime(0,now);
+  g.gain.linearRampToValueAtTime(.32,now+.02);
+  g.gain.setValueAtTime(.28,now+.06);
+  g.gain.exponentialRampToValueAtTime(.001,now+2.8);
+  o.connect(g);g.connect(dry);g.connect(rev);o.start(now);o.stop(now+2.8);
+  /* 八度泛音（空靈鼓共鳴） */
+  const o2=c.createOscillator(),g2=c.createGain();
+  o2.type='sine';o2.frequency.setValueAtTime(m.f*2,now);
+  g2.gain.setValueAtTime(0,now);
+  g2.gain.linearRampToValueAtTime(.1,now+.015);
+  g2.gain.exponentialRampToValueAtTime(.001,now+1.6);
+  o2.connect(g2);g2.connect(dry);g2.connect(rev);o2.start(now);o2.stop(now+1.6);
+  /* 柔和五度泛音（鼓腔溫暖共鳴） */
+  const o3=c.createOscillator(),g3=c.createGain();
+  o3.type='sine';o3.frequency.setValueAtTime(m.f*3.01,now);
+  g3.gain.setValueAtTime(0,now);
+  g3.gain.linearRampToValueAtTime(.02,now+.01);
+  g3.gain.exponentialRampToValueAtTime(.001,now+.9);
+  o3.connect(g3);g3.connect(dry);g3.connect(rev);o3.start(now);o3.stop(now+.9);
+  /* 擊打瞬態：手指碰金屬舌片的瞬間 */
+  const nb=c.createBufferSource();
+  const nbl=c.sampleRate*.03,nbuf=c.createBuffer(1,nbl,c.sampleRate);
+  const nd=nbuf.getChannelData(0);for(let i=0;i<nbl;i++)nd[i]=(Math.random()*2-1)*(1-i/nbl);
+  nb.buffer=nbuf;
+  const nf=c.createBiquadFilter();nf.type='bandpass';nf.frequency.value=m.f*4;nf.Q.value=2;
+  const ng=c.createGain();ng.gain.setValueAtTime(.06,now);ng.gain.exponentialRampToValueAtTime(.001,now+.04);
+  nb.connect(nf);nf.connect(ng);ng.connect(dry);nb.start(now);
+}
+
+/* ===== 自動播放 ===== */
+function togglePlay(){playing?stopPlay():startPlay()}
+
+function startPlay(){
+  playing=true;idx=0;
+  $('icPlay').style.display='none';
+  $('icPause').style.display='';
+  tick();
+}
+
+function stopPlay(){
+  playing=false;
+  $('icPlay').style.display='';
+  $('icPause').style.display='none';
+  if(timer)clearTimeout(timer);
+  document.querySelectorAll('.nc.playing').forEach(e=>e.classList.remove('playing'));
+  idx=0;
+}
+
+function tick(){
+  if(!playing||!curSong)return;
+  const cells=[...document.querySelectorAll('.nc')];
+  if(idx>=cells.length){stopPlay();return;}
+
+  cells.forEach(c=>c.classList.remove('playing'));
+  const cell=cells[idx];
+  cell.classList.add('playing');
+  cell.scrollIntoView({behavior:'smooth',block:'center'});
+
+  const note=cell.dataset.note;
+  if(note) playNote(note);
+
+  const bpm=parseInt($('bpmR').value)||70;
+  const ms=60000/bpm;
+  idx++;
+  timer=setTimeout(tick,ms);
+}
+
+/* ===== 模式切換 ===== */
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.mode-bar button').forEach(b=>{
+    b.classList.toggle('on',parseInt(b.dataset.m)===m);
+  });
+  renderGrid();
+  renderLegend();
+  renderDrum();
+  if(curSong) renderSheet(curSong);
+}
+
+init();
+</script>
+</body>
+</html>
