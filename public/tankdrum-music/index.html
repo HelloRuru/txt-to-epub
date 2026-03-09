@@ -71,11 +71,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .score-head .info{font-size:14px;color:var(--ink-light);margin-top:2px}
 
 /* 控制列 */
-.ctrl{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px;padding:10px 20px;background:var(--card);border-radius:24px;border:1px solid var(--border)}
+.ctrl{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px;padding:10px 20px;background:var(--card);border-radius:24px;border:1px solid var(--border);position:sticky;top:12px;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
 .play-btn{width:44px;height:44px;border-radius:50%;border:2px solid var(--ink);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
 .play-btn:hover{background:var(--ink)}
 .play-btn:hover svg{stroke:#fff}
 .play-btn svg{width:20px;height:20px}
+.stop-btn{width:44px;height:44px;border-radius:50%;border:2px solid #C97070;background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
+.stop-btn:hover{background:#C97070}
+.stop-btn:hover svg{stroke:#fff}
+.stop-btn svg{width:20px;height:20px;stroke:#C97070}
 .spd{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
 .spd input{width:80px;accent-color:var(--ink)}
 .spd b{color:var(--ink);min-width:28px}
@@ -189,6 +193,9 @@ footer a{color:var(--rose);text-decoration:none}
     <button class="play-btn" id="playBtn" onclick="togglePlay()">
       <svg id="icPlay" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       <svg id="icPause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+    </button>
+    <button class="stop-btn" id="stopBtn" onclick="stopPlay()" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
     </button>
     <div class="spd">
       <span>速度</span>
@@ -628,6 +635,7 @@ function startPlay(){
   playing=true;idx=0;
   $('icPlay').style.display='none';
   $('icPause').style.display='';
+  $('stopBtn').style.display='flex';
   tick();
 }
 
@@ -635,6 +643,7 @@ function stopPlay(){
   playing=false;
   $('icPlay').style.display='';
   $('icPause').style.display='none';
+  $('stopBtn').style.display='none';
   if(timer)clearTimeout(timer);
   document.querySelectorAll('.nc.playing').forEach(e=>e.classList.remove('playing'));
   idx=0;
