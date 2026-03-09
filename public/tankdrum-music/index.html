@@ -588,43 +588,43 @@ function getCtx(){if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext
 function playNote(n){
   const m=N[n];if(!m)return;
   const c=getCtx(),now=c.currentTime;
-  /* 空間殘響（模擬空靈鼓共鳴腔） */
+  /* 輕殘響（空靈鼓共鳴腔，不過重） */
   const rev=c.createConvolver();
-  const len=c.sampleRate*2.5,buf=c.createBuffer(2,len,c.sampleRate);
-  for(let ch=0;ch<2;ch++){const d=buf.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3);}
+  const len=c.sampleRate*1.2,buf=c.createBuffer(2,len,c.sampleRate);
+  for(let ch=0;ch<2;ch++){const d=buf.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,4);}
   rev.buffer=buf;
-  const wet=c.createGain();wet.gain.value=.18;
-  const dry=c.createGain();dry.gain.value=.75;
+  const wet=c.createGain();wet.gain.value=.10;
+  const dry=c.createGain();dry.gain.value=.85;
   rev.connect(wet);wet.connect(c.destination);dry.connect(c.destination);
-  /* 基音：溫暖正弦波，柔和起音（空靈鼓的圓潤感） */
+  /* 基音：清脆正弦波，短促起音 + 快速衰減（空靈鼓的叮聲） */
   const o=c.createOscillator(),g=c.createGain();
   o.type='sine';o.frequency.setValueAtTime(m.f,now);
   g.gain.setValueAtTime(0,now);
-  g.gain.linearRampToValueAtTime(.32,now+.02);
-  g.gain.setValueAtTime(.28,now+.06);
-  g.gain.exponentialRampToValueAtTime(.001,now+2.8);
-  o.connect(g);g.connect(dry);g.connect(rev);o.start(now);o.stop(now+2.8);
-  /* 八度泛音（空靈鼓共鳴） */
+  g.gain.linearRampToValueAtTime(.38,now+.008);
+  g.gain.setValueAtTime(.30,now+.03);
+  g.gain.exponentialRampToValueAtTime(.001,now+1.4);
+  o.connect(g);g.connect(dry);g.connect(rev);o.start(now);o.stop(now+1.5);
+  /* 八度泛音（輕微，增加金屬感） */
   const o2=c.createOscillator(),g2=c.createGain();
   o2.type='sine';o2.frequency.setValueAtTime(m.f*2,now);
   g2.gain.setValueAtTime(0,now);
-  g2.gain.linearRampToValueAtTime(.1,now+.015);
-  g2.gain.exponentialRampToValueAtTime(.001,now+1.6);
-  o2.connect(g2);g2.connect(dry);g2.connect(rev);o2.start(now);o2.stop(now+1.6);
-  /* 柔和五度泛音（鼓腔溫暖共鳴） */
+  g2.gain.linearRampToValueAtTime(.06,now+.005);
+  g2.gain.exponentialRampToValueAtTime(.001,now+.8);
+  o2.connect(g2);g2.connect(dry);g2.connect(rev);o2.start(now);o2.stop(now+.9);
+  /* 微弱五度泛音（鼓腔共鳴） */
   const o3=c.createOscillator(),g3=c.createGain();
   o3.type='sine';o3.frequency.setValueAtTime(m.f*3.01,now);
   g3.gain.setValueAtTime(0,now);
-  g3.gain.linearRampToValueAtTime(.02,now+.01);
-  g3.gain.exponentialRampToValueAtTime(.001,now+.9);
-  o3.connect(g3);g3.connect(dry);g3.connect(rev);o3.start(now);o3.stop(now+.9);
-  /* 擊打瞬態：手指碰金屬舌片的瞬間 */
+  g3.gain.linearRampToValueAtTime(.012,now+.005);
+  g3.gain.exponentialRampToValueAtTime(.001,now+.5);
+  o3.connect(g3);g3.connect(dry);g3.connect(rev);o3.start(now);o3.stop(now+.6);
+  /* 擊打瞬態：手指碰金屬舌片的「叮」 */
   const nb=c.createBufferSource();
-  const nbl=c.sampleRate*.03,nbuf=c.createBuffer(1,nbl,c.sampleRate);
+  const nbl=c.sampleRate*.02,nbuf=c.createBuffer(1,nbl,c.sampleRate);
   const nd=nbuf.getChannelData(0);for(let i=0;i<nbl;i++)nd[i]=(Math.random()*2-1)*(1-i/nbl);
   nb.buffer=nbuf;
-  const nf=c.createBiquadFilter();nf.type='bandpass';nf.frequency.value=m.f*4;nf.Q.value=2;
-  const ng=c.createGain();ng.gain.setValueAtTime(.06,now);ng.gain.exponentialRampToValueAtTime(.001,now+.04);
+  const nf=c.createBiquadFilter();nf.type='bandpass';nf.frequency.value=m.f*5;nf.Q.value=3;
+  const ng=c.createGain();ng.gain.setValueAtTime(.08,now);ng.gain.exponentialRampToValueAtTime(.001,now+.03);
   nb.connect(nf);nf.connect(ng);ng.connect(dry);nb.start(now);
 }
 
