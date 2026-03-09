@@ -49,8 +49,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* Header */
 .site-header{text-align:center;padding:48px 24px 24px;position:relative;z-index:1}
 .site-header h1{font-family:'Noto Serif TC',serif;font-size:36px;font-weight:700;color:var(--title);letter-spacing:6px;margin-bottom:4px}
-.site-header h1 a{color:inherit;text-decoration:none;transition:.2s}
-.site-header h1 a:hover{color:var(--gold)}
+.site-header h1{transition:.2s}
+.site-header h1:hover{color:var(--gold)}
 .site-header .sub{font-size:14px;color:var(--ink-light);letter-spacing:4px}
 .deco{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:12px}
 .deco .ln{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
@@ -98,6 +98,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .stop-btn:hover{background:#C97070}
 .stop-btn:hover svg{stroke:#fff}
 .stop-btn svg{width:20px;height:20px;stroke:#C97070}
+.metro-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--ink-light);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0;color:var(--ink-light)}
+.metro-btn:hover{border-color:var(--ink);color:var(--ink)}
+.metro-btn.on{background:var(--gold);border-color:var(--gold);color:#fff}
+.beat-dot{width:10px;height:10px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .05s}
+.beat-dot.flash{background:var(--gold)}
 .spd{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
 .spd input{width:80px;accent-color:var(--ink)}
 .spd b{color:var(--ink);min-width:28px}
@@ -170,7 +175,7 @@ footer a{color:var(--rose);text-decoration:none}
       <circle cx="100" cy="24" r="2" fill="var(--gold)" opacity=".4"/>
     </svg>
   </div>
-  <h1><a href="https://tools.helloruru.com/" title="回到首頁">空靈鼓簡譜集</a></h1>
+  <h1 onclick="goBack()" style="cursor:pointer" title="回到曲目列表">空靈鼓簡譜集</h1>
   <div class="sub">水晶音樂 -- KONIX 八音</div>
   <div class="deco"><span class="ln"></span><span class="dt"></span><span class="ln"></span></div>
   <div class="header-ornament bottom">
@@ -215,11 +220,19 @@ footer a{color:var(--rose);text-decoration:none}
     <button class="stop-btn" id="stopBtn" onclick="stopPlay()" style="display:none">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
     </button>
+    <button class="metro-btn" id="metroBtn" onclick="toggleMetro()" title="節拍器">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+        <path d="M12 2L8 22h8L12 2z" stroke-linejoin="round"/>
+        <line x1="12" y1="8" x2="17" y2="4"/>
+        <circle cx="17" cy="4" r="1.5" fill="currentColor"/>
+      </svg>
+    </button>
     <div class="spd">
       <span>速度</span>
       <input type="range" id="bpmR" min="30" max="140" value="70" oninput="$('bpmV').textContent=this.value">
       <b id="bpmV">70</b>
     </div>
+    <span class="beat-dot" id="beatDot"></span>
   </div>
   <div class="tip" id="tipBox">點擊任何數字可以試聽音色，按播放可自動演奏</div>
   <div class="legend" id="legend"></div>
@@ -645,6 +658,52 @@ function playNote(n){
   const ng=c.createGain();ng.gain.setValueAtTime(.08,now);ng.gain.exponentialRampToValueAtTime(.001,now+.03);
   nb.connect(nf);nf.connect(ng);ng.connect(dry);nb.start(now);
 }
+
+/* ===== 節拍器 ===== */
+let metroOn=false, metroTimer=null, beatCount=0;
+
+function metroClick(){
+  if(!ctx) ctx=new(window.AudioContext||window.webkitAudioContext)();
+  const c=ctx, now=c.currentTime;
+  const o=c.createOscillator(), g=c.createGain();
+  /* 第 1 拍高音，其餘低音 */
+  o.frequency.value=(beatCount%4===0)?1200:800;
+  o.type='sine';
+  g.gain.setValueAtTime(.18,now);
+  g.gain.exponentialRampToValueAtTime(.001,now+.06);
+  o.connect(g);g.connect(c.destination);
+  o.start(now);o.stop(now+.07);
+  /* 閃爍 */
+  const dot=$('beatDot');
+  dot.classList.add('flash');
+  setTimeout(()=>dot.classList.remove('flash'),100);
+  beatCount++;
+}
+
+function startMetro(){
+  metroOn=true;beatCount=0;
+  $('metroBtn').classList.add('on');
+  metroClick();
+  scheduleMetro();
+}
+
+function scheduleMetro(){
+  if(!metroOn)return;
+  const bpm=parseInt($('bpmR').value)||70;
+  metroTimer=setTimeout(()=>{
+    metroClick();
+    scheduleMetro();
+  },60000/bpm);
+}
+
+function stopMetro(){
+  metroOn=false;beatCount=0;
+  $('metroBtn').classList.remove('on');
+  if(metroTimer)clearTimeout(metroTimer);
+  $('beatDot').classList.remove('flash');
+}
+
+function toggleMetro(){metroOn?stopMetro():startMetro()}
 
 /* ===== 自動播放 ===== */
 function togglePlay(){playing?stopPlay():startPlay()}
