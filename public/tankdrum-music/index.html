@@ -49,6 +49,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* Header */
 .site-header{text-align:center;padding:48px 24px 24px;position:relative;z-index:1}
 .site-header h1{font-family:'Noto Serif TC',serif;font-size:36px;font-weight:700;color:var(--title);letter-spacing:6px;margin-bottom:4px}
+.site-header h1 a{color:inherit;text-decoration:none;transition:.2s}
+.site-header h1 a:hover{color:var(--gold)}
 .site-header .sub{font-size:14px;color:var(--ink-light);letter-spacing:4px}
 .deco{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:12px}
 .deco .ln{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
@@ -168,7 +170,7 @@ footer a{color:var(--rose);text-decoration:none}
       <circle cx="100" cy="24" r="2" fill="var(--gold)" opacity=".4"/>
     </svg>
   </div>
-  <h1>空靈鼓簡譜集</h1>
+  <h1><a href="https://tools.helloruru.com/" title="回到首頁">空靈鼓簡譜集</a></h1>
   <div class="sub">水晶音樂 -- KONIX 八音</div>
   <div class="deco"><span class="ln"></span><span class="dt"></span><span class="ln"></span></div>
   <div class="header-ornament bottom">
