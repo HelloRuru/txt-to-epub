@@ -89,7 +89,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .score-head .info{font-size:14px;color:var(--ink-light);margin-top:2px}
 
 /* 控制列 */
-.ctrl{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px;padding:10px 20px;background:var(--card);border-radius:24px;border:1px solid var(--border);position:sticky;top:12px;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.ctrl{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px;padding:10px 16px;background:var(--card);border-radius:24px;border:1px solid var(--border);position:sticky;top:12px;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,0.06);flex-wrap:wrap}
 .play-btn{width:44px;height:44px;border-radius:50%;border:2px solid var(--ink);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
 .play-btn:hover{background:var(--ink)}
 .play-btn:hover svg{stroke:#fff}
@@ -103,6 +103,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .metro-btn.on{background:var(--gold);border-color:var(--gold);color:#fff}
 .beat-dot{width:10px;height:10px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .05s}
 .beat-dot.flash{background:var(--gold)}
+.metro-vol{width:50px;accent-color:var(--gold)}
+.loop-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--ink-light);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0;color:var(--ink-light)}
+.loop-btn:hover{border-color:var(--ink);color:var(--ink)}
+.loop-btn.on{background:var(--rose);border-color:var(--rose);color:#fff}
+.loop-btn.picking{background:var(--gold);border-color:var(--gold);color:#fff;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.nc.loop-start,.nc.loop-end{box-shadow:0 0 0 2px var(--rose)}
+.nc.in-loop{background:rgba(212,165,165,.15)}
 .spd{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
 .spd input{width:80px;accent-color:var(--ink)}
 .spd b{color:var(--ink);min-width:28px}
@@ -225,6 +233,13 @@ footer a{color:var(--rose);text-decoration:none}
         <path d="M12 2L8 22h8L12 2z" stroke-linejoin="round"/>
         <line x1="12" y1="8" x2="17" y2="4"/>
         <circle cx="17" cy="4" r="1.5" fill="currentColor"/>
+      </svg>
+    </button>
+    <input type="range" class="metro-vol" id="metroVol" min="0" max="100" value="50" title="節拍器音量">
+    <button class="loop-btn" id="loopBtn" onclick="toggleLoopMode()" title="分段循環練習">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+        <path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+        <path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
       </svg>
     </button>
     <div class="spd">
@@ -470,7 +485,7 @@ function openSong(id){
 }
 
 function goBack(){
-  stopPlay();curSong=null;
+  stopPlay();stopMetro();clearLoop();curSong=null;
   $('listSec').style.display='';
   $('scoreSec').classList.remove('on');
 }
@@ -524,7 +539,7 @@ function renderSheet(song){
       const dotVis=hi||hi2;
 
       cell.innerHTML=`<span class="dot${dotVis?' on':''}"${dotVis?' style="color:'+meta.c+'"':''}>${hi2?'::':'&middot;'}</span><span class="num${out?' out':''}" style="color:${meta.c}">${base}</span>`;
-      cell.onclick=()=>playNote(note);
+      cell.onclick=()=>{if(loopPicking){pickLoopPoint(cell);return;}playNote(note);};
       cell.dataset.note=note;
     }
     measure.appendChild(cell);
@@ -669,7 +684,8 @@ function metroClick(){
   /* 第 1 拍高音，其餘低音 */
   o.frequency.value=(beatCount%4===0)?1200:800;
   o.type='sine';
-  g.gain.setValueAtTime(.18,now);
+  const vol=(parseInt($('metroVol').value)||50)/100;
+  g.gain.setValueAtTime(.35*vol,now);
   g.gain.exponentialRampToValueAtTime(.001,now+.06);
   o.connect(g);g.connect(c.destination);
   o.start(now);o.stop(now+.07);
@@ -705,11 +721,83 @@ function stopMetro(){
 
 function toggleMetro(){metroOn?stopMetro():startMetro()}
 
+/* ===== 分段循環 Loop ===== */
+let loopPicking=false, loopStart=-1, loopEnd=-1;
+
+function toggleLoopMode(){
+  if(loopStart>=0&&loopEnd>=0&&!loopPicking){
+    /* 已有 loop → 清除 */
+    clearLoop();return;
+  }
+  if(loopPicking){
+    /* 正在選 → 取消 */
+    loopPicking=false;
+    $('loopBtn').classList.remove('picking');
+    $('tipBox').textContent='點擊任何數字可以試聽音色，按播放可自動演奏';
+    return;
+  }
+  /* 進入選取模式 */
+  loopPicking=true;loopStart=-1;loopEnd=-1;
+  clearLoopHighlight();
+  $('loopBtn').classList.add('picking');
+  $('tipBox').textContent='點第一個音設起點，再點第二個音設終點';
+}
+
+function pickLoopPoint(cell){
+  const cells=[...document.querySelectorAll('.nc')];
+  const i=cells.indexOf(cell);
+  if(i<0)return;
+
+  if(loopStart<0){
+    loopStart=i;
+    cell.classList.add('loop-start');
+    $('tipBox').textContent='起點已設定，再點一個音設終點';
+    /* 試聽起點音 */
+    if(cell.dataset.note)playNote(cell.dataset.note);
+  } else {
+    loopEnd=i;
+    /* 確保 start < end */
+    if(loopEnd<loopStart){const t=loopStart;loopStart=loopEnd;loopEnd=t;}
+    loopPicking=false;
+    $('loopBtn').classList.remove('picking');
+    $('loopBtn').classList.add('on');
+    highlightLoop();
+    const count=loopEnd-loopStart+1;
+    $('tipBox').textContent='循環範圍：'+count+' 個音｜按播放開始練習｜再按循環鈕清除';
+    /* 試聽終點音 */
+    if(cell.dataset.note)playNote(cell.dataset.note);
+  }
+}
+
+function highlightLoop(){
+  clearLoopHighlight();
+  const cells=[...document.querySelectorAll('.nc')];
+  for(let i=loopStart;i<=loopEnd;i++){
+    cells[i].classList.add('in-loop');
+    if(i===loopStart)cells[i].classList.add('loop-start');
+    if(i===loopEnd)cells[i].classList.add('loop-end');
+  }
+}
+
+function clearLoopHighlight(){
+  document.querySelectorAll('.nc.in-loop,.nc.loop-start,.nc.loop-end').forEach(e=>{
+    e.classList.remove('in-loop','loop-start','loop-end');
+  });
+}
+
+function clearLoop(){
+  loopStart=-1;loopEnd=-1;loopPicking=false;
+  clearLoopHighlight();
+  $('loopBtn').classList.remove('on','picking');
+  $('tipBox').textContent='點擊任何數字可以試聽音色，按播放可自動演奏';
+}
+
 /* ===== 自動播放 ===== */
 function togglePlay(){playing?stopPlay():startPlay()}
 
 function startPlay(){
-  playing=true;idx=0;
+  playing=true;
+  idx=(loopStart>=0)?loopStart:0;
   $('icPlay').style.display='none';
   $('icPause').style.display='';
   $('stopBtn').style.display='flex';
@@ -729,7 +817,12 @@ function stopPlay(){
 function tick(){
   if(!playing||!curSong)return;
   const cells=[...document.querySelectorAll('.nc')];
-  if(idx>=cells.length){stopPlay();return;}
+  const end=(loopEnd>=0)?loopEnd+1:cells.length;
+  /* loop 回頭或結束 */
+  if(idx>=end){
+    if(loopStart>=0&&loopEnd>=0){idx=loopStart;}
+    else{stopPlay();return;}
+  }
 
   cells.forEach(c=>c.classList.remove('playing'));
   const cell=cells[idx];
