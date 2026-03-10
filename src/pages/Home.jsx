@@ -365,7 +365,7 @@ export default function Home() {
         </header>
 
         {/* Hero */}
-        <section className="text-center mb-16">
+        <section className="text-center mb-16 relative">
           <div className="flex justify-center mb-4">
             <BrandFlower size={40} />
           </div>
@@ -410,6 +410,12 @@ export default function Home() {
               {tools.length} 款免費工具
             </span>
           </div>
+          <img
+            src="/rabbit-watermark.png"
+            alt=""
+            aria-hidden="true"
+            className="absolute right-0 bottom-0 w-12 h-12 opacity-[0.18] pointer-events-none select-none"
+          />
         </section>
 
         {/* Categorized Tool Grid */}
