@@ -623,7 +623,10 @@
 
   <!-- 受款人 -->
   <div class="form-card">
-    <h2>受款人（個人）</h2>
+    <h2>
+      受款人（個人）
+      <button class="save-btn" id="savePayeeBtn" onclick="savePayee()">記住受款人</button>
+    </h2>
     <div class="form-row">
       <div class="field">
         <label>姓名 <span class="required">*</span></label>
@@ -829,6 +832,7 @@
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('serviceEnd').value = today;
     loadCompany();
+    loadPayee();
 
     document.querySelectorAll('input[name="incomeType"]').forEach(radio => {
       radio.addEventListener('change', () => {
@@ -927,6 +931,7 @@
 
   // ===== localStorage =====
   const COMPANY_KEY = 'helloruru_labor_company';
+  const PAYEE_KEY = 'helloruru_labor_payee';
 
   function saveCompany() {
     const data = {};
@@ -944,6 +949,31 @@
   function loadCompany() {
     try {
       const data = JSON.parse(localStorage.getItem(COMPANY_KEY));
+      if (!data) return;
+      Object.keys(data).forEach(id => {
+        const el = document.getElementById(id);
+        if (el && data[id]) el.value = data[id];
+      });
+    } catch(e) {}
+  }
+
+  function savePayee() {
+    const data = {};
+    // 跳過身分證字號（payeeId），不存敏感資料
+    ['payeeName','payeeAddress','payeePhone','payeeEmail','bankName','bankAccount'].forEach(id => {
+      data[id] = document.getElementById(id).value;
+    });
+    localStorage.setItem(PAYEE_KEY, JSON.stringify(data));
+    const btn = document.getElementById('savePayeeBtn');
+    btn.textContent = '已儲存';
+    btn.classList.add('saved');
+    showToast('受款人資料已儲存（身分證字號不儲存）');
+    setTimeout(() => { btn.textContent = '記住受款人'; btn.classList.remove('saved'); }, 2000);
+  }
+
+  function loadPayee() {
+    try {
+      const data = JSON.parse(localStorage.getItem(PAYEE_KEY));
       if (!data) return;
       Object.keys(data).forEach(id => {
         const el = document.getElementById(id);
