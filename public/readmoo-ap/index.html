@@ -137,7 +137,8 @@
     .deals-calendar-wrap {
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      overflow: hidden;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       background: var(--bg-card);
     }
     /* 週曆日期表頭 */
@@ -180,7 +181,7 @@
       border-right: 1px solid var(--border-color);
       position: relative;
       transition: background var(--transition-normal), transform var(--transition-normal);
-      min-width: 0;
+      min-width: 150px;
     }
     .deal-cell:last-child { border-right: none; }
     .deal-cell.is-today {
@@ -351,8 +352,8 @@
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
       }
-      .deals-cal-day { min-width: 120px; }
-      .deal-cell { min-width: 130px; padding: 12px 8px; }
+      .deals-cal-day { min-width: 140px; }
+      .deal-cell { min-width: 140px; padding: 12px 8px; }
       .deal-cell-cover { width: 90px; height: 135px; }
       .deal-cell-title { font-size: 13px; }
       .deal-cell-deal-price { font-size: 18px; }

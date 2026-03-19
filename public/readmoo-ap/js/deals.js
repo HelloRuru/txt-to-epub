@@ -138,7 +138,7 @@
     if (!headerEl || deals.length === 0) return;
 
     const cols = deals.length;
-    const colStyle = 'repeat(' + cols + ', 1fr)';
+    const colStyle = 'repeat(' + cols + ', minmax(150px, 1fr))';
     gridEl.style.gridTemplateColumns = colStyle;
 
     // 同日合併表頭
@@ -153,7 +153,7 @@
       }
     }
 
-    headerEl.style.gridTemplateColumns = colStyle;
+    headerEl.style.gridTemplateColumns = 'repeat(' + cols + ', minmax(150px, 1fr))';
     headerEl.innerHTML = dateGroups.map(g => {
       const d = new Date(g.date + 'T00:00:00');
       const isToday = g.date === today;
