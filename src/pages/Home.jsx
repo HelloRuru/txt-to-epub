@@ -89,6 +89,11 @@ const tools = [
     description: '讀墨 1500 日挑戰 LINE 群專用。輸入 AP 連結，自動產生串接推薦文案。',
     path: '/readmoo-ap/', color: 'sage', external: true,
   },
+  {
+    id: 'ebook-deals', name: '每日好書推薦', category: 'reading',
+    description: '三平台電子書每日特價一覽，Readmoo、博客來、Kobo 搜尋比價。',
+    path: '/ebook-deals/', color: 'rose', external: true,
+  },
 ]
 
 // ── Color Helpers ──────────────────────────────────
