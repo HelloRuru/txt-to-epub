@@ -1060,19 +1060,19 @@
           </div>
         </div>
         <div class="platform-column">
-          <div class="column-header">博客來</div>
+          <div class="column-header">Kobo</div>
           <div class="calendar-wrap">
-            <div class="calendar-header" id="cal-header-books"></div>
-            <div class="deals-grid" id="grid-books">
+            <div class="calendar-header" id="cal-header-kobo"></div>
+            <div class="deals-grid" id="grid-kobo">
               <div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-price"></div></div></div>
             </div>
           </div>
         </div>
         <div class="platform-column">
-          <div class="column-header">Kobo</div>
+          <div class="column-header">博客來</div>
           <div class="calendar-wrap">
-            <div class="calendar-header" id="cal-header-kobo"></div>
-            <div class="deals-grid" id="grid-kobo">
+            <div class="calendar-header" id="cal-header-books"></div>
+            <div class="deals-grid" id="grid-books">
               <div class="shimmer-card"><div class="shimmer-block shimmer-cover"></div><div class="shimmer-content"><div class="shimmer-block shimmer-title"></div><div class="shimmer-block shimmer-price"></div></div></div>
             </div>
           </div>
@@ -1114,7 +1114,7 @@
 
   <footer class="site-footer">
     <p>&copy; 2026 Kaoru Tsai. All Rights Reserved. | Contact: <a href="mailto:hello@helloruru.com">hello@helloruru.com</a></p>
-    <p class="credits">資料來源：Readmoo・博客來・<a href="https://t.me/kobo_99_notifier" target="_blank" rel="noopener">kobo_99_notifier</a> | 評分：Google Books</p>
+    <p class="credits">資料來源：Readmoo・博客來・Kobo Blog | 評分：Google Books</p>
   </footer>
 
   <button id="theme-toggle" class="theme-toggle" aria-label="切換深色模式">
@@ -1170,7 +1170,7 @@
     // === Fetch Deals ===
     async function fetchDeals(endpoint = '/api/deals') {
       try {
-        const res = await fetch(API_BASE + endpoint);
+        const res = await fetch(API_BASE + endpoint + '?v=20260319-2');
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         allDealsData = data;
