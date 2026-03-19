@@ -1,4 +1,4 @@
-// === 每日好書 Tab ===
+// === 每日好書 Tab（週曆排法） ===
 (function() {
   'use strict';
 
@@ -10,6 +10,8 @@
     readmoo: 'Readmoo', books: '博客來',
     kobo: 'Kobo', googlebooks: 'Google Books'
   };
+
+  const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
 
   function esc(str) {
     const d = document.createElement('div');
@@ -28,6 +30,13 @@
       .trim().toLowerCase();
   }
 
+  function getToday() {
+    const now = new Date();
+    return now.getFullYear() + '-' +
+      String(now.getMonth() + 1).padStart(2, '0') + '-' +
+      String(now.getDate()).padStart(2, '0');
+  }
+
   // === 搜尋比價 ===
   const searchBtn = document.getElementById('deals-search-btn');
   const searchInput = document.getElementById('deals-search-input');
@@ -41,7 +50,6 @@
     if (!query) return;
     const sr = document.getElementById('deals-search-results');
 
-    // shimmer
     sr.innerHTML = '<div class="deals-shimmer">' +
       [1,2,3].map(() =>
         '<div class="deals-shimmer-item">' +
@@ -71,7 +79,6 @@
         return;
       }
 
-      // 同書分組
       const groups = new Map();
       for (const r of all) {
         const key = normalizeTitle(r.title);
@@ -124,9 +131,71 @@
     }
   }
 
-  // === 讀墨今日優惠 ===
+  // === 讀墨週曆優惠 ===
+  function renderCalendarHeader(deals, today) {
+    const headerEl = document.getElementById('deals-cal-header');
+    const gridEl = document.getElementById('deals-cal-grid');
+    if (!headerEl || deals.length === 0) return;
+
+    const cols = deals.length;
+    const colStyle = 'repeat(' + cols + ', 1fr)';
+    gridEl.style.gridTemplateColumns = colStyle;
+
+    // 同日合併表頭
+    const dateGroups = [];
+    let prev = null;
+    for (const deal of deals) {
+      if (prev && prev.date === deal.date) {
+        prev.count++;
+      } else {
+        prev = { date: deal.date, count: 1 };
+        dateGroups.push(prev);
+      }
+    }
+
+    headerEl.style.gridTemplateColumns = colStyle;
+    headerEl.innerHTML = dateGroups.map(g => {
+      const d = new Date(g.date + 'T00:00:00');
+      const isToday = g.date === today;
+      const dayName = WEEKDAYS[d.getDay()];
+      const dateLabel = (d.getMonth() + 1) + '/' + d.getDate();
+      const spanAttr = g.count > 1 ? ' style="grid-column: span ' + g.count + '"' : '';
+      const cls = isToday ? ' is-today' : '';
+      return '<span class="deals-cal-day' + cls + '"' + spanAttr + '>' +
+        dayName + '<br>' + dateLabel +
+        (isToday ? '<br><b>今天</b>' : '') +
+        (g.count > 1 ? '<br>' + g.count + ' 本' : '') +
+        '</span>';
+    }).join('');
+  }
+
+  function renderDealCell(deal, today) {
+    const isToday = deal.date === today;
+    const is99 = deal.dealPrice === 99;
+
+    const cover = deal.coverUrl
+      ? '<img src="' + esc(deal.coverUrl) + '" alt="' + esc(deal.title) + '" loading="lazy" onerror="this.outerHTML=\'<div class=deal-cell-cover-ph>' + esc(deal.title.slice(0, 6)) + '</div>\'">'
+      : '<div class="deal-cell-cover-ph">' + esc(deal.title.slice(0, 6)) + '</div>';
+
+    const cls = 'deal-cell' + (isToday ? ' is-today' : '') + (is99 ? ' is-99' : '');
+
+    return '<article class="' + cls + '">' +
+      (is99 ? '<span class="deal-99-badge">$99</span>' : '') +
+      '<div class="deal-cell-cover">' + cover + '</div>' +
+      '<div class="deal-cell-title">' + esc(deal.title) + '</div>' +
+      (deal.author ? '<div class="deal-cell-author">' + esc(deal.author) + '</div>' : '') +
+      '<div class="deal-cell-pricing">' +
+        '<span class="deal-cell-deal-price">$' + deal.dealPrice + '</span>' +
+        (deal.originalPrice > 0 ? '<span class="deal-cell-orig-price">$' + deal.originalPrice + '</span>' : '') +
+      '</div>' +
+      '<a href="' + esc(deal.bookUrl) + '" class="deal-cell-link" target="_blank" rel="noopener">' +
+        '前往購買 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>' +
+      '</a>' +
+    '</article>';
+  }
+
   async function fetchReadmooDeals() {
-    const grid = document.getElementById('deals-readmoo-grid');
+    const gridEl = document.getElementById('deals-cal-grid');
     try {
       const res = await fetch(API_BASE + '/api/deals');
       if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -141,47 +210,30 @@
       }
 
       const deals = data.readmoo?.deals || [];
-      const now = new Date();
-      const today = now.getFullYear() + '-' +
-        String(now.getMonth() + 1).padStart(2, '0') + '-' +
-        String(now.getDate()).padStart(2, '0');
+      const today = getToday();
 
-      // 只顯示今天 + 未來
-      const showDeals = deals.filter(d => d.date >= today)
+      // 只顯示今天 + 未來，按日期排
+      const showDeals = deals
+        .filter(d => d.date >= today)
         .sort((a, b) => a.date.localeCompare(b.date));
 
       if (showDeals.length === 0) {
-        grid.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:var(--space-xl);grid-column:1/-1">今天讀墨沒有特價書</p>';
+        gridEl.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:var(--space-xl)">今天讀墨沒有特價書</p>';
         return;
       }
 
-      grid.innerHTML = showDeals.map(deal => {
-        const is99 = deal.dealPrice === 99;
-        const cover = deal.coverUrl
-          ? '<img src="' + esc(deal.coverUrl) + '" alt="' + esc(deal.title) + '" loading="lazy" onerror="this.outerHTML=\'<div class=deal-item-cover-placeholder>' + esc(deal.title.slice(0, 6)) + '</div>\'">'
-          : '<div class="deal-item-cover-placeholder">' + esc(deal.title.slice(0, 6)) + '</div>';
+      // 渲染日期表頭
+      renderCalendarHeader(showDeals, today);
 
-        return '<article class="deal-item' + (is99 ? ' is-99' : '') + '">' +
-          (is99 ? '<span class="deal-99-badge">$99</span>' : '') +
-          '<div class="deal-item-cover">' + cover + '</div>' +
-          '<div class="deal-item-title">' + esc(deal.title) + '</div>' +
-          (deal.author ? '<div class="deal-item-author">' + esc(deal.author) + '</div>' : '') +
-          '<div class="deal-item-pricing">' +
-            '<span class="deal-item-deal-price">$' + deal.dealPrice + '</span>' +
-            (deal.originalPrice > 0 ? '<span class="deal-item-original-price">$' + deal.originalPrice + '</span>' : '') +
-          '</div>' +
-          '<a href="' + esc(deal.bookUrl) + '" class="deal-item-link" target="_blank" rel="noopener">' +
-            '前往購買 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>' +
-          '</a>' +
-        '</article>';
-      }).join('');
+      // 渲染書格
+      gridEl.innerHTML = showDeals.map(deal => renderDealCell(deal, today)).join('');
 
     } catch (err) {
-      grid.innerHTML = '<p style="text-align:center;color:var(--status-error);padding:var(--space-xl);grid-column:1/-1">載入失敗：' + esc(err.message) + '</p>';
+      gridEl.innerHTML = '<p style="text-align:center;color:var(--status-error);padding:var(--space-xl)">載入失敗：' + esc(err.message) + '</p>';
     }
   }
 
-  // 當 tab 切到「每日好書」時才載入（延遲載入）
+  // 延遲載入：切到 tab 才抓
   let dealsLoaded = false;
   const observer = new MutationObserver(() => {
     const panel = document.getElementById('tab-deals');
@@ -194,7 +246,6 @@
   const tabDeals = document.getElementById('tab-deals');
   if (tabDeals) {
     observer.observe(tabDeals, { attributes: true, attributeFilter: ['class'] });
-    // 如果 URL hash 直接開到 deals tab
     if (tabDeals.classList.contains('active')) {
       dealsLoaded = true;
       fetchReadmooDeals();

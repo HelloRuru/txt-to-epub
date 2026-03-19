@@ -127,110 +127,173 @@
       margin-bottom: var(--space-sm);
     }
 
-    /* 讀墨優惠卡片 */
+    /* 讀墨週曆 */
     .deals-readmoo-section { margin-bottom: var(--space-lg); }
-    .deals-readmoo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: var(--space-md);
-    }
     .deals-loading {
-      grid-column: 1 / -1;
       text-align: center;
       padding: var(--space-xl);
       color: var(--text-muted);
     }
-
-    .deal-item {
-      display: flex; flex-direction: column;
-      align-items: center; text-align: center;
-      gap: var(--space-sm);
-      padding: var(--space-md) var(--space-sm);
-      background: var(--bg-card);
+    .deals-calendar-wrap {
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      transition: all var(--transition-normal);
-      position: relative;
+      overflow: hidden;
+      background: var(--bg-card);
     }
-    .deal-item:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-md);
+    /* 週曆日期表頭 */
+    .deals-calendar-header {
+      display: grid;
+      background: rgba(168, 181, 160, 0.10);
+      border-bottom: 1px solid var(--border-color);
+    }
+    html.dark .deals-calendar-header {
+      background: rgba(168, 181, 160, 0.08);
+    }
+    .deals-cal-day {
+      text-align: center;
+      padding: 10px 0;
+      font-size: 13px; font-weight: 500;
+      color: var(--text-hint);
+      line-height: 1.4;
+    }
+    .deals-cal-day.is-today {
+      color: var(--color-sage-dark);
+      font-weight: 700;
+      background: rgba(168, 181, 160, 0.22);
+      box-shadow: inset 0 -3px 0 var(--color-sage);
+    }
+    html.dark .deals-cal-day.is-today {
+      color: var(--color-sage);
+      background: rgba(168, 181, 160, 0.12);
+    }
+    /* 週曆書格 */
+    .deals-calendar-grid {
+      display: grid;
+      gap: 0;
+    }
+    .deal-cell {
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      gap: 8px;
+      padding: 12px 8px;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border-color);
+      position: relative;
+      transition: background var(--transition-normal), transform var(--transition-normal);
+    }
+    .deal-cell:last-child { border-right: none; }
+    .deal-cell.is-today {
+      background: rgba(168, 181, 160, 0.12);
+      box-shadow: inset 0 0 0 2px rgba(168, 181, 160, 0.3);
+    }
+    html.dark .deal-cell.is-today {
+      background: rgba(168, 181, 160, 0.08);
+      box-shadow: inset 0 0 0 2px rgba(168, 181, 160, 0.2);
+    }
+    @media (hover: hover) {
+      .deal-cell:hover {
+        background: var(--bg-elevated);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+        z-index: 1;
+      }
+      .deal-cell.is-today:hover {
+        background: rgba(168, 181, 160, 0.18);
+        box-shadow: var(--shadow-md), inset 0 0 0 2px rgba(168, 181, 160, 0.4);
+      }
     }
 
-    /* $99 醒目標籤 */
-    .deal-item.is-99 {
-      border-color: rgba(201, 112, 112, 0.4);
-      background: rgba(201, 112, 112, 0.04);
+    /* $99 醒目 */
+    .deal-cell.is-99 {
+      border-color: rgba(201, 112, 112, 0.3);
+    }
+    .deal-cell.is-99.is-today {
+      background: rgba(201, 112, 112, 0.08);
+      box-shadow: inset 0 0 0 2px rgba(201, 112, 112, 0.3);
     }
     .deal-99-badge {
-      position: absolute; top: -8px; right: -8px;
+      position: absolute; top: -1px; right: -1px;
       background: linear-gradient(135deg, #c97070, #d4a5a5);
-      color: #fff; font-size: 12px; font-weight: 700;
-      padding: 4px 10px; border-radius: 999px;
-      box-shadow: 0 2px 8px rgba(201, 112, 112, 0.3);
+      color: #fff; font-size: 11px; font-weight: 700;
+      padding: 3px 8px; border-radius: 0 0 0 8px;
+      box-shadow: 0 2px 6px rgba(201, 112, 112, 0.3);
       animation: deal99pulse 2s ease-in-out infinite;
     }
     @keyframes deal99pulse {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.08); }
+      50% { transform: scale(1.06); }
     }
-    html.dark .deal-item.is-99 {
-      border-color: rgba(212, 160, 154, 0.3);
-      background: rgba(212, 160, 154, 0.06);
+    html.dark .deal-cell.is-99 {
+      border-color: rgba(212, 160, 154, 0.25);
     }
 
-    .deal-item-cover {
-      width: 100px; height: 150px;
+    /* 書封 */
+    .deal-cell-cover {
+      width: 90px; height: 135px;
       border-radius: 2px 6px 6px 2px;
       overflow: hidden; position: relative;
       box-shadow: 3px 1px 4px rgba(92,74,58,0.15), 6px 4px 12px rgba(92,74,58,0.1);
     }
-    .deal-item-cover img {
+    .deal-cell-cover img {
       width: 100%; height: 100%;
       object-fit: cover; display: block;
     }
-    .deal-item-cover-placeholder {
+    .deal-cell-cover-ph {
       width: 100%; height: 100%;
       background: linear-gradient(135deg, #E5E0DB, #D8CFC4);
       display: flex; align-items: center; justify-content: center;
-      padding: 8px; font-size: 12px;
-      color: var(--text-muted); text-align: center;
+      padding: 8px; font-size: 11px;
+      color: var(--text-muted); text-align: center; line-height: 1.3;
     }
-    .deal-item-title {
-      font-weight: 700; font-size: 14px;
+    html.dark .deal-cell-cover-ph {
+      background: linear-gradient(135deg, #3D3428, #332B22);
+    }
+    /* 光澤滑過 */
+    .deal-cell-cover::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.12) 45%, rgba(255,255,255,0.04) 50%, transparent 55%);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+      z-index: 2;
+    }
+    @media (hover: hover) {
+      .deal-cell:hover .deal-cell-cover::after {
+        transform: translateX(100%);
+      }
+    }
+
+    .deal-cell-title {
+      font-weight: 700; font-size: 13px;
       color: var(--text-primary); line-height: 1.4;
       display: -webkit-box; -webkit-line-clamp: 2;
       -webkit-box-orient: vertical; overflow: hidden;
     }
-    .deal-item-author {
-      font-size: 12px; color: var(--text-muted);
+    .deal-cell-author {
+      font-size: 11px; color: var(--text-muted);
     }
-    .deal-item-pricing {
+    .deal-cell-pricing {
       display: flex; align-items: center;
-      gap: var(--space-sm); flex-wrap: wrap;
-      justify-content: center;
+      gap: 6px; justify-content: center;
     }
-    .deal-item-deal-price {
-      font-size: 20px; font-weight: 700;
+    .deal-cell-deal-price {
+      font-size: 18px; font-weight: 700;
       color: var(--color-rose);
     }
-    .deal-item.is-99 .deal-item-deal-price {
-      font-size: 24px;
-      color: #c97070;
+    .deal-cell.is-99 .deal-cell-deal-price {
+      font-size: 22px; color: #c97070;
     }
-    .deal-item-original-price {
-      font-size: 13px; color: var(--text-hint);
+    .deal-cell-orig-price {
+      font-size: 12px; color: var(--text-hint);
       text-decoration: line-through;
     }
-    .deal-item-link {
+    .deal-cell-link {
       display: inline-flex; align-items: center; gap: 4px;
-      font-size: 13px; color: var(--color-sage);
+      font-size: 12px; color: var(--color-sage);
       text-decoration: none;
     }
-    .deal-item-link:hover { color: var(--color-sage-dark); }
-    .deal-item-link svg {
-      width: 14px; height: 14px;
-    }
+    .deal-cell-link:hover { color: var(--color-sage-dark); }
+    .deal-cell-link svg { width: 14px; height: 14px; }
 
     .deals-more-link {
       text-align: center; padding: var(--space-md) 0;
@@ -266,10 +329,15 @@
     }
 
     @media (max-width: 768px) {
-      .deals-readmoo-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      .deals-calendar-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
-      .deal-item-cover { width: 80px; height: 120px; }
+      .deals-cal-day { min-width: 120px; }
+      .deal-cell { min-width: 120px; padding: 10px 6px; }
+      .deal-cell-cover { width: 75px; height: 112px; }
+      .deal-cell-title { font-size: 12px; }
+      .deal-cell-deal-price { font-size: 16px; }
       .deals-search-box { flex-direction: column; }
     }
   </style>
@@ -760,14 +828,17 @@
           <div id="deals-search-results" class="deals-search-results"></div>
         </div>
 
-        <!-- 讀墨今日優惠 -->
+        <!-- 讀墨今日優惠（週曆排法） -->
         <div class="deals-readmoo-section">
-          <h2>讀墨今日優惠</h2>
+          <h2>Readmoo 本週優惠</h2>
           <p class="section-desc" id="deals-updated-at"></p>
-          <div id="deals-readmoo-grid" class="deals-readmoo-grid">
-            <div class="deals-loading">
-              <div class="spinner"></div>
-              <p>正在載入優惠...</p>
+          <div class="deals-calendar-wrap" id="deals-calendar-wrap">
+            <div class="deals-calendar-header" id="deals-cal-header"></div>
+            <div class="deals-calendar-grid" id="deals-cal-grid">
+              <div class="deals-loading">
+                <div class="spinner"></div>
+                <p>正在載入優惠...</p>
+              </div>
             </div>
           </div>
         </div>
