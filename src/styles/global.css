@@ -1,0 +1,519 @@
+/* ============================================
+   HelloRuru Tools — DS 2.1 經典版
+   ============================================ */
+
+/* ── CSS Variables ── */
+:root {
+  /* 商標色 */
+  --brand-pink: #DFC6C6;
+  --brand-brown: #6D5954;
+
+  /* 主色 */
+  --rose: #D4A5A5;
+  --lavender: #B8A9C9;
+  --coral: #E8A87C;
+
+  /* 粉色系 */
+  --blush: #F5D0C5;
+  --gray-rose: #C9929A;
+  --nadeshiko: #E8B4B8;
+  --sakura: #FEDFE1;
+
+  /* 紫色系 */
+  --lotus: #9B7E93;
+  --fuji: #C4B7D7;
+  --bellflower: #8F77B5;
+
+  /* 中性色 */
+  --sage: #A8B5A0;
+  --mist: #E8E4E1;
+  --warm-gray: #B5ADA7;
+  --charcoal: #5C5856;
+
+  /* 文字 */
+  --text-heading: #333333;
+  --text-body: #4A4A4A;
+  --text-muted: #888888;
+  --text-note: #AAAAAA;
+
+  /* 背景 */
+  --bg-page: #FAFAFA;
+  --bg-card: #FFFFFF;
+
+  /* 邊框 */
+  --border-color: rgba(212, 165, 165, 0.15);
+
+  /* 陰影 */
+  --shadow-sm: 0 2px 8px rgba(212, 165, 165, 0.08);
+  --shadow-md: 0 4px 16px rgba(212, 165, 165, 0.10);
+  --shadow-lg: 0 8px 32px rgba(212, 165, 165, 0.14);
+
+  /* 漸層 */
+  --gradient-brand: linear-gradient(135deg, #D4A5A5, #B8A9C9);
+  --gradient-logo: linear-gradient(135deg, #DFC6C6, #6D5954);
+}
+
+/* ── 深色模式（暖可可） ── */
+html.dark {
+  --text-heading: #EDE8E9;
+  --text-body: #C4BBBF;
+  --text-muted: #918A8D;
+  --text-note: #6B6466;
+
+  --bg-page: #1E181B;
+  --bg-card: #282224;
+
+  --border-color: rgba(61, 53, 56, 0.6);
+
+  --rose: #DAAEB0;
+  --lavender: #C2B4D0;
+  --coral: #F0B88C;
+  --brand-pink: #E8D2D2;
+  --brand-brown: #8A7570;
+
+  --shadow-sm: 0 2px 8px rgba(30, 24, 27, 0.3);
+  --shadow-md: 0 4px 16px rgba(30, 24, 27, 0.4);
+  --shadow-lg: 0 8px 32px rgba(30, 24, 27, 0.5);
+}
+
+/* ── Font ── */
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GenSenRounded';
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* ── Reset & Base ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text-body);
+  background-color: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ── Layout ── */
+.page-wrapper {
+  min-height: 100vh;
+  padding: 48px 24px;
+  transition: background-color 0.5s, color 0.5s;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* ── Hero ── */
+.hero {
+  text-align: center;
+  margin-bottom: 48px;
+  position: relative;
+}
+
+.hero-title {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 20px;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-desc {
+  font-size: 16px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.badge-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 14px;
+  background: var(--bg-card);
+  border: 1px solid rgba(184, 169, 201, 0.2);
+  color: var(--text-muted);
+}
+
+.badge-solid {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  background: var(--gradient-brand);
+  color: #FFFFFF;
+  box-shadow: 0 4px 16px rgba(212, 165, 165, 0.25);
+}
+
+.hero-watermark {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 48px;
+  height: 48px;
+  opacity: 0.18;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Category Section ── */
+.category-section {
+  margin-bottom: 48px;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.category-title {
+  font-size: 18px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--rose);
+}
+
+.category-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+}
+
+.category-desc {
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+
+/* ── Tool Grid ── */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* ── Tool Card ── */
+.tool-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
+  padding-bottom: 64px;
+  border-radius: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  animation: fadeInUp 0.5s ease both;
+}
+
+.tool-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.tool-card:hover .top-bar {
+  opacity: 1 !important;
+}
+
+.tool-card:hover .tool-icon {
+  transform: scale(1.08) rotate(-3deg);
+}
+
+.tool-card:hover .card-arrow {
+  background: var(--gradient-brand);
+  color: #FFFFFF;
+}
+
+/* 頂部漸層條 */
+.top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 24px 24px 0 0;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+.top-bar.color-rose { background: linear-gradient(90deg, #D4A5A5, #F5D0C5); }
+.top-bar.color-lavender { background: linear-gradient(90deg, #B8A9C9, #C9C1DC); }
+.top-bar.color-sage { background: linear-gradient(90deg, #A8B5A0, #C5D4BD); }
+.top-bar.color-blush { background: linear-gradient(90deg, #F5D0C5, #FEDFE1); }
+.top-bar.color-sakura { background: linear-gradient(90deg, #FEDFE1, #F5D0C5); }
+
+/* 工具圖示 */
+.tool-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  transition: transform 0.5s;
+}
+
+.tool-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.tool-icon.color-rose {
+  background: linear-gradient(135deg, rgba(212, 165, 165, 0.22), rgba(245, 208, 197, 0.15));
+  color: var(--rose);
+}
+.tool-icon.color-lavender {
+  background: linear-gradient(135deg, rgba(184, 169, 201, 0.22), rgba(201, 193, 220, 0.15));
+  color: var(--lavender);
+}
+.tool-icon.color-sage {
+  background: linear-gradient(135deg, rgba(168, 181, 160, 0.22), rgba(184, 201, 176, 0.15));
+  color: var(--sage);
+}
+.tool-icon.color-blush {
+  background: linear-gradient(135deg, rgba(245, 208, 197, 0.22), rgba(254, 223, 225, 0.15));
+  color: var(--blush);
+}
+.tool-icon.color-sakura {
+  background: linear-gradient(135deg, rgba(254, 223, 225, 0.22), rgba(245, 208, 197, 0.15));
+  color: var(--sakura);
+}
+
+/* 卡片內容 */
+.tool-name {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 8px;
+  color: var(--text-heading);
+}
+
+.tool-desc {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+/* 開發中標記 */
+.badge-wip {
+  display: inline-block;
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 8px;
+  background: rgba(212, 165, 165, 0.15);
+  color: var(--rose);
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* 箭頭 */
+.card-arrow {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--mist);
+  color: var(--rose);
+  transition: background 0.3s, color 0.3s;
+}
+
+.card-arrow svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ── Footer ── */
+.site-footer {
+  margin-top: 40px;
+  padding-top: 48px;
+  text-align: center;
+  position: relative;
+}
+
+.site-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 1px;
+  background: var(--gradient-brand);
+}
+
+.footer-privacy {
+  font-size: 14px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.footer-copyright {
+  font-size: 14px;
+  color: var(--text-note);
+}
+
+.footer-copyright a {
+  color: var(--rose);
+  transition: opacity 0.3s;
+}
+
+.footer-copyright a:hover {
+  opacity: 0.8;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 20px;
+}
+
+.footer-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: color 0.3s;
+}
+
+.footer-link:hover {
+  color: var(--rose);
+}
+
+.footer-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Dark Mode Toggle ── */
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s, border-color 0.3s;
+  color: var(--text-muted);
+}
+
+.theme-toggle:hover {
+  border-color: var(--rose);
+  color: var(--rose);
+}
+
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ── Animation ── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 1023px) {
+  .tool-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .page-wrapper {
+    padding: 32px 16px;
+  }
+
+  .hero-title {
+    font-size: 30px;
+  }
+
+  .tool-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .category-desc {
+    display: none;
+  }
+
+  .footer-links {
+    gap: 20px;
+  }
+}

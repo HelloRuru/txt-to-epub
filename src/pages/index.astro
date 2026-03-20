@@ -1,0 +1,212 @@
+---
+import Base from '../layouts/Base.astro';
+
+// 讀取工具設定
+import toolsConfig from '../../tools-config.json';
+
+// 分類定義
+const categories = [
+  { id: 'text', label: '文字 & 轉檔', desc: '小說轉檔 · 社群排版 · AI 提示詞' },
+  { id: 'media', label: '圖片 & 多媒體', desc: '去背 · PDF · 卡片 · 問安圖 · 色票 · 歌詞 · 歌單' },
+  { id: 'discover', label: '查詢 & 測驗', desc: '閱讀器推薦 · 美妝色號' },
+  { id: 'reading', label: '閱讀 & 電子書', desc: '書櫃管理 · AP 串接 · 圖書館新書' },
+];
+
+// 工具分類對照（從 Home.jsx 搬過來）
+const toolCategoryMap: Record<string, string> = {
+  'epub': 'text',
+  'epub-convert': 'text',
+  'post-writer': 'text',
+  'spell': 'text',
+  'labor-report': 'text',
+  'bg-removal': 'media',
+  'pdf-editor': 'media',
+  'hihi': 'media',
+  'card-maker': 'media',
+  'find-color': 'media',
+  'lyric-player': 'media',
+  'spotify-goods': 'media',
+  'tankdrum-music': 'media',
+  'reader-quiz': 'discover',
+  'cosmetics-for-you': 'discover',
+  'book-manager': 'reading',
+  'readmoo-ap': 'reading',
+  'ebook-deals': 'reading',
+  'library-search': 'reading',
+};
+
+// 處理工具資料
+const tools = toolsConfig.tools.map(tool => ({
+  ...tool,
+  category: toolCategoryMap[tool.id] || 'text',
+}));
+
+const readyTools = tools.filter(t => t.ready);
+const totalCount = tools.length;
+
+// 圖示 SVG 對照
+const iconSvgs: Record<string, string> = {
+  'book': '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8"/><path d="M8 11h6"/>',
+  'convert': '<path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M8 14l4 4 4-4"/><circle cx="5" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>',
+  'scissors': '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/>',
+  'post-writer': '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/><path d="M10 9H8"/>',
+  'palette': '<circle cx="13.5" cy="6.5" r="0.5" fill="currentColor"/><circle cx="17.5" cy="10.5" r="0.5" fill="currentColor"/><circle cx="8.5" cy="7.5" r="0.5" fill="currentColor"/><circle cx="6.5" cy="12" r="0.5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>',
+  'sun': '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
+  'book-open': '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  'sparkles': '<path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z"/><path d="M18 14l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z"/>',
+  'music': '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  'bookmark': '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
+  'file-text': '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>',
+  'tag': '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+  'credit-card': '<rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>',
+  'file': '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+  'library': '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+};
+
+function getIconSvg(iconName: string): string {
+  return iconSvgs[iconName] || iconSvgs['book'];
+}
+---
+
+<Base title="HelloRuru 工具箱 — 免費線上小工具">
+  <div class="page-wrapper">
+    <div class="container">
+
+      <!-- Brand Header -->
+      <hello-ruru-header title="工具箱"></hello-ruru-header>
+
+      <!-- Theme Toggle（右上角） -->
+      <div style="position: fixed; top: 16px; right: 16px; z-index: 100;">
+        <button class="theme-toggle" id="themeToggle" aria-label="切換深色模式">
+          <svg id="iconSun" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor" style="display:none;">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <svg id="iconMoon" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Hero -->
+      <section class="hero">
+        <h1 class="hero-title">Tools</h1>
+        <p class="hero-desc">
+          簡單好用的線上小工具。<br />全程本機處理，保護你的隱私。
+        </p>
+        <div class="hero-badges">
+          <span class="badge-outline">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor" style="color: var(--rose);">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            檔案不會上傳到任何伺服器
+          </span>
+          <span class="badge-solid">
+            {totalCount} 款免費工具
+          </span>
+        </div>
+        <img src="/rabbit-watermark.png" alt="" aria-hidden="true" class="hero-watermark" />
+      </section>
+
+      <!-- 工具分類區塊 -->
+      {categories.map(cat => {
+        const catTools = tools.filter(t => t.category === cat.id);
+        return (
+          <section class="category-section">
+            <div class="category-header">
+              <h2 class="category-title">{cat.label}</h2>
+              <div class="category-line" />
+              <span class="category-desc">{cat.desc}</span>
+            </div>
+            <div class="tool-grid">
+              {catTools.map((tool, i) => (
+                <a
+                  href={tool.path}
+                  class="tool-card"
+                  style={`animation-delay: ${i * 0.08}s;`}
+                >
+                  <div class={`top-bar color-${tool.color}`} />
+                  <div class={`tool-icon color-${tool.color}`}>
+                    <svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor">
+                      <Fragment set:html={getIconSvg(tool.icon)} />
+                    </svg>
+                  </div>
+                  <h3 class="tool-name">
+                    {tool.name}
+                    {!tool.ready && <span class="badge-wip">開發中</span>}
+                  </h3>
+                  <p class="tool-desc">{tool.description}</p>
+                  <div class="card-arrow">
+                    <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+        );
+      })}
+
+      <!-- Footer -->
+      <footer class="site-footer">
+        <p class="footer-privacy">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor" style="color: var(--rose);">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          所有檔案處理皆在瀏覽器本機完成
+        </p>
+        <p class="footer-copyright">
+          &copy; 2026 Kaoru Tsai. All Rights Reserved. |
+          <a href="mailto:hello@helloruru.com">hello@helloruru.com</a>
+        </p>
+        <div class="footer-links">
+          <a href="https://lab.helloruru.com" class="footer-link">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor">
+              <path d="M9 3h6v5l4 9a2 2 0 0 1-1.8 2.9H6.8A2 2 0 0 1 5 17l4-9V3z"/><path d="M9 3h6"/><path d="M7 15h10"/>
+            </svg>
+            Lab
+          </a>
+          <a href="https://helloruru.com" class="footer-link">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>
+            </svg>
+            HelloRuru
+          </a>
+          <a href="https://github.com/HelloRuru" class="footer-link">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+            </svg>
+            GitHub
+          </a>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+</Base>
+
+<script>
+  // 深色模式切換
+  const toggle = document.getElementById('themeToggle');
+  const iconSun = document.getElementById('iconSun');
+  const iconMoon = document.getElementById('iconMoon');
+
+  function updateIcons() {
+    const isDark = document.documentElement.classList.contains('dark');
+    if (iconSun && iconMoon) {
+      iconSun.style.display = isDark ? 'block' : 'none';
+      iconMoon.style.display = isDark ? 'none' : 'block';
+    }
+  }
+
+  updateIcons();
+
+  toggle?.addEventListener('click', () => {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    updateIcons();
+  });
+</script>
