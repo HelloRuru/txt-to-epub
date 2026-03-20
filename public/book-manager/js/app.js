@@ -795,31 +795,26 @@ function initBookmarklets() {
     });
   }
 
-  // 加入書籤列按鈕
+  // 複製 bookmarklet（按了複製，再按 Ctrl+D 加書籤）
   const copyBtn = document.getElementById('btn-copy-bm');
   if (copyBtn) {
     copyBtn.addEventListener('click', () => {
       const code = getReadmooBookmarklet();
-      // 複製到剪貼簿
-      navigator.clipboard.writeText(code).catch(() => {
+      navigator.clipboard.writeText(code).then(() => {
+        copyBtn.textContent = '已複製';
+        showToast('已複製！按 Ctrl+D 新增書籤，網址貼上即可');
+        setTimeout(() => { copyBtn.textContent = '複製'; }, 3000);
+      }).catch(() => {
         const ta = document.createElement('textarea');
         ta.value = code;
         document.body.appendChild(ta);
         ta.select();
         document.execCommand('copy');
         ta.remove();
+        copyBtn.textContent = '已複製';
+        showToast('已複製！按 Ctrl+D 新增書籤，網址貼上即可');
+        setTimeout(() => { copyBtn.textContent = '複製'; }, 3000);
       });
-
-      const isMac = /Mac|iPhone|iPad/.test(navigator.userAgent);
-      const shortcut = isMac ? 'Cmd+D' : 'Ctrl+D';
-      alert(
-        '已複製到剪貼簿！\n\n' +
-        '下一步：\n' +
-        '1. 按 ' + shortcut + ' 打開「新增書籤」\n' +
-        '2. 把網址欄位清空，貼上剪貼簿內容\n' +
-        '3. 名稱改為「撈讀墨書櫃」\n' +
-        '4. 按確定，完成！'
-      );
     });
   }
 }
