@@ -249,40 +249,24 @@ export async function onRequest(context) {
         totalBestseller: bestBooks.length,
       });
 
-    } else if (action === 'search' && lib && query) {
-      // 搜尋特定圖書館
+    } else if (action === 'search' && query) {
+      // 搜尋 HyRead 書店（靜態 HTML，能抓到結果）
+      // 圖書館子站搜尋是 AJAX 加密，無法直接抓
       const encoded = encodeURIComponent(query);
       const html = await fetchHyRead(
-        `https://${lib}.ebook.hyread.com.tw/searchList.jsp?search_field=FullText&search_input=${encoded}`
+        `https://ebook.hyread.com.tw/searchList.jsp?search_field=FullText&MZAD=0&search_input=${encoded}`
       );
       const books = parseSearchResults(html);
-      return jsonResponse({ library: LIBRARIES[lib], query, books });
+      return jsonResponse({ query, books, source: 'HyRead 書店' });
 
     } else if (action === 'search-all' && query) {
-      // 搜尋所有圖書館（平行）
+      // 搜尋 HyRead 書店（同 search，保留 search-all 相容）
       const encoded = encodeURIComponent(query);
-      const results = {};
-
-      const entries = Object.entries(LIBRARIES);
-      // 分批（每批 5 間避免太猛）
-      const BATCH = 5;
-      for (let i = 0; i < entries.length; i += BATCH) {
-        const batch = entries.slice(i, i + BATCH);
-        const promises = batch.map(async ([code, name]) => {
-          try {
-            const html = await fetchHyRead(
-              `https://${code}.ebook.hyread.com.tw/searchList.jsp?search_field=FullText&search_input=${encoded}`
-            );
-            const books = parseSearchResults(html);
-            if (books.length > 0) {
-              results[code] = { name, books };
-            }
-          } catch { /* 跳過失敗的館 */ }
-        });
-        await Promise.all(promises);
-      }
-
-      return jsonResponse({ query, results });
+      const html = await fetchHyRead(
+        `https://ebook.hyread.com.tw/searchList.jsp?search_field=FullText&MZAD=0&search_input=${encoded}`
+      );
+      const books = parseSearchResults(html);
+      return jsonResponse({ query, books, source: 'HyRead 書店' });
 
     } else {
       return jsonResponse({

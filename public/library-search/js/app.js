@@ -150,12 +150,22 @@ async function searchBooks() {
   const query = document.getElementById('search-input').value.trim();
   if (!query) { showToast('請輸入書名'); return; }
 
-  showLoading(true, `正在搜尋「${query}」...（共 ${Object.keys(libraries).length} 間圖書館）`);
+  showLoading(true, `正在搜尋「${query}」...`);
   clearResults();
 
   try {
-    const data = await fetchAPI({ action: 'search-all', q: query });
-    renderSearchResults(data.results || {});
+    const data = await fetchAPI({ action: 'search', q: query });
+    const books = data.books || [];
+    currentBooks = books;
+    if (books.length === 0) {
+      document.getElementById('empty-state').style.display = '';
+      document.getElementById('empty-state').querySelector('p').textContent = '沒有找到相關書籍。';
+    } else {
+      // 用卡片模式渲染搜尋結果（點擊連到書店頁面）
+      currentTab = '_search_result';
+      renderBooks();
+      currentTab = 'new'; // 恢復
+    }
   } catch (err) {
     showToast('搜尋失敗：' + err.message);
   } finally {
@@ -200,7 +210,9 @@ function renderBooks() {
   for (const book of display) {
     const a = document.createElement('a');
     a.className = 'book-card';
-    a.href = `https://${currentLib}.ebook.hyread.com.tw/bookDetail.jsp?id=${book.id}`;
+    const isSearchResult = currentTab === '_search_result';
+    const host = isSearchResult ? 'ebook.hyread.com.tw' : `${currentLib}.ebook.hyread.com.tw`;
+    a.href = `https://${host}/bookDetail.jsp?id=${book.id}`;
     a.target = '_blank';
     a.rel = 'noopener';
 
