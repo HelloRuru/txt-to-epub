@@ -23,7 +23,7 @@ function getReadmooBookmarklet() {
   // Bookmarklet v4：直接掃書櫃頁面 DOM（div.title），不碰 token
   // 自動捲動載入全部書籍 → base64 帶回 book-manager
   const code = `void(function(){try{`
-    + `if(!location.hostname.includes('readmoo')){alert('請先到 read.readmoo.com 書櫃頁面');return}`
+    + `if(!location.hostname.includes('readmoo')){alert('請先到 readmoo.com 書櫃頁面');return}`
     + `var c=document.querySelector('.mo-bookcase')||document.scrollingElement||document.body,`
     + `last=0,tries=0;`
     // ── 捲動載入所有書 ──
@@ -65,19 +65,48 @@ const AppState = {
   },
 
   addBooks(newBooks) {
+    // 同平台 + 同書名（normalize 後）不重複加入
+    const existingKeys = new Set(
+      this.books.map(b => b.platform + '::' + normalizeTitle(b.title))
+    );
+    let added = 0;
     for (const book of newBooks) {
+      const key = book.platform + '::' + normalizeTitle(book.title);
+      if (existingKeys.has(key)) continue;
+      existingKeys.add(key);
       book.id = book.id || crypto.randomUUID();
       book.addedAt = book.addedAt || new Date().toISOString();
       this.books.push(book);
+      added++;
     }
-    this.save();
-    this.notify();
+    if (added > 0) {
+      this.save();
+      this.notify();
+    }
+    return added;
   },
 
   removeBook(id) {
     this.books = this.books.filter(b => b.id !== id);
     this.save();
     this.notify();
+  },
+
+  // 同平台重複只保留第一本
+  dedup() {
+    const seen = new Set();
+    const kept = [];
+    for (const book of this.books) {
+      const key = book.platform + '::' + normalizeTitle(book.title);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      kept.push(book);
+    }
+    const removed = this.books.length - kept.length;
+    this.books = kept;
+    this.save();
+    this.notify();
+    return removed;
   },
 
   clearAll() {
@@ -848,6 +877,16 @@ document.addEventListener('DOMContentLoaded', () => {
       renderLibrary();
     });
   }
+
+  // ── Dedup ──
+  document.getElementById('btn-dedup')?.addEventListener('click', () => {
+    const removed = AppState.dedup();
+    if (removed > 0) {
+      showToast(`已清除 ${removed} 本重複書籍`);
+    } else {
+      showToast('沒有同平台重複的書');
+    }
+  });
 
   // ── Clear ──
   document.getElementById('btn-clear').addEventListener('click', () => {
