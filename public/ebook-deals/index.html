@@ -106,23 +106,10 @@
       --bg-card-hover: #FBF8F4;
       --border-color: #E5E0DB;
 
-      /* Josh Comeau 多層陰影 — 暖棕色調 */
-      --shadow-sm:
-        0 1px 1px hsl(35deg 30% 30% / 0.06),
-        0 2px 2px hsl(35deg 30% 30% / 0.06),
-        0 4px 4px hsl(35deg 30% 30% / 0.06);
-      --shadow-md:
-        0 1px 1px hsl(35deg 30% 30% / 0.05),
-        0 2px 2px hsl(35deg 30% 30% / 0.05),
-        0 4px 4px hsl(35deg 30% 30% / 0.05),
-        0 8px 8px hsl(35deg 30% 30% / 0.05),
-        0 16px 16px hsl(35deg 30% 30% / 0.05);
-      --shadow-lg:
-        0 2px 2px hsl(35deg 30% 30% / 0.04),
-        0 4px 4px hsl(35deg 30% 30% / 0.04),
-        0 8px 8px hsl(35deg 30% 30% / 0.04),
-        0 16px 16px hsl(35deg 30% 30% / 0.04),
-        0 32px 32px hsl(35deg 30% 30% / 0.04);
+      /* DS V2.4 陰影 — 暖棕三層 */
+      --shadow-sm: 0 2px 8px rgba(92, 74, 58, 0.06);
+      --shadow-md: 0 4px 16px rgba(92, 74, 58, 0.08);
+      --shadow-lg: 0 8px 32px rgba(92, 74, 58, 0.12);
 
       --gradient-primary: linear-gradient(135deg, #A8B5A0, #AEA8B8);
 
@@ -139,41 +126,33 @@
 
     /* --- 深色模式：深夜書房 --- */
     html.dark {
-      --color-sage: #B8C4AE;
+      --color-sage: #B0BDA8;
       --color-sage-dark: #95A88C;
-      --color-sage-bg: rgba(184, 196, 174, 0.12);
+      --color-sage-bg: rgba(176, 189, 168, 0.12);
       --color-gold: #D4C490;
       --color-gold-dark: #B8A870;
       --color-gold-bg: rgba(212, 196, 144, 0.12);
       --color-ink: #D4C8BC;
-      --color-lavender: #C0BACC;
-      --color-lavender-bg: rgba(192, 186, 204, 0.10);
+      --color-lavender: #B8B2C2;
+      --color-lavender-bg: rgba(184, 178, 194, 0.10);
 
-      --text-primary: #E8E0D4;
-      --text-secondary: #C4B8A8;
-      --text-muted: #8A7E72;
+      --text-primary: #E8E5E2;
+      --text-secondary: #C4BFB8;
+      --text-muted: #8A857E;
       --text-hint: #6B665F;
 
-      --bg-page: #1C1614;
-      --bg-card: #252019;
-      --bg-card-warm: #2A231C;
-      --bg-card-hover: #332B22;
-      --border-color: #3D3428;
+      --bg-page: #1C1E1A;
+      --bg-card: #26282A;
+      --bg-card-warm: #2A2C28;
+      --bg-card-hover: #30322E;
+      --border-color: #3A3C38;
 
-      --shadow-sm:
-        0 1px 2px rgba(0,0,0,0.2),
-        0 2px 4px rgba(0,0,0,0.15);
-      --shadow-md:
-        0 2px 4px rgba(0,0,0,0.2),
-        0 4px 8px rgba(0,0,0,0.15),
-        0 8px 16px rgba(0,0,0,0.1);
-      --shadow-lg:
-        0 4px 8px rgba(0,0,0,0.2),
-        0 8px 16px rgba(0,0,0,0.15),
-        0 16px 32px rgba(0,0,0,0.1),
-        0 32px 64px rgba(0,0,0,0.05);
+      /* 暖色調陰影（不用純黑） */
+      --shadow-sm: 0 2px 8px rgba(30, 26, 22, 0.25);
+      --shadow-md: 0 4px 16px rgba(30, 26, 22, 0.30);
+      --shadow-lg: 0 8px 32px rgba(30, 26, 22, 0.40);
 
-      --gradient-primary: linear-gradient(135deg, #B8C4AE, #8BBCB0);
+      --gradient-primary: linear-gradient(135deg, #B0BDA8, #B8B2C2);
     }
 
     /* --- Reset & Base --- */
@@ -194,12 +173,12 @@
     h1, h2, h3 {
       font-family: var(--font-serif);
       color: var(--color-ink);
-      letter-spacing: 0.02em;
+      letter-spacing: 0.06em;
       line-height: 1.4;
     }
     h1 { font-size: 32px; font-weight: 600; }
     h2 { font-size: 22px; font-weight: 600; }
-    h3 { font-size: 18px; font-weight: 400; }
+    h3 { font-size: 18px; font-weight: 600; }
 
     a {
       color: var(--color-sage);
