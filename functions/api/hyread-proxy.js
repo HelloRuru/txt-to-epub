@@ -54,60 +54,37 @@ async function fetchHyRead(url) {
   return await res.text();
 }
 
-// 通用解析：從 HTML 找 bookDetail 連結 + h6 書名 或 img title
+// 通用解析：從 HTML 找 bookDetail 連結 + 書名 + 封面
 function parseBooks(html) {
   const books = [];
   const seen = new Set();
-
-  // 先建一個 id -> 封面圖 URL 的對照表
-  const coverMap = {};
-  const coverRe = /bookcover\/(\d+)[^"]*\.jpg/gi;
-  let cm;
-  while ((cm = coverRe.exec(html)) !== null) {
-    if (!coverMap[cm[1]]) {
-      coverMap[cm[1]] = cm[0].startsWith('http') ? cm[0] : `https://webcdn2.ebook.hyread.com.tw/${cm[0]}`;
-    }
-  }
-  // 再用完整 src 抓一次
-  const srcRe = /<img[^>]*src="(https?:\/\/[^"]*bookcover\/(\d+)[^"]*)"[^>]*>/gi;
-  while ((cm = srcRe.exec(html)) !== null) {
-    coverMap[cm[2]] = cm[1];
-  }
-
   let m;
 
-  // 策略 1：找 <a href="bookDetail.jsp?id=XXX"> 後面跟著 <h6>書名</h6>
-  const h6Re = /<a[^>]*href="[^"]*bookDetail\.jsp\?id=(\d+)[^"]*"[^>]*>[\s\S]*?<h6>([\s\S]*?)<\/h6>/gi;
-  while ((m = h6Re.exec(html)) !== null) {
+  // 策略 1：找 <a href="bookDetail?id=XXX"> 區塊，裡面同時抓 img src 和 h6 書名
+  // 實際 HTML 格式：<a href="/bookDetail.jsp?id=487315"><img src="https://...bookcover/487315xxx.jpg" title="書名"><h6>書名</h6></a>
+  const blockRe = /<a[^>]*href="[^"]*bookDetail\.jsp\?id=(\d+)[^"]*"[^>]*>([\s\S]*?)<\/a>/gi;
+  while ((m = blockRe.exec(html)) !== null) {
     const id = m[1];
-    const title = decodeEntities(m[2].replace(/<[^>]*>/g, '').trim());
-    if (!title || seen.has(id)) continue;
+    if (seen.has(id)) continue;
+    const block = m[2];
+
+    // 從區塊裡抓書名（h6 優先）
+    const h6Match = block.match(/<h6[^>]*>([\s\S]*?)<\/h6>/i);
+    const titleMatch = block.match(/<img[^>]*title="([^"#]+)"/i);
+    const altMatch = block.match(/<img[^>]*alt="([^"]+)"/i);
+    const title = decodeEntities(
+      (h6Match ? h6Match[1].replace(/<[^>]*>/g, '').trim() : '') ||
+      (titleMatch ? titleMatch[1].trim() : '') ||
+      (altMatch ? altMatch[1].trim() : '')
+    );
+    if (!title) continue;
+
+    // 從同一區塊裡抓封面圖 src
+    const imgMatch = block.match(/<img[^>]*src="(https?:\/\/[^"]*bookcover[^"]*)"/i);
+    const thumbnail = imgMatch ? imgMatch[1] : '';
+
     seen.add(id);
-    books.push({ id, title, thumbnail: coverMap[id] || '' });
-  }
-
-  // 策略 2：找 <img title="書名"> 搭配 bookDetail id
-  if (books.length === 0) {
-    const imgRe = /<a[^>]*href="[^"]*bookDetail\.jsp\?id=(\d+)[^"]*"[^>]*>[\s\S]*?<img[^>]*title="([^"#]+)"[^>]*>/gi;
-    while ((m = imgRe.exec(html)) !== null) {
-      const id = m[1];
-      const title = decodeEntities(m[2].trim());
-      if (!title || seen.has(id)) continue;
-      seen.add(id);
-      books.push({ id, title, thumbnail: coverMap[id] || '' });
-    }
-  }
-
-  // 策略 3：找 <img alt="書名"> 搭配 bookDetail id
-  if (books.length === 0) {
-    const altRe = /<a[^>]*href="[^"]*bookDetail\.jsp\?id=(\d+)[^"]*"[^>]*>[\s\S]*?<img[^>]*alt="([^"]+)"[^>]*>/gi;
-    while ((m = altRe.exec(html)) !== null) {
-      const id = m[1];
-      const title = decodeEntities(m[2].trim());
-      if (!title || seen.has(id)) continue;
-      seen.add(id);
-      books.push({ id, title, thumbnail: coverMap[id] || '' });
-    }
+    books.push({ id, title, thumbnail });
   }
 
   return books;
