@@ -55,36 +55,53 @@ async function fetchHyRead(url) {
 }
 
 // 通用解析：從 HTML 找 bookDetail 連結 + 書名 + 封面
+// HyRead 的封面和書名常在不同的 <a> 裡，所以要分兩步
 function parseBooks(html) {
   const books = [];
   const seen = new Set();
+  const coverMap = {};  // id -> 封面 URL
+  const titleMap = {};  // id -> 書名
+  const idOrder = [];   // 保留原始順序
   let m;
 
-  // 策略 1：找 <a href="bookDetail?id=XXX"> 區塊，裡面同時抓 img src 和 h6 書名
-  // 實際 HTML 格式：<a href="/bookDetail.jsp?id=487315"><img src="https://...bookcover/487315xxx.jpg" title="書名"><h6>書名</h6></a>
+  // 掃描所有 <a href="bookDetail?id=XXX"> 區塊
   const blockRe = /<a[^>]*href="[^"]*bookDetail\.jsp\?id=(\d+)[^"]*"[^>]*>([\s\S]*?)<\/a>/gi;
   while ((m = blockRe.exec(html)) !== null) {
     const id = m[1];
-    if (seen.has(id)) continue;
     const block = m[2];
 
-    // 從區塊裡抓書名（h6 優先）
-    const h6Match = block.match(/<h6[^>]*>([\s\S]*?)<\/h6>/i);
-    const titleMatch = block.match(/<img[^>]*title="([^"#]+)"/i);
-    const altMatch = block.match(/<img[^>]*alt="([^"]+)"/i);
-    const title = decodeEntities(
-      (h6Match ? h6Match[1].replace(/<[^>]*>/g, '').trim() : '') ||
-      (titleMatch ? titleMatch[1].trim() : '') ||
-      (altMatch ? altMatch[1].trim() : '')
-    );
-    if (!title) continue;
+    // 記錄順序
+    if (!idOrder.includes(id)) idOrder.push(id);
 
-    // 從同一區塊裡抓封面圖 src
-    const imgMatch = block.match(/<img[^>]*src="(https?:\/\/[^"]*bookcover[^"]*)"/i);
-    const thumbnail = imgMatch ? imgMatch[1] : '';
+    // 抓封面圖（從 img src）
+    if (!coverMap[id]) {
+      const imgMatch = block.match(/<img[^>]*src="(https?:\/\/[^"]*bookcover[^"]*)"/i);
+      if (imgMatch) coverMap[id] = imgMatch[1];
+    }
 
+    // 抓書名（從 h6 或 img title/alt）
+    if (!titleMap[id]) {
+      const h6Match = block.match(/<h6[^>]*>([\s\S]*?)<\/h6>/i);
+      if (h6Match) {
+        titleMap[id] = decodeEntities(h6Match[1].replace(/<[^>]*>/g, '').trim());
+      } else {
+        const titleMatch = block.match(/<img[^>]*title="([^"#]+)"/i);
+        const altMatch = block.match(/<img[^>]*alt="([^"]+)"/i);
+        const t = (titleMatch ? titleMatch[1].trim() : '') || (altMatch ? altMatch[1].trim() : '');
+        if (t) titleMap[id] = decodeEntities(t);
+      }
+    }
+  }
+
+  // 組合結果
+  for (const id of idOrder) {
+    if (seen.has(id) || !titleMap[id]) continue;
     seen.add(id);
-    books.push({ id, title, thumbnail });
+    books.push({
+      id,
+      title: titleMap[id],
+      thumbnail: coverMap[id] || '',
+    });
   }
 
   return books;
