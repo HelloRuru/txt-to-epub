@@ -248,7 +248,7 @@ export async function onRequest(context) {
     } else if (action === 'bestseller') {
       // HyRead 書店暢銷榜（要花錢買的書）
       const html = await fetchHyRead(
-        'https://ebook.hyread.com.tw/Template/RWD3.0/topSaleBook.jsp'
+        'https://one.ebook.hyread.com.tw/Template/GO/bestSelling.jsp'
       );
       const books = parseBooks(html);
       return jsonResponse({ books: books.map((b, i) => ({ rank: i + 1, ...b })) });
@@ -257,7 +257,7 @@ export async function onRequest(context) {
       // 圖書館新書 vs 書店暢銷榜 交叉比對
       const [newHtml, bestHtml] = await Promise.all([
         fetchHyRead(`https://${lib}.ebook.hyread.com.tw/Template/RWD3.0/moccount-page.jsp`),
-        fetchHyRead('https://ebook.hyread.com.tw/Template/RWD3.0/topSaleBook.jsp'),
+        fetchHyRead('https://one.ebook.hyread.com.tw/Template/GO/bestSelling.jsp'),
       ]);
       const newBooks = parseNewBooks(newHtml);
       const bestBooks = parseBooks(bestHtml);
