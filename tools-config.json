@@ -4,21 +4,21 @@
       "id": "epub",
       "name": "TXT 轉 EPUB",
       "description": "上傳 TXT 小說檔案，自動偵測章節結構、支援簡轉繁，一鍵生成標準 EPUB 電子書格式。",
-      "path": "/epub",
+      "path": "/epub/",
       "icon": "book",
       "ready": true,
       "color": "rose",
-      "external": false
+      "external": true
     },
     {
       "id": "epub-convert",
       "name": "EPUB 簡轉繁",
       "description": "將簡體中文 EPUB 電子書轉換為繁體中文，保留原有格式與排版。",
-      "path": "/epub-convert",
+      "path": "/epub-convert/",
       "icon": "convert",
       "ready": true,
       "color": "lavender",
-      "external": false
+      "external": true
     },
     {
       "id": "bg-removal",
