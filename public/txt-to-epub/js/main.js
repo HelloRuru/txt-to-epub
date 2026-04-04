@@ -152,22 +152,33 @@
   }
 
   // ── Step 2: Chapter Preview ──
+  var chapterShowAll = false;
+
   function renderChapters() {
     $('chapterCount').textContent = '偵測到 ' + state.chapters.length + ' 個章節';
 
     var html = '';
-    var max = Math.min(state.chapters.length, 100);
-    for (var i = 0; i < max; i++) {
+    var showCount = (chapterShowAll || state.chapters.length <= 100) ? state.chapters.length : 100;
+    for (var i = 0; i < showCount; i++) {
       html += '<div class="chapter-item">' +
         '<span class="chapter-num">' + (i + 1) + '</span>' +
         '<span class="chapter-title">' + escapeHtml(state.chapters[i].title) + '</span>' +
         '<button class="chapter-delete-btn" data-index="' + i + '" title="移除此章節（內容併入上一章）">✕</button>' +
         '</div>';
     }
-    if (state.chapters.length > 100) {
-      html += '<div class="chapter-item" style="justify-content:center;color:var(--text-muted);font-size:14px">...還有 ' + (state.chapters.length - 100) + ' 個章節</div>';
+    if (!chapterShowAll && state.chapters.length > 100) {
+      html += '<div class="chapter-item chapter-expand" style="justify-content:center;cursor:pointer;color:var(--rose);font-size:14px;font-weight:500" id="btnExpandChapters">顯示全部 ' + state.chapters.length + ' 個章節</div>';
     }
     $('chapterList').innerHTML = html;
+
+    // 展開按鈕
+    var expandBtn = document.getElementById('btnExpandChapters');
+    if (expandBtn) {
+      expandBtn.addEventListener('click', function () {
+        chapterShowAll = true;
+        renderChapters();
+      });
+    }
 
     // 綁定刪除按鈕
     var deleteBtns = document.querySelectorAll('.chapter-delete-btn');
@@ -203,6 +214,7 @@
       $('separatorWrap').classList.toggle('hidden', mode !== 'separator');
 
       if (mode !== 'separator') {
+        chapterShowAll = false;
         state.chapters = window.ChapterDetector.detectChapters(state.content, mode);
         renderChapters();
       }
@@ -212,6 +224,7 @@
   $('btnApplySeparator').addEventListener('click', function () {
     var sep = $('separatorInput').value.trim();
     if (!sep) return;
+    chapterShowAll = false;
     state.chapters = window.ChapterDetector.detectChapters(state.content, 'separator', { separator: sep });
     renderChapters();
   });
