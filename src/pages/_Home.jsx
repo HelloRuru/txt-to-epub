@@ -273,7 +273,7 @@ const BrandFlower = ({ size = 36 }) => (
 const getIcon = (id) => {
   switch (id) {
     case 'epub': return <BookIcon />
-    case 'epub-convert': return <ConvertIcon />
+    case 'epub-editor': return <ConvertIcon />
     case 'bg-removal': return <ScissorsIcon />
     case 'post-writer': return <PostWriterIcon />
     case 'pdf-editor': return <PdfEditIcon />

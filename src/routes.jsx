@@ -20,7 +20,7 @@ export const routes = [
     title: '首頁',
     seo: {
       title: 'Ruru 工具箱 — 免費線上工具，全程本機處理｜HelloRuru',
-      description: '免費線上工具箱：TXT 轉 EPUB 電子書、EPUB 簡轉繁、AI 批次去背、社群貼文排版、PDF 編輯簽名。全程瀏覽器本機處理，不上傳任何資料，保護個人隱私。',
+      description: '免費線上工具箱：TXT 轉 EPUB 電子書、EPUB 編輯、AI 批次去背、社群貼文排版、PDF 編輯簽名。全程瀏覽器本機處理，不上傳任何資料，保護個人隱私。',
       keywords: '線上工具,免費工具,TXT轉EPUB,EPUB簡轉繁,AI去背,社群貼文排版,PDF編輯,PDF簽名,本機處理,隱私保護,HelloRuru',
       canonical: `${BASE}/`,
       jsonLd: [
@@ -52,9 +52,9 @@ export const routes = [
             {
               '@type': 'ListItem',
               position: 2,
-              name: 'EPUB 簡轉繁',
-              description: '將簡體中文 EPUB 電子書轉換為繁體中文，使用 OpenCC 引擎做詞彙級轉換，保留原有格式與排版。',
-              url: `${BASE}/epub-convert`,
+              name: 'EPUB 編輯器',
+              description: 'EPUB 電子書編輯工具：簡轉繁、台灣標點符號、字型替換、行距字級調整。保留原書排版。',
+              url: `${BASE}/epub-editor`,
             },
             {
               '@type': 'ListItem',
@@ -141,7 +141,7 @@ export const routes = [
         '@context': 'https://schema.org',
         '@type': 'WebApplication',
         name: 'EPUB 編輯器 — HelloRuru',
-        alternateName: ['EPUB Editor', 'EPUB 簡轉繁'],
+        alternateName: ['EPUB Editor', 'EPUB 編輯器'],
         description: '免費線上 EPUB 編輯工具：簡轉繁、台灣標點符號、字型替換、行距字級調整。全程本機處理。',
         url: `${BASE}/epub-editor`,
         applicationCategory: 'UtilitiesApplication',
