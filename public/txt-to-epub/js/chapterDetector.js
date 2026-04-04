@@ -31,6 +31,7 @@ window.ChapterDetector = {
 
     var patterns = [
       { regex: /^[　\s]*(第[零一二三四五六七八九十百千\d]+[章節回卷篇集部])/gm, name: '中文章節' },
+      { regex: /^[　\s]*[■□●▶▷►☆★○◆◇▪▸※＊]\s*(\d+\s*章)/gm, name: '符號章節' },
       { regex: /^[　\s]*(Chapter\s+\d+)/gim, name: 'Chapter' },
       { regex: /^[　\s]*(\d+[\.、]\s*.+?)$/gm, name: '數字編號' },
     ];
@@ -125,6 +126,7 @@ window.ChapterDetector = {
     var patterns = [
       /^[　\s]*(\[\d+\].*?)$/gm,
       /^[　\s]*(第[零一二三四五六七八九十百千\d]+[章節回卷篇集部].*?)$/gm,
+      /^[　\s]*[■□●▶▷►☆★○◆◇▪▸※＊]\s*(\d+\s*章.*?)$/gm,
       /^[　\s]*(Chapter\s+\d+.*?)$/gim,
       /^[　\s]*(CHAPTER\s+\d+.*?)$/gm,
       /^[　\s]*(\d+[\.、]\s*.+?)$/gm,
