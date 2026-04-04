@@ -136,12 +136,34 @@
       html += '<div class="chapter-item">' +
         '<span class="chapter-num">' + (i + 1) + '</span>' +
         '<span class="chapter-title">' + escapeHtml(state.chapters[i].title) + '</span>' +
+        '<button class="chapter-delete-btn" data-index="' + i + '" title="移除此章節（內容併入上一章）">✕</button>' +
         '</div>';
     }
     if (state.chapters.length > 100) {
       html += '<div class="chapter-item" style="justify-content:center;color:var(--text-muted);font-size:14px">...還有 ' + (state.chapters.length - 100) + ' 個章節</div>';
     }
     $('chapterList').innerHTML = html;
+
+    // 綁定刪除按鈕
+    var deleteBtns = document.querySelectorAll('.chapter-delete-btn');
+    deleteBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var idx = parseInt(btn.dataset.index);
+        removeChapter(idx);
+      });
+    });
+  }
+
+  function removeChapter(index) {
+    if (state.chapters.length <= 1) return;
+    // 將被刪除章節的內容併入前一章（若是第一章則併入下一章）
+    if (index > 0) {
+      state.chapters[index - 1].content += '\n\n' + state.chapters[index].content;
+    } else {
+      state.chapters[1].content = state.chapters[0].content + '\n\n' + state.chapters[1].content;
+    }
+    state.chapters.splice(index, 1);
+    renderChapters();
   }
 
   // Mode selector

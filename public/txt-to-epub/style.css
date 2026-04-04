@@ -181,7 +181,14 @@ html.dark .icon-moon { display: none; }
   font-size: 12px; font-weight: 700; flex-shrink: 0;
   background: var(--gradient-brand); color: #fff;
 }
-.chapter-title { font-weight: 500; color: var(--text-heading); font-size: 14px; }
+.chapter-title { font-weight: 500; color: var(--text-heading); font-size: 14px; flex: 1; }
+.chapter-delete-btn {
+  width: 28px; height: 28px; border-radius: 50%; border: none;
+  background: transparent; color: var(--text-muted); cursor: pointer;
+  font-size: 14px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.2s; opacity: 0.4;
+}
+.chapter-delete-btn:hover { background: var(--rose); color: #fff; opacity: 1; }
 .chapter-count { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; }
 
 /* Settings */
