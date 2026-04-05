@@ -143,6 +143,7 @@ html.dark .icon-moon { display: none; }
 .upload-icon { color: var(--rose); margin-bottom: 16px; }
 .drop-text { font-weight: 500; color: var(--text-heading); margin-bottom: 4px; }
 .drop-hint { color: var(--text-muted); font-size: 14px; }
+.drop-limit { font-size: 12px; color: var(--text-note); margin-top: 6px; }
 .encoding-info {
   display: flex; align-items: center; gap: 8px; margin-top: 16px;
   padding: 12px 16px; border-radius: 16px; font-size: 14px;
