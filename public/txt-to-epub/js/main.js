@@ -360,6 +360,18 @@
     $('coverPreview').classList.add('hidden');
   });
 
+  // ── 大檔案偵測門檻 ──
+  var SPLIT_CHAR_THRESHOLD = 300000;  // 30 萬字
+  var SPLIT_CHAPTER_THRESHOLD = 150;  // 150 章
+
+  function getTotalCharCount() {
+    var total = 0;
+    for (var i = 0; i < state.chapters.length; i++) {
+      total += state.chapters[i].content.length;
+    }
+    return total;
+  }
+
   // ── Step 4: Export ──
   function renderExport() {
     $('exportReady').classList.remove('hidden');
@@ -369,10 +381,15 @@
     $('btnExport').classList.remove('processing');
 
     var fontName = (FONT_CONFIG[state.settings.fontFamily] || {}).name || '預設';
+    var totalChars = getTotalCharCount();
+    var totalCharsDisplay = totalChars >= 10000
+      ? Math.round(totalChars / 10000) + ' 萬字'
+      : totalChars.toLocaleString() + ' 字';
     var items = [
       ['書名', state.settings.title || '未命名'],
       ['作者', state.settings.author || '未填寫'],
       ['章節數', state.chapters.length + ' 章'],
+      ['總字數', totalCharsDisplay],
       ['封面', state.coverBlob ? '已設定' : '無'],
       ['簡轉繁', state.settings.convertToTraditional ? '是' : '否'],
       ['台灣標點', state.settings.convertPunctuation ? '是' : '否'],
@@ -384,6 +401,16 @@
       html += '<div class="summary-row"><span class="summary-label">' + items[i][0] + '</span><span class="summary-value">' + escapeHtml(items[i][1]) + '</span></div>';
     }
     $('summaryCard').innerHTML = html;
+
+    // 大檔案拆冊提示
+    var needSplit = totalChars >= SPLIT_CHAR_THRESHOLD || state.chapters.length >= SPLIT_CHAPTER_THRESHOLD;
+    $('splitNotice').classList.toggle('hidden', !needSplit);
+    if (needSplit) {
+      var reasons = [];
+      if (totalChars >= SPLIT_CHAR_THRESHOLD) reasons.push('字數達 ' + totalCharsDisplay);
+      if (state.chapters.length >= SPLIT_CHAPTER_THRESHOLD) reasons.push('章節達 ' + state.chapters.length + ' 章');
+      $('splitNoticeText').textContent = '此書' + reasons.join('、') + '，檔案較大。';
+    }
   }
 
   $('btnExport').addEventListener('click', async function () {
@@ -457,6 +484,100 @@
       $('btnExport').disabled = false;
       $('btnExport').classList.remove('processing');
       $('btnExport').innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 下載 EPUB';
+    }
+  });
+
+  // ── 自動拆冊 ──
+  $('btnAutoSplit').addEventListener('click', async function () {
+    var half = Math.ceil(state.chapters.length / 2);
+    var vol1Chapters = state.chapters.slice(0, half);
+    var vol2Chapters = state.chapters.slice(half);
+
+    $('btnAutoSplit').disabled = true;
+    $('btnAutoSplit').textContent = '拆冊生成中...';
+    $('exportProgress').classList.remove('hidden');
+
+    try {
+      var processedTitle = state.settings.title;
+      var processedAuthor = state.settings.author;
+
+      // 前處理：簡轉繁 + 標點
+      function processChapters(chapters) {
+        var result = chapters;
+        if (state.settings.convertToTraditional) {
+          var converted = [];
+          for (var i = 0; i < result.length; i++) {
+            converted.push({ title: convertText(result[i].title), content: convertText(result[i].content) });
+          }
+          result = converted;
+        }
+        if (state.settings.convertPunctuation) {
+          var punched = [];
+          for (var j = 0; j < result.length; j++) {
+            punched.push({ title: convertPunctuation(result[j].title), content: convertPunctuation(result[j].content) });
+          }
+          result = punched;
+        }
+        return result;
+      }
+
+      if (state.settings.convertToTraditional) {
+        processedTitle = convertText(processedTitle);
+        if (processedAuthor) processedAuthor = convertText(processedAuthor);
+      }
+      if (state.settings.convertPunctuation) {
+        processedTitle = convertPunctuation(processedTitle);
+        if (processedAuthor) processedAuthor = convertPunctuation(processedAuthor);
+      }
+
+      var baseFilename = processedAuthor
+        ? '《' + processedTitle + '》' + processedAuthor
+        : '《' + processedTitle + '》';
+      baseFilename = baseFilename.replace(/[<>:"/\\|?*]/g, '');
+
+      // 生成上冊
+      $('exportProgressText').textContent = '正在生成上冊...';
+      var blob1 = await window.EpubGenerator.generateEpub({
+        title: processedTitle + '（上冊）',
+        author: processedAuthor,
+        chapters: processChapters(vol1Chapters),
+        cover: state.coverBlob,
+        writingMode: state.settings.writingMode,
+        fontFamily: state.settings.fontFamily,
+        fontSize: state.settings.fontSize,
+        lineHeight: state.settings.lineHeight,
+        textIndent: state.settings.textIndent,
+        onProgress: function (p) { $('exportProgressText').textContent = '上冊：' + (p.message || '處理中...'); },
+      });
+
+      // 生成下冊
+      $('exportProgressText').textContent = '正在生成下冊...';
+      var blob2 = await window.EpubGenerator.generateEpub({
+        title: processedTitle + '（下冊）',
+        author: processedAuthor,
+        chapters: processChapters(vol2Chapters),
+        cover: null,
+        writingMode: state.settings.writingMode,
+        fontFamily: state.settings.fontFamily,
+        fontSize: state.settings.fontSize,
+        lineHeight: state.settings.lineHeight,
+        textIndent: state.settings.textIndent,
+        onProgress: function (p) { $('exportProgressText').textContent = '下冊：' + (p.message || '處理中...'); },
+      });
+
+      saveAs(blob1, baseFilename + '（上冊）.epub');
+      setTimeout(function () { saveAs(blob2, baseFilename + '（下冊）.epub'); }, 500);
+
+      $('exportReady').classList.add('hidden');
+      $('exportComplete').classList.remove('hidden');
+    } catch (error) {
+      console.error('拆冊生成失敗:', error);
+      alert('拆冊生成失敗：' + error.message);
+    } finally {
+      $('btnAutoSplit').disabled = false;
+      $('btnAutoSplit').innerHTML =
+        '<svg viewBox="0 0 24 24" width="14" height="14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor" style="margin-right:4px"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/></svg>' +
+        '自動拆成上下冊';
     }
   });
 

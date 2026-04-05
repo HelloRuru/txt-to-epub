@@ -21,7 +21,7 @@ const state = {
     convertToTraditional: true,
     convertPunctuation: true,
     writingMode: 'horizontal',
-    fontFamily: 'sans',
+    fontFamily: 'noto-sans',
     fontSize: 'medium',
     lineHeight: 'normal',
   }
@@ -46,9 +46,10 @@ const LINE_HEIGHT_MAP = {
 };
 
 const FONT_MAP = {
-  sans: { family: '"Noto Sans TC", "Microsoft JhengHei", sans-serif', name: '黑體' },
-  serif: { family: '"Noto Serif TC", "PMingLiU", serif', name: '明體' },
-  kai: { family: '"LXGW WenKai TC", "DFKai-SB", "BiauKai", serif', name: '楷體' },
+  'noto-sans': { family: '"Noto Sans TC", "Microsoft JhengHei", sans-serif', name: '思源黑體' },
+  'noto-serif': { family: '"Noto Serif TC", "PMingLiU", serif', name: '思源宋體' },
+  guankiap: { family: '"GuanKiapTsingKhai TW", "DFKai-SB", "BiauKai", serif', name: '原俠正楷' },
+  huninn: { family: '"jf-openhuninn", "Microsoft JhengHei", sans-serif', name: 'jf 粉圓' },
   default: { family: 'serif', name: '閱讀器預設' },
 };
 
