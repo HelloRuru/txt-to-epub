@@ -12,6 +12,9 @@ const state = {
   resultBlob: null,     // 處理完成的 blob
   resultFilename: '',   // 輸出檔名
   epubMeta: {},         // 解析到的 metadata
+  coverAction: 'keep',  // 'keep' | 'replace' | 'remove'
+  newCoverBlob: null,   // 替換用的新圖片 File
+  originalCover: null,  // { path, mimeType, dataUrl } 原書封面資訊
 
   // 設定
   settings: {
@@ -202,6 +205,123 @@ function parseEpubMetadata(zip) {
   return Promise.resolve(meta);
 }
 
+/* ========== 封面偵測 ========== */
+async function detectCover(zip) {
+  const allFiles = Object.keys(zip.files);
+  const opfFile = allFiles.find(f => f.toLowerCase().endsWith('.opf'));
+  if (!opfFile) return null;
+
+  const opfContent = await zip.files[opfFile].async('string');
+  const opfDir = opfFile.includes('/') ? opfFile.substring(0, opfFile.lastIndexOf('/') + 1) : '';
+
+  // 方法 1：找 <meta name="cover" content="..."/> 指向的 manifest item
+  const coverMeta = opfContent.match(/<meta[^>]*name=["']cover["'][^>]*content=["']([^"']+)["'][^>]*\/?>/i)
+    || opfContent.match(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']cover["'][^>]*\/?>/i);
+  if (coverMeta) {
+    const coverId = coverMeta[1];
+    const itemRegex = new RegExp('<item[^>]*id=["\']' + coverId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '["\'][^>]*>', 'i');
+    const itemMatch = opfContent.match(itemRegex);
+    if (itemMatch) {
+      const hrefMatch = itemMatch[0].match(/href=["']([^"']+)["']/i);
+      const typeMatch = itemMatch[0].match(/media-type=["']([^"']+)["']/i);
+      if (hrefMatch) {
+        const imgPath = opfDir + decodeURIComponent(hrefMatch[1]);
+        if (zip.files[imgPath]) {
+          const blob = await zip.files[imgPath].async('blob');
+          const dataUrl = URL.createObjectURL(blob);
+          return { path: imgPath, mimeType: typeMatch ? typeMatch[1] : 'image/jpeg', dataUrl };
+        }
+      }
+    }
+  }
+
+  // 方法 2：找 manifest 裡 properties="cover-image" 的 item（EPUB 3）
+  const coverPropMatch = opfContent.match(/<item[^>]*properties=["'][^"']*cover-image[^"']*["'][^>]*>/i);
+  if (coverPropMatch) {
+    const hrefMatch = coverPropMatch[0].match(/href=["']([^"']+)["']/i);
+    const typeMatch = coverPropMatch[0].match(/media-type=["']([^"']+)["']/i);
+    if (hrefMatch) {
+      const imgPath = opfDir + decodeURIComponent(hrefMatch[1]);
+      if (zip.files[imgPath]) {
+        const blob = await zip.files[imgPath].async('blob');
+        const dataUrl = URL.createObjectURL(blob);
+        return { path: imgPath, mimeType: typeMatch ? typeMatch[1] : 'image/jpeg', dataUrl };
+      }
+    }
+  }
+
+  return null;
+}
+
+/* ========== 封面寫入 EPUB ========== */
+async function injectCoverIntoEpub(zip) {
+  if (state.coverAction === 'keep') return;
+
+  const allFiles = Object.keys(zip.files);
+  const opfFile = allFiles.find(f => f.toLowerCase().endsWith('.opf'));
+  if (!opfFile) return;
+
+  let opfContent = await zip.files[opfFile].async('string');
+  const opfDir = opfFile.includes('/') ? opfFile.substring(0, opfFile.lastIndexOf('/') + 1) : '';
+
+  if (state.coverAction === 'remove') {
+    // 移除封面：刪掉圖片檔、移除 OPF 裡的 cover meta 和相關 manifest item
+    if (state.originalCover && zip.files[state.originalCover.path]) {
+      zip.remove(state.originalCover.path);
+    }
+    opfContent = opfContent.replace(/<meta[^>]*name=["']cover["'][^>]*\/?>\s*/gi, '');
+    zip.file(opfFile, opfContent);
+    return;
+  }
+
+  // coverAction === 'replace'
+  if (!state.newCoverBlob) return;
+
+  const coverFile = state.newCoverBlob;
+  const ext = coverFile.type === 'image/png' ? '.png' : coverFile.type === 'image/webp' ? '.webp' : '.jpg';
+  const mimeType = coverFile.type || 'image/jpeg';
+
+  // 決定圖片存放路徑
+  let imagesDir = opfDir + 'Images/';
+  // 如果原書有 images 目錄（可能大小寫不同），沿用
+  const existingImgDir = allFiles.find(f => f.toLowerCase().startsWith((opfDir + 'images/').toLowerCase()) && !zip.files[f].dir);
+  if (existingImgDir) {
+    imagesDir = existingImgDir.substring(0, existingImgDir.toLowerCase().indexOf('images/') + 7);
+  }
+
+  const coverPath = imagesDir + 'cover' + ext;
+  const coverHref = coverPath.startsWith(opfDir) ? coverPath.substring(opfDir.length) : coverPath;
+
+  // 寫入圖片
+  const arrayBuffer = await coverFile.arrayBuffer();
+  zip.file(coverPath, arrayBuffer);
+
+  // 如果原書有封面圖且路徑不同，刪掉舊的
+  if (state.originalCover && state.originalCover.path !== coverPath && zip.files[state.originalCover.path]) {
+    zip.remove(state.originalCover.path);
+  }
+
+  // 更新 OPF manifest — 先移除舊的 cover item，再加新的
+  // 移除舊的 cover-image item（如果有）
+  opfContent = opfContent.replace(/<item[^>]*properties=["'][^"']*cover-image[^"']*["'][^>]*\/?>[\s]*/gi, '');
+
+  // 檢查是否已有 id="cover-image" 的 item，移除
+  opfContent = opfContent.replace(/<item[^>]*id=["']cover-image["'][^>]*\/?>[\s]*/gi, '');
+
+  // 在 </manifest> 前加入新 item
+  const newItem = `  <item id="cover-image" href="${coverHref}" media-type="${mimeType}" properties="cover-image"/>\n`;
+  opfContent = opfContent.replace('</manifest>', newItem + '</manifest>');
+
+  // 確保 metadata 有 <meta name="cover" content="cover-image"/>
+  if (!opfContent.match(/<meta[^>]*name=["']cover["'][^>]*>/i)) {
+    opfContent = opfContent.replace('</metadata>', '  <meta name="cover" content="cover-image"/>\n</metadata>');
+  } else {
+    opfContent = opfContent.replace(/<meta[^>]*name=["']cover["'][^>]*\/?>/i, '<meta name="cover" content="cover-image"/>');
+  }
+
+  zip.file(opfFile, opfContent);
+}
+
 /* ========== CSS 注入 ========== */
 function generateStyleOverrides() {
   const s = state.settings;
@@ -376,8 +496,14 @@ async function processEpub() {
     await injectStyleIntoCSS(zip);
 
     // 5. 更新 OPF spine direction
-    updateProgress(80, '更新排版方向...');
+    updateProgress(78, '更新排版方向...');
     await updateSpineDirection(zip);
+
+    // 5.5. 處理封面圖片
+    if (state.coverAction !== 'keep') {
+      updateProgress(82, '處理封面圖片...');
+      await injectCoverIntoEpub(zip);
+    }
 
     // 6. 壓縮輸出
     updateProgress(85, '重新打包 EPUB...');
@@ -484,6 +610,23 @@ async function handleFile(file) {
     infoLines.push(`檔案數：${meta.fileCount} 個（${meta.textFileCount} 個內容檔）`);
 
     $('#epub-info').innerHTML = infoLines.join('<br>');
+
+    // 偵測原書封面
+    const cover = await detectCover(zip);
+    state.originalCover = cover;
+    state.coverAction = 'keep';
+    state.newCoverBlob = null;
+
+    if (cover) {
+      $('#cover-img').src = cover.dataUrl;
+      $('#cover-label').textContent = '原書封面';
+      $('#cover-upload-wrap').hidden = true;
+      $('#cover-preview').hidden = false;
+    } else {
+      $('#cover-upload-wrap').hidden = false;
+      $('#cover-preview').hidden = true;
+    }
+
     showStep('step-settings');
   } catch (err) {
     console.error('EPUB 解析失敗:', err);
@@ -498,6 +641,12 @@ function resetFile() {
   state.resultBlob = null;
   state.resultFilename = '';
   state.epubMeta = {};
+  state.coverAction = 'keep';
+  state.newCoverBlob = null;
+  if (state.originalCover && state.originalCover.dataUrl) {
+    URL.revokeObjectURL(state.originalCover.dataUrl);
+  }
+  state.originalCover = null;
 
   $('#file-info').hidden = true;
   $('#drop-zone').style.display = '';
@@ -589,6 +738,61 @@ function initEvents() {
       btn.classList.add('active');
       state.settings.lineHeight = btn.dataset.lineheight;
     });
+  });
+
+  // 封面上傳 — 拖拉 + 點擊
+  const coverZone = $('#cover-zone');
+  const coverInput = $('#cover-input');
+
+  coverZone.addEventListener('dragover', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    coverZone.classList.add('dragging');
+  });
+  coverZone.addEventListener('dragleave', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    coverZone.classList.remove('dragging');
+  });
+  coverZone.addEventListener('drop', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    coverZone.classList.remove('dragging');
+    if (e.dataTransfer.files[0]) handleCoverUpload(e.dataTransfer.files[0]);
+  });
+  coverInput.addEventListener('change', (e) => {
+    if (e.target.files[0]) handleCoverUpload(e.target.files[0]);
+    coverInput.value = '';
+  });
+
+  function handleCoverUpload(file) {
+    if (!file.type.startsWith('image/')) {
+      showToast('請上傳圖片格式的檔案（JPG、PNG 等）', 'error');
+      return;
+    }
+    state.newCoverBlob = file;
+    state.coverAction = 'replace';
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      $('#cover-img').src = e.target.result;
+      $('#cover-label').textContent = '新封面（將替換原書封面）';
+      $('#cover-upload-wrap').hidden = true;
+      $('#cover-preview').hidden = false;
+    };
+    reader.readAsDataURL(file);
+    showToast('已選取新封面', 'success');
+  }
+
+  // 替換封面
+  $('#btn-replace-cover').addEventListener('click', () => {
+    coverInput.click();
+  });
+
+  // 移除封面
+  $('#btn-remove-cover').addEventListener('click', () => {
+    state.coverAction = 'remove';
+    state.newCoverBlob = null;
+    $('#cover-upload-wrap').hidden = false;
+    $('#cover-preview').hidden = true;
+    showToast('封面已移除，處理時將不含封面', 'info');
   });
 
   // 動作按鈕

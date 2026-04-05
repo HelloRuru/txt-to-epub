@@ -101,10 +101,10 @@
   var dropZone = $('dropZone');
   var fileInput = $('fileInput');
 
-  dropZone.addEventListener('dragover', function (e) { e.preventDefault(); dropZone.classList.add('dragging'); });
-  dropZone.addEventListener('dragleave', function (e) { e.preventDefault(); dropZone.classList.remove('dragging'); });
+  dropZone.addEventListener('dragover', function (e) { e.preventDefault(); e.stopPropagation(); dropZone.classList.add('dragging'); });
+  dropZone.addEventListener('dragleave', function (e) { e.preventDefault(); e.stopPropagation(); dropZone.classList.remove('dragging'); });
   dropZone.addEventListener('drop', function (e) {
-    e.preventDefault(); dropZone.classList.remove('dragging');
+    e.preventDefault(); e.stopPropagation(); dropZone.classList.remove('dragging');
     if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
   });
   fileInput.addEventListener('change', function () {
@@ -325,14 +325,24 @@
     $('advancedArrow').style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
   });
 
-  // Cover upload
+  // Cover upload — 拖拉 + 點擊
+  var coverZone = $('coverZone');
+  coverZone.addEventListener('dragover', function (e) { e.preventDefault(); e.stopPropagation(); coverZone.classList.add('dragging'); });
+  coverZone.addEventListener('dragleave', function (e) { e.preventDefault(); e.stopPropagation(); coverZone.classList.remove('dragging'); });
+  coverZone.addEventListener('drop', function (e) {
+    e.preventDefault(); e.stopPropagation(); coverZone.classList.remove('dragging');
+    if (e.dataTransfer.files[0]) handleCover(e.dataTransfer.files[0]);
+  });
   $('coverInput').addEventListener('change', function () {
     if (this.files[0]) handleCover(this.files[0]);
     this.value = '';
   });
 
   function handleCover(file) {
-    if (!file.type.startsWith('image/')) return;
+    if (!file.type.startsWith('image/')) {
+      alert('請上傳圖片格式的檔案（JPG、PNG 等）');
+      return;
+    }
     state.coverBlob = file;
 
     var reader = new FileReader();

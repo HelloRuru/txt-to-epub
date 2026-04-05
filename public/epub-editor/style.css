@@ -414,6 +414,105 @@ hello-ruru-header {
   color: var(--text-primary);
 }
 
+/* ========== COVER IMAGE ========== */
+.cover-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.cover-zone:hover,
+.cover-zone.dragging {
+  border-color: var(--rose);
+  background: rgba(212,165,165,0.05);
+}
+
+.cover-zone.dragging {
+  background: rgba(212,165,165,0.1);
+}
+
+.cover-zone svg {
+  color: var(--rose);
+  margin-bottom: 12px;
+}
+
+.cover-zone-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.cover-zone-hint {
+  font-size: 12px;
+  color: var(--text-hint);
+}
+
+.cover-preview {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+}
+
+.cover-img {
+  width: 80px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
+.cover-preview-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cover-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.cover-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-small {
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-small:hover {
+  border-color: var(--rose);
+  color: var(--text-primary);
+}
+
+.btn-small.danger:hover {
+  border-color: #C9929A;
+  color: #C9929A;
+}
+
 /* ========== BUTTONS ========== */
 .action-buttons {
   display: flex;
@@ -643,5 +742,15 @@ hello-ruru-header {
 
   .setting-row {
     gap: 12px;
+  }
+
+  .cover-preview {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .cover-actions {
+    justify-content: center;
   }
 }
