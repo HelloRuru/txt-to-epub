@@ -247,27 +247,33 @@ export async function onRequest(context) {
       return jsonResponse({ library: LIBRARIES[lib], books });
 
     } else if (action === 'new' && lib) {
-      // 計次新書上架（分頁參數是 nowpage，每頁約 30 本）
-      const MAX_NEW_PAGES = 5;
-      const pageUrls = [];
-      for (let p = 1; p <= MAX_NEW_PAGES; p++) {
-        pageUrls.push(
-          fetchHyRead(`https://${lib}.ebook.hyread.com.tw/Template/RWD3.0/moccount-page.jsp?nowpage=${p}`)
-        );
-      }
-      const pages = await Promise.all(pageUrls);
+      // 計次新書上架（先抓第 1 頁取總頁數，再平行抓剩餘頁）
+      const baseUrl = `https://${lib}.ebook.hyread.com.tw/Template/RWD3.0/moccount-page.jsp`;
+      const firstHtml = await fetchHyRead(baseUrl);
+
+      // 從 HTML 取得總頁數（「共 N 頁」）
+      const totalMatch = firstHtml.match(/共\s*(\d+)\s*頁/);
+      const totalPages = totalMatch ? Math.min(parseInt(totalMatch[1], 10), 30) : 1;
+
       const seenIds = new Set();
       const books = [];
-      for (const pageHtml of pages) {
-        const pageBooks = parseNewBooks(pageHtml);
-        if (pageBooks.length === 0) break;
-        for (const b of pageBooks) {
-          if (!seenIds.has(b.id)) {
-            seenIds.add(b.id);
-            books.push(b);
+      for (const b of parseNewBooks(firstHtml)) {
+        if (!seenIds.has(b.id)) { seenIds.add(b.id); books.push(b); }
+      }
+
+      if (totalPages > 1) {
+        const restUrls = [];
+        for (let p = 2; p <= totalPages; p++) {
+          restUrls.push(fetchHyRead(`${baseUrl}?nowpage=${p}`));
+        }
+        const restPages = await Promise.all(restUrls);
+        for (const pageHtml of restPages) {
+          for (const b of parseNewBooks(pageHtml)) {
+            if (!seenIds.has(b.id)) { seenIds.add(b.id); books.push(b); }
           }
         }
       }
+
       await recordFirstSeen(kv, lib, books);
       return jsonResponse({ library: LIBRARIES[lib], books });
 
