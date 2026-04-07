@@ -228,6 +228,31 @@ a:hover { color: var(--color-sage-dark); }
   color: var(--color-ink);
 }
 
+/* 隱藏 input — 覆蓋在螢幕上，讓手機點擊時彈出數字鍵盤 */
+.hidden-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  font-size: 16px; /* 防止 iOS 自動縮放 */
+  border: none;
+  background: transparent;
+  -moz-appearance: textfield;
+  z-index: 1;
+}
+.hidden-input::-webkit-outer-spin-button,
+.hidden-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 螢幕需要 relative 定位 */
+.calc-screen-display {
+  position: relative;
+}
+
 .calc-screen-hint {
   font-size: 12px;
   color: var(--text-hint);

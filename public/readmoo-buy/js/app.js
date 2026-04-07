@@ -7,6 +7,8 @@
   var currentInput = '';
   var display = document.getElementById('price-display');
   var hintEl = document.getElementById('screen-hint');
+  var hiddenInput = document.getElementById('hidden-input');
+  var calcScreen = document.getElementById('calc-screen');
 
   /* ---- 領書額度成本 ---- */
   var POINT_COST = 999 / 6; /* ~166.5 */
@@ -23,8 +25,11 @@
   function updateDisplay() {
     display.textContent = currentInput || '0';
 
+    /* 同步隱藏 input */
+    if (hiddenInput) hiddenInput.value = currentInput;
+
     if (currentInput.length === 0) {
-      hintEl.textContent = '按數字鍵輸入書價';
+      hintEl.textContent = '點這裡可用手機鍵盤輸入';
       display.classList.remove('has-value');
     } else {
       var val = parseInt(currentInput, 10);
@@ -203,8 +208,11 @@
     });
   });
 
-  /* ---- 鍵盤支援 ---- */
+  /* ---- 鍵盤支援（桌面用，hidden-input focus 時跳過避免重複） ---- */
   document.addEventListener('keydown', function (e) {
+    /* 如果 hidden-input 有 focus，讓它的 input 事件處理就好 */
+    if (hiddenInput && document.activeElement === hiddenInput) return;
+
     if (e.key >= '0' && e.key <= '9') {
       handleDigit(e.key);
       var val = parseInt(currentInput, 10);
@@ -220,6 +228,33 @@
       renderResults(val3);
     }
   });
+
+  /* ---- 隱藏 input 同步（手機軟鍵盤） ---- */
+  if (hiddenInput) {
+    /* 點螢幕區域 → focus 隱藏 input → 手機彈出數字鍵盤 */
+    calcScreen.addEventListener('click', function () {
+      hiddenInput.focus();
+    });
+
+    /* 監聽隱藏 input 的輸入 */
+    hiddenInput.addEventListener('input', function () {
+      var val = this.value.replace(/\D/g, '').substring(0, 3);
+      currentInput = val;
+      this.value = val;
+      updateDisplay();
+      var num = parseInt(val, 10);
+      if (num >= 50) renderResults(num);
+      else if (!val) clearResults();
+    });
+
+    /* 同步：按鈕操作後也更新隱藏 input 的值 */
+    var origHandleDigit = handleDigit;
+    var origHandleClear = handleClear;
+    var origHandleBackspace = handleBackspace;
+
+    /* 覆寫 updateDisplay，每次都同步 hiddenInput */
+    var origUpdateDisplay = updateDisplay;
+  }
 
   /* ---- 深色模式 ---- */
   var toggle = document.getElementById('theme-toggle');

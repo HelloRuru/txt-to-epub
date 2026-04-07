@@ -69,13 +69,16 @@
     <!-- Calculator Body -->
     <div class="calculator">
       <!-- Screen -->
-      <div class="calc-screen">
+      <div class="calc-screen" id="calc-screen">
         <div class="calc-screen-label">書本售價</div>
         <div class="calc-screen-display">
           <span class="calc-currency">$</span>
           <span class="calc-price-display" id="price-display">0</span>
+          <input type="number" id="hidden-input" class="hidden-input"
+                 inputmode="numeric" pattern="[0-9]*"
+                 aria-label="輸入書本售價" autocomplete="off">
         </div>
-        <div class="calc-screen-hint" id="screen-hint">按數字鍵輸入書價</div>
+        <div class="calc-screen-hint" id="screen-hint">點這裡可用手機鍵盤輸入</div>
       </div>
 
       <!-- Number Keypad (like a real calculator) -->
