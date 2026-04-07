@@ -121,6 +121,16 @@
       "external": true
     },
     {
+      "id": "readmoo-buy",
+      "name": "讀墨省錢計算機",
+      "description": "輸入書價，立刻算出最划算的購買方式。75折券、8折券、嗜讀999領書額度一目瞭然。",
+      "path": "/readmoo-buy/",
+      "icon": "calculator",
+      "ready": true,
+      "color": "sage",
+      "external": true
+    },
+    {
       "id": "readmoo-ap",
       "name": "讀墨 AP 接龍工具",
       "description": "讀墨 1500 日挑戰社群專用，AP 接龍、書單管理、每日好書推薦、搜尋比價。",

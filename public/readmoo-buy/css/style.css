@@ -151,7 +151,7 @@ a:hover { color: var(--color-sage-dark); }
 /* ---- 4. Layout ---- */
 .main-content {
   width: 100%;
-  max-width: 520px;
+  max-width: 720px;
   margin: 0 auto;
   padding: var(--space-lg) var(--space-md) var(--space-3xl);
 }
@@ -434,7 +434,7 @@ a:hover { color: var(--color-sage-dark); }
 
 /* ---- 6. Cheat Sheet ---- */
 .cheat-sheet {
-  margin-top: var(--space-3xl);
+  margin-top: var(--space-2xl);
 }
 .cheat-sheet-subtitle {
   font-size: 15px;
