@@ -79,7 +79,7 @@
     <!-- Tab 切換 -->
     <nav class="tab-nav" id="tab-nav">
       <button class="tab active" data-tab="new">
-        <i data-lucide="book-plus" width="16" height="16"></i> 新書上架
+        <i data-lucide="book-plus" width="16" height="16"></i> 計次新書
       </button>
       <button class="tab" data-tab="top">
         <i data-lucide="flame" width="16" height="16"></i> 熱門排行
@@ -105,6 +105,9 @@
       <label for="select-lib">選擇圖書館</label>
       <select id="select-lib" class="select"></select>
     </div>
+
+    <!-- 計次新書提示 -->
+    <p class="form-note" id="moc-hint" style="display:none">以下為文化部計次服務的新書，借閱會扣當月次數（每館每月 10 次）。</p>
 
     <!-- 排序列 -->
     <div class="sort-row" id="sort-row">

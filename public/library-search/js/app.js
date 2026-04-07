@@ -64,6 +64,10 @@ function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
 
+  // 計次新書提示只在 new tab 顯示
+  const mocHint = document.getElementById('moc-hint');
+  if (mocHint) mocHint.style.display = tab === 'new' ? '' : 'none';
+
   // 搜尋面板永遠顯示，圖書館選擇器在非搜尋模式顯示
   if (tab === 'free-hits') {
     loadFreeHits();
@@ -210,8 +214,7 @@ function renderBooks() {
   for (const book of display) {
     const a = document.createElement('a');
     a.className = 'book-card';
-    const isSearchResult = currentTab === '_search_result';
-    const host = isSearchResult ? 'ebook.hyread.com.tw' : `${currentLib}.ebook.hyread.com.tw`;
+    const host = `${currentLib}.ebook.hyread.com.tw`;
     a.href = `https://${host}/bookDetail.jsp?id=${book.id}`;
     a.target = '_blank';
     a.rel = 'noopener';
@@ -402,7 +405,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  // 初始載入
+  // 初始載入（預設 Tab 是計次新書，顯示提示）
+  const mocHint = document.getElementById('moc-hint');
+  if (mocHint) mocHint.style.display = '';
   lucide.createIcons();
   loadBooks();
 });

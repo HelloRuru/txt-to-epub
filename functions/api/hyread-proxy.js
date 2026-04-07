@@ -247,11 +247,27 @@ export async function onRequest(context) {
       return jsonResponse({ library: LIBRARIES[lib], books });
 
     } else if (action === 'new' && lib) {
-      // 新書上架（KV 記錄首次出現日期）
-      const html = await fetchHyRead(
-        `https://${lib}.ebook.hyread.com.tw/Template/RWD3.0/moccount-page.jsp`
-      );
-      const books = parseNewBooks(html);
+      // 新書上架（多頁爬取 + KV 記錄首次出現日期）
+      const MAX_NEW_PAGES = 5;
+      const pageUrls = [];
+      for (let p = 1; p <= MAX_NEW_PAGES; p++) {
+        pageUrls.push(
+          fetchHyRead(`https://${lib}.ebook.hyread.com.tw/Template/RWD3.0/moccount-page.jsp?page=${p}`)
+        );
+      }
+      const pages = await Promise.all(pageUrls);
+      const seenIds = new Set();
+      const books = [];
+      for (const pageHtml of pages) {
+        const pageBooks = parseNewBooks(pageHtml);
+        if (pageBooks.length === 0) break; // 空頁 = 沒有更多了
+        for (const b of pageBooks) {
+          if (!seenIds.has(b.id)) {
+            seenIds.add(b.id);
+            books.push(b);
+          }
+        }
+      }
       await recordFirstSeen(kv, lib, books);
       return jsonResponse({ library: LIBRARIES[lib], books });
 
