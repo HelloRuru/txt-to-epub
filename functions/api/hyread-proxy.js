@@ -247,12 +247,12 @@ export async function onRequest(context) {
       return jsonResponse({ library: LIBRARIES[lib], books });
 
     } else if (action === 'new' && lib) {
-      // 新書上架（多頁爬取 + KV 記錄首次出現日期）
+      // 計次新書上架（分頁參數是 nowpage，每頁約 30 本）
       const MAX_NEW_PAGES = 5;
       const pageUrls = [];
       for (let p = 1; p <= MAX_NEW_PAGES; p++) {
         pageUrls.push(
-          fetchHyRead(`https://${lib}.ebook.hyread.com.tw/Template/RWD3.0/moccount-page.jsp?page=${p}`)
+          fetchHyRead(`https://${lib}.ebook.hyread.com.tw/Template/RWD3.0/moccount-page.jsp?nowpage=${p}`)
         );
       }
       const pages = await Promise.all(pageUrls);
@@ -260,7 +260,7 @@ export async function onRequest(context) {
       const books = [];
       for (const pageHtml of pages) {
         const pageBooks = parseNewBooks(pageHtml);
-        if (pageBooks.length === 0) break; // 空頁 = 沒有更多了
+        if (pageBooks.length === 0) break;
         for (const b of pageBooks) {
           if (!seenIds.has(b.id)) {
             seenIds.add(b.id);
@@ -285,7 +285,7 @@ export async function onRequest(context) {
       const newPageUrls = [];
       for (let p = 1; p <= MAX_NEW_PAGES; p++) {
         newPageUrls.push(
-          fetchHyRead(`https://${lib}.ebook.hyread.com.tw/Template/RWD3.0/moccount-page.jsp?page=${p}`)
+          fetchHyRead(`https://${lib}.ebook.hyread.com.tw/Template/RWD3.0/moccount-page.jsp?nowpage=${p}`)
         );
       }
 
