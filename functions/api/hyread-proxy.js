@@ -337,16 +337,16 @@ export async function onRequest(context) {
         const k = mainTitle(b.title);
         if (k.length < 3) return;
         bestSet.add(k);
-        bestSource[k] = 'HyRead 暢銷';
+        bestSource[k] = 'HyRead 熱賣';
       });
       readmooBest.forEach(b => {
         const k = mainTitle(b.title);
         if (k.length < 3) return;
         if (bestSet.has(k)) {
-          bestSource[k] = 'HyRead + Readmoo 暢銷';
+          bestSource[k] = '雙榜熱賣';
         } else {
           bestSet.add(k);
-          bestSource[k] = 'Readmoo 暢銷';
+          bestSource[k] = 'Readmoo 熱賣';
         }
       });
 
