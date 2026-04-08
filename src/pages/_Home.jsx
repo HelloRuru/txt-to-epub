@@ -474,6 +474,44 @@ export default function Home() {
           )
         })}
 
+        {/* ohruru 推薦卡片 */}
+        <section className="mt-12 mx-auto" style={{ maxWidth: 640, padding: '0 20px' }}>
+          <a
+            href="https://ohruru.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block rounded-2xl border transition-all hover:-translate-y-0.5"
+            style={{
+              padding: '24px 24px 20px',
+              background: 'var(--bg-card, #fff)',
+              borderColor: 'rgba(212,165,165,0.25)',
+              boxShadow: '0 2px 12px rgba(212,165,165,0.08)',
+              textDecoration: 'none',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            <div style={{
+              position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+              background: 'linear-gradient(90deg, #D4A5A5, #B8A9C9)', opacity: 0.7,
+            }} />
+            <div className="flex items-center gap-1.5 mb-3" style={{ fontSize: 11, fontWeight: 700, letterSpacing: '1.5px', color: '#D4A5A5' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#D4A5A5', display: 'inline-block' }} />
+              RECOMMENDED SERVICE
+            </div>
+            <div className="mb-1.5" style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary, #333)' }}>
+              工具生素材，社群靠策略
+            </div>
+            <div className="mb-3" style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--text-muted, #888)' }}>
+              問安圖做好了、咒語跑出來了，但固定發文、企劃排程這件事，工具幫不了。社群代操整包處理，公開報價不用先加 LINE。
+            </div>
+            <div className="flex items-center gap-1" style={{ fontSize: 14, fontWeight: 500, color: '#D4A5A5' }}>
+              ohruru.com
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </div>
+          </a>
+        </section>
+
         {/* Footer — DS 2.0 漸層淡線 */}
         <footer
           className="mt-10 pt-12 text-center footer-gradient-line"
