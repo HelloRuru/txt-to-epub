@@ -680,7 +680,13 @@ html.dark .icon-moon { display: block; }
     padding-top: var(--space-2xl);
   }
   .calc-result-cards {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .calc-card-cost {
+    font-size: 24px;
+  }
+  .calc-card-name {
+    font-size: 14px;
   }
 }
 

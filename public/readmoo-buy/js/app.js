@@ -86,13 +86,14 @@
     adviceEl.classList.remove('visible');
   }
 
-  /* ---- 計算四種方案 ---- */
+  /* ---- 計算五種方案 ---- */
   function calculate(price) {
     if (!price || price < 50) return null;
 
     var methods = [
       { name: '75折券', cost: Math.round(price * 0.75), tag: '375券（3本以上75折）' },
       { name: '8折券', cost: Math.round(price * 0.8), tag: '單本8折' },
+      { name: '折50券', cost: Math.max(price - 50, 0), tag: price >= 250 ? '滿250折$50（紅利兌換）' : '不限金額折$50' },
       { name: '領書額度', cost: Math.round(redeemCost(price)), tag: '嗜讀999（1點=$167）', points: pointsNeeded(price) },
       { name: '原價', cost: price, tag: '無折扣' }
     ];
@@ -109,8 +110,17 @@
     var saved = price - best.cost;
     var pts = pointsNeeded(price);
     var isRedeem = best.name === '領書額度';
+    var isCoupon50 = best.name === '折50券';
 
     /* 根據實際計算結果決定建議，不靠固定區間 */
+    if (isCoupon50) {
+      /* 折50券最划算：通常在 $200 以下 */
+      if (price <= 100) {
+        return '<strong>折50券</strong>直接折一半，省 $' + saved + '。便宜書用折50券最划算，其他券留著。';
+      }
+      return '<strong>折50券</strong>最省，省 $' + saved + '。$200 以下的書用折50券比打折券更划算。';
+    }
+
     if (isRedeem) {
       /* 領書額度最划算的情況 */
       if (price <= 250) {
@@ -120,9 +130,6 @@
     }
 
     /* 75折或8折最划算的情況 */
-    if (price <= 165) {
-      return '<strong>' + best.name + '</strong>最省，省 $' + saved + '。領書額度留給貴的書用。';
-    }
     if (price > 500) {
       return '書價偏高，<strong>' + best.name + '</strong>省 $' + saved + '。買 3 本以上搭 375 券可能更好，也可以等活動疊疊樂。';
     }
