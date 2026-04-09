@@ -50,8 +50,12 @@
   /* ---- 按鍵處理 ---- */
   function handleDigit(digit) {
     var next = currentInput + digit;
-    if (parseInt(next, 10) > 9999) return; /* 上限 */
-    if (next.length > 4) return;
+    if (parseInt(next, 10) > 9999 || next.length > 4) {
+      /* 超出上限 → 清掉舊數字，用新按的數字重新開始 */
+      currentInput = digit;
+      updateDisplay();
+      return;
+    }
     currentInput = next;
     updateDisplay();
   }
@@ -152,7 +156,7 @@
       return;
     }
 
-    hintEl.textContent = '$' + price + ' 的最佳買法';
+    hintEl.textContent = '$' + price + ' 的最佳買法｜點螢幕重新輸入';
     hintEl.classList.remove('hint-warn');
 
     var html = '<div class="calc-result-cards">';
@@ -236,8 +240,14 @@
 
   /* ---- 隱藏 input 同步（手機軟鍵盤） ---- */
   if (hiddenInput) {
-    /* 點螢幕區域 → focus 隱藏 input → 手機彈出數字鍵盤 */
+    /* 點螢幕區域 → 清空重新輸入 + focus 隱藏 input */
     calcScreen.addEventListener('click', function () {
+      if (currentInput.length > 0) {
+        currentInput = '';
+        updateDisplay();
+        clearResults();
+        hiddenInput.value = '';
+      }
       hiddenInput.focus();
     });
 
