@@ -487,6 +487,27 @@
     }
   });
 
+  // ── 下冊封面選項 ──
+  state.vol2CoverBlob = null;
+  var vol2Radios = document.querySelectorAll('input[name="vol2Cover"]');
+  for (var r = 0; r < vol2Radios.length; r++) {
+    vol2Radios[r].addEventListener('change', function () {
+      $('vol2CoverUpload').classList.toggle('hidden', this.value !== 'upload');
+    });
+  }
+  $('vol2CoverInput').addEventListener('change', function () {
+    if (this.files[0]) {
+      if (!this.files[0].type.startsWith('image/')) {
+        alert('請上傳圖片格式的檔案（JPG、PNG 等）');
+        this.value = '';
+        return;
+      }
+      state.vol2CoverBlob = this.files[0];
+      $('vol2CoverName').textContent = this.files[0].name;
+    }
+    this.value = '';
+  });
+
   // ── 自動拆冊 ──
   $('btnAutoSplit').addEventListener('click', async function () {
     var half = Math.ceil(state.chapters.length / 2);
@@ -550,13 +571,17 @@
         onProgress: function (p) { $('exportProgressText').textContent = '上冊：' + (p.message || '處理中...'); },
       });
 
-      // 生成下冊
+      // 生成下冊（封面依使用者選擇：沿用上冊 or 自訂）
+      var vol2CoverChoice = document.querySelector('input[name="vol2Cover"]:checked');
+      var vol2Cover = (vol2CoverChoice && vol2CoverChoice.value === 'upload' && state.vol2CoverBlob)
+        ? state.vol2CoverBlob
+        : (vol2CoverChoice && vol2CoverChoice.value === 'same') ? state.coverBlob : null;
       $('exportProgressText').textContent = '正在生成下冊...';
       var blob2 = await window.EpubGenerator.generateEpub({
         title: processedTitle + '（下冊）',
         author: processedAuthor,
         chapters: processChapters(vol2Chapters),
-        cover: null,
+        cover: vol2Cover,
         writingMode: state.settings.writingMode,
         fontFamily: state.settings.fontFamily,
         fontSize: state.settings.fontSize,
@@ -593,6 +618,7 @@
     state.chapters = [];
     state.cover = null;
     state.coverBlob = null;
+    state.vol2CoverBlob = null;
     state.lastBlob = null;
     state.settings.title = '';
     state.settings.author = '';
