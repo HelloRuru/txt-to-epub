@@ -44,7 +44,7 @@ export function analyzeText(text) {
 
   // 偵測傳統章節格式
   const patterns = [
-    { regex: /^[　\s]*(☆、.+?)$/gm, name: '☆ 晉江格式' },
+    { regex: /^[　\s]*([☆★✦✧❖◆◇●○■□▲△▼▽♦♠♣♥♡※＊✿❀❁✾✽❃❋✯✰⊙◎►◀▶◁☉✠✡✢✣✤✥✩✪✫✬✭✮][、，,.\s]*[^\r\n]+?)$/gm, name: '符號標記' },
     { regex: /^[　\s]*(第[零一二三四五六七八九十百千\d]+[章節回卷篇集部])/gm, name: '中文章節' },
     { regex: /^[　\s]*[^\w\s\u4e00-\u9fff]+\s*(\d+\s*章)/gm, name: '符號章節' },
     { regex: /^[　\s]*(Chapter\s+\d+)/gim, name: 'Chapter' },
@@ -129,8 +129,8 @@ function detectByPatterns(text) {
   const patterns = [
     // [數字] 格式 - 新增支援
     /^[　\s]*(\[\d+\].*?)$/gm,
-    // ☆、標題（晉江格式）
-    /^[　\s]*(☆、.+?)$/gm,
+    // 符號標記（☆★✿◆■ 等網路小說格式）
+    /^[　\s]*([☆★✦✧❖◆◇●○■□▲△▼▽♦♠♣♥♡※＊✿❀❁✾✽❃❋✯✰⊙◎►◀▶◁☉✠✡✢✣✤✥✩✪✫✬✭✮][、，,.\s]*[^\r\n]+?)$/gm,
     // 中文章節
     /^[　\s]*(第[零一二三四五六七八九十百千\d]+[章節回卷篇集部].*?)$/gm,
     // 符號 + 數字章（如 ■ 1章 □、● 2章 等）
@@ -158,9 +158,9 @@ function detectByPatterns(text) {
       const fullLine = text.slice(lineStart, lineEnd === -1 ? text.length : lineEnd).trim()
       if (fullLine.length > 30) continue
 
-      // 清理晉江 ☆、 前綴和多餘編號（如 ☆、1第 1 章 → 第 1 章）
+      // 清理符號前綴和多餘編號（如 ☆、1第 1 章 → 第 1 章、★ 番外 → 番外）
       let cleanTitle = match[1].trim()
-      cleanTitle = cleanTitle.replace(/^☆、\s*\d*\s*[、]?\s*/, '')
+      cleanTitle = cleanTitle.replace(/^[☆★✦✧❖◆◇●○■□▲△▼▽♦♠♣♥♡※＊✿❀❁✾✽❃❋✯✰⊙◎►◀▶◁☉✠✡✢✣✤✥✩✪✫✬✭✮][、，,.\s]*\d*[、，,.\s]*/, '')
       if (!cleanTitle) cleanTitle = match[1].trim()
 
       group.push({

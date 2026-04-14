@@ -30,7 +30,7 @@ window.ChapterDetector = {
     };
 
     var patterns = [
-      { regex: /^[　\s]*(☆、.+?)$/gm, name: '☆ 晉江格式' },
+      { regex: /^[　\s]*([☆★✦✧❖◆◇●○■□▲△▼▽♦♠♣♥♡※＊✿❀❁✾✽❃❋✯✰⊙◎►◀▶◁☉✠✡✢✣✤✥✩✪✫✬✭✮][、，,.\s]*[^\r\n]+?)$/gm, name: '符號標記' },
       { regex: /^[　\s]*(第[零一二三四五六七八九十百千\d]+[章節回卷篇集部])/gm, name: '中文章節' },
       { regex: /^[　\s]*[^\w\s\u4e00-\u9fff]+\s*(\d+\s*章)/gm, name: '符號章節' },
       { regex: /^[　\s]*(Chapter\s+\d+)/gim, name: 'Chapter' },
@@ -126,8 +126,8 @@ window.ChapterDetector = {
   _detectByPatterns: function (text) {
     var patterns = [
       /^[　\s]*(\[\d+\].*?)$/gm,
-      // ☆、標題（晉江格式）
-      /^[　\s]*(☆、.+?)$/gm,
+      // 符號標記（☆★✿◆■ 等網路小說格式）
+      /^[　\s]*([☆★✦✧❖◆◇●○■□▲△▼▽♦♠♣♥♡※＊✿❀❁✾✽❃❋✯✰⊙◎►◀▶◁☉✠✡✢✣✤✥✩✪✫✬✭✮][、，,.\s]*[^\r\n]+?)$/gm,
       /^[　\s]*(第[零一二三四五六七八九十百千\d]+[章節回卷篇集部].*?)$/gm,
       /^[　\s]*[^\w\s\u4e00-\u9fff]+\s*(\d+\s*章.*?)$/gm,
       /^[　\s]*(Chapter\s+\d+.*?)$/gim,
@@ -148,8 +148,8 @@ window.ChapterDetector = {
         var fullLine = text.slice(lineStart, lineEnd === -1 ? text.length : lineEnd).trim();
         if (fullLine.length > 30) continue;
         var rawTitle = found[f][1].trim();
-        // 清理晉江 ☆、 前綴和多餘編號（如 ☆、1第 1 章 → 第 1 章、☆、78、第 74 章 → 第 74 章）
-        rawTitle = rawTitle.replace(/^☆、\s*\d*\s*[、]?\s*/, '');
+        // 清理符號前綴和多餘編號（如 ☆、1第 1 章 → 第 1 章、★ 番外 → 番外）
+        rawTitle = rawTitle.replace(/^[☆★✦✧❖◆◇●○■□▲△▼▽♦♠♣♥♡※＊✿❀❁✾✽❃❋✯✰⊙◎►◀▶◁☉✠✡✢✣✤✥✩✪✫✬✭✮][、，,.\s]*\d*[、，,.\s]*/, '');
         if (!rawTitle) rawTitle = found[f][1].trim(); // fallback
         group.push({ title: rawTitle, index: found[f].index });
       }
