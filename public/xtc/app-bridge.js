@@ -544,11 +544,15 @@
     console.log('[app-bridge] 載入預設字型：NotoSerifTC');
     await window.loadGoogleFont('NotoSerifTC');
 
-    // 設定 fallback 字型鏈（缺字時依序嘗試）
-    // 思源宋體涵蓋最廣，當其他字型缺字時用它補
+    // 設定 fallback 字型（缺字時用思源宋體補）
     if (renderer && renderer.setFallbackFontFaces) {
-      renderer.setFallbackFontFaces('Noto Serif TC');
-      console.log('[app-bridge] Fallback 字型設定完成：Noto Serif TC');
+      try {
+        // 嘗試多種參數格式
+        renderer.setFallbackFontFaces('Noto Serif TC');
+      } catch (e1) {
+        try { renderer.setFallbackFontFaces(['Noto Serif TC']); } catch (e2) {}
+      }
+      console.log('[app-bridge] Fallback 字型設定完成');
     }
   };
 
@@ -1195,14 +1199,14 @@
       var alignMap = { left: 0, right: 1, center: 2, justify: 3 };
       renderer.setTextAlign(alignMap[alignVal] !== undefined ? alignMap[alignVal] : 0);
 
-      // 首行縮排：透過 CSS stylesheet 注入
+      // CSS stylesheet 注入（首行縮排 + font-family fallback）
       var indentEl = document.getElementById('indent');
       var indentVal = indentEl ? indentEl.value : '1em';
       if (renderer.setStyleSheet) {
-        var indentCss = indentVal === '0'
-          ? 'p { text-indent: 0; }'
-          : 'p { text-indent: ' + indentVal + '; }';
-        renderer.setStyleSheet(indentCss);
+        var indentCss = indentVal === '0' ? 'text-indent: 0;' : 'text-indent: ' + indentVal + ';';
+        // font-family fallback：選的字型缺字時用思源宋體補
+        var fontFallback = 'font-family: "' + creName + '", "Noto Serif TC", serif;';
+        renderer.setStyleSheet('body, p, div, span { ' + fontFallback + ' } p { ' + indentCss + ' }');
       }
 
       // 斷字
