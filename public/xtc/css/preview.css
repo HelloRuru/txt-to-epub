@@ -1,0 +1,110 @@
+/* === Preview Area, Canvas, Nav/Export Buttons, Lightbox === */
+
+/* ==========================================================================
+   MAIN CONTENT -- Card B (pastel): faint pink-purple gradient bg + pink border
+   ========================================================================== */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-page);
+  overflow: hidden;
+}
+
+/* ---------- Preview Header ---------- */
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-buttons {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.nav-buttons button,
+.export-buttons button {
+  padding: 10px var(--space-md);
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-input);
+  color: var(--text-body);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.nav-buttons button:hover,
+.export-buttons button:hover {
+  background: rgba(212, 165, 165, 0.10);
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-buttons button:disabled,
+.export-buttons button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Primary action button -- uses coral (max 1-2 times on page) */
+.export-buttons button.primary {
+  background: var(--color-coral);
+  color: var(--bg-card);
+  border: none;
+  font-weight: var(--font-weight-bold);
+  box-shadow: var(--shadow-sm);
+}
+
+.export-buttons button.primary:hover {
+  background: #D09060;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.export-buttons button.primary:disabled {
+  transform: none;
+  box-shadow: none;
+}
+
+.page-info {
+  font-size: 14px;
+  color: var(--text-caption);
+  font-weight: var(--font-weight-medium);
+}
+
+.export-buttons {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* ==========================================================================
+   PREVIEW AREA -- Card B style background
+   ========================================================================== */
+.preview-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  overflow: auto;
+  background: var(--bg-preview);
+  border: 1px solid rgba(212, 165, 165, 0.12);
+}
+
+#previewCanvas {
+  background: var(--bg-card);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-tag);
+  transform: scale(var(--preview-scale, 0.5));
+  transform-origin: center center;
+}

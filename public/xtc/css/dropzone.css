@@ -1,0 +1,113 @@
+/* === Drop Zone, Drag-over State, File List === */
+
+/* ---------- Drop Zone ---------- */
+.drop-zone {
+  border: 2px dashed var(--color-rose);
+  border-radius: var(--radius-card);
+  padding: var(--space-xl);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: var(--space-md);
+  background: rgba(212, 165, 165, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.drop-zone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-gradient);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: var(--brand-brown);
+  background: rgba(212, 165, 165, 0.10);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.drop-zone:hover::before,
+.drop-zone.drag-over::before {
+  opacity: 0.04;
+}
+
+.drop-zone-icon {
+  font-size: 32px;
+  margin-bottom: var(--space-sm);
+  color: var(--color-rose);
+  position: relative;
+  z-index: 1;
+}
+
+.drop-zone-text {
+  font-size: 13px;
+  color: var(--text-caption);
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- File List ---------- */
+.file-list {
+  max-height: 150px;
+  overflow-y: auto;
+  margin-bottom: var(--space-md);
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-input);
+  margin-bottom: var(--space-xs);
+  font-size: 12px;
+  color: var(--text-body);
+  transition: all 0.2s ease;
+}
+
+.file-item:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.file-item.active {
+  background: var(--color-rose);
+  color: var(--bg-card);
+  border-color: var(--color-rose);
+}
+
+.file-item .name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.file-item .remove {
+  background: none;
+  border: none;
+  color: var(--text-caption);
+  cursor: pointer;
+  padding: var(--space-xs);
+  margin-left: var(--space-sm);
+  border-radius: var(--radius-tag);
+  min-width: 28px;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.file-item .remove:hover {
+  color: var(--color-gray-rose);
+  background: rgba(201, 146, 154, 0.12);
+}

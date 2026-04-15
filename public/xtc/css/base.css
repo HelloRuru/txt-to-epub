@@ -1,0 +1,118 @@
+/* === Reset, Typography, Font-face, Global Styles === */
+
+/* ---------- Font Import ---------- */
+@font-face {
+  font-family: 'GenSenRounded';
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'GenSenRounded';
+  font-weight: 500;
+  font-display: swap;
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'GenSenRounded';
+  font-weight: 700;
+  font-display: swap;
+  src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2');
+}
+
+/* ---------- Reset ---------- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- Body ---------- */
+body {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  font-size: 16px;
+  line-height: var(--line-height);
+  background: var(--bg-page);
+  color: var(--text-body);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- App Layout ---------- */
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* ---------- Hidden Inputs ---------- */
+#fileInput,
+#customFontInput {
+  display: none;
+}
+
+/* ---------- Scrollbar (warm style) ---------- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-mist);
+  border-radius: var(--radius-tag);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-warm-gray);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* ---------- Utility Classes ---------- */
+
+/* Gradient divider (reusable) */
+.gradient-divider {
+  width: 120px;
+  height: 1px;
+  background: var(--brand-gradient);
+  margin: var(--space-lg) auto;
+  border: none;
+}
+
+/* Status colors (brand-aligned) */
+.status-success { color: var(--color-sage); }
+.status-warning { color: var(--color-rose); }
+.status-error   { color: var(--color-gray-rose); }
+.status-info    { color: var(--color-lavender); }
+
+/* Smooth transitions for dark mode toggle */
+body,
+.sidebar,
+.main-content,
+.preview-header,
+.preview-area,
+.progress-container,
+.book-info,
+.drop-zone,
+.file-item,
+.chapter-list,
+.chapter-item,
+.tabs button,
+.control-group select,
+.control-group input,
+.orientation-buttons button,
+.nav-buttons button,
+.export-buttons button {
+  transition: background-color 0.3s ease,
+              color 0.3s ease,
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+}

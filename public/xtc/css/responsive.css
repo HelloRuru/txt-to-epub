@@ -1,0 +1,277 @@
+/* === Responsive Breakpoints (Tablet + Mobile) === */
+
+/* ==========================================================================
+   Tablet (768-1023px)
+   ========================================================================== */
+@media (max-width: 1023px) {
+  .sidebar {
+    width: 280px;
+    padding: var(--space-md);
+  }
+
+  .preview-header {
+    padding: var(--space-sm) var(--space-md);
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .page-info {
+    font-size: 13px;
+    order: -1;
+    width: 100%;
+    text-align: center;
+    margin-bottom: var(--space-xs);
+  }
+
+  .nav-buttons,
+  .export-buttons {
+    flex: 1;
+  }
+
+  .export-buttons {
+    justify-content: flex-end;
+  }
+}
+
+/* ==========================================================================
+   Mobile (<768px)
+   ========================================================================== */
+@media (max-width: 767px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    max-height: 50vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border-light);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-md);
+  }
+
+  .drop-zone {
+    padding: var(--space-lg);
+  }
+
+  .drop-zone-icon {
+    font-size: 28px;
+  }
+
+  .preview-header {
+    padding: var(--space-sm);
+    gap: var(--space-xs);
+  }
+
+  .nav-buttons button,
+  .export-buttons button {
+    padding: 10px var(--space-sm);
+    font-size: 12px;
+    min-height: 44px;
+  }
+
+  .page-info {
+    font-size: 12px;
+  }
+
+  .preview-area {
+    padding: var(--space-sm);
+  }
+
+  /* Ensure all interactive elements are touch-friendly (44px) */
+  .orientation-buttons button,
+  .tabs button,
+  .checkbox-group,
+  .chapter-item {
+    min-height: 44px;
+  }
+
+  /* Stack export buttons on very small screens */
+  .export-buttons {
+    flex-wrap: wrap;
+  }
+
+  .progress-container {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  /* Sidebar H2 typography for mobile */
+  .sidebar h2 {
+    font-size: 12px;
+    margin: var(--space-md) 0 var(--space-sm) 0;
+  }
+}
+
+  /* Sidebar collapse behavior */
+  .sidebar.collapsed {
+    max-height: 48px;
+    overflow: hidden;
+  }
+
+  .sidebar.collapsed .sidebar-content {
+    display: none;
+  }
+
+  .sidebar.collapsed .sidebar-toggle {
+    border-bottom: none;
+  }
+
+  /* Tool tabs (書籍轉檔 / 圖片工具) */
+  .tool-tabs {
+    flex-direction: row;
+    gap: var(--space-xs);
+  }
+
+  .tool-tab {
+    font-size: 13px;
+    padding: var(--space-sm) var(--space-md);
+    min-height: 44px;
+  }
+
+  /* Image tool sub-tabs */
+  .image-tool-tabs {
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .img-tab {
+    font-size: 12px;
+    padding: var(--space-xs) var(--space-sm);
+    min-height: 44px;
+    flex: 1;
+    text-align: center;
+  }
+
+  /* Lightbox full screen on mobile */
+  .lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(30, 24, 27, 0.95);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox canvas {
+    max-width: 95vw;
+    max-height: 90vh;
+    object-fit: contain;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    color: #fff;
+    cursor: pointer;
+    z-index: 1001;
+  }
+
+  /* Tutorial cards single column */
+  .tutorial-cards {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .tutorial-section h2 {
+    font-size: 20px;
+  }
+
+  /* Mobile note visibility */
+  .mobile-note {
+    display: flex;
+  }
+
+  /* Preview canvas tap hint */
+  .preview-canvas-wrapper::after {
+    content: '點擊放大預覽';
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.8);
+    padding: 2px 8px;
+    border-radius: 8px;
+  }
+
+  /* Onboarding on mobile */
+  .onboarding-overlay {
+    padding: var(--space-md);
+  }
+
+  .onboarding-card {
+    max-width: 100%;
+    padding: var(--space-lg);
+  }
+
+  .onboarding-steps {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  /* Preset buttons stack */
+  .preset-buttons {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .preset-btn {
+    min-height: 44px;
+  }
+}
+
+/* Credits responsive */
+@media (max-width: 768px) {
+  .credits-content {
+    grid-template-columns: 1fr;
+  }
+
+  .credits-section {
+    padding: 0 var(--space-md);
+  }
+}
+
+/* Very small screens (<480px) */
+@media (max-width: 479px) {
+  .sidebar {
+    max-height: 40vh;
+  }
+
+  .preview-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .preview-nav {
+    justify-content: center;
+  }
+
+  .preview-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .preview-actions button {
+    width: 100%;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .margin-grid {
+    transform: scale(0.9);
+    transform-origin: center;
+  }
+}

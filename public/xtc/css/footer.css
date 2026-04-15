@@ -1,0 +1,18 @@
+/* === Footer with Gradient Line, Copyright === */
+
+.site-footer {
+  text-align: center;
+  padding: var(--space-lg) var(--space-md);
+  font-size: 14px;
+  color: var(--text-muted);
+  position: relative;
+}
+
+.site-footer::before {
+  content: '';
+  display: block;
+  width: 120px;
+  height: 1px;
+  background: var(--color-gradient);
+  margin: 0 auto var(--space-md);
+}

@@ -1,0 +1,371 @@
+/* === Sidebar Layout, Form Controls, Inputs, Tabs === */
+
+/* ==========================================================================
+   SIDEBAR -- Card A (plain): white bg, rounded, warm shadow
+   ========================================================================== */
+.sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  background: var(--bg-sidebar);
+  color: var(--text-body);
+  overflow-y: auto;
+  padding: var(--space-lg);
+  border-right: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebar h2 {
+  font-size: 13px;
+  color: var(--brand-brown);
+  margin: var(--space-lg) 0 var(--space-sm) 0;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: var(--font-weight-bold);
+  position: relative;
+  padding-left: 12px;
+}
+
+/* Accent bar before section headings */
+.sidebar h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 14px;
+  background: var(--brand-gradient);
+  border-radius: 2px;
+}
+
+.sidebar h2:first-child {
+  margin-top: 0;
+}
+
+/* ---------- Form Controls ---------- */
+.control-group {
+  margin-bottom: var(--space-md);
+}
+
+.control-group label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-caption);
+  margin-bottom: var(--space-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.control-group select,
+.control-group input[type="text"],
+.control-group input[type="number"] {
+  width: 100%;
+  padding: 10px var(--space-md);
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-input);
+  color: var(--text-body);
+  font-size: 13px;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.control-group select:focus,
+.control-group input:focus {
+  outline: none;
+  border-color: var(--color-rose);
+  box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.15);
+}
+
+.control-group select:hover,
+.control-group input[type="text"]:hover,
+.control-group input[type="number"]:hover {
+  border-color: var(--border-medium);
+}
+
+/* ---------- Slider Row ---------- */
+.slider-row {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.slider-row span {
+  color: var(--text-caption);
+}
+
+.slider-row input[type="range"] {
+  flex: 1;
+}
+
+.slider-row input[type="number"] {
+  width: 64px;
+  min-height: 44px;
+}
+
+/* Range input */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--color-mist);
+  border-radius: var(--radius-tag);
+  height: 6px;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--color-rose);
+  border: 2px solid var(--bg-card);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: var(--brand-brown);
+  transform: scale(1.15);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: var(--color-rose);
+  border: 2px solid var(--bg-card);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------- Checkbox ---------- */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+  min-height: 44px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-rose);
+  cursor: pointer;
+  border-radius: var(--space-xs);
+  flex-shrink: 0;
+}
+
+.checkbox-group label {
+  font-size: 13px;
+  color: var(--text-body);
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-group input[type="checkbox"]:disabled + label,
+.control-group:has(input:disabled) label {
+  opacity: 0.4;
+}
+
+/* Checkbox row */
+.checkbox-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.checkbox-row .checkbox-group {
+  margin-bottom: 0;
+}
+
+/* Progress bar settings row */
+.progress-bar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.progress-bar-row .checkbox-group {
+  margin-bottom: 0;
+}
+
+.progress-bar-row select {
+  padding: 8px 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-input);
+  color: var(--text-body);
+  font-size: 12px;
+  font-family: var(--font-family);
+  min-height: 44px;
+}
+
+/* ---------- Orientation Buttons ---------- */
+.orientation-buttons {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.orientation-buttons button {
+  flex: 1;
+  padding: 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-input);
+  color: var(--text-body);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.orientation-buttons button:hover {
+  background: rgba(212, 165, 165, 0.10);
+  border-color: var(--border-medium);
+}
+
+.orientation-buttons button.active {
+  border-color: var(--color-rose);
+  background: rgba(212, 165, 165, 0.12);
+  color: var(--brand-brown);
+  font-weight: var(--font-weight-bold);
+}
+
+/* ---------- Chapter List ---------- */
+.chapter-list {
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--bg-input);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-light);
+}
+
+.chapter-item {
+  padding: 10px var(--space-md);
+  font-size: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-caption);
+  transition: all 0.15s ease;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.chapter-item:hover {
+  background: rgba(212, 165, 165, 0.08);
+  color: var(--text-heading);
+}
+
+.chapter-item.active {
+  background: var(--color-rose);
+  color: var(--bg-card);
+}
+
+.chapter-item:last-child {
+  border-bottom: none;
+}
+
+/* ---------- Tabs ---------- */
+.tabs {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.tabs button {
+  flex: 1;
+  padding: 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-input);
+  color: var(--text-caption);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.tabs button:hover {
+  color: var(--text-body);
+  border-color: var(--border-medium);
+}
+
+.tabs button.active {
+  background: var(--color-rose);
+  color: var(--bg-card);
+  border-color: var(--color-rose);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Tab Content */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ---------- Optimizer Tab Button ---------- */
+#optimizeBtn {
+  width: 100%;
+  padding: var(--space-md);
+  margin-top: var(--space-md);
+  background: var(--color-coral) !important;
+  border: none !important;
+  border-radius: var(--radius-input) !important;
+  color: var(--bg-card) !important;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-bold);
+  transition: all 0.2s ease;
+  min-height: 48px;
+  box-shadow: var(--shadow-sm);
+}
+
+#optimizeBtn:hover {
+  background: #D09060 !important;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Optimizer tab description text */
+#optimizer-tab > p {
+  color: var(--text-caption) !important;
+}
+
+/* ---------- Form Hint ---------- */
+.form-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  font-size: 13px;
+  color: var(--text-caption);
+  margin-top: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(212, 165, 165, 0.06);
+  border-radius: 8px;
+  line-height: 1.5;
+}
+
+.form-hint svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--color-rose);
+}

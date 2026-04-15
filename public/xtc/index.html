@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>閱星瞳轉檔工具 | HelloRuru Tools</title>
+  <meta name="description" content="台灣第一個繁體中文閱星瞳轉檔工具。支援 EPUB、PDF、MOBI、TXT、Markdown 轉 XTC/XTCH，全程瀏覽器端處理，不上傳任何檔案。">
+
+  <!-- OG Tags -->
+  <meta property="og:title" content="閱星瞳轉檔工具 | HelloRuru">
+  <meta property="og:description" content="免費線上 EPUB/PDF 轉 XTC 工具，支援繁體中文字型，手機也能用。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tools.helloruru.com/xtc">
+
+  <!-- Brand Header -->
+  <script src="https://lab.helloruru.com/shared/brand-header.js"></script>
+
+  <!-- Fonts: GenSenRounded (DS v2.2 required) -->
+  <style>
+    @font-face { font-family: 'GenSenRounded'; src: url('https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+    @font-face { font-family: 'GenSenRounded'; src: url('https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+    @font-face { font-family: 'GenSenRounded'; src: url('https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+  </style>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="style-helloruru.css">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <!-- JSZip -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+  <!-- Brand Header -->
+  <hello-ruru-header title="閱星瞳轉檔工具"></hello-ruru-header>
+
+  <!-- Onboarding Overlay (first visit) -->
+  <div id="onboarding" class="onboarding-overlay" style="display:none;">
+    <div class="onboarding-card card-c">
+      <h2>歡迎使用閱星瞳轉檔工具</h2>
+      <div class="onboarding-steps">
+        <div class="step active" data-step="1">
+          <div class="step-icon"><i data-lucide="tablet-smartphone"></i></div>
+          <h3>選擇裝置</h3>
+          <p>先選你的閱星瞳型號（X4 或 X3）</p>
+        </div>
+        <div class="step" data-step="2">
+          <div class="step-icon"><i data-lucide="upload"></i></div>
+          <h3>上傳書籍</h3>
+          <p>支援 EPUB、PDF、MOBI、TXT、Markdown、DOC</p>
+        </div>
+        <div class="step" data-step="3">
+          <div class="step-icon"><i data-lucide="download"></i></div>
+          <h3>匯出 XTC</h3>
+          <p>調整設定，按下匯出就完成了</p>
+        </div>
+      </div>
+      <div class="onboarding-actions">
+        <button class="btn-secondary" onclick="skipOnboarding()">跳過</button>
+        <button class="btn-primary" onclick="skipOnboarding()">開始使用</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App Layout -->
+  <main class="app-container">
+    <!-- Sidebar (Card A - plain) -->
+    <aside id="sidebar" class="sidebar card-a">
+      <div class="sidebar-toggle" id="sidebarToggle">
+        <i data-lucide="settings"></i>
+        <span>設定</span>
+      </div>
+
+      <!-- 工具切換 -->
+      <div class="tool-tabs">
+        <button class="tool-tab active" data-tool="converter" onclick="switchTool('converter')">
+          <i data-lucide="book-open"></i> 書籍轉檔
+        </button>
+        <button class="tool-tab" data-tool="image" onclick="switchTool('image')">
+          <i data-lucide="image"></i> 圖片工具
+        </button>
+      </div>
+
+      <div id="converterPanel" class="tool-panel active">
+      <div class="sidebar-content">
+        <!-- Book Info -->
+        <section class="panel-section" id="bookInfoSection" style="display:none;">
+          <h3><i data-lucide="book-open"></i> 書籍資訊</h3>
+          <div id="bookInfo">
+            <p class="book-title" id="bookTitle">—</p>
+            <p class="book-author" id="bookAuthor">—</p>
+            <p class="book-pages" id="bookPages">—</p>
+          </div>
+        </section>
+
+        <!-- File Upload -->
+        <section class="panel-section">
+          <h3><i data-lucide="file-up"></i> 上傳檔案</h3>
+          <div id="dropZone" class="drop-zone">
+            <i data-lucide="upload-cloud" class="drop-icon"></i>
+            <p>點擊或拖放檔案到這裡</p>
+            <p class="drop-hint">EPUB · PDF · MOBI · TXT · MD · DOC</p>
+            <input type="file" id="fileInput" accept=".epub,.pdf,.mobi,.azw,.prc,.pdb,.txt,.md,.markdown,.doc,.docx,.docm" multiple hidden>
+          </div>
+          <div id="fileList" class="file-list"></div>
+        </section>
+
+        <!-- Quick Presets -->
+        <section class="panel-section">
+          <h3><i data-lucide="zap"></i> 快速設定</h3>
+          <div class="preset-buttons">
+            <button class="preset-btn" onclick="applyPreset('novel')">
+              <i data-lucide="book-text"></i>
+              <span>小說模式</span>
+            </button>
+            <button class="preset-btn" onclick="applyPreset('comic')">
+              <i data-lucide="image"></i>
+              <span>漫畫模式</span>
+            </button>
+            <button class="preset-btn" onclick="applyPreset('document')">
+              <i data-lucide="file-text"></i>
+              <span>文件模式</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Device Preset -->
+        <section class="panel-section">
+          <h3><i data-lucide="monitor-smartphone"></i> 裝置設定</h3>
+          <div class="form-group">
+            <label>裝置型號</label>
+            <select id="devicePreset">
+              <option value="x4">XTEink X4 (480×800)</option>
+              <option value="x3">XTEink X3 (528×792)</option>
+              <option value="custom">自訂尺寸</option>
+            </select>
+          </div>
+          <div id="customSize" style="display:none;">
+            <div class="form-row">
+              <div class="form-group">
+                <label>寬度 (px)</label>
+                <input type="number" id="customWidth" value="480">
+              </div>
+              <div class="form-group">
+                <label>高度 (px)</label>
+                <input type="number" id="customHeight" value="800">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>螢幕方向</label>
+            <div class="orientation-buttons">
+              <button class="orient-btn active" data-orient="0">0°</button>
+              <button class="orient-btn" data-orient="90">90°</button>
+              <button class="orient-btn" data-orient="180">180°</button>
+              <button class="orient-btn" data-orient="270">270°</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Font Settings -->
+        <section class="panel-section">
+          <h3><i data-lucide="type"></i> 字型設定</h3>
+          <div class="form-group">
+            <label>字型</label>
+            <select id="fontSelect">
+              <optgroup label="繁體中文">
+                <option value="GuanKiapTsingKhai">原俠正楷（楷體・建議 30-36px）</option>
+                <option value="Huninn">jf open 粉圓（圓體・建議 32-38px）</option>
+                <option value="NotoSerifTC" selected>思源宋體（明體・建議 28-34px）</option>
+                <option value="NotoSansTC">思源黑體（黑體・建議 28-34px）</option>
+                <option value="JasonHandwriting1">清松手寫體（手寫・建議 32px 以上）</option>
+                <option value="Cubic11">俐方體 11 號（點陣・建議 33px）</option>
+              </optgroup>
+              <optgroup label="英文">
+                <option value="Literata">Literata</option>
+                <option value="Lora">Lora</option>
+                <option value="Merriweather">Merriweather</option>
+                <option value="SourceSerif4">Source Serif 4</option>
+                <option value="NotoSerif">Noto Serif</option>
+                <option value="NotoSans">Noto Sans</option>
+                <option value="Roboto">Roboto</option>
+                <option value="EBGaramond">EB Garamond</option>
+              </optgroup>
+            </select>
+          </div>
+          <p class="form-hint" id="fontSizeHint">
+            <i data-lucide="info"></i>
+            <span>思源宋體適合長時間閱讀，建議字級 28-34px</span>
+          </p>
+          <div class="form-group">
+            <label>字級：<span id="fontSizeValue">34</span>px</label>
+            <input type="range" id="fontSize" min="12" max="48" value="34">
+          </div>
+          <div class="form-group">
+            <label>字重：<span id="fontWeightValue">400</span></label>
+            <input type="range" id="fontWeight" min="100" max="900" step="100" value="400">
+          </div>
+          <div class="form-group">
+            <label>行高：<span id="lineHeightValue">120</span>%</label>
+            <input type="range" id="lineHeight" min="100" max="200" value="120">
+          </div>
+          <div class="form-group">
+            <button class="btn-text" id="uploadFontBtn">
+              <i data-lucide="upload"></i> 上傳自訂字型（TTF/OTF）
+            </button>
+            <input type="file" id="fontFileInput" accept=".ttf,.otf" hidden>
+          </div>
+        </section>
+
+        <!-- Text Settings -->
+        <section class="panel-section">
+          <h3><i data-lucide="align-left"></i> 排版設定</h3>
+          <div class="form-group">
+            <label>邊距 (px)</label>
+            <div class="margin-grid">
+              <div></div>
+              <input type="number" id="marginTop" value="16" class="margin-input" placeholder="上">
+              <div></div>
+              <input type="number" id="marginLeft" value="16" class="margin-input" placeholder="左">
+              <div class="margin-center">px</div>
+              <input type="number" id="marginRight" value="16" class="margin-input" placeholder="右">
+              <div></div>
+              <input type="number" id="marginBottom" value="16" class="margin-input" placeholder="下">
+              <div></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>對齊方式</label>
+            <div class="align-buttons">
+              <button class="align-btn" data-align="left"><i data-lucide="align-left"></i></button>
+              <button class="align-btn" data-align="center"><i data-lucide="align-center"></i></button>
+              <button class="align-btn" data-align="right"><i data-lucide="align-right"></i></button>
+              <button class="align-btn active" data-align="justify"><i data-lucide="align-justify"></i></button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>首行縮排</label>
+            <select id="indent">
+              <option value="0">無縮排</option>
+              <option value="1em" selected>1em</option>
+              <option value="2em">2em</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>斷字</label>
+            <select id="hyphenation">
+              <option value="none">關閉</option>
+              <option value="algorithmic" selected>演算法</option>
+              <option value="dictionary">字典</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- Quality Settings -->
+        <section class="panel-section">
+          <h3><i data-lucide="sparkles"></i> 品質設定</h3>
+          <div class="form-group">
+            <label>匯出品質</label>
+            <div class="quality-toggle">
+              <button class="quality-btn active" data-quality="fast">
+                <strong>快刷</strong>
+                <small>1-bit 黑白，翻頁快</small>
+              </button>
+              <button class="quality-btn" data-quality="hq">
+                <strong>高清</strong>
+                <small>2-bit 灰階，畫質好</small>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>抖動處理</label>
+            <select id="ditherMode">
+              <option value="none">關閉</option>
+              <option value="image">僅圖片區域</option>
+              <option value="full" selected>全頁抖動</option>
+            </select>
+          </div>
+          <div class="form-group" id="ditherStrengthGroup">
+            <label>抖動強度：<span id="ditherStrengthValue">20</span>%</label>
+            <input type="range" id="ditherStrength" min="0" max="100" value="20">
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="negativeMode">
+              <span>負片模式（深色背景）</span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Image Settings -->
+        <section class="panel-section">
+          <h3><i data-lucide="image"></i> 圖片設定</h3>
+          <div class="form-group">
+            <label>亮度：<span id="brightnessValue">0</span></label>
+            <input type="range" id="brightness" min="-100" max="100" value="0">
+          </div>
+          <div class="form-group">
+            <label>對比度：<span id="contrastValue">0</span></label>
+            <input type="range" id="contrast" min="-100" max="100" value="0">
+          </div>
+        </section>
+
+        <!-- Progress Bar Settings -->
+        <section class="panel-section">
+          <h3><i data-lucide="bar-chart-2"></i> 進度條</h3>
+          <div class="form-group">
+            <label>主題風格</label>
+            <select id="progressTheme">
+              <option value="theme-1" selected>細線（原版）</option>
+              <option value="theme-2">條狀（原版）</option>
+              <option value="theme-cat">貓咪進度條</option>
+              <option value="theme-bookmark">書籤風</option>
+              <option value="theme-dots">極簡點點</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>位置</label>
+            <select id="progressPosition">
+              <option value="bottom" selected>底部</option>
+              <option value="top">頂部</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="showProgressLine" checked>
+              <span>顯示進度線</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="showChapterMarks">
+              <span>顯示章節標記</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="showPageNumber" checked>
+              <span>顯示頁碼</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="showPercentage">
+              <span>顯示百分比</span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Chapters -->
+        <section class="panel-section" id="chaptersSection" style="display:none;">
+          <h3><i data-lucide="list"></i> 章節目錄</h3>
+          <div id="chapterList" class="chapter-list"></div>
+        </section>
+
+        <!-- Config -->
+        <section class="panel-section">
+          <div class="config-actions">
+            <button class="btn-text" onclick="exportConfig()"><i data-lucide="download"></i> 匯出設定</button>
+            <button class="btn-text" onclick="importConfig()"><i data-lucide="upload"></i> 匯入設定</button>
+          </div>
+        </section>
+      </div>
+      </div><!-- /converterPanel -->
+
+      <div id="imagePanel" class="tool-panel" style="display:none;">
+
+        <!-- 圖片工具子選單 -->
+        <div class="image-tool-tabs">
+          <button class="img-tab active" data-imgtool="wallpaper" onclick="switchImageTool('wallpaper')">桌布</button>
+          <button class="img-tab" data-imgtool="imagebook" onclick="switchImageTool('imagebook')">圖片書</button>
+          <button class="img-tab" data-imgtool="cover" onclick="switchImageTool('cover')">透明書封</button>
+          <button class="img-tab" data-imgtool="card" onclick="switchImageTool('card')">曈卡</button>
+        </div>
+
+        <!-- 桌布 / 待機畫面 -->
+        <div id="wallpaperTool" class="img-tool-content">
+          <section class="panel-section">
+            <h3><i data-lucide="monitor"></i> 待機畫面制圖</h3>
+            <div id="imgDropZone" class="drop-zone">
+              <i data-lucide="image-plus" class="drop-icon"></i>
+              <p>上傳圖片</p>
+              <p class="drop-hint">JPG · PNG · WebP</p>
+              <input type="file" id="imgFileInput" accept="image/*" hidden>
+            </div>
+          </section>
+
+          <section class="panel-section">
+            <h3><i data-lucide="monitor-smartphone"></i> 裝置尺寸</h3>
+            <div class="form-group">
+              <select id="imgDevicePreset">
+                <option value="x4">XTEink X4 (480×800)</option>
+                <option value="x3">XTEink X3 (528×792)</option>
+                <option value="custom">自訂尺寸</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>裁切方式</label>
+              <select id="imgCropMode">
+                <option value="cover">填滿（裁切多餘）</option>
+                <option value="contain">適應（留白邊）</option>
+                <option value="stretch">拉伸</option>
+              </select>
+            </div>
+          </section>
+
+          <section class="panel-section">
+            <h3><i data-lucide="sliders"></i> 調整</h3>
+            <div class="form-group">
+              <label>亮度：<span id="imgBrightnessValue">0</span></label>
+              <input type="range" id="imgBrightness" min="-100" max="100" value="0">
+            </div>
+            <div class="form-group">
+              <label>對比度：<span id="imgContrastValue">0</span></label>
+              <input type="range" id="imgContrast" min="-100" max="100" value="0">
+            </div>
+            <div class="form-group">
+              <label>抖動強度：<span id="imgDitherValue">50</span>%</label>
+              <input type="range" id="imgDitherStrength" min="0" max="100" value="50">
+            </div>
+          </section>
+
+          <section class="panel-section">
+            <h3><i data-lucide="download"></i> 匯出</h3>
+            <div class="form-group">
+              <label>格式</label>
+              <select id="imgExportFormat">
+                <option value="xtg">XTG（1-bit 黑白）</option>
+                <option value="xth">XTH（2-bit 灰階）</option>
+              </select>
+            </div>
+            <button class="btn-primary" id="imgExportBtn" style="width:100%;">
+              <i data-lucide="download"></i> 匯出待機畫面
+            </button>
+          </section>
+        </div>
+
+        <!-- 圖片書 -->
+        <div id="imagebookTool" class="img-tool-content" style="display:none;">
+          <section class="panel-section">
+            <h3><i data-lucide="book-image"></i> 圖片書製作</h3>
+            <div id="imgBookDropZone" class="drop-zone">
+              <i data-lucide="images" class="drop-icon"></i>
+              <p>上傳多張圖片</p>
+              <p class="drop-hint">拖放或點擊選取，支援批次上傳</p>
+              <input type="file" id="imgBookFileInput" accept="image/*" multiple hidden>
+            </div>
+            <div id="imgBookList" class="file-list"></div>
+          </section>
+          <section class="panel-section">
+            <div class="form-group">
+              <label>抖動強度：<span id="imgBookDitherValue">50</span>%</label>
+              <input type="range" id="imgBookDither" min="0" max="100" value="50">
+            </div>
+            <button class="btn-primary" id="imgBookExportBtn" style="width:100%;">
+              <i data-lucide="download"></i> 匯出圖片書（XTC）
+            </button>
+          </section>
+        </div>
+
+        <!-- 透明書封 -->
+        <div id="coverTool" class="img-tool-content" style="display:none;">
+          <section class="panel-section">
+            <h3><i data-lucide="frame"></i> 透明書封</h3>
+            <div id="coverDropZone" class="drop-zone">
+              <i data-lucide="image-plus" class="drop-icon"></i>
+              <p>上傳封面圖片</p>
+              <input type="file" id="coverFileInput" accept="image/*" hidden>
+            </div>
+          </section>
+          <section class="panel-section">
+            <div class="form-group">
+              <label>輸出寬度 (px)</label>
+              <input type="number" id="coverWidth" value="240">
+            </div>
+            <div class="form-group">
+              <label>輸出高度 (px)</label>
+              <input type="number" id="coverHeight" value="400">
+            </div>
+            <button class="btn-primary" id="coverExportBtn" style="width:100%;">
+              <i data-lucide="download"></i> 匯出透明書封（PNG）
+            </button>
+          </section>
+        </div>
+
+        <!-- 曈卡 -->
+        <div id="cardTool" class="img-tool-content" style="display:none;">
+          <section class="panel-section">
+            <h3><i data-lucide="square"></i> 曈卡制圖</h3>
+            <div id="cardDropZone" class="drop-zone">
+              <i data-lucide="image-plus" class="drop-icon"></i>
+              <p>上傳圖片（裁切為方形）</p>
+              <input type="file" id="cardFileInput" accept="image/*" hidden>
+            </div>
+          </section>
+          <section class="panel-section">
+            <div class="form-group">
+              <label>色彩模式</label>
+              <select id="cardColorMode">
+                <option value="mono">無色（黑白兩階）</option>
+                <option value="color">有色（黑白紅黃四色）</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>抖動強度：<span id="cardDitherValue">50</span>%</label>
+              <input type="range" id="cardDither" min="0" max="100" value="50">
+            </div>
+            <button class="btn-primary" id="cardExportBtn" style="width:100%;">
+              <i data-lucide="download"></i> 匯出曈卡（BMP）
+            </button>
+          </section>
+        </div>
+      </div><!-- /imagePanel -->
+
+    </aside>
+
+    <!-- Preview Area (Card B - pastel) -->
+    <section class="preview-area card-b">
+      <!-- Preview Header -->
+      <div class="preview-header">
+        <div class="preview-nav">
+          <button class="btn-icon" id="prevPageBtn" title="上一頁">
+            <i data-lucide="chevron-left"></i>
+          </button>
+          <span class="page-info" id="pageInfo">尚未載入書籍</span>
+          <button class="btn-icon" id="nextPageBtn" title="下一頁">
+            <i data-lucide="chevron-right"></i>
+          </button>
+        </div>
+        <div class="preview-actions">
+          <button class="btn-secondary" id="refreshBtn" title="重新整理">
+            <i data-lucide="refresh-cw"></i>
+          </button>
+          <button class="btn-primary" id="exportPageBtn">
+            <i data-lucide="file-down"></i> 匯出當前頁
+          </button>
+          <button class="btn-primary btn-accent" id="exportXtcBtn">
+            <i data-lucide="download"></i> 匯出 XTC
+          </button>
+        </div>
+      </div>
+
+      <!-- Canvas Preview -->
+      <div class="preview-canvas-wrapper" id="previewWrapper">
+        <canvas id="previewCanvas" width="480" height="800"></canvas>
+        <div id="emptyState" class="empty-state">
+          <i data-lucide="book-open" class="empty-icon"></i>
+          <h3>上傳電子書開始轉換</h3>
+          <p>支援 EPUB、PDF、MOBI、TXT、Markdown、DOC 格式</p>
+          <p class="privacy-note"><i data-lucide="shield-check"></i> 所有轉檔在瀏覽器本地完成，不上傳任何檔案</p>
+        </div>
+      </div>
+
+      <!-- Export Progress -->
+      <div id="exportProgress" class="export-progress" style="display:none;">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p class="progress-text" id="progressText">準備中...</p>
+      </div>
+
+      <!-- Mobile capacity note -->
+      <div class="mobile-note">
+        <i data-lucide="smartphone"></i>
+        <div>
+          <p><strong>手機轉檔說明</strong></p>
+          <p>一般小說（200-400 頁）約 1-3 分鐘。長篇或含圖書籍建議連 WiFi。轉檔全程在你的手機上完成，不會上傳到任何伺服器。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Tutorial Section -->
+  <section class="tutorial-section">
+    <h2><i data-lucide="help-circle"></i> 轉好的檔案怎麼放到閱星瞳？</h2>
+    <div class="tutorial-cards">
+      <div class="card-a tutorial-card">
+        <div class="tutorial-icon"><i data-lucide="hard-drive"></i></div>
+        <h3>MicroSD 卡</h3>
+        <p class="tutorial-tag">最穩定</p>
+        <p>用退卡針取出記憶卡，插入讀卡器，把 XTC 檔案拖進去，再插回閱星瞳。</p>
+      </div>
+      <div class="card-a tutorial-card">
+        <div class="tutorial-icon"><i data-lucide="wifi"></i></div>
+        <h3>WiFi 無線傳書</h3>
+        <p class="tutorial-tag">免拔卡</p>
+        <p>閱星瞳開啟 WiFi 熱點（E-Paper / 密碼 12345678），手機連上後瀏覽器開 192.168.3.3 上傳。</p>
+      </div>
+      <div class="card-a tutorial-card">
+        <div class="tutorial-icon"><i data-lucide="smartphone"></i></div>
+        <h3>App 傳書</h3>
+        <p class="tutorial-tag">最方便</p>
+        <p>下載 XTEink 官方 App 或 CrossPoint Sync，同一個 WiFi 下自動連線，一鍵傳書。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 致謝 Credits -->
+  <section class="credits-section">
+    <h2><i data-lucide="heart"></i> 致謝</h2>
+    <div class="credits-content">
+      <div class="credits-group">
+        <h3>開源專案</h3>
+        <ul>
+          <li><a href="https://github.com/bigbag/epub-to-xtc-converter" target="_blank" rel="noopener">epub-to-xtc-converter</a>（Dave Allie, MIT License）— 本工具的核心基底</li>
+          <li><a href="https://github.com/nickel-org/nickel.rs" target="_blank" rel="noopener">CREngine / CoolReader</a>（GPL-2.0）— EPUB/MOBI 排版渲染引擎（WASM 版）</li>
+          <li><a href="https://mozilla.github.io/pdf.js/" target="_blank" rel="noopener">PDF.js</a>（Mozilla, Apache 2.0）— PDF 渲染引擎</li>
+          <li><a href="https://stuk.github.io/jszip/" target="_blank" rel="noopener">JSZip</a>（MIT）— ZIP 檔案處理</li>
+          <li><a href="https://lucide.dev/" target="_blank" rel="noopener">Lucide Icons</a>（ISC）— 圖示系統</li>
+        </ul>
+      </div>
+      <div class="credits-group">
+        <h3>繁體中文字型</h3>
+        <ul>
+          <li><a href="https://github.com/tonyhuan/GuanKiapTsingKhai" target="_blank" rel="noopener">原俠正楷</a>（tonyhuan, SIL OFL）— 基於芫荽與霞鶩文楷的楷體</li>
+          <li><a href="https://github.com/justfont/open-huninn-font" target="_blank" rel="noopener">jf open 粉圓</a>（justfont, SIL OFL）— 台灣設計的圓體</li>
+          <li><a href="https://github.com/notofonts/noto-cjk" target="_blank" rel="noopener">思源宋體 / 思源黑體</a>（Google & Adobe, SIL OFL）— Noto Serif TC / Noto Sans TC</li>
+          <li><a href="https://github.com/jasonhandwriting/JasonHandwriting" target="_blank" rel="noopener">清松手寫體</a>（游清松, SIL OFL）— 原子筆手寫風格</li>
+          <li><a href="https://github.com/ACh-K/Cubic-11" target="_blank" rel="noopener">俐方體 11 號</a>（ACh-K, SIL OFL 1.1）— 基於 M+ gothic 12r 的台灣點陣體</li>
+        </ul>
+      </div>
+      <div class="credits-group">
+        <h3>特別感謝</h3>
+        <ul>
+          <li><a href="https://www.xteink.cn/" target="_blank" rel="noopener">閱星瞳 XTEink</a> — 裝置與官方轉檔工具的參考</li>
+          <li><a href="https://x4converter.rho.sh/" target="_blank" rel="noopener">x4converter.rho.sh</a> — EPUB to XTC Converter 參考實作</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-line"></div>
+    <p>(C) 2026 Kaoru Tsai. All Rights Reserved. | Contact: hello@helloruru.com</p>
+    <p class="footer-credits">基於 <a href="https://github.com/bigbag/epub-to-xtc-converter" target="_blank">epub-to-xtc-converter</a> 開源專案 | 所有轉檔在瀏覽器本地完成</p>
+  </footer>
+
+  <!-- Lightbox (mobile full-screen preview) -->
+  <div id="lightbox" class="lightbox" style="display:none;">
+    <button class="lightbox-close" onclick="closeLightbox()"><i data-lucide="x"></i></button>
+    <canvas id="lightboxCanvas"></canvas>
+  </div>
+
+  <!-- Scripts -->
+  <script src="crengine.js"></script>
+  <script src="markdown-parser.js"></script>
+  <script src="format-handlers.js"></script>
+  <script src="dither-worker.js"></script>
+  <script src="compat-shim.js"></script>
+  <script src="app.js"></script>
+  <script src="font-config.js"></script>
+  <script src="status-bar-themes.js"></script>
+  <script src="image-tools.js"></script>
+  <script src="app-bridge.js"></script>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Show onboarding on first visit
+    if (!localStorage.getItem('xtc-onboarded')) {
+      document.getElementById('onboarding').style.display = 'flex';
+    }
+
+    function skipOnboarding() {
+      document.getElementById('onboarding').style.display = 'none';
+      localStorage.setItem('xtc-onboarded', 'true');
+    }
+
+    // Mobile sidebar toggle
+    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('collapsed');
+    });
+
+    // 字型建議字級對照表
+    const fontSizeRecommendations = {
+      'GuanKiapTsingKhai': { hint: '原俠正楷適合文學類閱讀，建議字級 30-36px', defaultSize: 34 },
+      'Huninn': { hint: '粉圓體筆畫飽滿好讀，建議字級 32-38px', defaultSize: 34 },
+      'NotoSerifTC': { hint: '思源宋體適合長時間閱讀，建議字級 28-34px', defaultSize: 30 },
+      'NotoSansTC': { hint: '思源黑體清晰俐落，建議字級 28-34px', defaultSize: 30 },
+      'JasonHandwriting1': { hint: '手寫體建議大一點才清楚，建議字級 32px 以上', defaultSize: 34 },
+      'Cubic11': { hint: '點陣體建議用 33px（11 的整數倍最清晰）', defaultSize: 33 },
+      'Literata': { hint: 'Literata 經典英文襯線體，建議字級 28-34px', defaultSize: 30 },
+      'Lora': { hint: 'Lora 優雅英文襯線體，建議字級 28-34px', defaultSize: 30 },
+    };
+
+    document.getElementById('fontSelect')?.addEventListener('change', function() {
+      const rec = fontSizeRecommendations[this.value];
+      const hintEl = document.getElementById('fontSizeHint');
+      if (rec && hintEl) {
+        hintEl.querySelector('span').textContent = rec.hint;
+        // Auto-adjust font size slider to recommended default
+        const slider = document.getElementById('fontSize');
+        const valueDisplay = document.getElementById('fontSizeValue');
+        if (slider && valueDisplay) {
+          slider.value = rec.defaultSize;
+          valueDisplay.textContent = rec.defaultSize;
+        }
+      }
+    });
+
+    // 工具切換
+    function switchTool(tool) {
+      document.querySelectorAll('.tool-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.tool-panel').forEach(function(p) { p.style.display = 'none'; });
+      document.querySelector('[data-tool="' + tool + '"]').classList.add('active');
+      document.getElementById(tool === 'converter' ? 'converterPanel' : 'imagePanel').style.display = 'block';
+      // Reinitialize Lucide icons for newly visible elements
+      lucide.createIcons();
+    }
+
+    function switchImageTool(tool) {
+      document.querySelectorAll('.img-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.img-tool-content').forEach(function(p) { p.style.display = 'none'; });
+      document.querySelector('[data-imgtool="' + tool + '"]').classList.add('active');
+      document.getElementById(tool + 'Tool').style.display = 'block';
+      lucide.createIcons();
+    }
+
+    // 圖片工具 slider 即時更新
+    ['imgBrightness', 'imgContrast', 'imgDitherStrength', 'imgBookDither', 'cardDither'].forEach(function(id) {
+      var slider = document.getElementById(id);
+      var display = document.getElementById(id + 'Value') || document.getElementById(id.replace('Strength', 'Value').replace('Dither', 'DitherValue'));
+      if (slider && display) {
+        slider.addEventListener('input', function() { display.textContent = this.value; });
+      }
+    });
+
+    // Auto-collapse sidebar on mobile
+    if (window.innerWidth <= 768) {
+      document.getElementById('sidebar')?.classList.add('collapsed');
+    }
+
+    // Canvas lightbox for mobile
+    document.getElementById('previewCanvas')?.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        openLightbox();
+      }
+    });
+
+    function openLightbox() {
+      const lb = document.getElementById('lightbox');
+      const src = document.getElementById('previewCanvas');
+      const dest = document.getElementById('lightboxCanvas');
+      dest.width = src.width;
+      dest.height = src.height;
+      dest.getContext('2d').drawImage(src, 0, 0);
+      lb.style.display = 'flex';
+      lucide.createIcons();
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+  </script>
+</body>
+</html>

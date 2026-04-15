@@ -1,0 +1,305 @@
+/* === Dark Mode -- Warm Cocoa (html.dark) === */
+/* All dark mode overrides consolidated from every module */
+
+/* ---------- Variable Overrides ---------- */
+html.dark {
+  --bg-page: #1E181B;
+  --bg-card: #282224;
+  --bg-sidebar: #282224;
+  --bg-input: #332C2F;
+  --bg-preview: linear-gradient(135deg, rgba(218, 174, 176, 0.04), rgba(194, 180, 208, 0.04));
+
+  --text-heading: #EDE8E9;
+  --text-body: #C4BBBF;
+  --text-caption: #918A8D;
+  --text-muted: #6B6466;
+
+  --brand-pink: #E8D2D2;
+  --brand-brown: #8A7570;
+
+  --color-rose: #DAAEB0;
+  --color-lavender: #C2B4D0;
+  --color-coral: #F0B88C;
+  --color-mist: #3D3538;
+  --color-warm-gray: #6B6466;
+
+  --border-light: #3D3538;
+  --border-medium: rgba(138, 117, 112, 0.40);
+  --border-focus: #DAAEB0;
+
+  --shadow-sm: 0 2px 8px rgba(30, 24, 27, 0.30);
+  --shadow-md: 0 4px 16px rgba(30, 24, 27, 0.40);
+  --shadow-lg: 0 8px 32px rgba(30, 24, 27, 0.50);
+
+  --color-gradient: linear-gradient(135deg, #DAAEB0, #C2B4D0);
+  --brand-gradient: linear-gradient(135deg, #E8D2D2, #8A7570);
+}
+
+/* ---------- Base ---------- */
+html.dark body {
+  background: var(--bg-page);
+  color: var(--text-body);
+}
+
+/* ---------- Sidebar ---------- */
+html.dark .sidebar {
+  background: var(--bg-sidebar);
+  border-right-color: var(--border-light);
+}
+
+html.dark .sidebar h2 {
+  color: var(--brand-brown);
+}
+
+/* ---------- Cards (Book Info) ---------- */
+html.dark .book-info {
+  background: rgba(218, 174, 176, 0.06);
+  border-color: rgba(218, 174, 176, 0.15);
+  border-left-color: var(--brand-brown);
+}
+
+html.dark .book-info .title {
+  color: var(--text-heading);
+}
+
+html.dark .book-info .author {
+  color: var(--text-caption);
+}
+
+/* ---------- Drop Zone ---------- */
+html.dark .drop-zone {
+  border-color: rgba(218, 174, 176, 0.30);
+  background: rgba(218, 174, 176, 0.04);
+}
+
+html.dark .drop-zone:hover,
+html.dark .drop-zone.drag-over {
+  border-color: var(--color-rose);
+  background: rgba(218, 174, 176, 0.10);
+}
+
+html.dark .drop-zone-icon {
+  color: var(--color-rose);
+}
+
+/* ---------- File List ---------- */
+html.dark .file-item {
+  background: var(--bg-input);
+  border-color: var(--border-light);
+  color: var(--text-body);
+}
+
+html.dark .file-item.active {
+  background: var(--color-rose);
+  color: #1E181B;
+  border-color: var(--color-rose);
+}
+
+/* ---------- Form Controls ---------- */
+html.dark .control-group select,
+html.dark .control-group input[type="text"],
+html.dark .control-group input[type="number"] {
+  background: var(--bg-input);
+  border-color: var(--border-light);
+  color: var(--text-heading);
+}
+
+html.dark .control-group select:focus,
+html.dark .control-group input:focus {
+  border-color: var(--color-rose);
+  box-shadow: 0 0 0 3px rgba(218, 174, 176, 0.15);
+}
+
+/* ---------- Range Input ---------- */
+html.dark input[type="range"] {
+  background: var(--border-light);
+}
+
+html.dark input[type="range"]::-webkit-slider-thumb {
+  background: var(--color-rose);
+  border-color: var(--bg-card);
+}
+
+html.dark input[type="range"]::-moz-range-thumb {
+  background: var(--color-rose);
+  border-color: var(--bg-card);
+}
+
+/* ---------- Checkbox ---------- */
+html.dark .checkbox-group label {
+  color: var(--text-body);
+}
+
+html.dark .checkbox-group input[type="checkbox"] {
+  accent-color: var(--color-rose);
+}
+
+/* ---------- Orientation Buttons ---------- */
+html.dark .orientation-buttons button {
+  background: var(--bg-input);
+  border-color: var(--border-light);
+  color: var(--text-body);
+}
+
+html.dark .orientation-buttons button:hover {
+  background: rgba(218, 174, 176, 0.10);
+}
+
+html.dark .orientation-buttons button.active {
+  border-color: var(--color-rose);
+  background: rgba(218, 174, 176, 0.15);
+  color: var(--color-rose);
+}
+
+/* ---------- Chapter List ---------- */
+html.dark .chapter-list {
+  background: var(--bg-input);
+  border-color: var(--border-light);
+}
+
+html.dark .chapter-item {
+  border-bottom-color: var(--border-light);
+  color: var(--text-caption);
+}
+
+html.dark .chapter-item:hover {
+  background: rgba(218, 174, 176, 0.08);
+  color: var(--text-heading);
+}
+
+html.dark .chapter-item.active {
+  background: var(--color-rose);
+  color: #1E181B;
+}
+
+/* ---------- Tabs ---------- */
+html.dark .tabs button {
+  background: var(--bg-input);
+  border-color: var(--border-light);
+  color: var(--text-caption);
+}
+
+html.dark .tabs button:hover {
+  color: var(--text-body);
+}
+
+html.dark .tabs button.active {
+  background: var(--color-rose);
+  color: #1E181B;
+  border-color: var(--color-rose);
+}
+
+/* ---------- Preview ---------- */
+html.dark .preview-header {
+  background: var(--bg-card);
+  border-bottom-color: var(--border-light);
+}
+
+html.dark .nav-buttons button,
+html.dark .export-buttons button {
+  background: var(--bg-input);
+  border-color: var(--border-light);
+  color: var(--text-body);
+}
+
+html.dark .nav-buttons button:hover,
+html.dark .export-buttons button:hover {
+  background: rgba(218, 174, 176, 0.10);
+}
+
+html.dark .export-buttons button.primary {
+  background: var(--color-coral);
+  color: #1E181B;
+}
+
+html.dark .export-buttons button.primary:hover {
+  background: #F0B88C;
+}
+
+html.dark .preview-area {
+  background: var(--bg-preview);
+  border-color: var(--border-light);
+}
+
+html.dark #previewCanvas {
+  box-shadow: var(--shadow-lg);
+}
+
+/* ---------- Progress ---------- */
+html.dark .progress-container {
+  background: var(--bg-card);
+  border-top-color: var(--border-light);
+}
+
+html.dark .progress-bar {
+  background: var(--border-light);
+}
+
+/* ---------- Optimizer ---------- */
+html.dark #optimizeBtn {
+  background: var(--color-coral) !important;
+  color: #1E181B !important;
+}
+
+html.dark #optimizeBtn:hover {
+  background: #F0B88C !important;
+}
+
+html.dark .progress-bar-row select {
+  background: var(--bg-input);
+  border-color: var(--border-light);
+  color: var(--text-heading);
+}
+
+/* ---------- Scrollbar ---------- */
+html.dark ::-webkit-scrollbar-track {
+  background: var(--bg-page);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-warm-gray);
+}
+
+/* ---------- Cards (Sticky Note) ---------- */
+html.dark .sticky-note,
+html.dark .tip-card,
+html.dark .onboarding-card {
+  background: linear-gradient(135deg, rgba(218, 174, 176, 0.08), rgba(194, 180, 208, 0.06));
+  border-color: var(--border-light);
+}
+
+/* ---------- Credits ---------- */
+html.dark .credits-group {
+  background: var(--dark-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+html.dark .credits-group h3 {
+  color: var(--dark-brand-pink);
+  border-bottom-color: var(--dark-border);
+}
+
+html.dark .credits-group li {
+  color: var(--dark-text-secondary);
+}
+
+html.dark .credits-group li + li {
+  border-top-color: var(--dark-border);
+}
+
+html.dark .credits-group a {
+  color: var(--dark-brand-pink);
+}
+
+html.dark .credits-group a:hover {
+  color: var(--dark-rose);
+}
+
+/* ---------- Form Hint ---------- */
+html.dark .form-hint {
+  background: rgba(218, 174, 176, 0.08);
+}

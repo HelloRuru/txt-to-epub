@@ -1,0 +1,74 @@
+/* === CSS Custom Properties (DS v2.2 Classic) === */
+
+:root {
+  /* Brand */
+  --brand-pink: #DFC6C6;
+  --brand-brown: #6D5954;
+  --brand-gradient: linear-gradient(135deg, #DFC6C6, #6D5954);
+
+  /* Primary palette */
+  --color-rose: #D4A5A5;
+  --color-lavender: #B8A9C9;
+  --color-coral: #E8A87C;
+  --color-gradient: linear-gradient(135deg, #D4A5A5, #B8A9C9);
+
+  /* Extended pinks */
+  --color-blush: #F5D0C5;
+  --color-gray-rose: #C9929A;
+  --color-nadeshiko: #E8B4B8;
+  --color-sakura: #FEDFE1;
+
+  /* Extended purples */
+  --color-lotus: #9B7E93;
+  --color-wisteria: #C4B7D7;
+
+  /* Neutrals */
+  --color-sage: #A8B5A0;
+  --color-mist: #E8E4E1;
+  --color-warm-gray: #B5ADA7;
+  --color-charcoal: #5C5856;
+
+  /* Text */
+  --text-heading: #333333;
+  --text-body: #4A4A4A;
+  --text-caption: #888888;
+  --text-muted: #AAAAAA;
+
+  /* Backgrounds */
+  --bg-page: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --bg-sidebar: #FFFFFF;
+  --bg-input: #FAFAFA;
+  --bg-preview: linear-gradient(135deg, rgba(212, 165, 165, 0.06), rgba(184, 169, 201, 0.06));
+
+  /* Borders */
+  --border-light: rgba(109, 89, 84, 0.12);
+  --border-medium: rgba(109, 89, 84, 0.20);
+  --border-focus: var(--color-rose);
+
+  /* Shadows (warm, never pure black) */
+  --shadow-sm: 0 2px 8px rgba(212, 165, 165, 0.08);
+  --shadow-md: 0 4px 16px rgba(212, 165, 165, 0.10);
+  --shadow-lg: 0 8px 32px rgba(212, 165, 165, 0.14);
+
+  /* Radii */
+  --radius-card: 24px;
+  --radius-input: 12px;
+  --radius-tag: 8px;
+
+  /* Typography */
+  --font-family: 'GenSenRounded', 'Noto Sans TC', sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --line-height: 1.8;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+}

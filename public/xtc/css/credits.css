@@ -1,0 +1,74 @@
+/* === Credits Section, Credits Groups, Font Hint === */
+
+.credits-section {
+  max-width: 960px;
+  margin: var(--space-2xl) auto;
+  padding: 0 var(--space-lg);
+}
+
+.credits-section h2 {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--color-brand-brown);
+  text-align: center;
+  margin-bottom: var(--space-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.credits-section h2 svg {
+  color: var(--color-rose);
+}
+
+.credits-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-lg);
+}
+
+.credits-group {
+  background: var(--bg-card);
+  border-radius: 24px;
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.credits-group h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-brand-brown);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 2px solid var(--color-brand-pink);
+}
+
+.credits-group ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.credits-group li {
+  font-size: 14px;
+  color: var(--text-body);
+  line-height: 1.6;
+  padding: var(--space-xs) 0;
+}
+
+.credits-group li + li {
+  border-top: 1px solid rgba(212, 165, 165, 0.1);
+}
+
+.credits-group a {
+  color: var(--color-brand-brown);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.credits-group a:hover {
+  color: var(--color-rose);
+  text-decoration: underline;
+}

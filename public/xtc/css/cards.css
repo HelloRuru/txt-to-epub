@@ -1,0 +1,52 @@
+/* === Card Styles (A: Plain, B: Pastel, C: Sticky Note) === */
+
+/* ---------- Card B — Book Info (pastel gradient + pink border) ---------- */
+.book-info {
+  background: linear-gradient(135deg, rgba(212, 165, 165, 0.08), rgba(184, 169, 201, 0.08));
+  border-radius: var(--radius-card);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+  border: 1px solid rgba(212, 165, 165, 0.20);
+  border-left: 3px solid var(--brand-brown);
+}
+
+.book-info .title {
+  font-weight: var(--font-weight-bold);
+  font-size: 14px;
+  margin-bottom: var(--space-xs);
+  word-break: break-word;
+  color: var(--text-heading);
+}
+
+.book-info .author {
+  color: var(--text-caption);
+  font-size: 12px;
+}
+
+/* ---------- Card C — Sticky Note (for tips/onboarding) ---------- */
+.sticky-note,
+.tip-card,
+.onboarding-card {
+  background: linear-gradient(135deg, rgba(254, 223, 225, 0.50), rgba(196, 183, 215, 0.25));
+  border-radius: var(--radius-card);
+  padding: var(--space-md);
+  position: relative;
+  transform: rotate(-0.5deg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--space-md);
+  border: 1px solid rgba(212, 165, 165, 0.15);
+}
+
+/* Top gradient bar */
+.sticky-note::before,
+.tip-card::before,
+.onboarding-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: var(--space-lg);
+  right: var(--space-lg);
+  height: 3px;
+  background: var(--brand-gradient);
+  border-radius: 0 0 2px 2px;
+}
