@@ -36,6 +36,17 @@ window.ChapterDetector = {
       { regex: /^[　\s]*[^\w\s\u4e00-\u9fff]+\s*(\d+\s*章)/gm, name: '符號章節' },
       { regex: /^[　\s]*(Chapter\s+\d+)/gim, name: 'Chapter' },
       { regex: /^[　\s]*(\d+[\.、話]\s*.+?)$/gm, name: '數字編號' },
+      { regex: /^[　\s]*((?:序章|序幕|楔子|引子|前言|前記|終章|終幕|尾聲|後記|番外|番外[一二三四五六七八九十\d]*|番外篇))/gm, name: '特殊章節' },
+      { regex: /^[　\s]*((?:Prologue|Epilogue|Interlude|Foreword|Afterword|Preface))/gim, name: 'Prologue/Epilogue' },
+      { regex: /^[　\s]*((?:Ep\.?\s*\d+|EP\s*\d+))/gim, name: 'Ep格式' },
+      { regex: /^[　\s]*((?:Act|ACT|Scene|SCENE|PART|Part|Book|BOOK)\s+[\dIVXivx]+)/gm, name: 'Act/Part/Book' },
+      { regex: /^[　\s]*((?:Vol\.?\s*\d+|Volume\s+\d+))/gim, name: 'Vol格式' },
+      { regex: /^[　\s]*(【.+?】)/gm, name: '【】標題' },
+      { regex: /^[　\s]*((?:[（(][零一二三四五六七八九十百\d]+[）)]))/gm, name: '括號編號' },
+      { regex: /^[　\s]*([壹貳參肆伍陸柒捌玖拾][、，.\s])/gm, name: '大寫數字' },
+      { regex: /^[　\s]*([一二三四五六七八九十]+[、])/gm, name: '中文數字' },
+      { regex: /^[　\s]*(S\d+E\d+)/gim, name: '影集格式' },
+      { regex: /^[　\s]*((?:Day|LOG|Page|PAGE)\s+\d+)/gim, name: 'Day/LOG/Page' },
     ];
 
     for (var p = 0; p < patterns.length; p++) {
@@ -136,6 +147,28 @@ window.ChapterDetector = {
       /^[　\s]*(\d+[\.、話]\s*.+?)$/gm,
       /^[　\s]*([①②③④⑤⑥⑦⑧⑨⑩].+?)$/gm,
       /^[　\s]*(卷[零一二三四五六七八九十百千\d]+.*?)$/gm,
+      // 特殊章節詞（序章/楔子/番外/終章/尾聲/後記等）
+      /^[　\s]*((?:序章|序幕|楔子|引子|前言|前記|終章|終幕|尾聲|後記|番外|番外[一二三四五六七八九十\d]*|番外篇).*?)$/gm,
+      // Prologue / Epilogue 等
+      /^[　\s]*((?:Prologue|Epilogue|Interlude|Foreword|Afterword|Preface).*?)$/gim,
+      // Ep / EP 格式
+      /^[　\s]*((?:Ep\.?\s*\d+|EP\s*\d+).*?)$/gim,
+      // Act / Scene / PART / Book
+      /^[　\s]*((?:Act|ACT|Scene|SCENE|PART|Part|Book|BOOK)\s+[\dIVXivx]+.*?)$/gm,
+      // Vol / Volume
+      /^[　\s]*((?:Vol\.?\s*\d+|Volume\s+\d+).*?)$/gim,
+      // 【】括號標題
+      /^[　\s]*(【.+?】.*?)$/gm,
+      // （一）(1) 括號編號
+      /^[　\s]*((?:[（(][零一二三四五六七八九十百\d]+[）)]).*?)$/gm,
+      // 壹、貳、參... 大寫數字
+      /^[　\s]*([壹貳參肆伍陸柒捌玖拾][、，.\s].+?)$/gm,
+      // 一、二、三... 中文數字
+      /^[　\s]*([一二三四五六七八九十]+[、].+?)$/gm,
+      // S01E01 影集格式
+      /^[　\s]*(S\d+E\d+.*?)$/gim,
+      // Day / LOG / Page
+      /^[　\s]*((?:Day|LOG|Page|PAGE)\s+\d+.*?)$/gim,
     ];
 
     // 各 pattern 分開收集，選命中數最多的那組
