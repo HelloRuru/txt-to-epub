@@ -111,8 +111,16 @@
             </select>
           </div>
           <div id="coverAutoPreview" class="cover-preview">
+            <div class="form-group">
+              <label>書名</label>
+              <input type="text" id="coverTitleInput" placeholder="輸入書名" oninput="generateAutoCover(this.value, document.getElementById('coverAuthorInput')?.value)">
+            </div>
+            <div class="form-group">
+              <label>作者</label>
+              <input type="text" id="coverAuthorInput" placeholder="輸入作者名（選填）" oninput="generateAutoCover(document.getElementById('coverTitleInput')?.value, this.value)">
+            </div>
             <canvas id="coverAutoCanvas" width="480" height="800" style="max-width:120px; border-radius:8px; box-shadow:0 2px 8px rgba(212,165,165,0.1);"></canvas>
-            <p class="form-hint"><i data-lucide="info"></i><span>會用書名和作者自動生成封面，轉檔時作為第一頁。</span></p>
+            <p class="form-hint"><i data-lucide="info"></i><span>輸入書名即時預覽封面。上傳 EPUB 時會自動帶入。</span></p>
           </div>
           <div id="coverUploadArea" style="display:none;">
             <div id="coverPreview" class="cover-preview" style="display:none;">
@@ -912,9 +920,12 @@
 
     // 自動生成封面（Canvas 繪製）
     function generateAutoCover(title, author) {
-      title = title || (document.getElementById('bookTitle')?.textContent) || '書名';
-      author = author || (document.getElementById('bookAuthor')?.textContent) || '';
-      if (title === '—') title = '書名';
+      // 優先用輸入框的值
+      var titleInput = document.getElementById('coverTitleInput');
+      var authorInput = document.getElementById('coverAuthorInput');
+      title = title || (titleInput?.value) || (document.getElementById('bookTitle')?.textContent) || '';
+      author = author || (authorInput?.value) || (document.getElementById('bookAuthor')?.textContent) || '';
+      if (title === '—' || !title) title = '書名';
       if (author === '—') author = '';
 
       var canvas = document.getElementById('coverAutoCanvas');
