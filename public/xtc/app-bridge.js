@@ -1526,40 +1526,46 @@
   window.applyPreset = function (preset) {
     switch (preset) {
       case 'novel':
-        // 小說模式：思源宋體、字級 30、行高 130、兩端對齊、快刷
+        // 小說模式：思源宋體、字大行鬆、不抖動、舒適閱讀
         setSelectValue('fontSelect', 'NotoSerifTC');
-        setSliderValue('fontSize', 30, 'fontSizeValue');
+        setSliderValue('fontSize', 34, 'fontSizeValue');
         setSliderValue('lineHeight', 130, 'lineHeightValue');
         setSliderValue('fontWeight', 400, 'fontWeightValue');
         setAlignActive('justify');
         setQualityActive('fast');
         setSelectValue('ditherMode', 'none');
-        setMargins(20, 16, 20, 16);
+        setSliderValue('ditherStrength', 0, 'ditherStrengthValue');
+        setMargins(16, 16, 16, 16);
         setSelectValue('indent', '2em');
         setSelectValue('hyphenation', 'algorithmic');
         break;
 
       case 'comic':
-        // 漫畫模式：高清、全頁抖動、無邊距
+        // 漫畫模式：灰階高清、全頁抖動 50%、圖片滿版零邊距
         setSelectValue('fontSelect', 'NotoSansTC');
         setSliderValue('fontSize', 28, 'fontSizeValue');
         setSliderValue('lineHeight', 120, 'lineHeightValue');
+        setAlignActive('left');
         setQualityActive('hq');
         setSelectValue('ditherMode', 'full');
-        setSliderValue('ditherStrength', 30, 'ditherStrengthValue');
+        setSliderValue('ditherStrength', 50, 'ditherStrengthValue');
         setMargins(0, 0, 0, 0);
+        setSelectValue('indent', '0');
         break;
 
       case 'document':
-        // 文件模式：思源黑體、大字、寬邊距
+        // 文件模式：思源黑體、字小行緊、僅圖片抖動、塞更多內容
         setSelectValue('fontSelect', 'NotoSansTC');
         setSliderValue('fontSize', 28, 'fontSizeValue');
-        setSliderValue('lineHeight', 140, 'lineHeightValue');
-        setAlignActive('left');
+        setSliderValue('lineHeight', 110, 'lineHeightValue');
+        setSliderValue('fontWeight', 400, 'fontWeightValue');
+        setAlignActive('justify');
         setQualityActive('fast');
         setSelectValue('ditherMode', 'image');
-        setMargins(24, 20, 24, 20);
+        setSliderValue('ditherStrength', 20, 'ditherStrengthValue');
+        setMargins(12, 12, 12, 12);
         setSelectValue('indent', '0');
+        setSelectValue('hyphenation', 'none');
         break;
     }
 
