@@ -26,6 +26,7 @@ const PRECACHE_URLS = [
   './css/footer.css',
   './css/dark-mode.css',
   './css/responsive.css',
+  './compat-shim.js',
   './app.js',
   './app-bridge.js',
   './font-config.js',

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 300px;
+      font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", -apple-system, sans-serif;
+      font-size: 14px;
+      color: #4A4A4A;
+      background: #fff;
+    }
+    .header {
+      padding: 14px 16px 10px;
+      background: #40C8F7;
+      color: #fff;
+    }
+    .header h1 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .header p {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+      padding: 14px 16px;
+      background: #FAFAFA;
+      border-bottom: 1px solid #EAF5FB;
+    }
+    .input-row input {
+      flex: 1;
+      border: 1.5px solid #E0F0F8;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #333;
+      outline: none;
+      background: #fff;
+      font-family: inherit;
+    }
+    .input-row input:focus {
+      border-color: #40C8F7;
+      box-shadow: 0 0 0 3px rgba(64,200,247,0.12);
+    }
+    .input-row input::placeholder {
+      color: #CCC;
+      font-weight: 400;
+      font-size: 16px;
+    }
+    .results {
+      padding: 0;
+      display: none;
+    }
+    .saved-banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #40C8F7, #2BA8D4);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .saved-banner small {
+      font-size: 13px;
+      font-weight: 400;
+      opacity: 0.85;
+    }
+    .methods {
+      padding: 10px 16px;
+    }
+    .method {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid #EAF5FB;
+    }
+    .method:last-child { border-bottom: none; }
+    .method-name {
+      flex: 1;
+      font-size: 14px;
+      color: #888;
+    }
+    .method-cost {
+      font-size: 15px;
+      font-weight: 600;
+      color: #888;
+    }
+    .best {
+      background: #F0FAFF;
+      border: 1.5px solid #40C8F7;
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin: 4px -4px;
+    }
+    .best .method-name {
+      font-weight: 700;
+      color: #2BA8D4;
+      font-size: 15px;
+    }
+    .best .method-cost {
+      color: #2BA8D4;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .badge {
+      font-size: 12px;
+      color: #fff;
+      background: #40C8F7;
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    .advice {
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #888;
+      background: #FAFAFA;
+      border-top: 1px solid #EAF5FB;
+    }
+    .sweet {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #2BA8D4;
+      background: #F5FCFF;
+      text-align: center;
+    }
+    .footer {
+      padding: 10px 16px 14px;
+      text-align: center;
+      border-top: 1px solid #EAF5FB;
+    }
+    .footer a {
+      font-size: 12px;
+      color: #40C8F7;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>讀墨省錢計算機</h1>
+    <p>輸入書價，看哪個最划算</p>
+  </div>
+
+  <div class="input-row">
+    <input type="number" id="price-input" placeholder="輸入書價" min="50" max="9999" autofocus>
+  </div>
+
+  <div class="results" id="results"></div>
+
+  <div class="footer">
+    <a href="https://tools.helloruru.com/readmoo-buy/" target="_blank">完整版計算機 &rarr;</a>
+  </div>
+
+  <script src="calc.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

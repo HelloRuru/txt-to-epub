@@ -1,0 +1,327 @@
+/**
+ * 讀墨省錢計算機 — 浮動面板樣式
+ * 配色參考讀墨：品牌藍 #40C8F7、背景 #FAFAFA、文字 #4A4A4A
+ */
+
+/* 面板容器 */
+.rmc-panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  max-height: 500px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #E0F0F8;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(64, 200, 247, 0.12), 0 2px 8px rgba(0,0,0,0.06);
+  font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", -apple-system, sans-serif;
+  font-size: 14px;
+  color: #4A4A4A;
+  z-index: 99999;
+  line-height: 1.5;
+}
+
+.rmc-cart-panel {
+  width: 340px;
+  max-height: 540px;
+}
+
+/* 標題列 — 讀墨藍 */
+.rmc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px 10px;
+  background: #40C8F7;
+  border-radius: 16px 16px 0 0;
+}
+
+.rmc-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.rmc-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.rmc-close:hover {
+  color: #fff;
+}
+
+/* 省多少 — 最醒目的區塊 */
+.rmc-saved-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #40C8F7, #2BA8D4);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.rmc-saved-banner small {
+  font-size: 13px;
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+/* 書價顯示 */
+.rmc-price-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #EAF5FB;
+}
+
+.rmc-label {
+  font-size: 13px;
+  color: #999;
+}
+
+.rmc-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+}
+
+.rmc-sale-badge {
+  font-size: 12px;
+  color: #fff;
+  background: #40C8F7;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* 方案列表 */
+.rmc-methods {
+  padding: 10px 16px;
+}
+
+.rmc-method {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #EAF5FB;
+}
+
+.rmc-method:last-child {
+  border-bottom: none;
+}
+
+.rmc-method-name {
+  flex: 1;
+  font-size: 14px;
+  color: #666;
+}
+
+.rmc-method-cost {
+  font-size: 16px;
+  font-weight: 600;
+  color: #666;
+}
+
+/* 最省方案 — 明顯區隔 */
+.rmc-best {
+  background: #F0FAFF;
+  border: 1.5px solid #40C8F7;
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin: 4px -4px;
+}
+
+.rmc-best .rmc-method-name {
+  font-weight: 700;
+  color: #2BA8D4;
+  font-size: 15px;
+}
+
+.rmc-best .rmc-method-cost {
+  color: #2BA8D4;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.rmc-badge {
+  font-size: 12px;
+  color: #fff;
+  background: #40C8F7;
+  padding: 3px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* 疊疊樂 */
+.rmc-stack {
+  padding: 0 16px 8px;
+}
+
+.rmc-stack-title {
+  font-size: 12px;
+  color: #40C8F7;
+  font-weight: 600;
+  padding: 8px 0 4px;
+  border-top: 1px dashed #E0F0F8;
+}
+
+/* 建議文字 */
+.rmc-advice {
+  padding: 10px 16px;
+  font-size: 13px;
+  color: #888;
+  background: #FAFAFA;
+  border-top: 1px solid #EAF5FB;
+}
+
+/* 甜蜜區提醒 */
+.rmc-sweet {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2BA8D4;
+  background: #F5FCFF;
+  text-align: center;
+}
+
+/* 底部連結 */
+.rmc-footer {
+  padding: 10px 16px 14px;
+  text-align: right;
+}
+
+.rmc-link {
+  font-size: 12px;
+  color: #40C8F7;
+  text-decoration: none;
+}
+
+.rmc-link:hover {
+  text-decoration: underline;
+}
+
+/* 空狀態 */
+.rmc-empty {
+  padding: 20px 16px;
+  text-align: center;
+  color: #BBB;
+  font-size: 14px;
+}
+
+.rmc-empty a {
+  color: #40C8F7;
+}
+
+/* 迷你觸發按鈕 — 讀墨藍 */
+.rmc-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #40C8F7;
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(64, 200, 247, 0.35);
+  z-index: 99999;
+  transition: transform 0.2s;
+}
+
+.rmc-toggle:hover {
+  transform: scale(1.1);
+}
+
+/* === 購物車面板 === */
+
+.rmc-cart-summary {
+  padding: 14px 16px;
+  border-bottom: 1px solid #EAF5FB;
+}
+
+.rmc-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+.rmc-summary-best {
+  font-weight: 700;
+  color: #2BA8D4;
+  font-size: 17px;
+  padding: 6px 0;
+}
+
+.rmc-summary-saved {
+  color: #40C8F7;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.rmc-cart-books {
+  padding: 10px 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.rmc-cart-book {
+  padding: 8px 0;
+  border-bottom: 1px solid #EAF5FB;
+}
+
+.rmc-cart-book:last-child {
+  border-bottom: none;
+}
+
+.rmc-cart-book-title {
+  font-size: 13px;
+  color: #4A4A4A;
+  font-weight: 500;
+  margin-bottom: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rmc-cart-book-detail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.rmc-arrow {
+  color: #CCC;
+}
+
+/* 滾動條 */
+.rmc-panel::-webkit-scrollbar,
+.rmc-cart-books::-webkit-scrollbar {
+  width: 4px;
+}
+
+.rmc-panel::-webkit-scrollbar-thumb,
+.rmc-cart-books::-webkit-scrollbar-thumb {
+  background: #E0F0F8;
+  border-radius: 2px;
+}
