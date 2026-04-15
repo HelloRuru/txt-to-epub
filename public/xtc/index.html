@@ -387,7 +387,8 @@
         <!-- 桌布 / 待機畫面 -->
         <div id="wallpaperTool" class="img-tool-content">
           <section class="panel-section">
-            <h3><i data-lucide="monitor"></i> 待機畫面制圖</h3>
+            <h3><i data-lucide="monitor"></i> 待機畫面 / 桌布</h3>
+            <p class="form-hint"><i data-lucide="info"></i><span>匯出 XTG/XTH 單頁圖片，放到閱星瞳當待機畫面用。不是書籍格式。</span></p>
             <div id="imgDropZone" class="drop-zone">
               <i data-lucide="image-plus" class="drop-icon"></i>
               <p>上傳圖片</p>
@@ -402,7 +403,6 @@
               <select id="imgDevicePreset">
                 <option value="x4">XTEink X4 (480×800)</option>
                 <option value="x3">XTEink X3 (528×792)</option>
-                <option value="custom">自訂尺寸</option>
               </select>
             </div>
             <div class="form-group">
@@ -426,7 +426,7 @@
               <input type="range" id="imgContrast" min="-100" max="100" value="0">
             </div>
             <div class="form-group">
-              <label>抖動強度：<span id="imgDitherValue">50</span>%</label>
+              <label>灰階強度：<span id="imgDitherValue">50</span>%</label>
               <input type="range" id="imgDitherStrength" min="0" max="100" value="50">
             </div>
           </section>
@@ -436,8 +436,8 @@
             <div class="form-group">
               <label>格式</label>
               <select id="imgExportFormat">
-                <option value="xtg">XTG（1-bit 黑白）</option>
-                <option value="xth">XTH（2-bit 灰階）</option>
+                <option value="xtg">XTG — 黑白（翻頁快、省電）</option>
+                <option value="xth">XTH — 灰階（圖片更細緻）</option>
               </select>
             </div>
             <button class="btn-primary" id="imgExportBtn" style="width:100%;">
@@ -460,7 +460,7 @@
           </section>
           <section class="panel-section">
             <div class="form-group">
-              <label>抖動強度：<span id="imgBookDitherValue">50</span>%</label>
+              <label>灰階強度：<span id="imgBookDitherValue">50</span>%</label>
               <input type="range" id="imgBookDither" min="0" max="100" value="50">
             </div>
             <button class="btn-primary" id="imgBookExportBtn" style="width:100%;">
@@ -481,12 +481,13 @@
           </section>
           <section class="panel-section">
             <div class="form-group">
-              <label>輸出寬度 (px)</label>
-              <input type="number" id="coverWidth" value="240">
-            </div>
-            <div class="form-group">
-              <label>輸出高度 (px)</label>
-              <input type="number" id="coverHeight" value="400">
+              <label>裝置尺寸</label>
+              <select id="coverDevicePreset" onchange="updateCoverSize(this.value)">
+                <option value="x4" selected>XTEink X4（480 x 800）</option>
+                <option value="x3">XTEink X3（528 x 792）</option>
+              </select>
+              <input type="hidden" id="coverWidth" value="480">
+              <input type="hidden" id="coverHeight" value="800">
             </div>
             <button class="btn-primary" id="coverExportBtn" style="width:100%;">
               <i data-lucide="download"></i> 匯出透明書封（PNG）
@@ -513,7 +514,7 @@
               </select>
             </div>
             <div class="form-group">
-              <label>抖動強度：<span id="cardDitherValue">50</span>%</label>
+              <label>灰階強度：<span id="cardDitherValue">50</span>%</label>
               <input type="range" id="cardDither" min="0" max="100" value="50">
             </div>
             <button class="btn-primary" id="cardExportBtn" style="width:100%;">
@@ -601,7 +602,7 @@
         <div class="tutorial-icon"><i data-lucide="smartphone"></i></div>
         <h3>App 傳書</h3>
         <p class="tutorial-tag">最方便</p>
-        <p>下載 XTEink 官方 App 或 CrossPoint Sync，同一個 WiFi 下自動連線，一鍵傳書。</p>
+        <p>在手機下載 XTEink 官方 App 或 CrossPoint Sync（免費，不需要刷機），和閱星瞳連同一個 WiFi 就能一鍵傳書。</p>
       </div>
     </div>
   </section>
@@ -735,6 +736,16 @@
       document.querySelector('[data-imgtool="' + tool + '"]').classList.add('active');
       document.getElementById(tool + 'Tool').style.display = 'block';
       lucide.createIcons();
+    }
+
+    // 透明書封裝置尺寸連動
+    function updateCoverSize(device) {
+      var sizes = { x4: [480, 800], x3: [528, 792] };
+      var s = sizes[device] || sizes.x4;
+      var w = document.getElementById('coverWidth');
+      var h = document.getElementById('coverHeight');
+      if (w) w.value = s[0];
+      if (h) h.value = s[1];
     }
 
     // 圖片工具 slider 即時更新
