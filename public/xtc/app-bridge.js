@@ -799,7 +799,40 @@
     updateBookInfo(info.title || fileData.name, info.author || info.authors || '未知作者', totalPages);
 
     // 取得目錄
-    currentToc = renderer.getToc() || [];
+    var isTxtFile = /\.(txt|md|markdown)$/i.test(fileData.name);
+    if (isTxtFile && typeof TextTools !== 'undefined') {
+      // TXT 用我們的偵測器（比 CREngine 內建的準確）
+      try {
+        var rawText = await fileData.file.text();
+        var parsed = TextTools.skipMetadata(rawText);
+        var mode = document.getElementById('chapterDetectMode')?.value || 'auto';
+        var opts = {};
+        if (mode === 'separator') opts.separator = document.getElementById('chapterSeparator')?.value || '';
+        if (mode === 'keyword') opts.keyword = document.getElementById('chapterKeyword')?.value || '';
+        var detected = TextTools.detectChapters(parsed.body, mode, opts);
+
+        // 轉換成 CREngine TOC 格式（需要頁碼，用估算）
+        currentToc = [];
+        if (detected.length > 0 && totalPages > 0) {
+          var bodyLength = parsed.body.length;
+          for (var d = 0; d < detected.length; d++) {
+            var estimatedPage = Math.floor((detected[d].position / bodyLength) * totalPages);
+            currentToc.push({
+              title: detected[d].name,
+              name: detected[d].name,
+              page: estimatedPage,
+              startPage: estimatedPage,
+            });
+          }
+        }
+        console.log('[app-bridge] TXT 目錄偵測：' + currentToc.length + ' 章');
+      } catch (tocErr) {
+        console.warn('[app-bridge] TXT 目錄偵測失敗，回退 CREngine：', tocErr);
+        currentToc = renderer.getToc() || [];
+      }
+    } else {
+      currentToc = renderer.getToc() || [];
+    }
     updateChapterList();
     if (currentToc.length > 0) {
       showSection('chaptersSection');
