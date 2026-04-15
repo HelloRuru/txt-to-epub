@@ -91,6 +91,20 @@ var FONT_CONFIG = {
     ],
   },
 
+  LINESeedTW: {
+    name: 'LINE Seed',
+    category: 'zh-TW',
+    style: '現代無襯線',
+    license: 'SIL OFL 1.1',
+    author: 'LINE Corp.',
+    recommendedSize: { min: 28, max: 36, default: 32 },
+    hint: 'LINE Seed 現代感無襯線體，建議字級 28-36px',
+    variants: [
+      { weight: 400, style: 'normal', url: 'https://lab.helloruru.com/fonts/xtc/LINESeedTW-Regular.ttf' },
+      { weight: 700, style: 'normal', url: 'https://lab.helloruru.com/fonts/xtc/LINESeedTW-Bold.ttf' },
+    ],
+  },
+
   // === 英文字型（保留 bigbag 原版） ===
 
   Literata: {

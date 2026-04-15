@@ -196,6 +196,7 @@
                 <option value="NotoSansTC">思源黑體（黑體・建議 28-34px）</option>
                 <option value="JasonHandwriting1">清松手寫體（手寫・建議 32px 以上）</option>
                 <option value="Cubic11">俐方體 11 號（點陣・建議 33px）</option>
+                <option value="LINESeedTW">LINE Seed（現代無襯線・建議 28-36px）</option>
               </optgroup>
               <optgroup label="英文">
                 <option value="Literata">Literata</option>
@@ -692,6 +693,7 @@
           <li><a href="https://github.com/notofonts/noto-cjk" target="_blank" rel="noopener">思源宋體 / 思源黑體</a>（Google & Adobe, SIL OFL）— Noto Serif TC / Noto Sans TC</li>
           <li><a href="https://github.com/jasonhandwriting/JasonHandwriting" target="_blank" rel="noopener">清松手寫體</a>（游清松, SIL OFL）— 原子筆手寫風格</li>
           <li><a href="https://github.com/ACh-K/Cubic-11" target="_blank" rel="noopener">俐方體 11 號</a>（ACh-K, SIL OFL 1.1）— 基於 M+ gothic 12r 的台灣點陣體</li>
+          <li><a href="https://seed.line.me/index_tw.html" target="_blank" rel="noopener">LINE Seed</a>（LINE Corp., SIL OFL 1.1）— 現代無襯線體</li>
         </ul>
       </div>
       <div class="credits-group">
@@ -758,12 +760,13 @@
       'NotoSansTC': { hint: '思源黑體清晰俐落，建議字級 28-34px', defaultSize: 30 },
       'JasonHandwriting1': { hint: '手寫體建議大一點才清楚，建議字級 32px 以上', defaultSize: 34 },
       'Cubic11': { hint: '點陣體建議用 33px（11 的整數倍最清晰）', defaultSize: 33 },
+      'LINESeedTW': { hint: 'LINE Seed 現代感清晰好讀，建議字級 28-36px', defaultSize: 32 },
       'Literata': { hint: 'Literata 經典英文襯線體，建議字級 28-34px', defaultSize: 30 },
       'Lora': { hint: 'Lora 優雅英文襯線體，建議字級 28-34px', defaultSize: 30 },
     };
 
     // 中文字型清單（斷字功能用）
-    const chineseFonts = ['GuanKiapTsingKhai', 'Huninn', 'NotoSerifTC', 'NotoSansTC', 'JasonHandwriting1', 'Cubic11'];
+    const chineseFonts = ['GuanKiapTsingKhai', 'Huninn', 'NotoSerifTC', 'NotoSansTC', 'JasonHandwriting1', 'Cubic11', 'LINESeedTW'];
 
     document.getElementById('fontSelect')?.addEventListener('change', function() {
       const rec = fontSizeRecommendations[this.value];
