@@ -21,6 +21,14 @@
   Cache-Control: no-store, no-cache, must-revalidate
   Pragma: no-cache
 
+/xtc/*.js
+  Cache-Control: no-store, no-cache, must-revalidate
+  Pragma: no-cache
+
+/xtc/*.css
+  Cache-Control: no-store, no-cache, must-revalidate
+  Pragma: no-cache
+
 # API: 短快取
 /api/*
   Cache-Control: public, max-age=300
