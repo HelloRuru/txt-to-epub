@@ -873,13 +873,16 @@
           }
 
           // 特殊字元替換（避免缺字顯示為 ?）
+          // 所有「點」類字元統一換成全形中點 U+30FB（字型覆蓋率最高）
           textContent = textContent
-            .replace(/\u00B7/g, '\u30FB')   // middle dot → 全形中點（字型覆蓋率更高）
-            .replace(/\u2027/g, '\u30FB')   // hyphenation point → 全形中點
+            .replace(/[\u00B7\u2027\u2219\u22C5\u2024\u2E31\uFF65]/g, '\u30FB')  // 各種 dot/middle dot → ・
             .replace(/\u2022/g, '\u25CF')   // bullet → 黑圓
             .replace(/\u2013/g, '\uFF0D')   // en dash → 全形減號
-            .replace(/\u2014/g, '\u2500')   // em dash → 橫線（─）
-            .replace(/\u2026/g, '\u2026');  // ellipsis 保持不變（大部分字型有）
+            .replace(/\u2014/g, '\u2014')   // em dash 保留（常用字型都有）
+            .replace(/\u2015/g, '\u2014')   // horizontal bar → em dash
+            .replace(/\u2026/g, '\u2026')   // ellipsis 保留
+            .replace(/[\u201C\u201D]/g, function(m) { return m === '\u201C' ? '\u300C' : '\u300D'; })  // "" → 「」
+            .replace(/[\u2018\u2019]/g, function(m) { return m === '\u2018' ? '\u300E' : '\u300F'; }); // '' → 『』
 
           // 把處理過的文字轉回 bytes
           data = new TextEncoder().encode(textContent);
