@@ -17,54 +17,12 @@
     'theme-2': { name: '條狀（原版）', id: 'theme-2', custom: false },
 
     // 新增主題
-    'theme-cat': { name: '貓咪進度條', id: 'theme-cat', custom: true },
     'theme-bookmark': { name: '書籤風', id: 'theme-bookmark', custom: true },
     'theme-dots': { name: '極簡點點', id: 'theme-dots', custom: true },
   };
 
   // 掛到全域
   window.STATUS_BAR_THEMES = STATUS_BAR_THEMES;
-
-  // === 貓咪剪影點陣圖（16x16 像素，1=黑 0=白）===
-  // 走路的貓（精細版）
-  var CAT_WALK = [
-    [0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0],
-    [0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0],
-    [0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0],
-    [0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
-    [1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
-    [1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0],
-    [0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0],
-    [0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0],
-    [0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0],
-    [0,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0],
-    [0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0],
-    [1,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0],
-  ];
-
-  // 睡覺的貓（到終點時顯示，精細版）
-  var CAT_SLEEP = [
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
-    [0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  ];
 
   // 書籤形狀（12x16 像素）
   var BOOKMARK_SHAPE = [
@@ -189,74 +147,7 @@
   }
 
   // ============================================
-  // === Theme 3：貓咪進度條 ===
-  // ============================================
-  /**
-   * 底部：細線進度條 + 小貓剪影跟著進度走
-   * 接近 100% 時貓咪變成睡覺姿勢
-   */
-  function drawCatTheme(imageData, pageNum, totalPgs, chapterInfo, options) {
-    var w = imageData.width;
-    var h = imageData.height;
-    var margin = options.sideMargin || 8;
-    var barY = h - 18;  // 距離底部 18px
-    var barStartX = margin;
-    var barEndX = w - margin;
-    var barWidth = barEndX - barStartX;
-
-    // 清除狀態列區域
-    clearArea(imageData, 0, barY - 12, w, 30);
-
-    // 進度比例
-    var progress = totalPgs > 0 ? (pageNum + 1) / totalPgs : 0;
-    var progressX = barStartX + Math.floor(barWidth * progress);
-
-    // 畫進度線（底線）
-    // 已走過：黑色實線
-    drawHLine(imageData, barStartX, progressX, barY + 4, 0);
-    // 未走過：淺灰虛線（每 4px 一段）
-    for (var x = progressX + 1; x <= barEndX; x++) {
-      if ((x - progressX) % 8 < 4) {
-        setPixel(imageData, x, barY + 4, 180);
-      }
-    }
-
-    // 畫小貓（16x16 像素原尺寸）
-    var catScale = 1;
-    var catBitmap = (progress >= 0.95) ? CAT_SLEEP : CAT_WALK;
-    var catX = Math.max(barStartX, progressX - 16);
-    var catY = barY - 16 + 4;
-    drawBitmap(imageData, catBitmap, catX, catY, catScale, 0);
-
-    // 畫頁碼文字（右下角）
-    if (options.showPageNumber) {
-      var pageText = (pageNum + 1) + '/' + totalPgs;
-      var fontSize = options.fontSize || 11;
-      var txtObj = renderText(pageText, fontSize, 80);
-      txtObj.ctx.textAlign = 'right';
-      txtObj.ctx.fillText(pageText, 76, txtObj.height / 2);
-      blitCanvas(txtObj.canvas, imageData, w - margin - 80, barY - 2);
-    }
-
-    // 章節標記（進度線上的小三角）
-    if (options.showChapterMarks && typeof currentToc !== 'undefined' && currentToc.length > 0) {
-      for (var i = 0; i < currentToc.length; i++) {
-        var ch = currentToc[i];
-        if (!ch) continue;
-        var chPage = ch.page || ch.startPage || 0;
-        var markX = barStartX + Math.floor((chPage / totalPgs) * barWidth);
-        // 小三角標記
-        setPixel(imageData, markX, barY + 2, 0);
-        setPixel(imageData, markX - 1, barY + 1, 0);
-        setPixel(imageData, markX + 1, barY + 1, 0);
-        setPixel(imageData, markX - 2, barY, 0);
-        setPixel(imageData, markX + 2, barY, 0);
-      }
-    }
-  }
-
-  // ============================================
-  // === Theme 4：書籤風 ===
+  // === Theme 3：書籤風 ===
   // ============================================
   /**
    * 右下角書籤形狀裡放頁碼，進度用細虛線表示
@@ -422,9 +313,6 @@
     }
 
     switch (themeId) {
-      case 'theme-cat':
-        drawCatTheme(imageData, pageNum, totalPgs, chapterInfo, options);
-        return true;
       case 'theme-bookmark':
         drawBookmarkTheme(imageData, pageNum, totalPgs, chapterInfo, options);
         return true;

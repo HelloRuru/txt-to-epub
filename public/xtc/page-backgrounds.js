@@ -20,22 +20,11 @@
     'dots':           { name: '點點',       id: 'dots' },
     'lines':          { name: '橫線',       id: 'lines' },
     'border-simple':  { name: '簡約邊框',   id: 'border-simple' },
-    'border-cat':     { name: '貓咪邊框',   id: 'border-cat' },
     'border-floral':  { name: '花邊',       id: 'border-floral' },
     'custom':         { name: '自訂背景圖', id: 'custom' }
   };
 
   // ==================== 像素圖案 ====================
-
-  // 貓咪肉球（6x6，1=填色 0=透明）
-  var CAT_PAW = [
-    [0,1,0,0,1,0],
-    [1,1,1,1,1,1],
-    [1,1,1,1,1,1],
-    [0,1,1,1,1,0],
-    [0,1,0,0,1,0],
-    [0,0,0,0,0,0]
-  ];
 
   // 小花（7x7）
   var FLOWER = [
@@ -317,51 +306,6 @@
   }
 
   /**
-   * 貓咪邊框 — 四角肉球 + 細線連接
-   */
-  function drawCatBorder(imageData, options) {
-    var w = imageData.width;
-    var h = imageData.height;
-    var opacity = (options && options.opacity !== undefined) ? options.opacity / 100 : 0.55;
-    var gray = 110;
-    var pawGray = 80; // 肉球要夠深才看得到
-    var margin = 10;
-    var pawScale = 3; // 6x6 放大 3 倍 = 18x18 像素
-    var pawW = 6 * pawScale;
-    var pawH = 6 * pawScale;
-
-    // 細線邊框（從肉球邊緣開始）
-    var lineInset = margin + pawW / 2;
-
-    // 上邊線（兩隻肉球之間）
-    blendHLine(imageData, lineInset, w - 1 - lineInset, margin + pawH / 2, gray, opacity * 0.7);
-    // 下邊線
-    blendHLine(imageData, lineInset, w - 1 - lineInset, h - 1 - margin - pawH / 2, gray, opacity * 0.7);
-    // 左邊線
-    blendVLine(imageData, margin + pawW / 2, lineInset, h - 1 - lineInset, gray, opacity * 0.7);
-    // 右邊線
-    blendVLine(imageData, w - 1 - margin - pawW / 2, lineInset, h - 1 - lineInset, gray, opacity * 0.7);
-
-    // 四角肉球
-    // 左上
-    drawBitmap(imageData, CAT_PAW, margin, margin, pawScale, pawGray, opacity);
-    // 右上
-    drawBitmapFlipH(imageData, CAT_PAW, w - margin - pawW, margin, pawScale, pawGray, opacity);
-    // 左下
-    drawBitmap(imageData, CAT_PAW, margin, h - margin - pawH, pawScale, pawGray, opacity);
-    // 右下
-    drawBitmapFlipH(imageData, CAT_PAW, w - margin - pawW, h - margin - pawH, pawScale, pawGray, opacity);
-
-    // 上下邊中央再各放一顆小肉球（scale=2）
-    var smallScale = 2;
-    var smallW = 6 * smallScale;
-    var smallH = 6 * smallScale;
-    var centerX = Math.floor((w - smallW) / 2);
-    drawBitmap(imageData, CAT_PAW, centerX, margin, smallScale, pawGray, opacity * 0.8);
-    drawBitmap(imageData, CAT_PAW, centerX, h - margin - smallH, smallScale, pawGray, opacity * 0.8);
-  }
-
-  /**
    * 花邊 — 四角花 + 邊緣葉片 + 細線
    */
   function drawFloralBorder(imageData, options) {
@@ -543,9 +487,6 @@
         break;
       case 'border-simple':
         drawSimpleBorder(imageData, options);
-        break;
-      case 'border-cat':
-        drawCatBorder(imageData, options);
         break;
       case 'border-floral':
         drawFloralBorder(imageData, options);
