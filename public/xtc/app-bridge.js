@@ -1526,12 +1526,12 @@
   window.applyPreset = function (preset) {
     switch (preset) {
       case 'novel':
-        // 小說模式：思源宋體、字大行鬆、不抖動、舒適閱讀
+        // 小說模式：思源宋體、字大行鬆、不抖動、靠左對齊（避免中文兩端對齊空隙）
         setSelectValue('fontSelect', 'NotoSerifTC');
         setSliderValue('fontSize', 34, 'fontSizeValue');
         setSliderValue('lineHeight', 130, 'lineHeightValue');
         setSliderValue('fontWeight', 400, 'fontWeightValue');
-        setAlignActive('justify');
+        setAlignActive('left');
         setQualityActive('fast');
         setSelectValue('ditherMode', 'none');
         setSliderValue('ditherStrength', 0, 'ditherStrengthValue');
