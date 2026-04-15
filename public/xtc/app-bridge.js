@@ -1633,13 +1633,10 @@
     var creName = (typeof getFontCReName === 'function') ? getFontCReName(selectedFont) : selectedFont;
     var fallbackCre = 'Noto Serif TC';
 
-    // 檢查自動補字開關
-    var autoFallbackEl = document.getElementById('enableAutoFallback');
-    var autoFallbackOn = autoFallbackEl ? autoFallbackEl.checked : true;
-
-    // 不需要補字的字型（字集完整）
+    // 補字只在手動觸發時執行（window._doFallbackOnce 為 true）
     var fullCoverageFonts = ['NotoSerifTC', 'NotoSansTC'];
-    var needFallback = autoFallbackOn && fullCoverageFonts.indexOf(selectedFont) === -1;
+    var needFallback = window._doFallbackOnce && fullCoverageFonts.indexOf(selectedFont) === -1;
+    window._doFallbackOnce = false; // 用完就關
 
     // 第一層：用選的字型渲染
     renderer.goToPage(currentPage);
@@ -2066,11 +2063,21 @@
     });
   }
 
-  // --- 6.7b 自動補字 change ---
-  var _autoFallback = document.getElementById('enableAutoFallback');
-  if (_autoFallback) {
-    _autoFallback.addEventListener('change', function () {
-      if (typeof renderCurrentPage === 'function' && window._currentEngine !== 'pdfjs') renderCurrentPage();
+  // --- 6.7b 預覽補字按鈕 ---
+  var _fallbackBtn = document.getElementById('fallbackPreviewBtn');
+  if (_fallbackBtn) {
+    _fallbackBtn.addEventListener('click', function () {
+      if (!renderer || totalPages === 0) {
+        bridgeAlert('請先載入檔案。');
+        return;
+      }
+      var selectedFont = _fontSelect ? _fontSelect.value : 'NotoSerifTC';
+      if (['NotoSerifTC', 'NotoSansTC'].indexOf(selectedFont) !== -1) {
+        bridgeAlert('目前字型字集完整，不需要補字。');
+        return;
+      }
+      window._doFallbackOnce = true;
+      renderCurrentPage();
     });
   }
 
