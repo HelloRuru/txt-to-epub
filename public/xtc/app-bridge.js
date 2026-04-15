@@ -2503,6 +2503,12 @@
     msg.textContent = '轉檔完成！如果沒收到檔案，按下面的按鈕再下載一次。';
     container.appendChild(msg);
 
+    // 傳書教學提示
+    var transferTip = document.createElement('p');
+    transferTip.style.cssText = 'margin:0 0 12px 0; font-size:13px; color:#6D5954;';
+    transferTip.innerHTML = '下載後怎麼放到閱星曈？→ <a href="#tutorial" style="color:#D4A5A5; text-decoration:underline;">WiFi 傳書 / MicroSD / App 教學</a>';
+    container.appendChild(transferTip);
+
     // 再次下載按鈕
     var btn = document.createElement('button');
     btn.style.cssText = 'background:linear-gradient(135deg,#D4A5A5,#B8A9C9); color:#fff; border:none; border-radius:24px; padding:10px 24px; font-size:14px; font-weight:500; cursor:pointer; font-family:inherit; min-height:44px;';
