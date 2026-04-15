@@ -483,6 +483,98 @@
    * @returns {Promise<{text: string, chapters: Array, changes: object}>}
    */
   /**
+   * 跳過 TXT 開頭的 metadata（書名、作者、標籤、簡介等）
+   * 找到第一個章節標題或正文開始的位置，之前的當 metadata 處理
+   * @param {string} text
+   * @returns {{ metadata: {title: string, author: string, tags: string}, body: string }}
+   */
+  function skipMetadata(text) {
+    if (!text) return { metadata: {}, body: text };
+
+    var lines = text.split('\n');
+    var metadata = { title: '', author: '', tags: '' };
+    var bodyStartLine = 0;
+
+    // 掃描前 50 行找 metadata
+    var maxScan = Math.min(lines.length, 50);
+    var foundContent = false;
+
+    for (var i = 0; i < maxScan; i++) {
+      var line = lines[i].trim();
+      if (!line) continue; // 空行跳過
+
+      // 書名模式
+      if (!metadata.title) {
+        var titleMatch = line.match(/^[~～]?\s*[《「]?(.+?)[》」]?\s*$/);
+        if (i < 3 && titleMatch && line.length < 50) {
+          metadata.title = titleMatch[1].trim();
+          continue;
+        }
+      }
+
+      // 作者模式
+      var authorMatch = line.match(/^(?:作者|著者|原著|作|文|撰|by)\s*[：:︰]\s*(.+?)$/i);
+      if (authorMatch) {
+        metadata.author = authorMatch[1].trim();
+        continue;
+      }
+      // 「xxx 著」模式
+      var authorMatch2 = line.match(/^(.{2,15})\s*[著作撰]$/);
+      if (authorMatch2) {
+        metadata.author = authorMatch2[1].trim();
+        continue;
+      }
+
+      // 標籤/分類模式
+      var tagMatch = line.match(/^(?:內容標籤|内容标签|標籤|标签|分類|分类|類型|类型|關鍵字|关键字)\s*[：:︰]\s*(.+?)$/);
+      if (tagMatch) {
+        metadata.tags = tagMatch[1].trim();
+        continue;
+      }
+
+      // 簡介模式（跳過接下來的幾行直到空行）
+      if (/^(?:簡介|简介|內容簡介|内容简介|文案|摘要)\s*[：:︰]?\s*$/.test(line)) {
+        // 跳到下一個空行
+        for (var j = i + 1; j < maxScan; j++) {
+          if (!lines[j].trim()) {
+            i = j;
+            break;
+          }
+        }
+        continue;
+      }
+
+      // 純裝飾行（短且全是符號/數字/空白）
+      if (line.length < 10 && /^[=\-\*_~#·・☆★\s\d\.]+$/.test(line)) {
+        continue;
+      }
+
+      // 短評語/推薦語（通常只有一兩個字加標點，出現在 metadata 區）
+      if (i < 20 && line.length <= 5 && /^[^\u4e00-\u9fff]*[\u4e00-\u9fff]{1,3}[！!？?。]*$/.test(line)) {
+        continue;
+      }
+
+      // 碰到章節標題或夠長的正文行 → 正文開始
+      var isChapter = /^[　\s]*(第[零一二三四五六七八九十百千\d]+[章節回卷篇])/.test(line);
+      var isLongText = line.length >= 20;
+      if (isChapter || isLongText) {
+        bodyStartLine = i;
+        foundContent = true;
+        break;
+      }
+    }
+
+    if (!foundContent) {
+      bodyStartLine = 0; // 找不到就不跳
+    }
+
+    return {
+      metadata: metadata,
+      body: lines.slice(bodyStartLine).join('\n'),
+    };
+  }
+
+  /**
    * 清理中文文字中的多餘空格
    * 簡體電子書常見問題：中文字之間被插入全形或多個半形空格
    * @param {string} text
@@ -564,6 +656,7 @@
     simplifiedToTraditional: simplifiedToTraditional,
     halfToFull: halfToFull,
     convertPunctuation: convertPunctuation,
+    skipMetadata: skipMetadata,
     cleanSpaces: cleanSpaces,
     detectChapters: detectChapters,
     analyzeText: analyzeText,

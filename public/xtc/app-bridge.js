@@ -707,7 +707,74 @@
     // 回退：直接餵 raw bytes 給 CREngine
     // CREngine 內建格式偵測，EPUB/MOBI/TXT/DOC/DOCX 都能處理
     if (!loaded) {
-      var data = new Uint8Array(await fileData.file.arrayBuffer());
+      var rawBytes = await fileData.file.arrayBuffer();
+      var data = new Uint8Array(rawBytes);
+
+      // TXT 檔案前處理：跳過 metadata + 清理空格 + 簡轉繁
+      var isTxt = /\.(txt|md|markdown)$/i.test(fileData.name);
+      if (isTxt && typeof TextTools !== 'undefined') {
+        try {
+          var textContent = new TextDecoder('utf-8').decode(data);
+
+          // 跳過開頭 metadata（書名、作者、標籤、簡介等）
+          var parsed = TextTools.skipMetadata(textContent);
+          if (parsed.metadata.title) {
+            window._detectedTitle = parsed.metadata.title;
+          }
+          if (parsed.metadata.author) {
+            window._detectedAuthor = parsed.metadata.author;
+          }
+          textContent = parsed.body;
+
+          // 讀取 UI 勾選狀態
+          var doS2TW = document.getElementById('enableS2TW')?.checked !== false;
+          var doHalf = document.getElementById('enableHalfToFull')?.checked !== false;
+          var doPunct = document.getElementById('enablePunctTW')?.checked !== false;
+          var doClean = document.getElementById('enableCleanSpaces')?.checked !== false;
+
+          // 執行文字處理
+          var processed = await TextTools.processAll(textContent, {
+            s2tw: doS2TW,
+            halfToFull: doHalf,
+            punctuation: doPunct,
+            cleanSpaces: doClean,
+          });
+          textContent = processed.text;
+
+          // 回報處理結果
+          var changeLog = [];
+          if (processed.changes.cleanSpaces > 0) changeLog.push('清理 ' + processed.changes.cleanSpaces + ' 個多餘空格');
+          if (processed.changes.s2tw > 0) changeLog.push('簡轉繁 ' + processed.changes.s2tw + ' 字');
+          if (processed.changes.halfToFull > 0) changeLog.push('半全形 ' + processed.changes.halfToFull + ' 處');
+          if (processed.changes.punctuation > 0) changeLog.push('標點 ' + processed.changes.punctuation + ' 處');
+          if (changeLog.length > 0) {
+            console.log('[text-tools] 文字處理完成：' + changeLog.join('、'));
+          }
+
+          // 把處理過的文字轉回 bytes
+          data = new TextEncoder().encode(textContent);
+
+          // 自動填入封面的書名和作者
+          if (window._detectedTitle) {
+            var coverTitleInput = document.getElementById('coverTitleInput');
+            if (coverTitleInput && !coverTitleInput.value) {
+              coverTitleInput.value = window._detectedTitle;
+            }
+          }
+          if (window._detectedAuthor) {
+            var coverAuthorInput = document.getElementById('coverAuthorInput');
+            if (coverAuthorInput && !coverAuthorInput.value) {
+              coverAuthorInput.value = window._detectedAuthor;
+            }
+          }
+          if (typeof generateAutoCover === 'function') generateAutoCover();
+
+        } catch (textErr) {
+          console.warn('[text-tools] 文字前處理失敗，使用原始檔案：', textErr);
+          data = new Uint8Array(rawBytes);
+        }
+      }
+
       var ptr = Module.allocateMemory(data.length);
       Module.HEAPU8.set(data, ptr);
       try {
@@ -1795,7 +1862,164 @@
   }
 
   // ============================================
-  // === 七、進度條主題攔截 ===
+  // === 七、章節目錄編輯 ===
+  // ============================================
+
+  // 自訂章節清單（覆蓋 CREngine 的 TOC）
+  window._customToc = null; // null = 用原始 TOC，陣列 = 用自訂的
+
+  /**
+   * 渲染章節清單 UI（支援編輯）
+   */
+  function renderChapterListUI() {
+    var listEl = document.getElementById('chapterList');
+    if (!listEl) return;
+
+    var toc = window._customToc || currentToc || [];
+    listEl.innerHTML = '';
+
+    if (toc.length === 0) {
+      listEl.innerHTML = '<p style="color:#888; font-size:13px; text-align:center; padding:8px;">尚未偵測到章節</p>';
+      return;
+    }
+
+    for (var i = 0; i < toc.length; i++) {
+      var ch = toc[i];
+      var item = document.createElement('div');
+      item.className = 'chapter-edit-item';
+      item.setAttribute('data-index', i);
+      item.style.cssText = 'display:flex; align-items:center; gap:6px; padding:6px 0; border-bottom:1px solid rgba(212,165,165,0.1);';
+
+      // 章節名（可編輯）
+      var nameInput = document.createElement('input');
+      nameInput.type = 'text';
+      nameInput.value = ch.title || ch.name || '(未命名)';
+      nameInput.className = 'chapter-name-input';
+      nameInput.style.cssText = 'flex:1; border:1px solid transparent; background:transparent; font-size:13px; font-family:inherit; padding:4px 6px; border-radius:6px; color:#4A4A4A;';
+      nameInput.setAttribute('data-index', i);
+      nameInput.addEventListener('focus', function() { this.style.borderColor = '#D4A5A5'; this.style.background = '#fff'; });
+      nameInput.addEventListener('blur', function() {
+        this.style.borderColor = 'transparent';
+        this.style.background = 'transparent';
+        var idx = parseInt(this.getAttribute('data-index'));
+        updateChapterName(idx, this.value);
+      });
+
+      // 頁碼
+      var pageSpan = document.createElement('span');
+      pageSpan.style.cssText = 'font-size:11px; color:#AAA; min-width:30px; text-align:right;';
+      pageSpan.textContent = 'p.' + ((ch.page || ch.startPage || 0) + 1);
+
+      // 點擊跳轉
+      pageSpan.style.cursor = 'pointer';
+      pageSpan.setAttribute('data-page', ch.page || ch.startPage || 0);
+      pageSpan.addEventListener('click', function() {
+        var page = parseInt(this.getAttribute('data-page'));
+        if (!isNaN(page)) {
+          currentPage = page;
+          if (typeof renderCurrentPage === 'function') renderCurrentPage();
+        }
+      });
+
+      // 刪除按鈕
+      var delBtn = document.createElement('button');
+      delBtn.style.cssText = 'background:none; border:none; color:#C9929A; cursor:pointer; font-size:14px; padding:2px 4px; border-radius:4px;';
+      delBtn.innerHTML = '&times;';
+      delBtn.setAttribute('data-index', i);
+      delBtn.addEventListener('click', function() {
+        var idx = parseInt(this.getAttribute('data-index'));
+        removeChapter(idx);
+      });
+
+      item.appendChild(nameInput);
+      item.appendChild(pageSpan);
+      item.appendChild(delBtn);
+      listEl.appendChild(item);
+    }
+  }
+
+  function updateChapterName(index, newName) {
+    ensureCustomToc();
+    if (window._customToc[index]) {
+      window._customToc[index].title = newName;
+      window._customToc[index].name = newName;
+    }
+  }
+
+  function removeChapter(index) {
+    ensureCustomToc();
+    window._customToc.splice(index, 1);
+    renderChapterListUI();
+    // 同步到 currentToc
+    if (typeof currentToc !== 'undefined') {
+      currentToc.length = 0;
+      for (var i = 0; i < window._customToc.length; i++) {
+        currentToc.push(window._customToc[i]);
+      }
+    }
+  }
+
+  window.addChapter = function() {
+    ensureCustomToc();
+    var page = typeof currentPage !== 'undefined' ? currentPage : 0;
+    var name = prompt('輸入章節名稱：', '新章節');
+    if (!name) return;
+    window._customToc.push({ title: name, name: name, page: page, startPage: page });
+    // 按頁碼排序
+    window._customToc.sort(function(a, b) { return (a.page || a.startPage || 0) - (b.page || b.startPage || 0); });
+    renderChapterListUI();
+    // 同步
+    if (typeof currentToc !== 'undefined') {
+      currentToc.length = 0;
+      for (var i = 0; i < window._customToc.length; i++) {
+        currentToc.push(window._customToc[i]);
+      }
+    }
+  };
+
+  window.redetectChapters = function() {
+    window._customToc = null;
+    // 重新從 CREngine 取 TOC
+    if (typeof renderer !== 'undefined' && renderer && renderer.getToc) {
+      try {
+        var rawToc = renderer.getToc();
+        if (rawToc && typeof rawToc === 'string') {
+          rawToc = JSON.parse(rawToc);
+        }
+        if (Array.isArray(rawToc)) {
+          currentToc = rawToc;
+        }
+      } catch (e) {}
+    }
+    renderChapterListUI();
+  };
+
+  function ensureCustomToc() {
+    if (!window._customToc) {
+      // 從 currentToc 複製一份
+      window._customToc = [];
+      var src = (typeof currentToc !== 'undefined' && currentToc) ? currentToc : [];
+      for (var i = 0; i < src.length; i++) {
+        window._customToc.push({
+          title: src[i].title || src[i].name || '',
+          name: src[i].title || src[i].name || '',
+          page: src[i].page || src[i].startPage || 0,
+          startPage: src[i].page || src[i].startPage || 0,
+        });
+      }
+    }
+  }
+
+  // 覆寫原版的章節列表渲染
+  var _origShowChapters = window.showChapters;
+  window.showChapters = function() {
+    if (typeof _origShowChapters === 'function') _origShowChapters();
+    // 用我們的可編輯版本替換
+    setTimeout(renderChapterListUI, 100);
+  };
+
+  // ============================================
+  // === 八、進度條主題攔截 ===
   // ============================================
   // 避免原版 drawStatusBar 與自訂主題衝突（兩層疊在一起）
   // 選了自訂主題時，攔截原版呼叫，改用 drawCustomStatusBar

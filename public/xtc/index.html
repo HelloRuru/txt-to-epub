@@ -462,7 +462,12 @@
         <!-- Chapters -->
         <section class="panel-section" id="chaptersSection" style="display:none;">
           <h3><i data-lucide="list"></i> 章節目錄</h3>
+          <div class="chapter-toolbar">
+            <button class="btn-text" onclick="addChapter()"><i data-lucide="plus"></i> 新增章節</button>
+            <button class="btn-text" onclick="redetectChapters()"><i data-lucide="scan"></i> 重新偵測</button>
+          </div>
           <div id="chapterList" class="chapter-list"></div>
+          <p class="form-hint"><i data-lucide="info"></i><span>點擊章節名稱可修改，點 X 刪除。拖曳可排序。</span></p>
         </section>
 
         <!-- Config -->
