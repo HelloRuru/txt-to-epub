@@ -413,6 +413,40 @@
           </div>
         </section>
 
+        <!-- 頁面背景 -->
+        <section class="panel-section">
+          <h3><i data-lucide="frame"></i> 頁面背景</h3>
+          <div class="form-group">
+            <label>背景樣式</label>
+            <select id="pageBgStyle" onchange="updateBgPreview()">
+              <option value="none" selected>無背景</option>
+              <option value="grid">格子</option>
+              <option value="dots">點點</option>
+              <option value="lines">橫線</option>
+              <option value="border-simple">簡約邊框</option>
+              <option value="border-cat">貓咪邊框</option>
+              <option value="border-floral">花邊</option>
+              <option value="custom">自訂背景圖...</option>
+            </select>
+          </div>
+          <div class="form-group" id="bgOpacityGroup" style="display:none;">
+            <label>背景濃度：<span id="bgOpacityValue">30</span>%</label>
+            <input type="range" id="bgOpacity" min="5" max="80" value="30" oninput="document.getElementById('bgOpacityValue').textContent=this.value; updateBgPreview();">
+            <p class="form-hint"><i data-lucide="info"></i><span>太深會影響文字閱讀，建議 20-40%。</span></p>
+          </div>
+          <div class="form-group" id="bgCustomGroup" style="display:none;">
+            <button class="btn-secondary" onclick="document.getElementById('bgCustomInput').click();" style="width:100%;">
+              <i data-lucide="image-plus"></i> 上傳背景圖
+            </button>
+            <input type="file" id="bgCustomInput" accept="image/*" hidden>
+            <select id="bgCustomMode">
+              <option value="tile">平鋪</option>
+              <option value="stretch">伸展</option>
+              <option value="center">置中</option>
+            </select>
+          </div>
+        </section>
+
         <!-- Progress Bar Settings -->
         <section class="panel-section">
           <h3><i data-lucide="bar-chart-2"></i> 進度條</h3>
@@ -779,6 +813,7 @@
   <script src="status-bar-themes.js?v=2"></script>
   <script src="image-tools.js?v=2"></script>
   <script src="text-tools.js?v=2"></script>
+  <script src="page-backgrounds.js?v=2"></script>
   <script src="app-bridge.js?v=2"></script>
 
   <script>
@@ -1061,6 +1096,20 @@
 
     // 頁面載入時先畫一個預設封面
     generateAutoCover();
+
+    // 頁面背景設定切換
+    document.getElementById('pageBgStyle')?.addEventListener('change', function() {
+      var opGroup = document.getElementById('bgOpacityGroup');
+      var customGroup = document.getElementById('bgCustomGroup');
+      var isNone = this.value === 'none';
+      var isCustom = this.value === 'custom';
+      if (opGroup) opGroup.style.display = isNone ? 'none' : 'block';
+      if (customGroup) customGroup.style.display = isCustom ? 'block' : 'none';
+    });
+
+    function updateBgPreview() {
+      if (typeof debouncedRender === 'function') debouncedRender();
+    }
   </script>
 </body>
 </html>
