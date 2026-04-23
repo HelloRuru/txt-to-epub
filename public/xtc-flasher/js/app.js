@@ -167,6 +167,10 @@ async function flashZhTw(device) {
   let transport;
 
   try {
+    // ⚠️ 關鍵：先要 USB 權限（必須在 user gesture 同一 tick 內），再做其他事
+    const { loader, transport: t } = await connect();
+    transport = t;
+
     setStatus(`載入 ${device.toUpperCase()} 韌體檔案中…`, "running");
     log(`載入韌體：${device}-zhtw`);
 
@@ -183,9 +187,6 @@ async function flashZhTw(device) {
       fileArray.push({ data: binStr, address: p.offset });
       log(`  載入 ${p.path.split("/").pop()}：${(bytes.length / 1024).toFixed(1)} KB @ 0x${p.offset.toString(16)}`);
     }
-
-    const { loader, transport: t } = await connect();
-    transport = t;
 
     setStatus(`刷入 ${device.toUpperCase()} 繁中版中…`, "running");
     log("開始寫入 Flash…");
@@ -233,6 +234,10 @@ async function restoreBackup() {
   let transport;
 
   try {
+    // ⚠️ 關鍵：先要 USB 權限，再做其他事
+    const { loader, transport: t } = await connect();
+    transport = t;
+
     setStatus(`讀取備份檔 ${file.name}…`, "running");
     log(`備份檔大小：${(file.size / 1024 / 1024).toFixed(2)} MB`);
 
@@ -240,9 +245,6 @@ async function restoreBackup() {
     const bytes = new Uint8Array(buf);
     let binStr = "";
     for (let i = 0; i < bytes.length; i++) binStr += String.fromCharCode(bytes[i]);
-
-    const { loader, transport: t } = await connect();
-    transport = t;
 
     setStatus("還原備份中，約 15 分鐘…", "running");
     log("開始從 offset 0x0 寫入整片備份…");
