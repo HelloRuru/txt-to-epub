@@ -1,15 +1,15 @@
 {
-  "version": "2026.04.23-v3-yuanxia-dual",
-  "build_date": "2026-04-23 18:38",
+  "version": "2026.04.23-v4-yuanxia-tbold-ceilfix",
+  "build_date": "2026-04-23 18:46",
   "changelog": [
-    "UI + 閱讀字型統一改為原俠正楷（SIL OFL，繁中楷書）",
+    "字型改用原俠正楷 T-Bold 粗體版（筆畫較粗，閱讀更清楚）",
+    "修復字間距問題：advance_x 計算由 floor 改為 ceil（字不再擠在一起）",
     "保留兩種字型大小：13pt（Small/Medium/Large）+ 22pt（X Large）",
-    "刪除原本多種混用字型（倉耳硬核體、倉耳玄三、釘釘進步體、倉耳漁陽體），解決 Flash 過擠問題",
-    "Flash 使用率：86% → 75%，開書載入更快",
-    "前版本：v2 jf 粉圓（已替換）"
+    "Flash 使用率仍維持約 75%",
+    "前版本：v3 原俠正楷 Regular（字間距有問題）"
   ],
-  "x3_firmware_bytes": 6505264,
-  "x4_firmware_bytes": 6481120,
-  "font": "GuanKiapTsingKhai 原俠正楷 (SIL OFL)",
+  "x3_firmware_bytes": 6515296,
+  "x4_firmware_bytes": 6491152,
+  "font": "GuanKiapTsingKhai-Tbold 原俠正楷粗體 (SIL OFL)",
   "font_sizes": ["13pt", "22pt"]
 }
