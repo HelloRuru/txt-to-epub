@@ -604,13 +604,20 @@ function getActiveFormat() {
   return document.querySelector('#formatRow .preset-btn.active').dataset.format;
 }
 
-// .bin 字級 → 寬高公式（從官方樣本表反推）
-// pt 42→44×51, 48→50×51, 51→52×51, 56→58×58, 64→68×68, 68→72×72
-// outerW = pt + 2~4 (小字 +2，大字 +4)
-// outerH = max(51, pt × 1.06 + 4)
+// .bin 字級 → 寬高
+// 官方樣本字級用查表（pixel-perfect），其他字級用比例公式
+const BIN_OFFICIAL_DIMS = {
+  42: { w: 44, h: 51 },
+  48: { w: 50, h: 51 },
+  51: { w: 52, h: 51 },
+  56: { w: 58, h: 58 },
+  64: { w: 68, h: 68 },
+  68: { w: 72, h: 72 }
+};
 function binDimsForPt(pt) {
+  if (BIN_OFFICIAL_DIMS[pt]) return BIN_OFFICIAL_DIMS[pt];
   const w = pt < 50 ? pt + 2 : pt + 4;
-  const h = Math.max(51, Math.round(pt * 1.06 + 4));
+  const h = Math.round(pt * 1.06 + 4);
   return { w, h };
 }
 
