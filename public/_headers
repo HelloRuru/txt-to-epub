@@ -29,6 +29,34 @@
   Cache-Control: no-store, no-cache, must-revalidate
   Pragma: no-cache
 
+# XTC Flasher: HTML / JS / CSS 不快取（方便更新），bin 檔短快取 + must-revalidate
+/xtc-flasher/
+  Cache-Control: no-store, no-cache, must-revalidate
+  Pragma: no-cache
+
+/xtc-flasher/index.html
+  Cache-Control: no-store, no-cache, must-revalidate
+  Pragma: no-cache
+
+/xtc-flasher/*.js
+  Cache-Control: no-store, no-cache, must-revalidate
+  Pragma: no-cache
+
+/xtc-flasher/*.css
+  Cache-Control: no-store, no-cache, must-revalidate
+  Pragma: no-cache
+
+/xtc-flasher/css/*
+  Cache-Control: no-store, no-cache, must-revalidate
+  Pragma: no-cache
+
+/xtc-flasher/js/*
+  Cache-Control: no-store, no-cache, must-revalidate
+  Pragma: no-cache
+
+/xtc-flasher/firmware/*
+  Cache-Control: public, max-age=60, must-revalidate
+
 # API: 短快取
 /api/*
   Cache-Control: public, max-age=300
