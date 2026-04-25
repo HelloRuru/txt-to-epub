@@ -44,7 +44,7 @@ def all_bmp_ranges() -> list[tuple[int, int]]:
     return [(0x0020, 0xFFFD)]
 
 
-PIL_PT_RATIO = 64 / 38      # XTEink pt → PIL pt（從官方 38 號樣本反推）
+PIL_PT_RATIO = 79 / 38      # XTEink pt → PIL pt（從官方 38 號樣本「永」字 aw=79 反推，17 號驗證 aw=35 一致）
 DEVICE_CELL_SIZE = 48       # 裝置字格大小（兩個官方樣本實測都是 48，固定）
 
 

@@ -88,8 +88,8 @@ function renderBinGlyph(font, cp, fontSizePt, w, h, xOff, yOff, ctx, out, slotOf
 }
 
 // ============ .epdfont encoder ============
-const EPDFONT_PIL_PT_RATIO = 64 / 38;
-const EPDFONT_DEVICE_CELL_SIZE = 48;  // 裝置字格大小（兩個官方樣本實測都是 48，固定）
+const EPDFONT_PIL_PT_RATIO = 79 / 38;  // 從官方 38 號樣本「永」字 aw=79 反推（17 號驗證 aw=35 一致）
+const EPDFONT_DEVICE_CELL_SIZE = 48;   // 裝置字格大小（官方樣本實測都是 48 固定）
 
 async function runEpdfont({ ttfBuffer, fontSizePt, charset = 'common', fontName = 'font', defaultRanges }) {
   const font = opentype.parse(ttfBuffer);

@@ -590,7 +590,7 @@ footer a:hover { text-decoration: underline; }
     <label>第二步：選輸出格式</label>
     <div class="preset-row" id="formatRow">
       <button type="button" class="preset-btn active" data-format="bin">.bin（XTC 墨水屏）</button>
-      <button type="button" class="preset-btn" data-format="epdfont">.epdfont（刷機版）</button>
+      <button type="button" class="preset-btn" data-format="epdfont">.epdfont（刷機版・實驗中）</button>
     </div>
 
     <div id="binPanel">
@@ -613,6 +613,15 @@ footer a:hover { text-decoration: underline; }
     </div>
 
     <div id="epdfontPanel" style="display:none;">
+      <div style="background: linear-gradient(135deg, rgba(232,168,124,0.12), rgba(212,165,165,0.10));
+                  border: 1px solid rgba(232,168,124,0.4);
+                  border-radius: 16px; padding: 16px 20px; margin-top: 20px; font-size: 14px; line-height: 1.7;">
+        <strong style="color: #B8723C;">實驗中・建議用 .bin 格式</strong><br>
+        <span style="color: var(--text-body);">.epdfont 內部結構是逆向工程出來的，目前轉檔後刷進閱星曈裝置可能造成系統崩潰、書打不開。已知官方版的 .epdfont 檔（從官方工具下載）能正常使用。</span><br>
+        <span style="color: var(--text-muted);">→ 建議轉成 <strong>.bin 格式</strong>（XTC 墨水屏專用、結構穩定），或直接用官方工具：
+          <a href="http://47.110.70.84:3000/" target="_blank" rel="noopener" style="color: var(--brand-brown);">http://47.110.70.84:3000/</a>
+        </span>
+      </div>
       <label style="margin-top:24px;">選字級</label>
       <div class="slider-wrap">
         <input type="range" id="epdSlider" min="16" max="56" value="38" step="1">
@@ -844,7 +853,7 @@ $('binSlider').addEventListener('input', () => {
 
 $('epdSlider').addEventListener('input', () => {
   const pt = parseInt($('epdSlider').value);
-  const pilPt = Math.round(pt * 64 / 38);
+  const pilPt = Math.round(pt * 79 / 38);
   $('epdPtText').textContent = pt;
   $('epdPxText').textContent = pilPt;  // 顯示 PIL pt（實際渲染字級），pixel_size 固定 48 不顯示
 });
@@ -998,7 +1007,7 @@ function getCellSize() {
     // .epdfont：slider 上顯示的是「檔名號碼」（如 17 號 / 38 號）
     // 實際渲染 pt = 號碼 × 64/38（跟 worker.js EPDFONT_PIL_PT_RATIO 同步）
     labelPt = parseInt($('epdSlider').value);
-    fontSizePt = Math.round(labelPt * 64 / 38);
+    fontSizePt = Math.round(labelPt * 79 / 38);
     // cell 大小用實際渲染後的字高（從字體 metric 算）
     if (opentypeFont) {
       const scale = fontSizePt / opentypeFont.unitsPerEm;
