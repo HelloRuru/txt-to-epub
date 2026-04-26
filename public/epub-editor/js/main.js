@@ -15,6 +15,8 @@ const state = {
   coverAction: 'keep',  // 'keep' | 'replace' | 'remove'
   newCoverBlob: null,   // 替換用的新圖片 File
   originalCover: null,  // { path, mimeType, dataUrl } 原書封面資訊
+  customFontFile: null, // 使用者上傳的字體 File 物件
+  customFontInfo: null, // { realName, embeddedFilename, mime, format } 子集化後的資訊
 
   // 設定
   settings: {
@@ -57,8 +59,152 @@ const FONT_MAP = {
   'noto-serif': { family: '"Noto Serif TC", "PMingLiU", serif', name: '思源宋體' },
   guankiap: { family: '"GuanKiapTsingKhai TW", "DFKai-SB", "BiauKai", serif', name: '原俠正楷' },
   huninn: { family: '"jf-openhuninn", "Microsoft JhengHei", sans-serif', name: 'jf 粉圓' },
+  custom: { family: '"CustomUserFont", sans-serif', name: '自訂字體' },
   default: { family: 'serif', name: '閱讀器預設' },
 };
+
+// 副檔名對應 MIME / format
+function getCustomFontMeta(file) {
+  const name = (file.name || '').toLowerCase();
+  if (name.endsWith('.woff2')) return { ext: 'woff2', mime: 'font/woff2', format: 'woff2' };
+  if (name.endsWith('.woff')) return { ext: 'woff', mime: 'font/woff', format: 'woff' };
+  if (name.endsWith('.otf')) return { ext: 'otf', mime: 'font/otf', format: 'opentype' };
+  return { ext: 'ttf', mime: 'font/ttf', format: 'truetype' };
+}
+
+// HarfBuzz WASM 子集化 — 從 jsDelivr CDN 動態載入
+let _hbExportsPromise = null;
+function loadHbSubset() {
+  if (_hbExportsPromise) return _hbExportsPromise;
+  _hbExportsPromise = (async () => {
+    const resp = await fetch('https://cdn.jsdelivr.net/npm/harfbuzzjs@0.4.11/hb-subset.wasm');
+    if (!resp.ok) throw new Error('載入 hb-subset.wasm 失敗：' + resp.status);
+    const bytes = await resp.arrayBuffer();
+    const result = await WebAssembly.instantiate(bytes);
+    return result.instance.exports;
+  })();
+  return _hbExportsPromise;
+}
+
+// 從 EPUB 內所有文字檔收集用到的 codepoint
+async function collectCodepointsFromZip(zip) {
+  const set = new Set();
+  // 收 ASCII 確保英數能顯示
+  for (let a = 0x20; a < 0x7F; a++) set.add(a);
+  const textFiles = Object.keys(zip.files).filter(f => {
+    if (zip.files[f].dir) return false;
+    const ext = f.toLowerCase().slice(f.lastIndexOf('.'));
+    return CONTENT_EXTENSIONS.includes(ext) || ext === '.ncx' || ext === '.opf';
+  });
+  for (const fn of textFiles) {
+    const u8 = await zip.files[fn].async('uint8array');
+    const text = decodeContent(u8);
+    for (let i = 0; i < text.length; i++) {
+      const cp = text.codePointAt(i);
+      set.add(cp);
+      if (cp > 0xFFFF) i++;
+    }
+  }
+  return set;
+}
+
+// hb-subset 子集化
+async function subsetFontWithHarfBuzz(fontArrayBuffer, codepointSet) {
+  const exports = await loadHbSubset();
+  const fontBytes = new Uint8Array(fontArrayBuffer);
+  const fontPtr = exports.malloc(fontBytes.byteLength);
+  // memory grow 後 buffer reference 失效，每次重抓
+  new Uint8Array(exports.memory.buffer).set(fontBytes, fontPtr);
+
+  const blob = exports.hb_blob_create(fontPtr, fontBytes.byteLength, 2 /* WRITABLE */, 0, 0);
+  const face = exports.hb_face_create(blob, 0);
+  exports.hb_blob_destroy(blob);
+
+  const input = exports.hb_subset_input_create_or_fail();
+  if (!input) {
+    exports.hb_face_destroy(face);
+    exports.free(fontPtr);
+    throw new Error('hb_subset_input_create_or_fail 回傳 null');
+  }
+  const unicodeSet = exports.hb_subset_input_unicode_set(input);
+  codepointSet.forEach(cp => exports.hb_set_add(unicodeSet, cp));
+
+  const subsetFace = exports.hb_subset_or_fail(face, input);
+  exports.hb_subset_input_destroy(input);
+  if (!subsetFace) {
+    exports.hb_face_destroy(face);
+    exports.free(fontPtr);
+    throw new Error('hb_subset_or_fail 失敗');
+  }
+
+  const resultBlob = exports.hb_face_reference_blob(subsetFace);
+  const offset = exports.hb_blob_get_data(resultBlob, 0);
+  const subsetLength = exports.hb_blob_get_length(resultBlob);
+  if (subsetLength === 0) {
+    exports.hb_blob_destroy(resultBlob);
+    exports.hb_face_destroy(subsetFace);
+    exports.hb_face_destroy(face);
+    exports.free(fontPtr);
+    throw new Error('子集化後字體大小為 0');
+  }
+  const resultView = new Uint8Array(exports.memory.buffer, offset, subsetLength);
+  const subsetData = new Uint8Array(subsetLength);
+  subsetData.set(resultView);
+
+  exports.hb_blob_destroy(resultBlob);
+  exports.hb_face_destroy(subsetFace);
+  exports.hb_face_destroy(face);
+  exports.free(fontPtr);
+  return subsetData.buffer;
+}
+
+// 從 sfnt name table 讀字體真實 family name
+function readFontFamilyName(arrayBuffer) {
+  try {
+    const view = new DataView(arrayBuffer);
+    const sfnt = view.getUint32(0);
+    if (sfnt !== 0x00010000 && sfnt !== 0x4F54544F && sfnt !== 0x74727565) return null;
+    const numTables = view.getUint16(4);
+    let nameOffset = null;
+    for (let i = 0; i < numTables; i++) {
+      const rec = 12 + i * 16;
+      const tag = String.fromCharCode(view.getUint8(rec), view.getUint8(rec+1), view.getUint8(rec+2), view.getUint8(rec+3));
+      if (tag === 'name') {
+        nameOffset = view.getUint32(rec + 8);
+        break;
+      }
+    }
+    if (nameOffset === null) return null;
+    const count = view.getUint16(nameOffset + 2);
+    const stringOffset = view.getUint16(nameOffset + 4);
+    const candidates = [];
+    for (let r = 0; r < count; r++) {
+      const rec = nameOffset + 6 + r * 12;
+      const platformID = view.getUint16(rec);
+      const encodingID = view.getUint16(rec + 2);
+      const nameID = view.getUint16(rec + 6);
+      const sLen = view.getUint16(rec + 8);
+      const sOff = view.getUint16(rec + 10);
+      if (nameID !== 1 && nameID !== 16) continue;
+      const raw = new Uint8Array(arrayBuffer, nameOffset + stringOffset + sOff, sLen);
+      let str;
+      if (platformID === 3 || (platformID === 0 && encodingID >= 3)) {
+        const chars = [];
+        for (let k = 0; k < raw.length; k += 2) chars.push(String.fromCharCode((raw[k] << 8) | raw[k + 1]));
+        str = chars.join('');
+      } else {
+        str = String.fromCharCode.apply(null, raw);
+      }
+      candidates.push({ priority: (nameID === 16 ? 0 : 1) + (platformID === 3 ? 0 : 10), name: str });
+    }
+    if (!candidates.length) return null;
+    candidates.sort((a, b) => a.priority - b.priority);
+    return candidates[0].name;
+  } catch (e) {
+    console.warn('讀取字體 family name 失敗：', e);
+    return null;
+  }
+}
 
 // 簡體標點 → 繁體標點
 const PUNCTUATION_MAP = {
@@ -331,7 +477,21 @@ async function injectCoverIntoEpub(zip) {
 }
 
 /* ========== CSS 注入 ========== */
-function generateStyleOverrides() {
+// 算 CSS 檔案到字體檔的相對路徑（給 url() 用）
+function relativePathFromCss(cssFilePath, fontFilePath) {
+  const cssParts = cssFilePath.split('/').slice(0, -1);  // 去掉檔名，剩目錄
+  const fontParts = fontFilePath.split('/');
+  // 找共同前綴
+  let common = 0;
+  while (common < cssParts.length && common < fontParts.length - 1 && cssParts[common] === fontParts[common]) {
+    common++;
+  }
+  const upLevels = cssParts.length - common;
+  const downPath = fontParts.slice(common).join('/');
+  return ('../'.repeat(upLevels)) + downPath;
+}
+
+function generateStyleOverrides(cssFilePath) {
   const s = state.settings;
   const isVertical = s.writingMode === 'vertical';
   const font = FONT_MAP[s.fontFamily] || FONT_MAP.default;
@@ -340,7 +500,32 @@ function generateStyleOverrides() {
 
   let css = '\n/* === HelloRuru EPUB Editor 樣式覆蓋 === */\n';
 
-  if (s.fontFamily !== 'default') {
+  // 自訂字體：@font-face + !important + 全域 * 強制覆蓋
+  const useCustom = s.fontFamily === 'custom' && state.customFontInfo;
+  if (useCustom) {
+    const info = state.customFontInfo;
+    const realFamily = info.realName || 'CustomUserFont';
+    // 字體檔的絕對位置（在 EPUB 內）
+    const fontAbsPath = info.embeddedPath;
+    const fontUrl = cssFilePath ? relativePathFromCss(cssFilePath, fontAbsPath) : fontAbsPath;
+    css += `@font-face {
+  font-family: "${realFamily}";
+  src: url("${fontUrl}") format("${info.format}");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "CustomUserFont";
+  src: url("${fontUrl}") format("${info.format}");
+  font-weight: normal;
+  font-style: normal;
+}
+* { font-family: "${realFamily}", "CustomUserFont", sans-serif !important; }
+body { font-family: "${realFamily}", "CustomUserFont", sans-serif !important; }
+p { font-family: "${realFamily}", "CustomUserFont", sans-serif !important; }
+h1, h2, h3, h4, h5, h6 { font-family: "${realFamily}", "CustomUserFont", sans-serif !important; }
+`;
+  } else if (s.fontFamily !== 'default') {
     css += `body { font-family: ${font.family}; }\n`;
   }
   css += `body { font-size: ${fontSize}; line-height: ${lineHeight}; }\n`;
@@ -364,15 +549,80 @@ function generateStyleOverrides() {
   return css;
 }
 
+// 清掉 EPUB 內原有字體（自訂字體模式才呼叫）+ 從 OPF/CSS 移除引用
+async function removeOldFontsFromEpub(zip) {
+  const FONT_EXTS = ['.ttf', '.otf', '.woff', '.woff2'];
+  // 找所有字體檔
+  const fontFiles = Object.keys(zip.files).filter(f => {
+    if (zip.files[f].dir) return false;
+    const lo = f.toLowerCase();
+    return FONT_EXTS.some(ext => lo.endsWith(ext));
+  });
+  fontFiles.forEach(f => zip.remove(f));
+  // 清掉 OPF manifest 裡的字體 item
+  const opfFiles = Object.keys(zip.files).filter(f => f.toLowerCase().endsWith('.opf'));
+  for (const opf of opfFiles) {
+    let content = await zip.files[opf].async('string');
+    // 移除 media-type 是 font/* 或 application/font-* 或 application/vnd.ms-opentype 的 item
+    content = content.replace(
+      /<item[^>]*media-type=["'](?:font\/[^"']*|application\/(?:font-[^"']*|vnd\.ms-opentype|x-font-[^"']*))["'][^>]*\/>\s*\n?/gi,
+      ''
+    );
+    // 也以副檔名清理（保險）
+    content = content.replace(
+      /<item[^>]*href=["'][^"']*\.(ttf|otf|woff2?|TTF|OTF|WOFF2?)["'][^>]*\/>\s*\n?/g,
+      ''
+    );
+    zip.file(opf, content);
+  }
+  // 清掉現有 CSS 裡的 @font-face 區塊
+  const cssFiles = Object.keys(zip.files).filter(f => f.toLowerCase().endsWith('.css'));
+  for (const cf of cssFiles) {
+    let content = await zip.files[cf].async('string');
+    content = content.replace(/@font-face\s*\{[^}]*\}\s*/g, '');
+    zip.file(cf, content);
+  }
+}
+
+// 嵌入自訂字體：把字體檔放進 EPUB 內 fonts/，登錄到 OPF manifest，回傳實際絕對路徑
+async function embedCustomFontIntoEpub(zip, fontDataBuffer, meta) {
+  // 偵測 EPUB 結構：找一個 OPF 檔，把字體放在它附近的 fonts/ 子目錄
+  const opfFiles = Object.keys(zip.files).filter(f => f.toLowerCase().endsWith('.opf'));
+  let targetPath;
+  if (opfFiles.length > 0) {
+    const opfDir = opfFiles[0].substring(0, opfFiles[0].lastIndexOf('/') + 1);
+    targetPath = opfDir + 'fonts/' + meta.embeddedFilename;
+  } else {
+    targetPath = 'fonts/' + meta.embeddedFilename;
+  }
+  zip.file(targetPath, fontDataBuffer);
+
+  // 找 OPF 並加 manifest item
+  for (const opf of opfFiles) {
+    let content = await zip.files[opf].async('string');
+    const opfDir = opf.substring(0, opf.lastIndexOf('/') + 1);
+    let href;
+    if (targetPath.startsWith(opfDir)) {
+      href = targetPath.substring(opfDir.length);
+    } else {
+      const depth = opfDir.split('/').length - 1;
+      href = '../'.repeat(depth) + targetPath;
+    }
+    const newItem = `    <item id="hr-custom-font" href="${href}" media-type="${meta.mime}"/>\n`;
+    content = content.replace('</manifest>', newItem + '</manifest>');
+    zip.file(opf, content);
+  }
+  return targetPath;
+}
+
 function injectStyleIntoCSS(zip) {
-  const overrides = generateStyleOverrides();
   const cssFiles = Object.keys(zip.files).filter(f =>
     f.toLowerCase().endsWith('.css') && !zip.files[f].dir
   );
 
   const promises = cssFiles.map(async (filename) => {
+    const overrides = generateStyleOverrides(filename);  // 用每個 CSS 檔的路徑算字體相對位置
     const content = await zip.files[filename].async('string');
-    // 在 CSS 末尾附加覆蓋樣式
     zip.file(filename, content + overrides);
   });
 
@@ -386,6 +636,7 @@ function injectStyleIntoCSS(zip) {
     xhtmlFiles.forEach(filename => {
       promises.push(
         zip.files[filename].async('string').then(content => {
+          const overrides = generateStyleOverrides(filename);  // XHTML 的位置算 url
           const styleTag = `<style>${overrides}</style>`;
           if (content.includes('</head>')) {
             content = content.replace('</head>', styleTag + '</head>');
@@ -504,6 +755,48 @@ async function processEpub() {
       if (i % 10 === 0) {
         await new Promise(r => setTimeout(r, 0));
       }
+    }
+
+    // 3.5. 自訂字體：清舊字體 + 子集化 + 嵌入新字體
+    if (settings.fontFamily === 'custom' && state.customFontFile) {
+      try {
+        updateProgress(70, '清除原 EPUB 字體...');
+        await removeOldFontsFromEpub(zip);
+
+        updateProgress(72, '收集書中用到的字...');
+        const codepoints = await collectCodepointsFromZip(zip);
+
+        updateProgress(73, '載入子集化引擎...');
+        const rawBuffer = await state.customFontFile.arrayBuffer();
+        let fontBufferToEmbed = rawBuffer;
+        try {
+          fontBufferToEmbed = await subsetFontWithHarfBuzz(rawBuffer, codepoints);
+          const origMB = (rawBuffer.byteLength / 1048576).toFixed(2);
+          const subMB = (fontBufferToEmbed.byteLength / 1048576).toFixed(2);
+          updateProgress(74, `字體精簡完成（${origMB} MB → ${subMB} MB）`);
+        } catch (subErr) {
+          console.warn('字體子集化失敗，改用原始字體：', subErr);
+          updateProgress(74, '字體子集化失敗，改用原始字體');
+        }
+
+        const realName = readFontFamilyName(fontBufferToEmbed);
+        // 子集化後副檔名統一 ttf；原始字體則沿用上傳的副檔名
+        const originalMeta = getCustomFontMeta(state.customFontFile);
+        const isSubsetSuccess = fontBufferToEmbed !== rawBuffer;
+        const meta = {
+          embeddedFilename: 'hr-custom-font.' + (isSubsetSuccess ? 'ttf' : originalMeta.ext),
+          mime: isSubsetSuccess ? 'font/ttf' : originalMeta.mime,
+          format: isSubsetSuccess ? 'truetype' : originalMeta.format,
+        };
+        const embeddedPath = await embedCustomFontIntoEpub(zip, fontBufferToEmbed, meta);
+        state.customFontInfo = { ...meta, realName, embeddedPath };
+      } catch (err) {
+        console.error('自訂字體處理失敗：', err);
+        showToast('自訂字體處理失敗：' + err.message, 'error');
+        state.customFontInfo = null;
+      }
+    } else {
+      state.customFontInfo = null;
     }
 
     // 4. 注入排版樣式
@@ -749,8 +1042,30 @@ function initEvents() {
       $$('[data-font]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       state.settings.fontFamily = btn.dataset.font;
+      // 切換自訂字體上傳區顯示
+      const wrap = $('#custom-font-wrap');
+      if (wrap) wrap.hidden = btn.dataset.font !== 'custom';
     });
   });
+
+  // 自訂字體上傳
+  const customFontInput = $('#custom-font-input');
+  if (customFontInput) {
+    customFontInput.addEventListener('change', (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      const lo = (f.name || '').toLowerCase();
+      if (!['.ttf', '.otf', '.woff', '.woff2'].some(ext => lo.endsWith(ext))) {
+        showToast('請上傳 .ttf / .otf / .woff / .woff2 格式的字體檔', 'error');
+        e.target.value = '';
+        return;
+      }
+      state.customFontFile = f;
+      const lbl = $('#custom-font-label');
+      if (lbl) lbl.textContent = `${f.name}（${(f.size / 1048576).toFixed(1)} MB）`;
+      e.target.value = '';
+    });
+  }
 
   // 字體大小
   $$('[data-size]').forEach(btn => {

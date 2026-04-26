@@ -210,6 +210,23 @@
           <p class="option-title">閱讀器預設</p>
           <p class="option-desc">不指定字型，交給閱讀器決定</p>
         </button>
+        <button class="option-btn" data-font="custom">
+          <p class="option-title">自訂字體</p>
+          <p class="option-desc">上傳自己的字體檔（請確認授權）</p>
+        </button>
+      </div>
+      <!-- 自訂字體上傳區（選了「自訂字體」才顯示） -->
+      <div id="custom-font-wrap" hidden style="margin-top:12px;padding:14px;border-radius:14px;background:rgba(184,169,201,0.06);border:1px solid rgba(184,169,201,0.25)">
+        <label id="custom-font-zone" style="display:flex;align-items:center;gap:8px;font-size:13px;padding:10px 16px;border-radius:10px;border:1px dashed rgba(184,169,201,0.5);color:var(--text-muted);cursor:pointer;background:rgba(255,255,255,0.4)">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span id="custom-font-label">點擊選擇字體檔（.ttf / .otf / .woff / .woff2）</span>
+          <input type="file" id="custom-font-input" accept=".ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2" style="display:none">
+        </label>
+        <p style="font-size:12px;color:var(--text-note,#AAAAAA);margin-top:8px;line-height:1.6">
+          系統會自動子集化（只保留書中用到的字），輸出 EPUB 體積通常會壓到 1-3 MB。建議檔案 30 MB 以下。<br>
+          字體會內嵌進 EPUB 檔案中，全程在你的瀏覽器處理，不會上傳到伺服器。原書內已有的字體會被替換掉。<br>
+          <strong style="color:var(--text-muted,#888)">請確認你擁有該字體的嵌入授權。</strong>
+        </p>
       </div>
     </div>
 
@@ -360,6 +377,6 @@
   document.getElementById('footer-year').textContent =
     currentYear > startYear ? startYear + '\u2013' + currentYear : String(startYear);
 </script>
-<script src="js/main.js"></script>
+<script src="js/main.js?v=20260426a"></script>
 </body>
 </html>
