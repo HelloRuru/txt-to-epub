@@ -178,10 +178,9 @@ function searchBooks() {
   const libName = libraries[lib] || '圖書館';
   const encoded = encodeURIComponent(query);
 
-  // 全部館藏（計次+買斷混合）
-  const allUrl = `https://${lib}.ebook.hyread.com.tw/searchList.jsp?search_field=FullText&search_input=${encoded}`;
-  // 只看計次書（filter=1 是 HyRead 內建的計次篩選參數）
-  const mocUrl = `https://${lib}.ebook.hyread.com.tw/searchList.jsp?search_field=FullText&search_input=${encoded}&filter=1`;
+  // HyRead 搜尋頁參數：scope=2 全部館藏（計次+買斷）/ scope=4 只看計次館藏 / isRental=0 排除付費
+  const allUrl = `https://${lib}.ebook.hyread.com.tw/searchList.jsp?search_field=FullText&search_input=${encoded}&target=lib&scope=2&isRental=0`;
+  const mocUrl = `https://${lib}.ebook.hyread.com.tw/searchList.jsp?search_field=FullText&search_input=${encoded}&target=lib&scope=4&isRental=0`;
 
   // 同時開兩個分頁
   window.open(allUrl, '_blank', 'noopener');
