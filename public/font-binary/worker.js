@@ -90,8 +90,11 @@ function renderBinGlyph(font, cp, fontSizePt, w, h, xOff, yOff, ctx, out, slotOf
 }
 
 // ============ .epdfont encoder ============
-const EPDFONT_PIL_PT_RATIO = 79 / 38;  // 從官方 38 號樣本「永」字 aw=79 反推（17 號驗證 aw=35 一致）
-const EPDFONT_DEVICE_CELL_SIZE = 48;   // 裝置字格大小（官方樣本實測都是 48 固定）
+// 從官方樣本反推（38 號「永」aw=79、pixel_size=48；17 號 aw=35 驗證一致）
+// PIL_pt = round(xteink_pt × 79/38)
+// pixel_size = round(xteink_pt × 48/38)（不再寫死 48，跟 Python 編碼器一致）
+const EPDFONT_PIL_PT_RATIO = 79 / 38;
+const EPDFONT_PIXEL_SIZE_RATIO = 48 / 38;
 
 async function runEpdfont({ ttfBuffer, fontSizePt, charset = 'common', fontName = 'font', defaultRanges }) {
   const font = opentype.parse(ttfBuffer);
@@ -108,7 +111,7 @@ async function runEpdfont({ ttfBuffer, fontSizePt, charset = 'common', fontName 
   }
 
   const renderPt = Math.round(fontSizePt * EPDFONT_PIL_PT_RATIO);
-  const pixelSize = EPDFONT_DEVICE_CELL_SIZE;
+  const pixelSize = Math.round(fontSizePt * EPDFONT_PIXEL_SIZE_RATIO);
   const scale = renderPt / font.unitsPerEm;
   const ascent = Math.round(font.ascender * scale);
   const descent = Math.round(-font.descender * scale);

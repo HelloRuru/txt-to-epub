@@ -699,8 +699,21 @@ footer a:hover { text-decoration: underline; }
       <label style="margin-top:8px;">官方字級（風眼樣本實測值）</label>
       <div class="preset-row" id="epdfontPresetRow">
         <button type="button" class="preset-btn" data-pt="17">17 號</button>
+        <button type="button" class="preset-btn" data-pt="22">22 號</button>
+        <button type="button" class="preset-btn" data-pt="28">28 號</button>
         <button type="button" class="preset-btn active" data-pt="38">38 號</button>
+        <button type="button" class="preset-btn" data-pt="48">48 號</button>
       </div>
+
+      <label style="margin-top:16px;">微調字級</label>
+      <div class="slider-wrap">
+        <input type="range" id="epdfontSlider" min="12" max="72" value="38" step="1">
+        <div class="slider-value">
+          <span id="epdfontPtText">38</span> 號
+          <span class="slider-sub">→ pixel_size <span id="epdfontPxText">48</span></span>
+        </div>
+      </div>
+
       <label style="margin-top:16px;">字符範圍</label>
       <select id="epdfontCharset">
         <option value="common">常用字（沿用官方 79 段範圍 ≈ 28k 字）</option>
@@ -708,7 +721,7 @@ footer a:hover { text-decoration: underline; }
         <option value="all">全 BMP（U+0020–U+FFFD，最完整但最慢）</option>
       </select>
       <div class="warn-msg show" style="margin-top:12px;">
-        <strong>注意</strong>：.epdfont 編碼器是依官方樣本反推的實驗版，header 還有未解欄位。建議先用「常用字」測試，有問題回報。
+        <strong>注意</strong>：.epdfont 是依官方樣本反推的實驗版，只有 17 / 38 號實機驗過。其他字級照公式線性外推（PIL_pt × 79/38、pixel_size × 48/38），<strong>非 17/38 可能裝到風眼上不顯示</strong>，請小批量測。
       </div>
     </div>
 
@@ -981,11 +994,22 @@ $('binPresetRow').addEventListener('click', (e) => {
   renderPreview();
 });
 
+function updateEpdfontSliderDisplay() {
+  const pt = parseInt($('epdfontSlider').value);
+  const pixelSize = Math.round(pt * 48 / 38);
+  $('epdfontPtText').textContent = pt;
+  $('epdfontPxText').textContent = pixelSize;
+  document.querySelectorAll('#epdfontPresetRow .preset-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.pt) === pt);
+  });
+}
+$('epdfontSlider').addEventListener('input', updateEpdfontSliderDisplay);
+
 $('epdfontPresetRow').addEventListener('click', (e) => {
   const btn = e.target.closest('.preset-btn');
   if (!btn) return;
-  $('epdfontPresetRow').querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  $('epdfontSlider').value = btn.dataset.pt;
+  updateEpdfontSliderDisplay();
 });
 
 function sanitizeFilename(name) {
@@ -1059,8 +1083,7 @@ runBtn.addEventListener('click', () => {
       vertical, fontName
     };
   } else {
-    const activePt = $('epdfontPresetRow').querySelector('.preset-btn.active');
-    const fontSizePt = parseInt(activePt ? activePt.dataset.pt : 38);
+    const fontSizePt = parseInt($('epdfontSlider').value);
     const charset = $('epdfontCharset').value;
     if (charset === 'common' && !epdfontDefaultRanges) {
       showError('字符範圍檔（epdfont_ranges.json）還沒載入完，請稍等再試。');
