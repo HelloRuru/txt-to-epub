@@ -361,7 +361,7 @@
       'noto-sans': '"Noto Sans TC", "Microsoft JhengHei", sans-serif',
       'noto-serif': '"Noto Serif TC", "PMingLiU", serif',
       'guankiap': '"GuanKiapTsingKhai", "DFKai-SB", "BiauKai", serif',
-      'huninn': '"jf-openhuninn-2.0", "Microsoft JhengHei", sans-serif',
+      'huninn': '"jf-openhuninn", "Microsoft JhengHei", sans-serif',
       'custom': null,  // 動態決定
     };
     if (state.settings.fontFamily === 'custom' && state.customFontFile) {
