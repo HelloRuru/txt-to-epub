@@ -45,6 +45,7 @@
     chapters: [],
     cover: null,
     coverBlob: null,
+    customFontFile: null,
     lastBlob: null,
     lastFilename: '',
     settings: {
@@ -271,6 +272,14 @@
       });
     });
 
+    // 自訂字體區塊顯示／隱藏
+    $('customFontWrap').classList.toggle('hidden', state.settings.fontFamily !== 'custom');
+    if (state.customFontFile) {
+      $('customFontLabel').textContent = state.customFontFile.name;
+    } else {
+      $('customFontLabel').textContent = '點擊選擇字體檔（.ttf / .otf / .woff / .woff2）';
+    }
+
     // Font size
     renderSmallBtns('fontSizeGrid', [
       { id: 'small', label: '小' }, { id: 'medium', label: '中' },
@@ -369,6 +378,23 @@
     $('coverPreview').classList.add('hidden');
   });
 
+  // 自訂字體上傳
+  $('customFontInput').addEventListener('change', function () {
+    if (this.files && this.files[0]) {
+      var f = this.files[0];
+      var name = (f.name || '').toLowerCase();
+      var okExt = name.endsWith('.ttf') || name.endsWith('.otf') || name.endsWith('.woff') || name.endsWith('.woff2');
+      if (!okExt) {
+        alert('請上傳 .ttf / .otf / .woff / .woff2 格式的字體檔');
+        this.value = '';
+        return;
+      }
+      state.customFontFile = f;
+      $('customFontLabel').textContent = f.name + '（' + (f.size / 1048576).toFixed(1) + ' MB）';
+    }
+    this.value = '';
+  });
+
   // ── 大檔案偵測門檻 ──
   var SPLIT_CHAR_THRESHOLD = 300000;  // 30 萬字
   var SPLIT_CHAPTER_THRESHOLD = 150;  // 150 章
@@ -390,6 +416,9 @@
     $('btnExport').classList.remove('processing');
 
     var fontName = (FONT_CONFIG[state.settings.fontFamily] || {}).name || '預設';
+    if (state.settings.fontFamily === 'custom') {
+      fontName = state.customFontFile ? ('自訂：' + state.customFontFile.name) : '自訂（未選擇，將使用預設）';
+    }
     var totalChars = getTotalCharCount();
     var totalCharsDisplay = totalChars >= 10000
       ? Math.round(totalChars / 10000) + ' 萬字'
@@ -476,6 +505,7 @@
         fontSize: state.settings.fontSize,
         lineHeight: state.settings.lineHeight,
         textIndent: state.settings.textIndent,
+        customFont: state.customFontFile,
         onProgress: function (p) {
           $('exportProgressText').textContent = p.message || '處理中...';
         },
@@ -517,13 +547,7 @@
     this.value = '';
   });
 
-  // ── 下載單一冊（不拆）──
-  $('btnSingleVolume').addEventListener('click', function () {
-    $('splitNotice').classList.add('hidden');
-    $('btnExport').click();
-  });
-
-  // ── 自動拆冊 ──
+  // ── 一鍵拆冊 ──
   $('btnAutoSplit').addEventListener('click', async function () {
     var half = Math.ceil(state.chapters.length / 2);
     var vol1Chapters = state.chapters.slice(0, half);
@@ -583,6 +607,7 @@
         fontSize: state.settings.fontSize,
         lineHeight: state.settings.lineHeight,
         textIndent: state.settings.textIndent,
+        customFont: state.customFontFile,
         onProgress: function (p) { $('exportProgressText').textContent = '上冊：' + (p.message || '處理中...'); },
       });
 
@@ -602,6 +627,7 @@
         fontSize: state.settings.fontSize,
         lineHeight: state.settings.lineHeight,
         textIndent: state.settings.textIndent,
+        customFont: state.customFontFile,
         onProgress: function (p) { $('exportProgressText').textContent = '下冊：' + (p.message || '處理中...'); },
       });
 
@@ -634,6 +660,7 @@
     state.cover = null;
     state.coverBlob = null;
     state.vol2CoverBlob = null;
+    state.customFontFile = null;
     state.lastBlob = null;
     state.settings.title = '';
     state.settings.author = '';

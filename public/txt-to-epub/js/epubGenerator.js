@@ -11,7 +11,17 @@ var FONT_CONFIG = {
   'noto-serif': { id: 'noto-serif', name: '思源宋體', family: 'Noto Serif TC', description: '典雅正式，適合長篇小說' },
   'guankiap': { id: 'guankiap', name: '原俠正楷', family: 'GuanKiapTsingKhai TW', description: '手寫楷書，溫暖文青感' },
   'huninn': { id: 'huninn', name: 'jf 粉圓', family: 'jf-openhuninn', description: '可愛圓體，活潑輕鬆' },
+  'custom': { id: 'custom', name: '自訂字體', family: 'CustomUserFont', description: '上傳你自己的字體檔（請確認授權）' },
 };
+
+// 副檔名對應的 MIME type 與 EPUB 內檔名
+function getCustomFontMeta(file) {
+  var name = (file.name || '').toLowerCase();
+  if (name.endsWith('.woff2')) return { ext: 'woff2', mime: 'font/woff2', format: 'woff2' };
+  if (name.endsWith('.woff')) return { ext: 'woff', mime: 'font/woff', format: 'woff' };
+  if (name.endsWith('.otf')) return { ext: 'otf', mime: 'font/otf', format: 'opentype' };
+  return { ext: 'ttf', mime: 'font/ttf', format: 'truetype' };
+}
 
 function escapeHtml(text) {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -30,13 +40,17 @@ window.EpubGenerator = {
     var fontSize = opts.fontSize || 'medium';
     var lineHeight = opts.lineHeight || 'normal';
     var textIndent = opts.textIndent || 'two';
+    var customFont = opts.customFont || null;  // File 物件（使用者上傳的字體）
     var onProgress = opts.onProgress || function () {};
 
     var zip = new JSZip();
     var bookId = 'urn:uuid:' + crypto.randomUUID();
     var isVertical = writingMode === 'vertical';
 
-    var fontConfig = FONT_CONFIG[fontFamily] || FONT_CONFIG['noto-sans'];
+    var useCustom = fontFamily === 'custom' && customFont;
+    var fontConfig = useCustom ? FONT_CONFIG['custom'] : (FONT_CONFIG[fontFamily] || FONT_CONFIG['noto-sans']);
+    // 自訂字體拿不到時退回思源黑體
+    if (fontFamily === 'custom' && !customFont) fontConfig = FONT_CONFIG['noto-sans'];
     var fontFamilyCSS = '"' + fontConfig.family + '", "Noto Sans TC", sans-serif';
     var fontSizeValue = SIZE_MAP[fontSize] || SIZE_MAP['medium'];
     var lineHeightValue = LINE_HEIGHT_MAP[lineHeight] || LINE_HEIGHT_MAP['normal'];
@@ -79,9 +93,28 @@ window.EpubGenerator = {
 
     onProgress({ stage: 'css', message: '正在產生樣式表...' });
 
+    // 自訂字體：把檔案塞進 EPUB，並用 @font-face 注入
+    var fontFaceCSS = '';
+    var fontManifest = '';
+    if (useCustom) {
+      onProgress({ stage: 'font', message: '正在嵌入自訂字體...' });
+      var fontMeta = getCustomFontMeta(customFont);
+      var fontData = await customFont.arrayBuffer();
+      var fontFilename = 'user-font.' + fontMeta.ext;
+      zip.file('OEBPS/fonts/' + fontFilename, fontData);
+      fontFaceCSS =
+        '@font-face {\n' +
+        '  font-family: "CustomUserFont";\n' +
+        '  src: url("fonts/' + fontFilename + '") format("' + fontMeta.format + '");\n' +
+        '  font-weight: normal;\n' +
+        '  font-style: normal;\n' +
+        '}\n\n';
+      fontManifest = '<item id="user-font" href="fonts/' + fontFilename + '" media-type="' + fontMeta.mime + '"/>';
+    }
+
     // CSS
     var verticalCSS = isVertical ? '\n  writing-mode: vertical-rl;\n  -webkit-writing-mode: vertical-rl;\n  -epub-writing-mode: vertical-rl;\n  text-orientation: mixed;' : '';
-    var css =
+    var css = fontFaceCSS +
       'body {\n' +
       '  font-family: ' + fontFamilyCSS + ';\n' +
       '  font-size: ' + fontSizeValue + ';\n' +
@@ -182,6 +215,7 @@ window.EpubGenerator = {
       '    <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>\n' +
       '    <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>\n' +
       '    <item id="css" href="styles/main.css" media-type="text/css"/>\n' +
+      (fontManifest ? '    ' + fontManifest + '\n' : '') +
       '    ' + coverManifest + '\n' +
       '    ' + chapterManifest.join('\n    ') + '\n' +
       '  </manifest>\n' +
