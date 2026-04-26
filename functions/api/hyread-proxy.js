@@ -215,12 +215,13 @@ async function librarySearch(lib, query, scope = 4) {
 }
 
 // 解析圖書館搜尋的 AJAX HTML 片段
+// 結構：<div class="booklistblock"><section>... <a href="/bookDetail.jsp?id=NNN"><img src="..."></a> <h6><a>書名</a></h6> ...</section></div>
 function parseLibrarySearchBooks(html) {
   const books = [];
   const seen = new Set();
 
-  // 用 bookDetail 連結為錨點，往前抓書封、往後抓書名
-  const blockRegex = /<section[^>]*class="[^"]*book__list[^"]*"[\s\S]*?<\/section>/g;
+  // 用 booklistblock 為單位切塊
+  const blockRegex = /<div\s+class="booklistblock"[\s\S]*?(?=<div\s+class="booklistblock"|<\/div>\s*<\/div>\s*<\/div>|$)/g;
   const blocks = html.match(blockRegex) || [];
 
   for (const block of blocks) {
@@ -230,7 +231,7 @@ function parseLibrarySearchBooks(html) {
     if (seen.has(id)) continue;
 
     const titleMatch = block.match(/<h6[^>]*>\s*<a[^>]*>([^<]+)<\/a>/);
-    const imgMatch = block.match(/<img[^>]+src="([^"]+)"/);
+    const imgMatch = block.match(/<img[^>]+src="(https?:[^"]+)"/);
 
     books.push({
       id,
@@ -240,14 +241,24 @@ function parseLibrarySearchBooks(html) {
     seen.add(id);
   }
 
-  // 後備：如果上面 section 抓不到，用直接 regex
+  // 後備：booklistblock 沒切到時，用 bookDetail 連結 + 鄰近 img/h6 直接撈
   if (books.length === 0) {
-    const titleRegex = /<h6[^>]*>\s*<a[^>]*href="\/bookDetail\.jsp\?id=(\d+)"[^>]*>([^<]+)<\/a>/g;
+    const idRegex = /href="\/bookDetail\.jsp\?id=(\d+)"/g;
     let m;
-    while ((m = titleRegex.exec(html)) !== null) {
-      if (seen.has(m[1])) continue;
-      books.push({ id: m[1], title: decodeEntities(m[2].trim()), thumbnail: '' });
-      seen.add(m[1]);
+    while ((m = idRegex.exec(html)) !== null) {
+      const id = m[1];
+      if (seen.has(id)) continue;
+      seen.add(id);
+
+      // 往後 1500 字元內找 h6 書名 + img 書封
+      const nearby = html.slice(m.index, m.index + 1500);
+      const titleMatch = nearby.match(/<h6[^>]*>\s*<a[^>]*>([^<]+)<\/a>/);
+      const imgMatch = nearby.match(/<img[^>]+src="(https?:\/\/[^"]*bookcover[^"]+)"/);
+      books.push({
+        id,
+        title: titleMatch ? decodeEntities(titleMatch[1].trim()) : '',
+        thumbnail: imgMatch ? imgMatch[1] : '',
+      });
     }
   }
 
