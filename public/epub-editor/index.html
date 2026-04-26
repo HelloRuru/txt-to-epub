@@ -59,6 +59,21 @@
 <link as="font" crossorigin href="https://lab.helloruru.com/fonts/GenSenRounded-Regular.woff2" rel="preload" type="font/woff2">
 <link as="font" crossorigin href="https://lab.helloruru.com/fonts/GenSenRounded-Medium.woff2" rel="preload" type="font/woff2">
 <link as="font" crossorigin href="https://lab.helloruru.com/fonts/GenSenRounded-Bold.woff2" rel="preload" type="font/woff2">
+
+<!-- 預覽用內建字體 CDN（讓即時預覽真的看到字體變化） -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fontsapi.zeoseven.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500&family=Noto+Serif+TC:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fontsapi.zeoseven.com/427/main/result.css" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: "jf-openhuninn";
+    src: url("https://cdn.jsdelivr.net/gh/justfont/open-huninn-font@2.0/font/jf-openhuninn-2.0.ttf") format("truetype");
+    font-display: swap;
+  }
+</style>
+
 <link rel="stylesheet" href="style.css">
 <!-- Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -291,6 +306,15 @@
       </div>
     </div>
 
+    <!-- 即時排版預覽 -->
+    <div class="setting-group">
+      <p class="setting-section-title">即時排版預覽</p>
+      <p style="font-size:12px;color:var(--text-note,#AAAAAA);margin-bottom:12px;line-height:1.6">調整上方設定可即時看到變化。預覽僅供參考，實際以閱讀器顯示為準。</p>
+      <div id="previewFrame" class="preview-frame">
+        <div id="previewContent" class="preview-content"></div>
+      </div>
+    </div>
+
     <p class="setting-note">
       <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
         <circle cx="12" cy="12" r="10"/>
@@ -377,6 +401,6 @@
   document.getElementById('footer-year').textContent =
     currentYear > startYear ? startYear + '\u2013' + currentYear : String(startYear);
 </script>
-<script src="js/main.js?v=20260426b"></script>
+<script src="js/main.js?v=20260426c"></script>
 </body>
 </html>

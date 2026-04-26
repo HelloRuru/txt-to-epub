@@ -762,3 +762,48 @@ hello-ruru-header {
     justify-content: center;
   }
 }
+
+/* === 即時排版預覽 === */
+.preview-frame {
+  border: 1px solid var(--border-color, #E8E4E1);
+  border-radius: 16px;
+  background: #FAFAFA;
+  padding: 0;
+  max-height: 480px;
+  overflow: auto;
+  position: relative;
+}
+.preview-content {
+  padding: 24px 20px;
+  color: #333;
+  font-family: "Noto Sans TC", sans-serif;
+  font-size: 1em;
+  line-height: 1.8;
+  text-align: justify;
+}
+.preview-content h1 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0 0 1em 0;
+  line-height: 1.3;
+  text-align: left;
+}
+.preview-content p {
+  margin: 0.5em 0;
+  text-indent: 2em;
+}
+.preview-content.vertical {
+  writing-mode: vertical-rl;
+  -webkit-writing-mode: vertical-rl;
+  text-orientation: mixed;
+  height: 420px;
+  max-height: 420px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.preview-content.vertical h1 {
+  text-align: center;
+}
+html.dark .preview-frame { background: #2A2326; }
+html.dark .preview-content { color: #EDE8E9; }
+

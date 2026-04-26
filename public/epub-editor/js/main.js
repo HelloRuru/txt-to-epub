@@ -17,6 +17,7 @@ const state = {
   originalCover: null,  // { path, mimeType, dataUrl } 原書封面資訊
   customFontFile: null, // 使用者上傳的字體 File 物件
   customFontInfo: null, // { realName, embeddedFilename, mime, format } 子集化後的資訊
+  previewSample: { title: '', text: '' },  // 即時預覽用的樣本文字
 
   // 設定
   settings: {
@@ -474,6 +475,184 @@ async function injectCoverIntoEpub(zip) {
   }
 
   zip.file(opfFile, opfContent);
+}
+
+/* ========== 即時排版預覽 ========== */
+// 從 zip 抽出第一個內容章節的開頭當預覽樣本
+async function extractPreviewSample(zip) {
+  const fileNames = Object.keys(zip.files).filter(f => {
+    if (zip.files[f].dir) return false;
+    const ext = f.toLowerCase().slice(f.lastIndexOf('.'));
+    return CONTENT_EXTENSIONS.includes(ext);
+  }).sort();
+  // 跳過 cover/nav/toc 開頭的檔案，找實際章節
+  const skipPatterns = /(cover|nav|toc|colophon|copyright|titlepage|frontmatter)/i;
+  const candidate = fileNames.find(f => !skipPatterns.test(f.split('/').pop())) || fileNames[0];
+  if (!candidate) return { title: '預覽', text: '此 EPUB 找不到內容章節。' };
+
+  const u8 = await zip.files[candidate].async('uint8array');
+  let html = decodeContent(u8);
+  // 抽 <h1>/<h2> 當標題，抽 <p> 內文文字
+  const titleMatch = html.match(/<(?:h1|h2)[^>]*>([\s\S]*?)<\/(?:h1|h2)>/i);
+  let title = titleMatch ? titleMatch[1] : '';
+  title = title.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  // 抽 body 內所有 p
+  const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  const bodyHtml = bodyMatch ? bodyMatch[1] : html;
+  const pMatches = bodyHtml.match(/<p[^>]*>([\s\S]*?)<\/p>/gi) || [];
+  const paragraphs = [];
+  let totalChars = 0;
+  for (const p of pMatches) {
+    const text = p.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').trim();
+    if (!text) continue;
+    paragraphs.push(text);
+    totalChars += text.length;
+    if (totalChars > 600) break;
+  }
+  return { title: title || '預覽', text: paragraphs.join('\n') };
+}
+
+// 套上目前的設定渲染預覽
+function renderPreview() {
+  const pc = $('#previewContent');
+  const pf = $('#previewFrame');
+  if (!pc || !pf) return;
+
+  const sample = state.previewSample || { title: '', text: '' };
+  let title = sample.title || '預覽';
+  let text = sample.text || '上傳 EPUB 後會在這裡看到實際排版。';
+
+  // 簡轉繁 / 標點
+  if (state.settings.convertToTraditional) {
+    try {
+      const conv = getConverter();
+      title = conv(title);
+      text = conv(text);
+    } catch (e) {}
+  }
+  if (state.settings.convertPunctuation) {
+    title = convertPunctuation(title);
+    text = convertPunctuation(text);
+  }
+
+  // HTML 渲染
+  const paragraphs = text.split(/\n+/).filter(p => p.trim());
+  let html = `<h1>${escapeHtml(title)}</h1>`;
+  for (const p of paragraphs) html += `<p>${escapeHtml(p.trim())}</p>`;
+  pc.innerHTML = html;
+
+  // 直/橫排
+  pc.classList.toggle('vertical', state.settings.writingMode === 'vertical');
+
+  // 字級 / 行距 / 縮排
+  pc.style.fontSize = SIZE_MAP[state.settings.fontSize] || '1em';
+  pc.style.lineHeight = LINE_HEIGHT_MAP[state.settings.lineHeight] || '1.8';
+  const indent = INDENT_MAP[state.settings.textIndent] || '2em';
+  pc.querySelectorAll('p').forEach(el => { el.style.textIndent = indent; });
+
+  // 字型
+  const previewFontMap = {
+    'noto-sans': '"Noto Sans TC", "Microsoft JhengHei", sans-serif',
+    'noto-serif': '"Noto Serif TC", "PMingLiU", serif',
+    'guankiap': '"GuanKiapTsingKhai", "DFKai-SB", "BiauKai", serif',
+    'huninn': '"jf-openhuninn", "Microsoft JhengHei", sans-serif',
+    'default': 'inherit',
+  };
+  if (state.settings.fontFamily === 'custom' && state.customFontFile) {
+    injectCustomFontForPreview();
+    pc.style.fontFamily = '"EpubEditorPreviewCustom", sans-serif';
+  } else if (state.settings.fontFamily === 'custom') {
+    pc.style.fontFamily = 'sans-serif';
+  } else {
+    pc.style.fontFamily = previewFontMap[state.settings.fontFamily] || previewFontMap['noto-sans'];
+  }
+}
+
+// helper：簡單 HTML escape（main.js 既有的 escapeHtml 沒 export，這裡寫一個）
+function escapeHtml(s) {
+  const el = document.createElement('span');
+  el.textContent = s;
+  return el.innerHTML;
+}
+
+// 自訂字體預覽：先子集化再注入 @font-face
+let _customFontPreviewCache = { name: null, size: null, blobUrl: null };
+let _customFontPreviewStyleEl = null;
+let _previewHbExports = null;
+async function _previewLoadHb() {
+  if (_previewHbExports) return _previewHbExports;
+  const resp = await fetch('https://cdn.jsdelivr.net/npm/harfbuzzjs@0.4.11/hb-subset.wasm');
+  if (!resp.ok) throw new Error('hb-subset.wasm 載入失敗');
+  const result = await WebAssembly.instantiate(await resp.arrayBuffer());
+  _previewHbExports = result.instance.exports;
+  return _previewHbExports;
+}
+async function _previewSubset(fontBuffer, cps) {
+  const ex = await _previewLoadHb();
+  const fontBytes = new Uint8Array(fontBuffer);
+  const ptr = ex.malloc(fontBytes.byteLength);
+  new Uint8Array(ex.memory.buffer).set(fontBytes, ptr);
+  const blob = ex.hb_blob_create(ptr, fontBytes.byteLength, 2, 0, 0);
+  const face = ex.hb_face_create(blob, 0);
+  ex.hb_blob_destroy(blob);
+  const input = ex.hb_subset_input_create_or_fail();
+  const us = ex.hb_subset_input_unicode_set(input);
+  cps.forEach(cp => ex.hb_set_add(us, cp));
+  const sub = ex.hb_subset_or_fail(face, input);
+  ex.hb_subset_input_destroy(input);
+  if (!sub) {
+    ex.hb_face_destroy(face);
+    ex.free(ptr);
+    throw new Error('hb_subset_or_fail');
+  }
+  const rb = ex.hb_face_reference_blob(sub);
+  const off = ex.hb_blob_get_data(rb, 0);
+  const len = ex.hb_blob_get_length(rb);
+  const view = new Uint8Array(ex.memory.buffer, off, len);
+  const data = new Uint8Array(len);
+  data.set(view);
+  ex.hb_blob_destroy(rb);
+  ex.hb_face_destroy(sub);
+  ex.hb_face_destroy(face);
+  ex.free(ptr);
+  return data.buffer;
+}
+async function injectCustomFontForPreview() {
+  const f = state.customFontFile;
+  if (!f) return;
+  if (_customFontPreviewCache.name === f.name && _customFontPreviewCache.size === f.size && _customFontPreviewCache.blobUrl) return;
+  if (_customFontPreviewCache.blobUrl) URL.revokeObjectURL(_customFontPreviewCache.blobUrl);
+  if (!_customFontPreviewStyleEl) {
+    _customFontPreviewStyleEl = document.createElement('style');
+    document.head.appendChild(_customFontPreviewStyleEl);
+  }
+  try {
+    // 收 codepoint：預覽樣本 + ASCII
+    const sample = (state.previewSample.title || '') + '\n' + (state.previewSample.text || '');
+    const cps = new Set();
+    for (let i = 0; i < sample.length; i++) {
+      const cp = sample.codePointAt(i);
+      cps.add(cp);
+      if (cp > 0xFFFF) i++;
+    }
+    for (let a = 0x20; a < 0x7F; a++) cps.add(a);
+    const buf = await f.arrayBuffer();
+    const sub = await _previewSubset(buf, cps);
+    const url = URL.createObjectURL(new Blob([sub], { type: 'font/ttf' }));
+    _customFontPreviewCache = { name: f.name, size: f.size, blobUrl: url };
+    _customFontPreviewStyleEl.textContent =
+      '@font-face { font-family: "EpubEditorPreviewCustom"; src: url("' + url + '") format("truetype"); font-display: swap; }';
+    const pc = $('#previewContent');
+    if (pc && state.settings.fontFamily === 'custom') {
+      pc.style.fontFamily = '"EpubEditorPreviewCustom", sans-serif';
+    }
+  } catch (err) {
+    console.warn('預覽字體子集化失敗，改用原始字體：', err);
+    const url = URL.createObjectURL(f);
+    _customFontPreviewCache = { name: f.name, size: f.size, blobUrl: url };
+    _customFontPreviewStyleEl.textContent =
+      '@font-face { font-family: "EpubEditorPreviewCustom"; src: url("' + url + '"); font-display: swap; }';
+  }
 }
 
 /* ========== CSS 注入 ========== */
@@ -972,7 +1151,12 @@ async function handleFile(file) {
       $('#cover-preview').hidden = true;
     }
 
+    // 抽預覽用樣本文字（第一個內容章節前 ~600 字）
+    state.previewSample = await extractPreviewSample(zip);
+
     showStep('step-settings');
+    // 切到設定頁就先 render 一次預覽
+    renderPreview();
   } catch (err) {
     console.error('EPUB 解析失敗:', err);
     showToast('無法解析此 EPUB 檔案，請確認檔案是否損壞', 'error');
@@ -1040,6 +1224,7 @@ function initEvents() {
     const isActive = this.classList.contains('active');
     this.setAttribute('aria-pressed', isActive);
     state.settings.convertToTraditional = isActive;
+    renderPreview();
   });
 
   $('#toggle-punctuation').addEventListener('click', function() {
@@ -1047,6 +1232,7 @@ function initEvents() {
     const isActive = this.classList.contains('active');
     this.setAttribute('aria-pressed', isActive);
     state.settings.convertPunctuation = isActive;
+    renderPreview();
   });
 
   // 排版方向
@@ -1055,6 +1241,7 @@ function initEvents() {
       $$('[data-writing]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       state.settings.writingMode = btn.dataset.writing;
+      renderPreview();
     });
   });
 
@@ -1067,6 +1254,7 @@ function initEvents() {
       // 切換自訂字體上傳區顯示
       const wrap = $('#custom-font-wrap');
       if (wrap) wrap.hidden = btn.dataset.font !== 'custom';
+      renderPreview();
     });
   });
 
@@ -1086,6 +1274,7 @@ function initEvents() {
       const lbl = $('#custom-font-label');
       if (lbl) lbl.textContent = `${f.name}（${(f.size / 1048576).toFixed(1)} MB）`;
       e.target.value = '';
+      if (state.settings.fontFamily === 'custom') renderPreview();
     });
   }
 
@@ -1095,6 +1284,7 @@ function initEvents() {
       $$('[data-size]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       state.settings.fontSize = btn.dataset.size;
+      renderPreview();
     });
   });
 
@@ -1104,6 +1294,7 @@ function initEvents() {
       $$('[data-lineheight]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       state.settings.lineHeight = btn.dataset.lineheight;
+      renderPreview();
     });
   });
 
@@ -1113,6 +1304,7 @@ function initEvents() {
       $$('[data-indent]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       state.settings.textIndent = btn.dataset.indent;
+      renderPreview();
     });
   });
 
