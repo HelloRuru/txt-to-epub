@@ -1306,12 +1306,10 @@
       const platformNames = { readmoo: 'Readmoo', books: '博客來', kobo: 'Kobo' };
       for (const platform of ['readmoo', 'books', 'kobo']) {
         const deals = data[platform]?.deals || [];
-        // 全部按日期升冪排（日曆由左到右）
-        // Readmoo：只顯示今天 + 未來
-        const showDeals = (platform === 'readmoo'
-          ? deals.filter(d => d.date >= today)
-          : deals
-        ).sort((a, b) => a.date.localeCompare(b.date));
+        // 三平台一致：只顯示今天 + 未來，日期升冪
+        const showDeals = deals
+          .filter(d => d.date >= today)
+          .sort((a, b) => a.date.localeCompare(b.date));
 
         const grid = document.getElementById('grid-' + platform);
         const calHeader = document.getElementById('cal-header-' + platform);
