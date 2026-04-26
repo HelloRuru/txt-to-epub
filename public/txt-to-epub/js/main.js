@@ -517,6 +517,12 @@
     this.value = '';
   });
 
+  // ── 下載單一冊（不拆）──
+  $('btnSingleVolume').addEventListener('click', function () {
+    $('splitNotice').classList.add('hidden');
+    $('btnExport').click();
+  });
+
   // ── 自動拆冊 ──
   $('btnAutoSplit').addEventListener('click', async function () {
     var half = Math.ceil(state.chapters.length / 2);
