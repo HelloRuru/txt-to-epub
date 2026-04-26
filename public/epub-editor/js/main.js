@@ -615,41 +615,63 @@ async function embedCustomFontIntoEpub(zip, fontDataBuffer, meta) {
   return targetPath;
 }
 
-function injectStyleIntoCSS(zip) {
+async function injectStyleIntoCSS(zip) {
   const cssFiles = Object.keys(zip.files).filter(f =>
     f.toLowerCase().endsWith('.css') && !zip.files[f].dir
   );
 
-  const promises = cssFiles.map(async (filename) => {
-    const overrides = generateStyleOverrides(filename);  // 用每個 CSS 檔的路徑算字體相對位置
+  // 1. 在每個 CSS 檔尾部附加覆蓋樣式（給有引用 CSS 的頁面用）
+  for (const filename of cssFiles) {
+    const overrides = generateStyleOverrides(filename);
     const content = await zip.files[filename].async('string');
     zip.file(filename, content + overrides);
-  });
-
-  // 如果沒有 CSS 檔案，找 XHTML 注入 <style>
-  if (cssFiles.length === 0) {
-    const xhtmlFiles = Object.keys(zip.files).filter(f => {
-      const ext = f.toLowerCase().slice(f.lastIndexOf('.'));
-      return CONTENT_EXTENSIONS.includes(ext) && !zip.files[f].dir;
-    });
-
-    xhtmlFiles.forEach(filename => {
-      promises.push(
-        zip.files[filename].async('string').then(content => {
-          const overrides = generateStyleOverrides(filename);  // XHTML 的位置算 url
-          const styleTag = `<style>${overrides}</style>`;
-          if (content.includes('</head>')) {
-            content = content.replace('</head>', styleTag + '</head>');
-          } else if (content.includes('<body')) {
-            content = content.replace('<body', styleTag + '<body');
-          }
-          zip.file(filename, content);
-        })
-      );
-    });
   }
 
-  return Promise.all(promises);
+  // 2. 對所有章節 XHTML — 不管 EPUB 有沒有 CSS 檔 —
+  // 都檢查它是否「實際引用了我們注入規則的 CSS」。
+  // 沒引用的話，就在 XHTML 內直接注入 <style>，確保樣式一定生效。
+  // （很多 EPUB 把 CSS 只給 nav.xhtml 用，章節頁面 head 是空的）
+  const xhtmlFiles = Object.keys(zip.files).filter(f => {
+    if (zip.files[f].dir) return false;
+    const ext = f.toLowerCase().slice(f.lastIndexOf('.'));
+    return CONTENT_EXTENSIONS.includes(ext);
+  });
+
+  // 把 CSS 檔名（去掉路徑）建成 set 方便比對
+  const cssBasenames = new Set(cssFiles.map(f => f.split('/').pop().toLowerCase()));
+
+  for (const filename of xhtmlFiles) {
+    let content = await zip.files[filename].async('string');
+    // 看 head 裡有沒有 <link rel="stylesheet"> 引用任何我們處理過的 CSS
+    let referencesCss = false;
+    if (cssBasenames.size > 0) {
+      const linkMatches = content.match(/<link[^>]+rel=["']stylesheet["'][^>]*>/gi) || [];
+      for (const link of linkMatches) {
+        const hrefMatch = link.match(/href=["']([^"']+)["']/i);
+        if (hrefMatch) {
+          const referenced = hrefMatch[1].split('/').pop().toLowerCase();
+          if (cssBasenames.has(referenced)) {
+            referencesCss = true;
+            break;
+          }
+        }
+      }
+    }
+    // 沒引用任何我們的 CSS → 注入 inline <style>
+    if (!referencesCss) {
+      const overrides = generateStyleOverrides(filename);
+      const styleTag = `<style type="text/css">${overrides}</style>`;
+      if (content.includes('</head>')) {
+        content = content.replace('</head>', styleTag + '</head>');
+      } else if (content.match(/<body[^>]*>/i)) {
+        content = content.replace(/(<body[^>]*>)/i, styleTag + '$1');
+      } else {
+        // 沒 head 也沒 body（極少見）就直接前綴
+        content = styleTag + content;
+      }
+      zip.file(filename, content);
+    }
+  }
 }
 
 /* ========== OPF spine 方向修改 ========== */
