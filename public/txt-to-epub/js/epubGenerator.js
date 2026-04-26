@@ -27,6 +27,108 @@ function escapeHtml(text) {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+// ── HarfBuzz WASM 子集化 ──
+// 從 jsDelivr CDN 載入 hb-subset.wasm，把字體只保留書中用到的字元
+var _hbExportsPromise = null;
+function loadHbSubset() {
+  if (_hbExportsPromise) return _hbExportsPromise;
+  _hbExportsPromise = (async function () {
+    var resp = await fetch('https://cdn.jsdelivr.net/npm/harfbuzzjs@0.4.11/hb-subset.wasm');
+    if (!resp.ok) throw new Error('載入 hb-subset.wasm 失敗：' + resp.status);
+    var bytes = await resp.arrayBuffer();
+    var result = await WebAssembly.instantiate(bytes);
+    return result.instance.exports;
+  })();
+  return _hbExportsPromise;
+}
+
+// 從章節文字中收集所有用到的 unicode codepoint
+function collectCodepoints(chapters, title, author) {
+  var set = new Set();
+  // 把書名/作者也加進去
+  function addText(t) {
+    if (!t) return;
+    for (var i = 0; i < t.length; i++) {
+      var cp = t.codePointAt(i);
+      set.add(cp);
+      // surrogate pair：跳過第二個 code unit
+      if (cp > 0xFFFF) i++;
+    }
+  }
+  addText(title);
+  addText(author);
+  for (var c = 0; c < chapters.length; c++) {
+    addText(chapters[c].title);
+    addText(chapters[c].content);
+  }
+  // 加上常用 ASCII（標點、數字、英字）— 確保介面上的數字章節編號等能顯示
+  for (var ascii = 0x20; ascii < 0x7F; ascii++) set.add(ascii);
+  return set;
+}
+
+// 用 hb-subset 對字體做子集化
+async function subsetFontWithHarfBuzz(fontArrayBuffer, codepointSet, onProgress) {
+  onProgress && onProgress({ stage: 'font', message: '正在載入子集化引擎...' });
+  var exports = await loadHbSubset();
+
+  onProgress && onProgress({ stage: 'font', message: '正在分析字體（' + codepointSet.size + ' 個字元）...' });
+  var heapu8 = new Uint8Array(exports.memory.buffer);
+  var fontBytes = new Uint8Array(fontArrayBuffer);
+
+  // 配記憶體放原始字體
+  var fontPtr = exports.malloc(fontBytes.byteLength);
+  // memory grow 後 buffer reference 會失效，所以每次都重新拿 view
+  new Uint8Array(exports.memory.buffer).set(fontBytes, fontPtr);
+
+  var blob = exports.hb_blob_create(fontPtr, fontBytes.byteLength, 2 /* HB_MEMORY_MODE_WRITABLE */, 0, 0);
+  var face = exports.hb_face_create(blob, 0);
+  exports.hb_blob_destroy(blob);
+
+  var input = exports.hb_subset_input_create_or_fail();
+  if (!input) {
+    exports.hb_face_destroy(face);
+    exports.free(fontPtr);
+    throw new Error('hb_subset_input_create_or_fail 回傳 null');
+  }
+  var unicodeSet = exports.hb_subset_input_unicode_set(input);
+  codepointSet.forEach(function (cp) {
+    exports.hb_set_add(unicodeSet, cp);
+  });
+
+  onProgress && onProgress({ stage: 'font', message: '正在精簡字體（保留 ' + codepointSet.size + ' 個字元）...' });
+  var subsetFace = exports.hb_subset_or_fail(face, input);
+  exports.hb_subset_input_destroy(input);
+  if (!subsetFace) {
+    exports.hb_face_destroy(face);
+    exports.free(fontPtr);
+    throw new Error('hb_subset_or_fail 失敗');
+  }
+
+  var resultBlob = exports.hb_face_reference_blob(subsetFace);
+  var offset = exports.hb_blob_get_data(resultBlob, 0);
+  var subsetLength = exports.hb_blob_get_length(resultBlob);
+  if (subsetLength === 0) {
+    exports.hb_blob_destroy(resultBlob);
+    exports.hb_face_destroy(subsetFace);
+    exports.hb_face_destroy(face);
+    exports.free(fontPtr);
+    throw new Error('子集化後字體大小為 0');
+  }
+
+  // 拷貝出來（grow 後的 buffer 才安全）
+  var resultView = new Uint8Array(exports.memory.buffer, offset, subsetLength);
+  var subsetData = new Uint8Array(subsetLength);
+  subsetData.set(resultView);
+
+  // 清理
+  exports.hb_blob_destroy(resultBlob);
+  exports.hb_face_destroy(subsetFace);
+  exports.hb_face_destroy(face);
+  exports.free(fontPtr);
+
+  return subsetData.buffer;
+}
+
 window.EpubGenerator = {
   FONT_CONFIG: FONT_CONFIG,
 
@@ -51,7 +153,11 @@ window.EpubGenerator = {
     var fontConfig = useCustom ? FONT_CONFIG['custom'] : (FONT_CONFIG[fontFamily] || FONT_CONFIG['noto-sans']);
     // 自訂字體拿不到時退回思源黑體
     if (fontFamily === 'custom' && !customFont) fontConfig = FONT_CONFIG['noto-sans'];
-    var fontFamilyCSS = '"' + fontConfig.family + '", "Noto Sans TC", sans-serif';
+    // 自訂字體：用 !important 強制覆蓋，並把 fallback 降到只剩通用族（避免閱讀器拿系統字體覆蓋）
+    var fontFamilyCSS = useCustom
+      ? '"' + fontConfig.family + '", sans-serif'
+      : '"' + fontConfig.family + '", "Noto Sans TC", sans-serif';
+    var fontImportant = useCustom ? ' !important' : '';
     var fontSizeValue = SIZE_MAP[fontSize] || SIZE_MAP['medium'];
     var lineHeightValue = LINE_HEIGHT_MAP[lineHeight] || LINE_HEIGHT_MAP['normal'];
     var textIndentValue = INDENT_MAP[textIndent] || INDENT_MAP['two'];
@@ -93,30 +199,53 @@ window.EpubGenerator = {
 
     onProgress({ stage: 'css', message: '正在產生樣式表...' });
 
-    // 自訂字體：把檔案塞進 EPUB，並用 @font-face 注入
+    // 自訂字體：子集化（只保留書中用到的字）後嵌入 EPUB
     var fontFaceCSS = '';
     var fontManifest = '';
     if (useCustom) {
-      onProgress({ stage: 'font', message: '正在嵌入自訂字體...' });
       var fontMeta = getCustomFontMeta(customFont);
-      var fontData = await customFont.arrayBuffer();
-      var fontFilename = 'user-font.' + fontMeta.ext;
-      zip.file('OEBPS/fonts/' + fontFilename, fontData);
+      var rawFontData = await customFont.arrayBuffer();
+      var fontDataToEmbed = rawFontData;
+      var subsetExt = fontMeta.ext;
+      var subsetMime = fontMeta.mime;
+      var subsetFormat = fontMeta.format;
+      // hb-subset 輸出統一是 sfnt（TTF/OTF），把 woff/woff2 子集化後也改用 ttf 副檔名
+      try {
+        var codepoints = collectCodepoints(chapters, title, author);
+        var subsetBuffer = await subsetFontWithHarfBuzz(rawFontData, codepoints, onProgress);
+        fontDataToEmbed = subsetBuffer;
+        // 子集化輸出是 sfnt，直接用 ttf
+        subsetExt = 'ttf';
+        subsetMime = 'font/ttf';
+        subsetFormat = 'truetype';
+        var origMB = (rawFontData.byteLength / 1048576).toFixed(2);
+        var subMB = (subsetBuffer.byteLength / 1048576).toFixed(2);
+        onProgress({ stage: 'font', message: '字體精簡完成（' + origMB + ' MB → ' + subMB + ' MB）' });
+      } catch (subErr) {
+        console.warn('字體子集化失敗，改用原始字體：', subErr);
+        onProgress({ stage: 'font', message: '字體子集化失敗，改用原始字體（' + (rawFontData.byteLength / 1048576).toFixed(1) + ' MB）' });
+      }
+      var fontFilename = 'user-font.' + subsetExt;
+      zip.file('OEBPS/fonts/' + fontFilename, fontDataToEmbed);
       fontFaceCSS =
         '@font-face {\n' +
         '  font-family: "CustomUserFont";\n' +
-        '  src: url("fonts/' + fontFilename + '") format("' + fontMeta.format + '");\n' +
+        '  src: url("fonts/' + fontFilename + '") format("' + subsetFormat + '");\n' +
         '  font-weight: normal;\n' +
         '  font-style: normal;\n' +
         '}\n\n';
-      fontManifest = '<item id="user-font" href="fonts/' + fontFilename + '" media-type="' + fontMeta.mime + '"/>';
+      fontManifest = '<item id="user-font" href="fonts/' + fontFilename + '" media-type="' + subsetMime + '"/>';
     }
 
     // CSS
     var verticalCSS = isVertical ? '\n  writing-mode: vertical-rl;\n  -webkit-writing-mode: vertical-rl;\n  -epub-writing-mode: vertical-rl;\n  text-orientation: mixed;' : '';
-    var css = fontFaceCSS +
+    // 自訂字體用 !important + 全域 * 選擇器強制覆蓋，避免被閱讀器系統字體吃掉
+    var globalFontRule = useCustom
+      ? '* {\n  font-family: ' + fontFamilyCSS + fontImportant + ';\n}\n\n'
+      : '';
+    var css = fontFaceCSS + globalFontRule +
       'body {\n' +
-      '  font-family: ' + fontFamilyCSS + ';\n' +
+      '  font-family: ' + fontFamilyCSS + fontImportant + ';\n' +
       '  font-size: ' + fontSizeValue + ';\n' +
       '  line-height: ' + lineHeightValue + ';\n' +
       '  padding: 1em;\n' +
@@ -124,6 +253,7 @@ window.EpubGenerator = {
       '  text-align: justify;' + verticalCSS + '\n' +
       '}\n\n' +
       'h1 {\n' +
+      '  font-family: ' + fontFamilyCSS + fontImportant + ';\n' +
       '  font-size: 1.5em;\n' +
       '  font-weight: bold;\n' +
       '  margin: 1.5em 0 1em 0;\n' +
@@ -131,6 +261,7 @@ window.EpubGenerator = {
       '  text-align: ' + (isVertical ? 'center' : 'left') + ';\n' +
       '}\n\n' +
       'p {\n' +
+      '  font-family: ' + fontFamilyCSS + fontImportant + ';\n' +
       '  text-indent: ' + textIndentValue + ';\n' +
       '  margin: 0.5em 0;\n' +
       '  hanging-punctuation: allow-end;\n' +
