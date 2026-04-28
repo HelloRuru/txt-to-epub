@@ -701,24 +701,25 @@ footer a:hover { text-decoration: underline; }
         <div class="field">
           <label for="binAAMode">字邊緣處理</label>
           <select id="binAAMode">
-            <option value="System1BitGridFit" selected>1-bit 對齊網格（預設）</option>
+            <option value="System1BitGridFit">1-bit 對齊網格</option>
             <option value="System1Bit">1-bit 不對齊</option>
-            <option value="SystemAntiAltasGridFit">抗鋸齒對齊網格</option>
+            <option value="SystemAntiAltasGridFit" selected>抗鋸齒對齊網格（預設）</option>
             <option value="SystemAntiAltas">抗鋸齒</option>
           </select>
         </div>
         <div class="field">
           <label for="binLightThreshold">取色閾值</label>
-          <input type="number" id="binLightThreshold" min="0" max="255" value="128" step="1">
+          <input type="number" id="binLightThreshold" min="0" max="255" value="100" step="1">
         </div>
       </div>
 
       <div class="field-row" style="margin-top:12px;">
         <div class="field">
-          <label for="orientation">排版方向</label>
-          <select id="orientation">
-            <option value="horizontal">橫排</option>
-            <option value="vertical">豎排（檔名加「豎-」前綴）</option>
+          <label for="binBoldPx">字加粗 (px)</label>
+          <select id="binBoldPx">
+            <option value="0" selected>無（最忠實字體原貌）</option>
+            <option value="1">+1（鋸齒視覺減輕）</option>
+            <option value="2">+2（粗體效果）</option>
           </select>
         </div>
         <div class="field">
@@ -730,8 +731,16 @@ footer a:hover { text-decoration: underline; }
         </div>
       </div>
 
-      <div class="note" style="margin-top:12px; font-size:13px;">
-        <strong>對齊 XTEink 工具公式</strong>：字級 px → 用「坐」字測量 W×H，加上字距/行距即為 cell size。所有選項預設值跟 XTEink 一致。閾值 128 = 像素亮度大於 128 視為「字」（白色筆畫）。
+      <div class="field" style="margin-top:12px;">
+        <label for="orientation">排版方向</label>
+        <select id="orientation">
+          <option value="horizontal">橫排</option>
+          <option value="vertical">豎排（檔名加「豎-」前綴）</option>
+        </select>
+      </div>
+
+      <div class="warn-msg show" style="margin-top:12px;">
+        <strong>關於鋸齒</strong>：閱星曈原廠 .bin 是 1-bit 黑白格式，鋸齒在物理上<strong>無法完全消除</strong>（風眼刷機版的 .epdfont 才能用 2-bit 灰階解決）。本工具預設「抗鋸齒對齊網格 + 閾值 100」會讓邊緣盡量平順；想再減輕鋸齒可選「字加粗 +1」讓筆畫變粗、相對鋸齒比例變小。
       </div>
     </div>
 
@@ -877,7 +886,7 @@ footer a:hover { text-decoration: underline; }
 <script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js" id="opentypeLib"></script>
 <script>
 // 版本號 — 改 worker.js / epdfont_ranges.json 時要 bump 這個值，瀏覽器才會抓新版
-const ASSET_VERSION = '20260428c';
+const ASSET_VERSION = '20260428d-bold';
 const $ = (id) => document.getElementById(id);
 const dropzone = $('dropzone');
 const ttfInput = $('ttfInput');
@@ -1108,6 +1117,7 @@ runBtn.addEventListener('click', () => {
     const antiAlias = aaMode.startsWith('SystemAntiAltas');
     const lightThreshold = parseInt($('binLightThreshold').value || 128);
     const renderBorder = $('binRenderBorder').value === '1';
+    const boldPx = parseInt($('binBoldPx').value || 0) || 0;
     payload = {
       format: 'bin',
       ttfBuffer: bufferCopy,
@@ -1119,6 +1129,7 @@ runBtn.addEventListener('click', () => {
       antiAlias,
       vertical,
       renderBorder,
+      boldPx,
       fontName,
     };
   } else {
@@ -1170,7 +1181,7 @@ function getCellSize() {
 }
 
 function renderPreview() {
-  if (!opentypeFont) return;
+  if (!_binFontFamily) return;
 
   const screen = SCREEN_DIMS[previewScreen];
   const { outerW, outerH, fontSizePt } = getCellSize();
@@ -1191,7 +1202,7 @@ function renderPreview() {
 
 function drawScreen(paragraphs, font, fontSizePt, cellW, cellH, screen, writing) {
   const canvas = $('previewCanvas');
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
   canvas.width = screen.w;
   canvas.height = screen.h;
@@ -1203,13 +1214,13 @@ function drawScreen(paragraphs, font, fontSizePt, cellW, cellH, screen, writing)
   ctx.fillRect(0, 0, screen.w, screen.h);
   ctx.imageSmoothingEnabled = false;
 
-  const scale = fontSizePt / font.unitsPerEm;
-  const ascent = Math.round(font.ascender * scale);
-  const descent = Math.round(-font.descender * scale);
-  const yPad = Math.max(0, cellH - (ascent + descent));
-  const baselineInCell = ascent + Math.floor(yPad / 2);
-
-  ctx.fillStyle = '#222';
+  // 預覽要如實反映 .bin 編碼結果：用同樣的 Canvas font + 設定逐字渲染
+  const cs = parseInt($('binLetterSpacing')?.value || 0) || 0;
+  const ls = parseInt($('binLineSpacing')?.value || 0) || 0;
+  const threshold = parseInt($('binLightThreshold')?.value || 128) || 128;
+  const aaMode = $('binAAMode')?.value || 'SystemAntiAltasGridFit';
+  const antiAlias = aaMode.startsWith('SystemAntiAltas');
+  const boldPx = parseInt($('binBoldPx')?.value || 0) || 0;
 
   if (writing === 'horizontal') {
     let curY = PAGE_MARGIN;
@@ -1223,7 +1234,7 @@ function drawScreen(paragraphs, font, fontSizePt, cellW, cellH, screen, writing)
           curY += cellH + LINE_GAP;
           if (curY + cellH > screen.h - PAGE_MARGIN) break;
         }
-        drawGlyphInCell(ctx, font, ch, fontSizePt, scale, baselineInCell, curX, curY, cellW, cellH);
+        drawGlyphInCellXTEink(ctx, ch, fontSizePt, curX, curY, cellW, cellH, cs, ls, threshold, antiAlias, boldPx);
         curX += cellW;
       }
       curY += cellH + LINE_GAP * 2;
@@ -1240,7 +1251,7 @@ function drawScreen(paragraphs, font, fontSizePt, cellW, cellH, screen, writing)
           curX -= cellW + LINE_GAP;
           if (curX < PAGE_MARGIN) break;
         }
-        drawGlyphInCell(ctx, font, ch, fontSizePt, scale, baselineInCell, curX, curY, cellW, cellH);
+        drawGlyphInCellXTEink(ctx, ch, fontSizePt, curX, curY, cellW, cellH, cs, ls, threshold, antiAlias, boldPx);
         curY += cellH;
       }
       curX -= cellW + LINE_GAP * 2;
@@ -1248,20 +1259,66 @@ function drawScreen(paragraphs, font, fontSizePt, cellW, cellH, screen, writing)
   }
 }
 
-function drawGlyphInCell(ctx, font, ch, fontSizePt, scale, baselineInCell, cellX, cellY, cellW, cellH) {
-  const glyph = font.charToGlyph(ch);
-  if (!glyph || glyph.index === 0) {
-    ctx.strokeStyle = 'rgba(120,120,120,0.35)';
-    ctx.lineWidth = 1;
-    const m = 4;
-    ctx.strokeRect(cellX + m + 0.5, cellY + m + 0.5, cellW - m * 2 - 1, cellH - m * 2 - 1);
-    return;
+// 用 Canvas font 渲染 + 套 XTEink 規則：黑底白字 → R>threshold 二值化 → dilation 加粗 → 黑色畫到主畫布
+const _glyphCanvas = document.createElement('canvas');
+const _glyphCtx = _glyphCanvas.getContext('2d', { willReadFrequently: true });
+function drawGlyphInCellXTEink(ctx, ch, pxSize, cellX, cellY, cellW, cellH, charSpacing, lineSpacing, threshold, antiAlias, boldPx) {
+  if (!_binFontFamily) return;  // 字體未載入
+
+  // 用 cell 大小的離屏 canvas 渲染這個字
+  _glyphCanvas.width = cellW;
+  _glyphCanvas.height = cellH;
+  const g = _glyphCtx;
+  g.resetTransform();
+  g.fillStyle = 'black';
+  g.fillRect(0, 0, cellW, cellH);
+  g.font = `${pxSize}px "${_binFontFamily}"`;
+  g.textBaseline = 'top';
+  if ('textRendering' in g) {
+    g.textRendering = antiAlias ? 'geometricPrecision' : 'optimizeSpeed';
   }
-  const advance = Math.round(glyph.advanceWidth * scale);
-  const xPad = Math.max(0, Math.floor((cellW - advance) / 2));
-  const path = glyph.getPath(cellX + xPad, cellY + baselineInCell, fontSizePt);
-  path.fill = '#222';
-  path.draw(ctx);
+  // 套用 spacing/2 偏移（XTEink 規則）
+  let tx = 0, ty = Math.floor(lineSpacing / 2);
+  const cp = ch.codePointAt(0);
+  if (charSpacing > 0 && cp > 0xFF) tx += Math.floor(charSpacing / 2);
+  g.translate(tx, ty);
+  g.fillStyle = 'white';
+  g.fillText(ch, 0, 0);
+  g.resetTransform();
+
+  // 二值化
+  const px = g.getImageData(0, 0, cellW, cellH).data;
+  let bin = new Uint8Array(cellW * cellH);
+  for (let row = 0; row < cellH; row++) {
+    for (let col = 0; col < cellW; col++) {
+      if (px[(row * cellW + col) * 4] > threshold) bin[row * cellW + col] = 1;
+    }
+  }
+  // 加粗（dilation）
+  for (let pass = 0; pass < boldPx; pass++) {
+    const next = new Uint8Array(cellW * cellH);
+    for (let row = 0; row < cellH; row++) {
+      for (let col = 0; col < cellW; col++) {
+        if (bin[row * cellW + col]) { next[row * cellW + col] = 1; continue; }
+        if ((row > 0          && bin[(row - 1) * cellW + col]) ||
+            (row < cellH - 1  && bin[(row + 1) * cellW + col]) ||
+            (col > 0          && bin[row * cellW + col - 1]) ||
+            (col < cellW - 1  && bin[row * cellW + col + 1])) {
+          next[row * cellW + col] = 1;
+        }
+      }
+    }
+    bin = next;
+  }
+  // 把二值結果用黑色畫到主畫布
+  ctx.fillStyle = '#222';
+  for (let row = 0; row < cellH; row++) {
+    for (let col = 0; col < cellW; col++) {
+      if (bin[row * cellW + col]) {
+        ctx.fillRect(cellX + col, cellY + row, 1, 1);
+      }
+    }
+  }
 }
 
 function bindToggleRow(rowId, attr, onChange) {
@@ -1279,7 +1336,7 @@ bindToggleRow('previewScreenRow', 'screen', (v) => { previewScreen = v; renderPr
 bindToggleRow('previewWritingRow', 'writing', (v) => { previewWriting = v; renderPreview(); });
 
 ['orientation', 'previewText', 'binLetterSpacing', 'binLineSpacing',
- 'binAAMode', 'binLightThreshold', 'binRenderBorder'].forEach(id => {
+ 'binAAMode', 'binLightThreshold', 'binRenderBorder', 'binBoldPx'].forEach(id => {
   const el = $(id);
   if (el) el.addEventListener('input', () => { updateBinSliderDisplay(); renderPreview(); });
 });

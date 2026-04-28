@@ -40,7 +40,7 @@ function progress(current, total) {
 const BIN_GLYPH_COUNT = 0x10000;
 const BIN_BASE_CHAR = '坐';  // XTEink 用「坐」當基準字測量 W/H
 
-async function runBin({ ttfBuffer, fontSizePx, outerW, outerH, charSpacingPx = 0, lineSpacingPx = 0, lightThreshold = 128, antiAlias = true, vertical = false, renderBorder = false, fontName = 'font' }) {
+async function runBin({ ttfBuffer, fontSizePx, outerW, outerH, charSpacingPx = 0, lineSpacingPx = 0, lightThreshold = 128, antiAlias = true, vertical = false, renderBorder = false, boldPx = 0, fontName = 'font' }) {
   // 透過 FontFace API 把 TTF 註冊給 OffscreenCanvas 用
   const fontFamily = `xteink_font_${Date.now()}`;
   const fontFace = new FontFace(fontFamily, ttfBuffer);
@@ -64,7 +64,7 @@ async function runBin({ ttfBuffer, fontSizePx, outerW, outerH, charSpacingPx = 0
   // 從第 32 個 codepoint 開始（U+0020 之前都是控制字元）
   let lastReport = 0;
   for (let cp = 0x20; cp < BIN_GLYPH_COUNT; cp++) {
-    renderBinGlyphXTEink(cp, ctx, out, cp * slotSize, outerW, outerH, widthByte, charSpacingPx, lineSpacingPx, lightThreshold, vertical, renderBorder);
+    renderBinGlyphXTEink(cp, ctx, out, cp * slotSize, outerW, outerH, widthByte, charSpacingPx, lineSpacingPx, lightThreshold, vertical, renderBorder, boldPx);
     if (cp - lastReport >= PROGRESS_STEP) {
       progress(cp, BIN_GLYPH_COUNT);
       lastReport = cp;
@@ -79,7 +79,7 @@ async function runBin({ ttfBuffer, fontSizePx, outerW, outerH, charSpacingPx = 0
   self.postMessage({ type: 'done', buffer: out.buffer, filename }, [out.buffer]);
 }
 
-function renderBinGlyphXTEink(cp, ctx, out, slotOffset, w, h, widthByte, charSpacing, lineSpacing, threshold, vertical, renderBorder) {
+function renderBinGlyphXTEink(cp, ctx, out, slotOffset, w, h, widthByte, charSpacing, lineSpacing, threshold, vertical, renderBorder, boldPx = 0) {
   // 1. 黑底
   ctx.resetTransform();
   ctx.fillStyle = 'black';
@@ -119,13 +119,43 @@ function renderBinGlyphXTEink(cp, ctx, out, slotOffset, w, h, widthByte, charSpa
   ctx.fillStyle = 'white';
   ctx.fillText(ch, 0, 0);
 
-  // 7. 取 R channel，> threshold 即為前景
+  // 7. 取 R channel 二值化
   ctx.resetTransform();
   const px = ctx.getImageData(0, 0, w, h).data;
+  const bin = new Uint8Array(w * h);
   for (let row = 0; row < h; row++) {
     for (let col = 0; col < w; col++) {
-      if (px[(row * w + col) * 4] > threshold) {
-        // MSB first：col=0 是 byte 的最高位
+      if (px[(row * w + col) * 4] > threshold) bin[row * w + col] = 1;
+    }
+  }
+
+  // 8. 加粗（dilation）：每個白像素 → 鄰近 boldPx 格也變白
+  // 1-bit 字邊緣鋸齒視覺減輕的最直接方式（鋸齒沒消失，只是相對筆畫粗度變小）
+  let final = bin;
+  for (let pass = 0; pass < boldPx; pass++) {
+    const next = new Uint8Array(w * h);
+    for (let row = 0; row < h; row++) {
+      for (let col = 0; col < w; col++) {
+        if (final[row * w + col]) {
+          next[row * w + col] = 1;
+          continue;
+        }
+        // 4-鄰域 dilation
+        if ((row > 0     && final[(row - 1) * w + col]) ||
+            (row < h - 1 && final[(row + 1) * w + col]) ||
+            (col > 0     && final[row * w + col - 1]) ||
+            (col < w - 1 && final[row * w + col + 1])) {
+          next[row * w + col] = 1;
+        }
+      }
+    }
+    final = next;
+  }
+
+  // 9. 寫入 .bin slot（MSB first）
+  for (let row = 0; row < h; row++) {
+    for (let col = 0; col < w; col++) {
+      if (final[row * w + col]) {
         out[slotOffset + row * widthByte + (col >>> 3)] |= 0x80 >>> (col & 7);
       }
     }
