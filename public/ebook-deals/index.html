@@ -811,9 +811,17 @@
     html.dark .feed-btn:hover { color: var(--color-sage); }
     .feed-btn svg { width: 13px; height: 13px; }
     .feed-btn.is-copied {
-      border-color: var(--color-sage);
-      color: var(--color-sage-dark);
-      background: var(--color-sage-bg);
+      border-color: var(--color-sage-dark);
+      border-width: 2px;
+      color: #fff;
+      background: var(--color-sage-dark);
+      transform: scale(1.04);
+      box-shadow: 0 0 0 4px var(--color-sage-bg);
+      transition: all 0.2s ease;
+    }
+    html.dark .feed-btn.is-copied {
+      background: var(--color-sage);
+      color: var(--bg-page);
     }
     .feed-btn-primary {
       border-color: var(--color-sage);
@@ -1513,7 +1521,7 @@
     // === Fetch Deals ===
     async function fetchDeals(endpoint = '/api/deals') {
       try {
-        const res = await fetch(API_BASE + endpoint + '?v=20260428-6');
+        const res = await fetch(API_BASE + endpoint + '?v=20260428-7');
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         allDealsData = data;
@@ -2079,7 +2087,7 @@
           setTimeout(() => {
             if (span) span.textContent = original;
             btn.classList.remove('is-copied');
-          }, 2200);
+          }, 4000);
         });
       });
     }
