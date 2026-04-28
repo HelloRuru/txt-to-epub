@@ -1513,7 +1513,7 @@
     // === Fetch Deals ===
     async function fetchDeals(endpoint = '/api/deals') {
       try {
-        const res = await fetch(API_BASE + endpoint + '?v=20260428-5');
+        const res = await fetch(API_BASE + endpoint + '?v=20260428-6');
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         allDealsData = data;
@@ -2030,41 +2030,52 @@
       }).join('');
 
       wrap.querySelectorAll('.feed-btn[data-copy]').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          // iOS Safari 限制：必須在點擊事件「同步」執行複製動作，
-          // 用 await 會在 microtask 後失去使用者授權。所以這裡用同步 execCommand。
+        btn.addEventListener('click', async (e) => {
           const url = btn.dataset.copy;
+          const span = btn.querySelector('span');
+          const original = span ? span.textContent : '';
+
+          // 1. 現代瀏覽器：navigator.clipboard.writeText（在點擊事件 handler 同步起跑，
+          //    桌面 Chrome/Edge/Firefox/Safari 都吃，iOS 14+ Safari 也吃）
           let ok = false;
+          if (navigator.clipboard && window.isSecureContext) {
+            try {
+              await navigator.clipboard.writeText(url);
+              ok = true;
+            } catch {
+              ok = false;
+            }
+          }
 
-          // 同步路徑：execCommand（iOS / 老瀏覽器一定吃）
-          try {
-            const ta = document.createElement('textarea');
-            ta.value = url;
-            ta.setAttribute('readonly', '');
-            ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;';
-            document.body.appendChild(ta);
-            // iOS Safari 需要 contentEditable + selection range
-            ta.contentEditable = 'true';
-            const range = document.createRange();
-            range.selectNodeContents(ta);
-            const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
-            ta.setSelectionRange(0, url.length);
-            ok = document.execCommand('copy');
-            document.body.removeChild(ta);
-          } catch {}
-
-          // 異步路徑：clipboard API（現代瀏覽器更可靠，但 Safari 對 await 嚴格）
-          if (!ok && navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(url).catch(() => {});
+          // 2. Fallback：execCommand（老瀏覽器 / 非 https 場景）
+          if (!ok) {
+            try {
+              const ta = document.createElement('textarea');
+              ta.value = url;
+              ta.setAttribute('readonly', '');
+              ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;';
+              document.body.appendChild(ta);
+              ta.contentEditable = 'true';
+              const range = document.createRange();
+              range.selectNodeContents(ta);
+              const sel = window.getSelection();
+              sel.removeAllRanges();
+              sel.addRange(range);
+              ta.setSelectionRange(0, url.length);
+              ok = document.execCommand('copy');
+              document.body.removeChild(ta);
+            } catch {}
           }
 
           // 視覺回饋
-          const span = btn.querySelector('span');
-          const original = span ? span.textContent : '';
-          if (span) span.textContent = ok ? '已複製！' : '長按連結手動複製';
+          if (span) span.textContent = ok ? '已複製！' : '請長按下方網址';
           btn.classList.add('is-copied');
+          // 失敗時把下方 input 自動選取，方便使用者直接 Ctrl+C
+          if (!ok) {
+            const urlInput = btn.closest('.feed-card')?.querySelector('.feed-card-url');
+            urlInput?.focus();
+            urlInput?.select();
+          }
           setTimeout(() => {
             if (span) span.textContent = original;
             btn.classList.remove('is-copied');
