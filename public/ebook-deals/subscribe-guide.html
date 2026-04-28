@@ -332,7 +332,20 @@
       transition: transform var(--transition-fast);
     }
     details[open] summary::after { content: '−'; }
-    details p { margin: 10px 0 0; }
+    details[open] summary {
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px dashed var(--border-color);
+    }
+    details p,
+    details ol,
+    details ul {
+      margin: 12px 0 0;
+      color: var(--text-secondary);
+      line-height: 1.95;
+    }
+    details ol li,
+    details ul li { margin-bottom: 8px; }
 
     /* 主題切換 */
     .theme-toggle {
