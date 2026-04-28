@@ -189,6 +189,21 @@ h1 {
   margin-bottom: 0;
 }
 
+/* 手機版（< 600px）強制單欄，避免兩個 select 擠在一起看不清 */
+@media (max-width: 600px) {
+  .field-row {
+    flex-direction: column;
+  }
+  .field-row .field {
+    flex: none;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+  .field-row .field:last-child {
+    margin-bottom: 0;
+  }
+}
+
 label {
   display: block;
   font-size: 14px;
@@ -894,7 +909,7 @@ footer a:hover { text-decoration: underline; }
 <script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js" id="opentypeLib"></script>
 <script>
 // 版本號 — 改 worker.js / epdfont_ranges.json 時要 bump 這個值，瀏覽器才會抓新版
-const ASSET_VERSION = '20260428g-render';
+const ASSET_VERSION = '20260428h-mobile';
 const $ = (id) => document.getElementById(id);
 const dropzone = $('dropzone');
 const ttfInput = $('ttfInput');
