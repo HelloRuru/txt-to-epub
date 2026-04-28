@@ -809,7 +809,15 @@ footer a:hover { text-decoration: underline; }
   <aside class="preview-col">
     <div class="preview-card">
       <div class="preview-title">即時預覽</div>
-      <div class="preview-sub">畫面方向 × 文字排版，4 種組合任選</div>
+      <div class="preview-sub">機型 × 畫面方向 × 文字排版</div>
+
+      <div style="margin-bottom: 12px;">
+        <div style="font-size:13px; color:var(--text-heading); font-weight:500; margin-bottom:6px;">機型</div>
+        <div class="preset-row" id="previewDeviceRow">
+          <button type="button" class="preset-btn active" data-device="x3">閱星曈 X3 (528×792)</button>
+          <button type="button" class="preset-btn" data-device="x4" disabled style="opacity:0.5; cursor:not-allowed;">閱星曈 X4（待補尺寸）</button>
+        </div>
+      </div>
 
       <div style="margin-bottom: 12px;">
         <div style="font-size:13px; color:var(--text-heading); font-weight:500; margin-bottom:6px;">畫面方向</div>
@@ -856,7 +864,7 @@ footer a:hover { text-decoration: underline; }
     <div class="preview-card" style="background: linear-gradient(135deg, rgba(223,198,198,0.18), rgba(184,169,201,0.14)); border: 1px solid rgba(223,198,198,0.4);">
       <div class="preview-title">小提示</div>
       <div class="preview-sub" style="margin-bottom:0;">
-        畫面框模擬閱星曈墨水屏（直版 750×1024 / 橫版 1024×750）。<br>
+        畫面框模擬閱星曈墨水屏實際尺寸（X3 = 直版 528×792 / 橫版 792×528）。<br>
         字按裝置實際吃的 px 渲染，預覽會自動縮放配合畫面框。
       </div>
     </div>
@@ -886,7 +894,7 @@ footer a:hover { text-decoration: underline; }
 <script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js" id="opentypeLib"></script>
 <script>
 // 版本號 — 改 worker.js / epdfont_ranges.json 時要 bump 這個值，瀏覽器才會抓新版
-const ASSET_VERSION = '20260428d-bold';
+const ASSET_VERSION = '20260428e-x3';
 const $ = (id) => document.getElementById(id);
 const dropzone = $('dropzone');
 const ttfInput = $('ttfInput');
@@ -1165,10 +1173,18 @@ function hideError() {
   errorMsg.classList.remove('show');
 }
 
-const SCREEN_DIMS = {
-  portrait:  { w: 750,  h: 1024 },
-  landscape: { w: 1024, h: 750 }
+// 各機型螢幕尺寸（直版 W×H，橫版 = 直版翻轉）
+const DEVICE_SCREENS = {
+  x3: { w: 528,  h: 792 },
+  // x4: { w: ?, h: ? },  // 待補
 };
+let previewDevice = 'x3';
+function getScreenDims() {
+  const d = DEVICE_SCREENS[previewDevice];
+  return previewScreen === 'portrait'
+    ? { w: d.w, h: d.h }
+    : { w: d.h, h: d.w };
+}
 const PAGE_MARGIN = 32;
 const LINE_GAP = 4;
 
@@ -1183,7 +1199,7 @@ function getCellSize() {
 function renderPreview() {
   if (!_binFontFamily) return;
 
-  const screen = SCREEN_DIMS[previewScreen];
+  const screen = getScreenDims();
   const { outerW, outerH, fontSizePt } = getCellSize();
 
   const rawText = $('previewText').value || '閱星曈';
@@ -1332,6 +1348,7 @@ function bindToggleRow(rowId, attr, onChange) {
     onChange(btn.dataset[attr]);
   });
 }
+bindToggleRow('previewDeviceRow', 'device', (v) => { previewDevice = v; renderPreview(); });
 bindToggleRow('previewScreenRow', 'screen', (v) => { previewScreen = v; renderPreview(); });
 bindToggleRow('previewWritingRow', 'writing', (v) => { previewWriting = v; renderPreview(); });
 
