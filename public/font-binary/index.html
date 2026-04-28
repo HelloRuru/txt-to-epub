@@ -686,6 +686,20 @@ footer a:hover { text-decoration: underline; }
         </div>
       </div>
 
+      <div class="field-row" style="margin-top:16px;">
+        <div class="field">
+          <label for="binLetterSpacing">字距加成 (px)</label>
+          <input type="number" id="binLetterSpacing" min="0" max="20" value="0" step="1">
+        </div>
+        <div class="field">
+          <label for="binLineSpacing">行距加成 (px)</label>
+          <input type="number" id="binLineSpacing" min="0" max="30" value="0" step="1">
+        </div>
+      </div>
+      <div class="note" style="margin-top:8px; font-size:13px;">
+        <strong>什麼是字距/行距加成？</strong>每個字格的寬高在公式算出後再加 N px。例：32 pt 公式算 43×57，行距 +8 → 43×65（檔案大小同步變大）。XTEink 工具的「調行距」就是這個原理。
+      </div>
+
       <div class="field" style="margin-top:16px;">
         <label for="orientation">排版方向</label>
         <select id="orientation">
@@ -979,9 +993,11 @@ function measureBinDims(displayPt) {
 
 function getActiveBinPreset() {
   const pt = parseInt($('binSlider').value);
+  const dW = parseInt($('binLetterSpacing')?.value || 0) || 0;
+  const dH = parseInt($('binLineSpacing')?.value || 0) || 0;
   const dims = measureBinDims(pt);
-  if (dims) return { pt, w: dims.w, h: dims.h };
-  return { pt, w: pt + 2, h: Math.round(pt * 1.18) };
+  const base = dims || { w: pt + 2, h: Math.round(pt * 1.18) };
+  return { pt, w: base.w + dW, h: base.h + dH };
 }
 
 function updateBinSliderDisplay() {
@@ -1245,9 +1261,9 @@ function bindToggleRow(rowId, attr, onChange) {
 bindToggleRow('previewScreenRow', 'screen', (v) => { previewScreen = v; renderPreview(); });
 bindToggleRow('previewWritingRow', 'writing', (v) => { previewWriting = v; renderPreview(); });
 
-['orientation', 'previewText'].forEach(id => {
+['orientation', 'previewText', 'binLetterSpacing', 'binLineSpacing'].forEach(id => {
   const el = $(id);
-  if (el) el.addEventListener('input', renderPreview);
+  if (el) el.addEventListener('input', () => { updateBinSliderDisplay(); renderPreview(); });
 });
 
 </script>
