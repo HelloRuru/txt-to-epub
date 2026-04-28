@@ -1552,7 +1552,7 @@
     // === Fetch Deals ===
     async function fetchDeals(endpoint = '/api/deals') {
       try {
-        const res = await fetch(API_BASE + endpoint + '?v=20260428-10');
+        const res = await fetch(API_BASE + endpoint + '?v=20260428-11');
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         allDealsData = data;
@@ -1716,14 +1716,26 @@
           '</div>'
         : '';
 
-      // 促銷類型標籤（Pubu 兩種、HyRead 週末快閃；其他平台無 promoMessage 時不顯示）
+      // 促銷類型標籤
+      // - Pubu: promoMessage 已寫「每日精選」/「限時 99 最後一天」
+      // - HyRead: promoMessage 寫「週末快閃 99」
+      // - Readmoo: 統一「每日 99」
+      // - 博客來: 用 dealType（99元/66元/...）
+      // - Kobo: 用 dealType（每日99）
+      let promoLabel = deal.promoMessage || '';
+      if (!promoLabel) {
+        if (deal.platform === 'readmoo') promoLabel = '每日 99';
+        else if (deal.platform === 'books') promoLabel = deal.dealType || '每日限時搶';
+        else if (deal.platform === 'kobo') promoLabel = '每週 99 選書';
+      }
+
       let promoTag = '';
-      if (deal.promoMessage) {
+      if (promoLabel) {
         let tagClass = 'promo-tag';
-        if (/限時.*99|即將下架/.test(deal.promoMessage)) tagClass += ' promo-flash';
-        else if (/週末快閃/.test(deal.promoMessage)) tagClass += ' promo-weekend';
+        if (/限時.*99|即將下架/.test(promoLabel)) tagClass += ' promo-flash';
+        else if (/週末快閃/.test(promoLabel)) tagClass += ' promo-weekend';
         else tagClass += ' promo-daily';
-        promoTag = '<span class="' + tagClass + '">' + escapeHtml(deal.promoMessage) + '</span>';
+        promoTag = '<span class="' + tagClass + '">' + escapeHtml(promoLabel) + '</span>';
       }
 
       return '<article class="deal-card' + (isToday ? ' is-today' : isPast ? ' is-past' : '') + '" data-platform="' + p + '">' +
