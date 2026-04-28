@@ -877,7 +877,7 @@ footer a:hover { text-decoration: underline; }
 <script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js" id="opentypeLib"></script>
 <script>
 // 版本號 — 改 worker.js / epdfont_ranges.json 時要 bump 這個值，瀏覽器才會抓新版
-const ASSET_VERSION = '20260428b-xteink';
+const ASSET_VERSION = '20260428c';
 const $ = (id) => document.getElementById(id);
 const dropzone = $('dropzone');
 const ttfInput = $('ttfInput');
@@ -1166,7 +1166,7 @@ let previewWriting = 'horizontal';
 
 function getCellSize() {
   const p = getActiveBinPreset();
-  return { outerW: p.w, outerH: p.h, fontSizePt: p.pt };
+  return { outerW: p.w, outerH: p.h, fontSizePt: p.pxSize };
 }
 
 function renderPreview() {
