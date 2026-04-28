@@ -1521,7 +1521,7 @@
     // === Fetch Deals ===
     async function fetchDeals(endpoint = '/api/deals') {
       try {
-        const res = await fetch(API_BASE + endpoint + '?v=20260428-7');
+        const res = await fetch(API_BASE + endpoint + '?v=20260428-8');
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         allDealsData = data;
@@ -1990,27 +1990,27 @@
       },
       {
         title: 'Readmoo 讀墨',
-        desc: '只追讀墨每日 99 元書',
+        desc: '每日特價 99 元起，深度好書多',
         url: SUBSCRIBE_BASE + '?platform=readmoo',
       },
       {
         title: '博客來',
-        desc: '只追博客來每日 50 元限時搶',
+        desc: '每日限時搶 $66 起，新書出版社促銷',
         url: SUBSCRIBE_BASE + '?platform=books',
       },
       {
         title: 'Kobo',
-        desc: '只追 Kobo 每週 99 元書單',
+        desc: '每週 99 元書單（Kobo 部落格選書）',
         url: SUBSCRIBE_BASE + '?platform=kobo',
       },
       {
         title: 'Pubu',
-        desc: '每日精選 + 限時 99 即將下架提醒',
+        desc: '每日精選 + 限時 $99 即將下架提醒',
         url: SUBSCRIBE_BASE + '?platform=pubu',
       },
       {
         title: 'HyRead',
-        desc: '週末快閃 99（每週五～日）',
+        desc: '週末快閃 99（每週五～日同一批書）',
         url: SUBSCRIBE_BASE + '?platform=hyread',
       },
     ];
