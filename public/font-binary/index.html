@@ -925,7 +925,7 @@ footer a:hover { text-decoration: underline; }
 <script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js" id="opentypeLib"></script>
 <script>
 // 版本號 — 改 worker.js / epdfont_ranges.json 時要 bump 這個值，瀏覽器才會抓新版
-const ASSET_VERSION = '20260429d-h132';
+const ASSET_VERSION = '20260429e-real';
 const $ = (id) => document.getElementById(id);
 const dropzone = $('dropzone');
 const ttfInput = $('ttfInput');
@@ -1027,17 +1027,14 @@ async function ensureBinCanvasFont(buffer) {
 }
 
 function measureBinBase(pxSize) {
-  if (!_binFontFamily) return null;
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = Math.ceil(pxSize * 2);
-  const ctx = canvas.getContext('2d');
-  ctx.font = `${pxSize}px "${_binFontFamily}"`;
-  const m = ctx.measureText(BIN_BASE_CHAR);
-  const w = Math.round(m.width);
-  // 對齊 XTEink 實測（思源黑 32px → cell 32×43，pythonnet 跑 dll 確認）：
-  //   H = round(pxSize × 1.3125)
-  // Canvas fontBoundingBox 通常會多算 ~3 px（含 line gap），不適合直接用
-  const h = Math.round(pxSize * 1.3125);
+  // 從 30+ 個閱星瞳 X3/X4 真實可用 .bin 樣本反推（嚕寶 G:\字體整理\閱星瞳扔扔\）：
+  //   30pt → 40×53、32pt → ~40×50、34pt → 45×60、38pt → 45×59
+  //   平均 W/pt ≈ 1.25、H/pt ≈ 1.6（中文字體常見比例）
+  // 這比 XTEink 工具的 1×1.31 大很多 — 證明閱星瞳實際 .bin 不是 XTEink 工具生的
+  // 不同字體 W×H 差異也大（例：32pt 樣本有 38×43、43×43、43×57），無單一公式
+  // 所以這裡給「保守安全值」，使用者用字距/行距 fine-tune
+  const w = Math.round(pxSize * 1.25);
+  const h = Math.round(pxSize * 1.6);
   return { w, h };
 }
 
