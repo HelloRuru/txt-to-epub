@@ -209,6 +209,16 @@
       "ready": true,
       "color": "coral",
       "external": true
+    },
+    {
+      "id": "suno-prompt",
+      "name": "蘇諾大姊姊 · Suno 提示詞產生器",
+      "description": "PM 追問式 7 題幫你配出 Suno 不會跑掉的 Style + Exclude + 歌詞結構 + Voice 命名 + 封面 prompt。支援 V5/V5.5。",
+      "path": "/suno-prompt/",
+      "icon": "music",
+      "ready": true,
+      "color": "coral",
+      "external": true
     }
   ]
 }
