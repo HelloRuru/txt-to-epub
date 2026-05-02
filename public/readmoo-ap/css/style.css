@@ -460,6 +460,7 @@ select.input-field {
 .section-desc {
   color: var(--text-muted);
   margin-bottom: var(--space-lg);
+  text-wrap: pretty;
 }
 
 /* ---- Empty State ---- */
