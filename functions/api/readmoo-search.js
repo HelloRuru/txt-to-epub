@@ -241,9 +241,36 @@ async function fallbackSearch(query) {
     })
   );
 
-  return results
+  const fbBooks = results
     .filter(r => r.status === 'fulfilled' && r.value)
     .map(r => r.value);
+
+  // 過濾「不像」的結果（DDG 模糊搜尋會抓到完全無關的書）
+  // 規則：書名與 query 的字元交集 / query 字元數 < 0.5 → 過濾
+  // 例：query「上班N年後永遠是明天的我更努力」vs 書名「想到明天要上班就失眠」
+  //     交集字元（明、天、上、班）= 4，query 不重複字元 14，交集率 0.29 → 過濾
+  return fbBooks.filter(book => similarityScore(query, book.title) >= 0.5);
+}
+
+// 計算 query 字元有多少比例出現在書名中
+function similarityScore(query, title) {
+  if (!query || !title) return 0;
+  // 移除標點空白雜訊
+  const clean = (s) => s.replace(/[\s\p{P}]/gu, '').toLowerCase();
+  const q = clean(query);
+  const t = clean(title);
+  if (q.length === 0) return 0;
+  // 計算 q 中每個字元有多少在 t 裡出現
+  const tSet = new Set([...t]);
+  let hits = 0;
+  const seen = new Set();
+  for (const ch of q) {
+    if (seen.has(ch)) continue;
+    seen.add(ch);
+    if (tSet.has(ch)) hits++;
+  }
+  const uniqueQ = seen.size;
+  return uniqueQ > 0 ? hits / uniqueQ : 0;
 }
 
 function parseSearchResults(html) {
