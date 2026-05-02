@@ -1567,7 +1567,7 @@
     // === Fetch Deals ===
     async function fetchDeals(endpoint = '/api/deals') {
       try {
-        const res = await fetch(API_BASE + endpoint + '?v=20260428-13');
+        const res = await fetch(API_BASE + endpoint + '?v=20260502-1');
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         allDealsData = data;
@@ -2083,36 +2083,49 @@
       ? 'http://localhost:8787'
       : 'https://ebook-deals.vmpvmp1017.workers.dev') + '/api/deals.ics';
 
+    // 自動帶當天日期參數，避開 Google Calendar server-side 訂閱快取
+    // 同一個使用者今天訂的 URL 跟昨天訂的不同 → Google 視為全新訂閱，不會用舊快取
+    function todayParam() {
+      const d = new Date();
+      return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+    }
+    function feedUrl(platform) {
+      const v = todayParam();
+      return platform
+        ? SUBSCRIBE_BASE + '?platform=' + platform + '&v=' + v
+        : SUBSCRIBE_BASE + '?v=' + v;
+    }
+
     const FEEDS = [
       {
         title: '全部平台',
         desc: '五平台每日特價一網打盡，最完整',
-        url: SUBSCRIBE_BASE,
+        get url() { return feedUrl(); },
       },
       {
         title: 'Readmoo 讀墨',
         desc: '每日特價 99 元起，深度好書多',
-        url: SUBSCRIBE_BASE + '?platform=readmoo',
+        get url() { return feedUrl('readmoo'); },
       },
       {
         title: '博客來',
         desc: '每日限時搶 $66 起，新書出版社促銷',
-        url: SUBSCRIBE_BASE + '?platform=books',
+        get url() { return feedUrl('books'); },
       },
       {
         title: 'Kobo',
         desc: '每週 99 元書單（Kobo 部落格選書）',
-        url: SUBSCRIBE_BASE + '?platform=kobo',
+        get url() { return feedUrl('kobo'); },
       },
       {
         title: 'Pubu',
         desc: '每日精選 + 限時 $99 即將下架提醒',
-        url: SUBSCRIBE_BASE + '?platform=pubu',
+        get url() { return feedUrl('pubu'); },
       },
       {
         title: 'HyRead',
         desc: '週末快閃 99（每週五～日同一批書）',
-        url: SUBSCRIBE_BASE + '?platform=hyread',
+        get url() { return feedUrl('hyread'); },
       },
     ];
 
