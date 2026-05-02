@@ -26,13 +26,6 @@ export async function onRequest(context) {
     return resp({ ok: true, ts: Date.now() });
   }
 
-  // 診斷模式：直接看 DDG 回的內容
-  // 用法：?q=__diag__&t=書名
-  if (rawQuery === '__diag__') {
-    const t = url.searchParams.get('t') || '出社會第N年';
-    return diagDdg(t);
-  }
-
   // 讀墨搜尋不接受全形/半形標點（哈利波特：神秘的魔法石 → 0 筆）
   // 把標點換成空格，再壓掉多餘空白
   const query = stripPunctuation(rawQuery);
@@ -81,25 +74,12 @@ export async function onRequest(context) {
     const html = await rmRes.text();
     const allBooks = parseSearchResults(html);
     // 最多回傳 20 本（減少回應大小 + 出版日期抓取時間）
-    let books = allBooks.slice(0, 20);
-    let fallback = false;
-
-    // 讀墨自家搜尋只 index 部分欄位（書名很多字搜不到）
-    // 0 筆時用 DuckDuckGo 搜 site:readmoo.com 當 fallback
-    if (books.length === 0) {
-      try {
-        const fbBooks = await fallbackSearch(query);
-        if (fbBooks.length > 0) {
-          books = fbBooks;
-          fallback = true;
-        }
-      } catch (e) { /* fallback 失敗就回 0 筆，不影響原流程 */ }
-    }
+    const books = allBooks.slice(0, 20);
 
     // 平行抓每本書的出版日期（從詳情頁）
     await fetchPublishDates(books);
 
-    const body = JSON.stringify({ query: rawQuery, count: books.length, books, fallback });
+    const body = JSON.stringify({ query: rawQuery, count: books.length, books });
 
     // 寫入 cache（失敗不影響回應）
     if (cache && cacheKey) {
@@ -135,166 +115,6 @@ function stripPunctuation(s) {
     .replace(/[:,.?!"'`()\[\]{}<>~\-—|/\\;]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-}
-
-async function diagDdg(t) {
-  const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent('site:readmoo.com ' + t)}`;
-  try {
-    const r = await fetch(ddgUrl, { headers: FETCH_HEADERS });
-    const html = await r.text();
-    const shareIds = [];
-    const re = /share\.readmoo\.com%2Fbook%2F(\d+)/g;
-    let m;
-    while ((m = re.exec(html)) !== null) shareIds.push(m[1]);
-    const uniqIds = [...new Set(shareIds)].slice(0, 3);
-
-    // 測試打 share 頁是否能通
-    const shareTest = await Promise.allSettled(
-      uniqIds.map(async id => {
-        const sr = await fetch(`https://share.readmoo.com/book/${id}`, { headers: FETCH_HEADERS });
-        const sh = await sr.text();
-        const idMatch = sh.match(/(?:^|[^\d])(2\d{14})(?:[^\d]|$)/);
-        return {
-          shareId: id,
-          status: sr.status,
-          size: sh.length,
-          realId: idMatch ? idMatch[1] : null,
-          firstTitle: (sh.match(/<title>([^<]+)<\/title>/) || [])[1] || ''
-        };
-      })
-    );
-
-    return resp({
-      ddgStatus: r.status,
-      ddgSize: html.length,
-      shareIds: uniqIds,
-      shareTest: shareTest.map(r => r.status === 'fulfilled' ? r.value : { err: r.reason?.message }),
-      hasBlocked: html.includes('Anomaly') || html.includes('blocked') || html.includes('captcha'),
-    });
-  } catch (e) {
-    return resp({ error: e.message, name: e.name });
-  }
-}
-
-// 讀墨自家搜尋找不到時的備援：
-// 1. DuckDuckGo HTML 版搜 site:readmoo.com → 抓 share.readmoo.com/book/XXX
-// 2. 進 share 頁從 Base64 share URL 解出真正的 13 位數 book ID
-// 3. 抓正規詳情頁取得書名/作者/封面/價格
-async function fallbackSearch(query) {
-  const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent('site:readmoo.com ' + query)}`;
-  const ddgRes = await fetch(ddgUrl, { headers: FETCH_HEADERS });
-  if (!ddgRes.ok) return [];
-  const ddgHtml = await ddgRes.text();
-
-  // 抓 share.readmoo.com/book/XXX 候選（去重，最多 5 個避免打太多 request）
-  const shareIds = new Set();
-  const sharePattern = /share\.readmoo\.com%2Fbook%2F(\d+)/g;
-  let m;
-  while ((m = sharePattern.exec(ddgHtml)) !== null) {
-    shareIds.add(m[1]);
-    if (shareIds.size >= 5) break;
-  }
-
-  if (shareIds.size === 0) return [];
-
-  // 平行：share 頁 → 真正 ID → 詳情頁
-  const results = await Promise.allSettled(
-    Array.from(shareIds).map(async (shareId) => {
-      // share 頁
-      const shareRes = await fetch(`https://share.readmoo.com/book/${shareId}`, { headers: FETCH_HEADERS });
-      if (!shareRes.ok) return null;
-      const shareHtml = await shareRes.text();
-
-      // 找 15 位數正規 book ID（讀墨格式：2XXXXXXXXXXXXXX）
-      // 優先從 HTML 內文抓（讀墨 share 頁的 base64 share URL 結尾被截，解出來是 13 位不完整 ID）
-      let realId = null;
-      const idMatch = shareHtml.match(/(?:^|[^\d])(2\d{14})(?:[^\d]|$)/);
-      if (idMatch) realId = idMatch[1];
-      // 退而求其次：base64 share URL（如果剛好沒被截）
-      if (!realId) {
-        const b64Match = shareHtml.match(/\/ap\/target\/share\?url=([A-Za-z0-9+/=]+)/);
-        if (b64Match) {
-          try {
-            const decoded = atob(b64Match[1]);
-            const m2 = decoded.match(/\/book\/(2\d{14})/);
-            if (m2) realId = m2[1];
-          } catch (e) { /* 跳過 */ }
-        }
-      }
-      if (!realId) return null;
-
-      // 抓正規詳情頁
-      const bookRes = await fetch(`https://readmoo.com/book/${realId}`, { headers: FETCH_HEADERS });
-      if (!bookRes.ok) return null;
-      const bookHtml = await bookRes.text();
-
-      const title = (bookHtml.match(/<h1[^>]*class="book-detail-title"[^>]*>([^<]+)<\/h1>/) || [])[1] || '';
-      if (!title) return null;
-
-      // 作者：itemprop="author" 或從 og:title 結尾的「- 作者」
-      let author = '';
-      const authorMatch = bookHtml.match(/<a[^>]*itemprop="author"[^>]*>([^<]+)<\/a>/);
-      if (authorMatch) {
-        author = authorMatch[1].trim();
-      } else {
-        const ogTitle = (bookHtml.match(/property="og:title"\s+content="([^"]+)"/) || [])[1] || '';
-        const dashIdx = ogTitle.lastIndexOf(' - ');
-        const pipeIdx = ogTitle.indexOf(' | ');
-        if (dashIdx > 0 && pipeIdx > dashIdx) {
-          author = ogTitle.substring(dashIdx + 3, pipeIdx).trim();
-        }
-      }
-
-      const cover = (bookHtml.match(/property="og:image"\s+content="([^"]+)"/) || [])[1] || '';
-      const publisher = (bookHtml.match(/<a[^>]*itemprop="publisher"[^>]*>([^<]+)<\/a>/) || [])[1]?.trim() || '';
-      const priceStr = (bookHtml.match(/itemprop="price"[^>]*content="([0-9.]+)"/) || [])[1]
-                    || (bookHtml.match(/"price":\s*"?([0-9.]+)"?/) || [])[1] || '';
-      const price = priceStr ? parseFloat(priceStr) : 0;
-      const pubdate = (bookHtml.match(/出版日期：(\d{4}-\d{2}-\d{2})/) || [])[1] || '';
-
-      return {
-        id: realId,
-        title: title.trim(),
-        author,
-        publisher,
-        price,
-        cover,
-        pubdate,
-        url: `https://readmoo.com/book/${realId}`,
-      };
-    })
-  );
-
-  const fbBooks = results
-    .filter(r => r.status === 'fulfilled' && r.value)
-    .map(r => r.value);
-
-  // 過濾「不像」的結果（DDG 模糊搜尋會抓到完全無關的書）
-  // 規則：書名與 query 的字元交集 / query 字元數 < 0.5 → 過濾
-  // 例：query「上班N年後永遠是明天的我更努力」vs 書名「想到明天要上班就失眠」
-  //     交集字元（明、天、上、班）= 4，query 不重複字元 14，交集率 0.29 → 過濾
-  return fbBooks.filter(book => similarityScore(query, book.title) >= 0.5);
-}
-
-// 計算 query 字元有多少比例出現在書名中
-function similarityScore(query, title) {
-  if (!query || !title) return 0;
-  // 移除標點空白雜訊
-  const clean = (s) => s.replace(/[\s\p{P}]/gu, '').toLowerCase();
-  const q = clean(query);
-  const t = clean(title);
-  if (q.length === 0) return 0;
-  // 計算 q 中每個字元有多少在 t 裡出現
-  const tSet = new Set([...t]);
-  let hits = 0;
-  const seen = new Set();
-  for (const ch of q) {
-    if (seen.has(ch)) continue;
-    seen.add(ch);
-    if (tSet.has(ch)) hits++;
-  }
-  const uniqueQ = seen.size;
-  return uniqueQ > 0 ? hits / uniqueQ : 0;
 }
 
 function parseSearchResults(html) {

@@ -31,6 +31,41 @@ function initReadmooSearch() {
 
   btnGo.addEventListener('click', () => doSearch());
 
+  // 貼讀墨網址 → 抓書
+  const pasteInput = document.getElementById('paste-url-input');
+  const pasteBtn = document.getElementById('btn-paste-url-go');
+  const pasteStatus = document.getElementById('paste-url-status');
+  const pasteResult = document.getElementById('paste-url-result');
+  if (pasteBtn && pasteInput) {
+    pasteInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.isComposing) {
+        e.preventDefault();
+        fetchByUrl();
+      }
+    });
+    pasteBtn.addEventListener('click', () => fetchByUrl());
+  }
+
+  async function fetchByUrl() {
+    const raw = pasteInput.value.trim();
+    if (!raw) { showToast('請貼網址或書本 ID'); return; }
+    pasteStatus.style.display = 'block';
+    pasteStatus.innerHTML = '<div class="spinner-sm"></div> 抓取中...';
+    pasteResult.innerHTML = '';
+    try {
+      const res = await fetch(`/api/readmoo-book?url=${encodeURIComponent(raw)}`);
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        pasteStatus.innerHTML = `<span class="search-error">${escapeHtml(data.error || ('HTTP ' + res.status))}</span>`;
+        return;
+      }
+      pasteStatus.innerHTML = `已抓到「${escapeHtml(data.book.title)}」`;
+      renderResultsTo(pasteResult, [data.book]);
+    } catch (err) {
+      pasteStatus.innerHTML = `<span class="search-error">抓取失敗：${escapeHtml(err.message)}</span>`;
+    }
+  }
+
   // 備用連結：輸入時同步更新「直接到讀墨搜尋」的 URL
   const directLink = document.getElementById('readmoo-direct-link');
   input.addEventListener('input', () => {
@@ -74,12 +109,29 @@ function initReadmooSearch() {
       const books = data.books;
 
       if (books.length === 0) {
-        statusEl.innerHTML = '找不到相關書籍，試試其他關鍵字？或用 <a href="https://taiwan-ebook-lover.github.io/" target="_blank" rel="noopener">台灣電子書搜尋</a>';
+        const q = encodeURIComponent(query);
+        statusEl.innerHTML = `
+          <div class="search-zero-result">
+            <p>找不到「${escapeHtml(query)}」相關書籍。</p>
+            <p class="search-zero-hint">讀墨內部搜尋只認得部分字，<strong>建議到讀墨網站查到書本網址後，貼到下方「貼網址加書單」</strong>。</p>
+            <div class="search-zero-actions">
+              <a href="https://readmoo.com/search/keyword?q=${q}" target="_blank" rel="noopener" class="btn-secondary btn-sm">
+                <i data-lucide="external-link"></i> 到讀墨搜尋
+              </a>
+              <a href="https://taiwan-ebook-lover.github.io/?q=${q}" target="_blank" rel="noopener" class="btn-secondary btn-sm">
+                <i data-lucide="external-link"></i> 跨書城比價
+              </a>
+              <a href="https://www.google.com/search?q=site%3Areadmoo.com+${q}" target="_blank" rel="noopener" class="btn-secondary btn-sm">
+                <i data-lucide="external-link"></i> Google 搜讀墨
+              </a>
+            </div>
+          </div>
+        `;
+        if (window.lucide) lucide.createIcons();
         return;
       }
 
-      const fbBadge = data.fallback ? ' <span class="cache-badge" title="讀墨內部搜尋找不到，透過 Google 索引繞道找到">Google 索引</span>' : '';
-      statusEl.innerHTML = `「${escapeHtml(query)}」找到 ${books.length} 本${cacheHit ? ' <span class="cache-badge">快取</span>' : ''}${fbBadge}`;
+      statusEl.innerHTML = `「${escapeHtml(query)}」找到 ${books.length} 本${cacheHit ? ' <span class="cache-badge">快取</span>' : ''}`;
       renderResults(books);
     } catch (err) {
       const isTimeout = err.name === 'AbortError';
@@ -115,10 +167,14 @@ function initReadmooSearch() {
   }
 
   function renderResults(books) {
+    renderResultsTo(resultsEl, books);
+  }
+
+  function renderResultsTo(targetEl, books) {
     const existingBooks = getBooks();
     const existingTitles = new Set(existingBooks.map(b => b.title.toLowerCase()));
 
-    resultsEl.innerHTML = books.map(book => {
+    targetEl.innerHTML = books.map(book => {
       const alreadyAdded = existingTitles.has(book.title.toLowerCase());
       return `
         <div class="rm-result-card">
@@ -162,11 +218,11 @@ function initReadmooSearch() {
     }).join('');
 
     if (window.lucide) lucide.createIcons();
-    bindAddButtons();
+    bindAddButtons(targetEl);
   }
 
-  function bindAddButtons() {
-    resultsEl.querySelectorAll('.rm-add-btn').forEach(btn => {
+  function bindAddButtons(scopeEl) {
+    (scopeEl || resultsEl).querySelectorAll('.rm-add-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const books = getBooks();
         books.push({

@@ -2429,3 +2429,54 @@ html.dark .rm-result-card:hover {
   background: var(--bg-elevated);
 }
 .chain-ap-log-toggle-btn i { width: 14px; height: 14px; }
+
+/* ============ 0 筆結果頁 + 貼網址加書單 ============ */
+.search-zero-result {
+  padding: var(--space-md);
+  background: var(--status-warning-bg);
+  border-radius: var(--radius-sm);
+}
+.search-zero-result p {
+  margin: 0 0 var(--space-xs);
+  font-size: 15px;
+}
+.search-zero-hint {
+  font-size: 14px !important;
+  color: var(--text-muted);
+}
+.search-zero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+.search-zero-actions a {
+  text-decoration: none;
+}
+.paste-url-section {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px dashed var(--border-color);
+}
+.paste-url-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 var(--space-xs);
+  font-size: 16px;
+  font-family: var(--font-serif);
+  color: var(--color-ink);
+}
+.paste-url-title i { width: 16px; height: 16px; color: var(--color-rose); }
+.paste-url-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: var(--space-sm);
+}
+.paste-url-hint code {
+  font-size: 12px;
+  background: var(--bg-page);
+  padding: 1px 6px;
+  border-radius: 4px;
+  word-break: break-all;
+}
