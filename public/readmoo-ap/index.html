@@ -60,7 +60,7 @@
     onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js'"></script>
 
   <!-- Styles -->
-  <link rel="stylesheet" href="css/style.min.css?v=20260502c">
+  <link rel="stylesheet" href="css/style.min.css?v=20260502d">
 
   <!-- 每日好書 tab 樣式 -->
   <style>
@@ -467,6 +467,10 @@
     <button class="tab-btn" data-tab="deals" role="tab" aria-selected="false">
       <i data-lucide="tag"></i>
       <span>每日好書</span>
+    </button>
+    <button class="tab-btn" data-tab="ap-log" role="tab" aria-selected="false">
+      <i data-lucide="gift"></i>
+      <span>AP 紀錄</span>
     </button>
     <button class="tab-btn" data-tab="changelog" role="tab" aria-selected="false">
       <i data-lucide="file-text"></i>
@@ -948,7 +952,68 @@
       </div>
     </section>
 
-    <!-- ============ Tab 6: 修改紀錄 ============ -->
+    <!-- ============ Tab 6: AP 紀錄（私人筆記）============ -->
+    <section id="tab-ap-log" class="tab-panel" role="tabpanel">
+      <div class="ap-log-container">
+        <!-- 暱稱設定 -->
+        <div class="ap-log-section">
+          <h2>我的社群暱稱</h2>
+          <p class="section-desc">parser 用這個字串認出 LINE 對話裡哪個 @ 是你。資料只存在這台裝置，別人看不到。</p>
+          <div class="ap-log-nick-row">
+            <input type="text" id="ap-log-nick-input" class="input-field" placeholder="例如：嚕嚕在看書！" autocomplete="off">
+            <button id="ap-log-nick-save" class="btn-primary btn-sm">
+              <i data-lucide="save"></i> 儲存
+            </button>
+          </div>
+          <div id="ap-log-nick-status" class="ap-log-nick-status"></div>
+        </div>
+
+        <!-- 貼對話解析 -->
+        <div class="ap-log-section" id="ap-log-paste-section" style="display:none;">
+          <h2>貼 LINE 對話 → 解析</h2>
+          <p class="section-desc">把整段 LINE 對話貼進來，自動找出「誰送 AP 給你」。</p>
+          <div class="ap-log-date-row">
+            <label for="ap-log-date">對話日期：</label>
+            <input type="date" id="ap-log-date" class="input-field">
+            <span class="ap-log-date-hint">（預設今天，可改成對話實際發生的日期）</span>
+          </div>
+          <textarea id="ap-log-textarea" class="input-field ap-log-textarea" rows="10" placeholder="例：&#10;小魚：AP*68&#10;@Nancy Tsai&#10;@嚕嚕在看書！&#10;&#10;雲雲：@嚕嚕在看書！ #634請收"></textarea>
+          <div class="ap-log-paste-actions">
+            <button id="ap-log-parse-btn" class="btn-primary btn-sm">
+              <i data-lucide="scan-search"></i> 解析
+            </button>
+            <button id="ap-log-clear-btn" class="btn-secondary btn-sm">
+              <i data-lucide="x"></i> 清空
+            </button>
+          </div>
+          <div id="ap-log-parse-result" class="ap-log-parse-result"></div>
+        </div>
+
+        <!-- 回饋 AP 人選清單 -->
+        <div class="ap-log-section" id="ap-log-list-section" style="display:none;">
+          <div class="section-header">
+            <h2>回饋 AP 人選 <span id="ap-log-count" class="ap-log-count"></span></h2>
+            <div class="header-actions">
+              <select id="ap-log-filter" class="input-field">
+                <option value="all">全部</option>
+                <option value="pending">待回禮</option>
+                <option value="returned">已回禮</option>
+              </select>
+              <button id="ap-log-export-btn" class="btn-secondary btn-sm">
+                <i data-lucide="download"></i> 匯出 CSV
+              </button>
+            </div>
+          </div>
+          <div id="ap-log-list" class="ap-log-list"></div>
+          <div id="ap-log-empty" class="ap-log-empty" style="display:none;">
+            <i data-lucide="inbox"></i>
+            <p>還沒有紀錄。把 LINE 對話貼到上面解析後就會出現。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Tab 7: 修改紀錄 ============ -->
     <section id="tab-changelog" class="tab-panel" role="tabpanel">
       <div class="changelog-container">
         <div class="section-header">
@@ -1195,6 +1260,7 @@
   <script src="js/changelog.min.js?v=20260303n"></script>
   <script src="js/export-utils.min.js?v=20260303n"></script>
   <script src="js/readmoo-search.min.js?v=20260502c"></script>
+  <script src="js/ap-log.min.js?v=20260502d"></script>
   <script src="js/deals.js?v=20260319b"></script>
 </body>
 </html>
