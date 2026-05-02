@@ -74,6 +74,13 @@ function initBooks() {
 
     listEl.innerHTML = filtered.map(b => `
       <div class="book-card ${b.status === 'bought' ? 'bought' : ''}" data-id="${b.id}">
+        <div class="book-cover-thumb">
+          ${b.cover
+            ? `<img src="${escapeHtml(b.cover)}" alt="${escapeHtml(b.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+               <div class="book-cover-fallback" style="display:none"><i data-lucide="book"></i></div>`
+            : `<div class="book-cover-fallback"><i data-lucide="book"></i></div>`
+          }
+        </div>
         <div class="book-info">
           <div class="book-title">${escapeHtml(b.title)}</div>
           <div class="book-meta">

@@ -1230,6 +1230,34 @@ html.dark .storybook-page::before {
 .book-card.bought {
   border-left: 3px solid var(--status-success);
 }
+.book-cover-thumb {
+  flex-shrink: 0;
+  width: 48px;
+  height: 68px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-page);
+  position: relative;
+}
+.book-cover-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.book-cover-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-hint);
+  background: var(--bg-page);
+}
+.book-cover-fallback i {
+  width: 20px;
+  height: 20px;
+}
 
 .book-info {
   flex: 1;
