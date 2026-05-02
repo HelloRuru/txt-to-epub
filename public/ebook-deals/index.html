@@ -353,7 +353,7 @@
       border-radius: 4px 0 0 4px;
       z-index: 2;
     }
-    /* B: 封面右上角「今日」徽章 */
+    /* B: 封面右上角「今日」徽章（金黃色，跟左側鼠尾草粗條形成對比） */
     .deal-card.is-today .book-cover-wrap {
       position: relative;
     }
@@ -362,13 +362,13 @@
       position: absolute;
       top: -6px;
       right: -6px;
-      background: var(--color-sage-dark);
+      background: var(--color-gold);
       color: #fff;
       font-size: 11px;
       font-weight: 600;
       padding: 3px 8px;
       border-radius: 999px;
-      box-shadow: 0 2px 6px rgba(92, 74, 58, 0.25);
+      box-shadow: 0 2px 6px rgba(176, 160, 112, 0.35);
       letter-spacing: 0.05em;
       z-index: 3;
       line-height: 1;
@@ -381,7 +381,7 @@
       background: var(--color-sage);
     }
     html.dark .deal-card.is-today .book-cover-wrap::after {
-      background: var(--color-sage);
+      background: var(--color-gold);
       color: var(--bg-page);
     }
     .deal-card.is-past { opacity: 0.45; }
@@ -1607,7 +1607,7 @@
     // === Fetch Deals ===
     async function fetchDeals(endpoint = '/api/deals') {
       try {
-        const res = await fetch(API_BASE + endpoint + '?v=20260502-2');
+        const res = await fetch(API_BASE + endpoint + '?v=20260502-3');
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         allDealsData = data;
