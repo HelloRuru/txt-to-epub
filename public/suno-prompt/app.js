@@ -535,9 +535,10 @@
     const voice = suggestVoice(answers);
     const songNames = suggestSongNames(answers, composed.pair);
     const nextSong = suggestNextSong(answers, voice, composed.pair);
+    const coverPrompt = suggestCoverPrompt(answers, composed.pair, voice);
     const checks = runChecklist(composed.styleString, composed.excludeString);
 
-    showResult({ composed, lyrics, voice, songNames, nextSong, checks });
+    showResult({ composed, lyrics, voice, songNames, nextSong, coverPrompt, checks });
     clearDraft();
   }
 
@@ -979,6 +980,103 @@
     return ['〈寫給你〉', '〈那個下午〉', '〈不確定〉'];
   }
 
+  // ---------- 封面 prompt 生成器 ----------
+  function suggestCoverPrompt(a, pair, voiceName) {
+    const allTerms = (pair.primary + ' ' + pair.secondary + (pair.tertiary || '')).toLowerCase();
+    const moodAll = (a.mood + ' ' + a.moodChips.join(' ')).toLowerCase();
+    const elements = a.elements || [];
+
+    // 1. 美學基底（依流派）
+    let aesthetic = '';
+    let scene = '';
+    let typography = '';
+    let colorPalette = '';
+    let texture = '';
+    let composition = 'square album cover composition';
+
+    if (/japanese|enka|city pop/.test(allTerms)) {
+      aesthetic = '80s Japanese city pop aesthetic, Mariya Takeuchi / Tatsuro Yamashita era reference';
+      scene = elements.includes('日本味')
+        ? 'minimalist cassette tape cover design, single neon palm tree silhouette against gradient sky'
+        : 'late night Tokyo cityscape, neon-lit street viewed from low angle';
+      colorPalette = 'gradient from coral pink to deep magenta to midnight blue, electric cyan accents';
+      typography = 'Japanese typography in thin retro serif type';
+      texture = 'vintage VHS scan-line texture, warm tape saturation, dust scratches';
+    } else if (/shanghai|vintage|crooner|1940/.test(allTerms)) {
+      aesthetic = '1940s old Shanghai vintage poster aesthetic, art deco reference';
+      scene = 'silhouette of a woman in qipao dress against shanghai bund at dusk, smoking jazz lounge interior';
+      colorPalette = 'sepia tones, vintage gold, faded burgundy, smoke gray';
+      typography = 'classical chinese calligraphy in vertical layout';
+      texture = 'aged paper texture, film grain, vintage halftone print';
+    } else if (/lo-fi|narrative|dark jazz/.test(allTerms)) {
+      aesthetic = 'cinematic noir film poster aesthetic, lo-fi storytelling vibe';
+      scene = 'dimly lit interior with single warm desk lamp, vinyl record on turntable, abstract shadows';
+      colorPalette = 'deep navy, burnt sienna, candlelight gold, charcoal black';
+      typography = 'classic serif title in cinematic style';
+      texture = 'film grain, vinyl crackle visualization, soft chromatic aberration';
+    } else if (/hyperpop|glitch|experimental/.test(allTerms)) {
+      aesthetic = 'hyperpop glitch art aesthetic, post-internet visual culture';
+      scene = 'distorted portrait fragmented into pixels, vaporwave geometric shapes overlapping';
+      colorPalette = 'neon hot pink, electric green, glitch cyan, pure white on black';
+      typography = 'distorted Y2K display font, broken digital text';
+      texture = 'CRT scan lines, datamosh artifacts, chromatic aberration glitch';
+    } else if (/techno|tribal|industrial/.test(allTerms)) {
+      aesthetic = 'dark techno club poster aesthetic, Berghain visual reference';
+      scene = 'minimalist black space with single beam of light, abstract geometric concrete texture';
+      colorPalette = 'pure black, industrial gray, single accent of blood red or warning orange';
+      typography = 'bold sans-serif in monolithic block letters';
+      texture = 'concrete texture, smoke haze, sharp high-contrast lighting';
+    } else if (/healing|ambient|spa/.test(allTerms)) {
+      aesthetic = 'minimalist healing aesthetic, spa branding visual style';
+      scene = 'soft gradient field with single zen element, water ripple or candle flame';
+      colorPalette = 'sage green, dusty rose, oat beige, warm cream';
+      typography = 'thin sans-serif in airy spacing';
+      texture = 'subtle paper grain, soft watercolor wash, gentle film grain';
+    } else if (/indie|folk|dream|bedroom/.test(allTerms)) {
+      aesthetic = 'indie bedroom pop aesthetic, polaroid memory vibe';
+      scene = 'sun-faded memory of an empty room, curtain drifting in afternoon light';
+      colorPalette = 'faded peach, dusty lavender, warm cream, sepia';
+      typography = 'handwritten script or vintage typewriter font';
+      texture = 'polaroid film texture, light leak, soft focus blur';
+    } else {
+      aesthetic = 'cinematic film poster aesthetic';
+      scene = 'evocative scene matching the song mood';
+      colorPalette = 'warm filmic color grading';
+      typography = 'classic serif title';
+      texture = '35mm film grain, soft chromatic depth';
+    }
+
+    // 2. 情緒覆蓋（讓場景更精準）
+    let moodOverlay = '';
+    if (/想哭|孤單|解脫/.test(moodAll)) {
+      moodOverlay = 'bittersweet melancholic yet liberating mood, soft tears with quiet smile';
+    } else if (/興奮|爆發|衝突/.test(moodAll)) {
+      moodOverlay = 'electric euphoric tension, charged atmosphere';
+    } else if (/夢幻|迷幻|療癒/.test(moodAll)) {
+      moodOverlay = 'dreamy ethereal floating quality, soft hazy atmosphere';
+    } else if (/懷舊|溫暖/.test(moodAll)) {
+      moodOverlay = 'nostalgic warm tender mood, golden hour glow';
+    } else if (/懸疑|深沉/.test(moodAll)) {
+      moodOverlay = 'mysterious cinematic tension, low-key dramatic lighting';
+    } else {
+      moodOverlay = 'evocative emotional atmosphere matching the song';
+    }
+
+    // 3. 組裝完整 prompt
+    const parts = [
+      scene,
+      aesthetic,
+      colorPalette,
+      typography,
+      texture,
+      moodOverlay,
+      'shot on 35mm film, cinematic depth of field',
+      composition,
+    ].filter(Boolean);
+
+    return parts.join(', ');
+  }
+
   // ---------- 下一首推薦（同 Voice 衍生）----------
   function suggestNextSong(a, voiceName, pair) {
     if (a.vocal === '純配樂') {
@@ -1029,7 +1127,7 @@
   }
 
   // ---------- 結果頁渲染 ----------
-  function showResult({ composed, lyrics, voice, songNames, nextSong, checks }) {
+  function showResult({ composed, lyrics, voice, songNames, nextSong, coverPrompt, checks }) {
     showScreen('screen-result');
 
     // Style 字串
@@ -1066,6 +1164,11 @@
 
     // 下一首推薦
     $('#nextsong-text').textContent = nextSong;
+
+    // 封面 prompt
+    if (coverPrompt && $('#cover-output')) {
+      $('#cover-output').value = coverPrompt;
+    }
 
     // Reasoning 摘要
     $('#result-sub').textContent = composed.reasoning.join(' · ');
@@ -1185,12 +1288,19 @@
       reasoning: [`範本：${t.nameZh}`, `情境：${t.scenario}`],
     };
     const checks = runChecklist(t.style, t.exclude || '');
+    // 範本也生封面 prompt（用範本的元素假裝答案）
+    const fakeAnswers = {
+      mood: '', moodChips: [t.tags?.[0] || ''], elements: [],
+      vocal: t.style.includes('no vocal') ? '純配樂' : '女聲',
+    };
+    const coverPrompt = suggestCoverPrompt(fakeAnswers, { primary: t.nameEn, secondary: t.nameZh, tertiary: '' }, t.voice);
     showResult({
       composed,
       lyrics: t.structure,
       voice: t.voice || t.persona || '溫柔嗓',
       songNames: t.songNames || ['〈待命名〉', '〈第一首〉', '〈未完成〉'],
       nextSong: `滿意這版後存成 Voice「${t.voice || '溫柔嗓'}」，下次同系列直接套同一顆音色。`,
+      coverPrompt,
       checks,
     });
   }

@@ -930,6 +930,10 @@ body::before {
 
 .nextsong-card { background: var(--c-paper-deep); border-left: 3px solid var(--c-gold); }
 
+.cover-card { border-top: 3px solid var(--c-mint); background: #fff; }
+.cover-output { min-height: 120px; font-family: var(--font-mono); font-size: var(--fs-small); color: var(--c-ink); line-height: 1.7; }
+.cover-hint { font-size: var(--fs-small); color: var(--c-ink-soft); margin-top: var(--sp-3); line-height: 1.7; }
+
 /* 保留舊 persona class 相容 */
 .persona-card { background: var(--c-paper-deep); border: 1px solid var(--c-line); }
 .persona-output {
