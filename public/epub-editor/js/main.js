@@ -717,7 +717,7 @@ h1, h2, h3, h4, h5, h6 { font-family: "${realFamily}", "CustomUserFont", sans-se
   }
 
   if (isVertical) {
-    css += `html, body {
+    css += `html, body, body * {
   writing-mode: vertical-rl !important;
   -webkit-writing-mode: vertical-rl !important;
   -epub-writing-mode: vertical-rl !important;
@@ -725,7 +725,7 @@ h1, h2, h3, h4, h5, h6 { font-family: "${realFamily}", "CustomUserFont", sans-se
 }\n`;
   } else {
     // 橫排：強制覆蓋原 EPUB 可能存在的直排設定
-    css += `html, body {
+    css += `html, body, body * {
   writing-mode: horizontal-tb !important;
   -webkit-writing-mode: horizontal-tb !important;
   -epub-writing-mode: horizontal-tb !important;
@@ -824,40 +824,20 @@ async function injectStyleIntoCSS(zip) {
     return CONTENT_EXTENSIONS.includes(ext);
   });
 
-  // 把 CSS 檔名（去掉路徑）建成 set 方便比對
-  const cssBasenames = new Set(cssFiles.map(f => f.split('/').pop().toLowerCase()));
-
+  // 不管章節有沒有引用 CSS，一律在 head 最尾端注入 inline <style>。
+  // 這樣 inline 規則永遠在外部 CSS 之後解析、永遠贏，避免外部 CSS 寫死方向時蓋不過。
   for (const filename of xhtmlFiles) {
     let content = await zip.files[filename].async('string');
-    // 看 head 裡有沒有 <link rel="stylesheet"> 引用任何我們處理過的 CSS
-    let referencesCss = false;
-    if (cssBasenames.size > 0) {
-      const linkMatches = content.match(/<link[^>]+rel=["']stylesheet["'][^>]*>/gi) || [];
-      for (const link of linkMatches) {
-        const hrefMatch = link.match(/href=["']([^"']+)["']/i);
-        if (hrefMatch) {
-          const referenced = hrefMatch[1].split('/').pop().toLowerCase();
-          if (cssBasenames.has(referenced)) {
-            referencesCss = true;
-            break;
-          }
-        }
-      }
+    const overrides = generateStyleOverrides(filename);
+    const styleTag = `<style type="text/css">${overrides}</style>`;
+    if (content.includes('</head>')) {
+      content = content.replace('</head>', styleTag + '</head>');
+    } else if (content.match(/<body[^>]*>/i)) {
+      content = content.replace(/(<body[^>]*>)/i, styleTag + '$1');
+    } else {
+      content = styleTag + content;
     }
-    // 沒引用任何我們的 CSS → 注入 inline <style>
-    if (!referencesCss) {
-      const overrides = generateStyleOverrides(filename);
-      const styleTag = `<style type="text/css">${overrides}</style>`;
-      if (content.includes('</head>')) {
-        content = content.replace('</head>', styleTag + '</head>');
-      } else if (content.match(/<body[^>]*>/i)) {
-        content = content.replace(/(<body[^>]*>)/i, styleTag + '$1');
-      } else {
-        // 沒 head 也沒 body（極少見）就直接前綴
-        content = styleTag + content;
-      }
-      zip.file(filename, content);
-    }
+    zip.file(filename, content);
   }
 }
 
