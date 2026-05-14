@@ -73,6 +73,84 @@ function getCustomFontMeta(file) {
   return { ext: 'ttf', mime: 'font/ttf', format: 'truetype' };
 }
 
+// WOFF (v1) → TTF：純瀏覽器解壓，無外部依賴
+// WOFF v1 格式：12 bytes header + table directory (20 bytes per entry) + 各 table 資料（可能 zlib 壓縮）
+// 還原成 SFNT (TTF) 結構：12 bytes header + table directory (16 bytes per entry) + 原始 table 資料
+async function decompressWoffToTtf(woffArrayBuffer) {
+  const view = new DataView(woffArrayBuffer);
+  const signature = view.getUint32(0);
+  if (signature !== 0x774F4646) throw new Error('不是合法的 WOFF 檔（magic 不符）');
+  const flavor = view.getUint32(4);
+  const numTables = view.getUint16(12);
+
+  // 解 WOFF table directory
+  const tables = [];
+  let dirOffset = 44;
+  for (let i = 0; i < numTables; i++) {
+    tables.push({
+      tag: view.getUint32(dirOffset),
+      offset: view.getUint32(dirOffset + 4),
+      compLength: view.getUint32(dirOffset + 8),
+      origLength: view.getUint32(dirOffset + 12),
+      origChecksum: view.getUint32(dirOffset + 16),
+    });
+    dirOffset += 20;
+  }
+
+  // 解壓每個 table（compLength < origLength 表示有用 zlib 壓縮）
+  const woffBytes = new Uint8Array(woffArrayBuffer);
+  for (const t of tables) {
+    const slice = woffBytes.subarray(t.offset, t.offset + t.compLength);
+    if (t.compLength < t.origLength) {
+      const stream = new Response(new Blob([slice]).stream().pipeThrough(new DecompressionStream('deflate')));
+      const buf = await stream.arrayBuffer();
+      t.data = new Uint8Array(buf);
+    } else {
+      t.data = new Uint8Array(slice);
+    }
+  }
+
+  // 組 SFNT：header 12 + directory (numTables * 16) + table data（每個 table 對齊 4 bytes）
+  const headerSize = 12 + numTables * 16;
+  let bodySize = 0;
+  for (const t of tables) {
+    bodySize += t.data.byteLength;
+    const pad = (4 - (t.data.byteLength % 4)) % 4;
+    bodySize += pad;
+  }
+  const ttf = new ArrayBuffer(headerSize + bodySize);
+  const ttfView = new DataView(ttf);
+  const ttfBytes = new Uint8Array(ttf);
+
+  // SFNT header
+  ttfView.setUint32(0, flavor);
+  ttfView.setUint16(4, numTables);
+  // searchRange / entrySelector / rangeShift（hb-subset 不嚴格驗證，但補上比較乾淨）
+  let entrySelector = 0;
+  let searchRange = 1;
+  while (searchRange * 2 <= numTables) { searchRange *= 2; entrySelector++; }
+  searchRange *= 16;
+  ttfView.setUint16(6, searchRange);
+  ttfView.setUint16(8, entrySelector);
+  ttfView.setUint16(10, numTables * 16 - searchRange);
+
+  // 寫 table directory + table data
+  let dataOffset = headerSize;
+  let dirCursor = 12;
+  for (const t of tables) {
+    ttfView.setUint32(dirCursor, t.tag);
+    ttfView.setUint32(dirCursor + 4, t.origChecksum);
+    ttfView.setUint32(dirCursor + 8, dataOffset);
+    ttfView.setUint32(dirCursor + 12, t.data.byteLength);
+    dirCursor += 16;
+    ttfBytes.set(t.data, dataOffset);
+    dataOffset += t.data.byteLength;
+    const pad = (4 - (t.data.byteLength % 4)) % 4;
+    dataOffset += pad;
+  }
+  return ttf;
+}
+
 // HarfBuzz WASM 子集化 — 從 jsDelivr CDN 動態載入
 let _hbExportsPromise = null;
 function loadHbSubset() {
@@ -164,6 +242,9 @@ function readFontFamilyName(arrayBuffer) {
   try {
     const view = new DataView(arrayBuffer);
     const sfnt = view.getUint32(0);
+    // 0x00010000 TTF / 0x4F54544F "OTTO" / 0x74727565 "true" / 0x774F4646 "wOFF" / 0x774F4632 "wOF2"
+    // WOFF/WOFF2 容器無法直接用此 SFNT-style 解析，但保留 magic 認識避免誤判
+    if (sfnt === 0x774F4646 || sfnt === 0x774F4632) return null;
     if (sfnt !== 0x00010000 && sfnt !== 0x4F54544F && sfnt !== 0x74727565) return null;
     const numTables = view.getUint16(4);
     let nameOffset = null;
@@ -957,15 +1038,37 @@ async function processEpub() {
 
         updateProgress(73, '載入子集化引擎...');
         const rawBuffer = await state.customFontFile.arrayBuffer();
+        const fname = (state.customFontFile.name || '').toLowerCase();
+
+        // 字體格式預處理：WOFF → 解壓成 TTF；WOFF2 → 暫不支援子集化
+        let fontForSubset = rawBuffer;
+        if (fname.endsWith('.woff2')) {
+          showToast('WOFF2 格式暫不支援子集化，將整顆字體嵌入（檔案會較大）。建議改用 .ttf 或 .otf', 'warning');
+          updateProgress(73, 'WOFF2 不支援子集化，直接嵌入...');
+        } else if (fname.endsWith('.woff')) {
+          try {
+            updateProgress(73, 'WOFF 解壓中...');
+            fontForSubset = await decompressWoffToTtf(rawBuffer);
+          } catch (woffErr) {
+            console.warn('WOFF 解壓失敗：', woffErr);
+            showToast('WOFF 解壓失敗，將整顆字體嵌入：' + woffErr.message, 'warning');
+            fontForSubset = rawBuffer;
+          }
+        }
+
         let fontBufferToEmbed = rawBuffer;
-        try {
-          fontBufferToEmbed = await subsetFontWithHarfBuzz(rawBuffer, codepoints);
-          const origMB = (rawBuffer.byteLength / 1048576).toFixed(2);
-          const subMB = (fontBufferToEmbed.byteLength / 1048576).toFixed(2);
-          updateProgress(74, `字體精簡完成（${origMB} MB → ${subMB} MB）`);
-        } catch (subErr) {
-          console.warn('字體子集化失敗，改用原始字體：', subErr);
-          updateProgress(74, '字體子集化失敗，改用原始字體');
+        // WOFF2 直接跳過子集化（HarfBuzz 不吃 WOFF2 容器）
+        const canSubset = !fname.endsWith('.woff2');
+        if (canSubset) {
+          try {
+            fontBufferToEmbed = await subsetFontWithHarfBuzz(fontForSubset, codepoints);
+            const origMB = (rawBuffer.byteLength / 1048576).toFixed(2);
+            const subMB = (fontBufferToEmbed.byteLength / 1048576).toFixed(2);
+            updateProgress(74, `字體精簡完成（${origMB} MB → ${subMB} MB）`);
+          } catch (subErr) {
+            console.warn('字體子集化失敗，改用原始字體：', subErr);
+            updateProgress(74, '字體子集化失敗，改用原始字體');
+          }
         }
 
         const realName = readFontFamilyName(fontBufferToEmbed);
