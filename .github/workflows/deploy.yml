@@ -29,7 +29,7 @@ jobs:
         run: npm run build
 
       - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy dist --project-name=tools-helloruru --commit-dirty=true
+        run: npx wrangler pages deploy dist --project-name=tools-helloruru --commit-dirty=true --commit-hash="$GITHUB_SHA" --commit-message="Deploy $GITHUB_SHA"
         env:
           CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
           CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
